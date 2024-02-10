@@ -1,7 +1,7 @@
 [versions]
 
 kotlin = "1.9.21"
-compose = "1.5.11"
+compose = "1.6.0-beta02"
 agp = "8.2.0"
 androidx-appcompat = "1.6.1"
 androidx-activityCompose = "1.8.1"
@@ -22,12 +22,26 @@ kstore = "0.7.1"
 sqlDelight = "2.0.1"
 apollo = "4.0.0-beta.4"
 
+
+#firebase
+google-services = "4.4.1"
+firebase-database-ktx = "20.3.0"
+firebase-firestore-ktx = "24.10.2"
+firebase-storage-ktx = "20.3.0"
+firebase-common-ktx = "20.4.2"
+firebase-auth-ktx = "22.3.1"
+gson = "2.8.8"
+play-services-auth = "20.7.0"
+
 [libraries]
 
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-appcompat" }
 androidx-activityCompose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
 compose-uitooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose-uitooling" }
 voyager-navigator = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyager" }
+voyager-screenmodel = { module = "cafe.adriel.voyager:voyager-screenmodel", version.ref = "voyager" }
+voyager-tabnavigator = { module = "cafe.adriel.voyager:voyager-tab-navigator", version.ref = "voyager" }
+voyager-transitions = { module = "cafe.adriel.voyager:voyager-transitions", version.ref = "voyager" }
 composeImageLoader = { module = "io.github.qdsfdhvh:image-loader", version.ref = "composeImageLoader" }
 napier = { module = "io.github.aakira:napier", version.ref = "napier" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
@@ -52,6 +66,15 @@ sqlDelight-driver-native = { module = "app.cash.sqldelight:native-driver", versi
 sqlDelight-driver-js = { module = "app.cash.sqldelight:web-worker-driver", version.ref = "sqlDelight" }
 apollo-runtime = { module = "com.apollographql.apollo3:apollo-runtime", version.ref = "apollo" }
 
+#firebase
+firebase-database-ktx = {group = "com.google.firebase", name = "firebase-database-ktx", version.ref = "firebase-database-ktx"}
+firebase-auth-ktx = {group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebase-auth-ktx"}
+firebase-firestore-ktx = {group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebase-firestore-ktx"}
+firebase-storage-ktx = {group = "com.google.firebase", name = "firebase-storage-ktx", version.ref = "firebase-storage-ktx"}
+firebase-common-ktx = {group = "com.google.firebase", name = "firebase-common-ktx", version.ref = "gson"}
+playservices-auth = {module = "com.google.android.gms:play-services-auth", version.ref = "play-services-auth"}
+google-gson = {group = "com.google.code.gson", name = "gson", version.ref = "gson"}
+
 [plugins]
 
 multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
@@ -61,3 +84,4 @@ buildConfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildConfig
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 sqlDelight = { id = "app.cash.sqldelight", version.ref = "sqlDelight" }
 apollo = { id = "com.apollographql.apollo3", version.ref = "apollo" }
+google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }

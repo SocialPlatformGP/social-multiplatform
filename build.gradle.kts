@@ -6,4 +6,5 @@ plugins {
     alias(libs.plugins.kotlinx.serialization).apply(false)
     alias(libs.plugins.sqlDelight).apply(false)
     alias(libs.plugins.apollo).apply(false)
+    alias(libs.plugins.google.services).apply(false)
 }

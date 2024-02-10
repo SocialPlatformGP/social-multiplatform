@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.sqlDelight)
     alias(libs.plugins.apollo)
+    alias(libs.plugins.google.services)
 }
 
 kotlin {
@@ -39,6 +40,9 @@ kotlin {
             @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
             implementation(compose.components.resources)
             implementation(libs.voyager.navigator)
+            implementation(libs.voyager.screenmodel)
+            implementation(libs.voyager.tabnavigator)
+            implementation(libs.voyager.transitions)
             implementation(libs.composeImageLoader)
             implementation(libs.napier)
             implementation(libs.kotlinx.coroutines.core)
@@ -88,7 +92,7 @@ android {
     compileSdk = 34
 
     defaultConfig {
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
 
         applicationId = "com.gp.socialapp.androidApp"
