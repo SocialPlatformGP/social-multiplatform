@@ -55,6 +55,7 @@ kotlin {
             implementation(libs.koin.core)
             implementation(libs.kstore)
             implementation(libs.apollo.runtime)
+
         }
 
         commonTest.dependencies {
@@ -68,6 +69,7 @@ kotlin {
             implementation(libs.kotlinx.coroutines.android)
             implementation(libs.ktor.client.okhttp)
             implementation(libs.sqlDelight.driver.android)
+            implementation(compose.preview)
         }
 
         jvmMain.dependencies {
@@ -115,6 +117,7 @@ android {
         kotlinCompilerExtensionVersion = "1.5.4"
     }
 }
+
 
 compose.desktop {
     application {
