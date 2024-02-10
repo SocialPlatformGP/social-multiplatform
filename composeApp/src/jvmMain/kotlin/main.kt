@@ -5,7 +5,7 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import java.awt.Dimension
-import com.gp.socialapp.App
+import com.gp.socialapp.presentation.app.App
 
 fun main() = application {
     Window(

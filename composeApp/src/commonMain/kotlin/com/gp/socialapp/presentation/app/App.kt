@@ -1,4 +1,4 @@
-package com.gp.socialapp
+package com.gp.socialapp.presentation.app
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

@@ -21,6 +21,7 @@ koin = "3.5.3"
 kstore = "0.7.1"
 sqlDelight = "2.0.1"
 apollo = "4.0.0-beta.4"
+dotsIndicator = "5.0"
 
 
 #firebase
@@ -65,6 +66,7 @@ sqlDelight-driver-android = { module = "app.cash.sqldelight:android-driver", ver
 sqlDelight-driver-native = { module = "app.cash.sqldelight:native-driver", version.ref = "sqlDelight" }
 sqlDelight-driver-js = { module = "app.cash.sqldelight:web-worker-driver", version.ref = "sqlDelight" }
 apollo-runtime = { module = "com.apollographql.apollo3:apollo-runtime", version.ref = "apollo" }
+dotsindicator = { module = "com.tbuonomo:dotsindicator", version.ref = "dotsIndicator" }
 
 #firebase
 firebase-database-ktx = {group = "com.google.firebase", name = "firebase-database-ktx", version.ref = "firebase-database-ktx"}
