@@ -1,5 +1,6 @@
 package com.gp.socialapp.presentation.material
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,7 +11,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
 
-object MaterialScreen: Screen {
+data class MaterialScreen(
+    val name: String = ""
+): Screen {
     @Composable
     override fun Content() {
         Column (
@@ -19,8 +22,8 @@ object MaterialScreen: Screen {
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "Material Screen",
-                style = MaterialTheme.typography.displaySmall
+                text = "Material Screen $name",
+                style = MaterialTheme.typography.displaySmall,
             )
         }
     }

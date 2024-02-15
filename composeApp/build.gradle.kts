@@ -57,7 +57,6 @@ kotlin {
             implementation(libs.koin.core)
             implementation(libs.kstore)
             implementation(libs.apollo.runtime)
-
         }
 
         commonTest.dependencies {

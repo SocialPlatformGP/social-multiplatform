@@ -1,3 +1,4 @@
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.CanvasBasedWindow
 import com.gp.socialapp.presentation.app.App
@@ -11,4 +12,5 @@ fun main() {
         }
     }
 }
+
 
