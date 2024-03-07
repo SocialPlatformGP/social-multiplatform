@@ -2,11 +2,11 @@
 
 kotlin = "1.9.21"
 compose = "1.6.0-beta02"
-agp = "8.2.1"
+agp = "8.2.2"
 androidx-appcompat = "1.6.1"
-androidx-activityCompose = "1.8.1"
-compose-uitooling = "1.5.4"
-voyager = "1.0.0"
+androidx-activityCompose = "1.8.2"
+compose-uitooling = "1.6.1"
+voyager = "1.1.0-alpha03"
 composeImageLoader = "1.7.1"
 napier = "2.7.0"
 buildConfig = "4.1.1"
@@ -24,15 +24,6 @@ apollo = "4.0.0-beta.4"
 dotsIndicator = "5.0"
 
 
-#firebase
-google-services = "4.4.1"
-firebase-database-ktx = "20.3.0"
-firebase-firestore-ktx = "24.10.2"
-firebase-storage-ktx = "20.3.0"
-firebase-common-ktx = "20.4.2"
-firebase-auth-ktx = "22.3.1"
-gson = "2.8.8"
-play-services-auth = "20.7.0"
 
 [libraries]
 
@@ -68,14 +59,6 @@ sqlDelight-driver-js = { module = "app.cash.sqldelight:web-worker-driver", versi
 apollo-runtime = { module = "com.apollographql.apollo3:apollo-runtime", version.ref = "apollo" }
 dotsindicator = { module = "com.tbuonomo:dotsindicator", version.ref = "dotsIndicator" }
 
-#firebase
-firebase-database-ktx = {group = "com.google.firebase", name = "firebase-database-ktx", version.ref = "firebase-database-ktx"}
-firebase-auth-ktx = {group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebase-auth-ktx"}
-firebase-firestore-ktx = {group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebase-firestore-ktx"}
-firebase-storage-ktx = {group = "com.google.firebase", name = "firebase-storage-ktx", version.ref = "firebase-storage-ktx"}
-firebase-common-ktx = {group = "com.google.firebase", name = "firebase-common-ktx", version.ref = "gson"}
-playservices-auth = {module = "com.google.android.gms:play-services-auth", version.ref = "play-services-auth"}
-google-gson = {group = "com.google.code.gson", name = "gson", version.ref = "gson"}
 
 [plugins]
 
@@ -86,4 +69,3 @@ buildConfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildConfig
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 sqlDelight = { id = "app.cash.sqldelight", version.ref = "sqlDelight" }
 apollo = { id = "com.apollographql.apollo3", version.ref = "apollo" }
-google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }

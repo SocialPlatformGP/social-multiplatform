@@ -29,18 +29,10 @@ import com.gp.socialapp.tabs.PostsTab
 import com.gp.socialapp.theme.AppTheme
 import kotlinx.serialization.json.JsonNull.content
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun App() = AppTheme {
-    var index by remember { mutableStateOf(0) }
     TabNavigator(PostsTab) {
         Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = {
-                    Text("EduLink")
-                })
-            },
             content = {
                 CurrentTab()
             },

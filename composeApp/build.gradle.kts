@@ -10,7 +10,7 @@ plugins {
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.sqlDelight)
     alias(libs.plugins.apollo)
-    alias(libs.plugins.google.services)
+//    alias(libs.plugins.google.services)
 }
 
 kotlin {
