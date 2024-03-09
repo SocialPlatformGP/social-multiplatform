@@ -45,6 +45,7 @@ kotlin {
             implementation(libs.voyager.screenmodel)
             implementation(libs.voyager.tabnavigator)
             implementation(libs.voyager.transitions)
+            implementation(libs.voyager.koin)
             implementation(libs.composeImageLoader)
             implementation(libs.napier)
             implementation(libs.kotlinx.coroutines.core)
@@ -57,6 +58,7 @@ kotlin {
             implementation(libs.koin.core)
             implementation(libs.kstore)
             implementation(libs.apollo.runtime)
+            implementation(libs.koin.compose)
         }
 
         commonTest.dependencies {
