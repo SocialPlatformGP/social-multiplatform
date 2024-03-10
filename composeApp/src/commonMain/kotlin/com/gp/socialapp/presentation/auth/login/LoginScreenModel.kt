@@ -35,9 +35,20 @@ class LoginScreenModel(
             with(_uiState.value){
                 val state = authRepo.signInUser(email, password)
                 state.collect{
-                    _uiState.value = _uiState.value.copy(signInResult = it, passwordError = "", emailError = "")
-                    if(it is Result.Error){
-                        _uiState.value = _uiState.value.copy(passwordError = it.message)
+                    when(it){
+                        is Result.SuccessWithData -> {
+                            _uiState.value = _uiState.value.copy(
+                                token = it.data,
+                                serverErrorMessage = ""
+                            )
+                        }
+                        is Result.Error -> {
+                            _uiState.value = _uiState.value.copy(
+                                token = "",
+                                serverErrorMessage = it.message
+                            )
+                        }
+                        else->Unit
                     }
                 }
             }

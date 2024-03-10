@@ -10,5 +10,5 @@ data class SignUpUiState(
     var rePassword: String = "",
     var error: SignUpError = SignUpError.NoError,
     var isSignedUp: Result<User> = Result.Idle,
-    var userExists: Result<Boolean> = Result.Idle
+    var isEmailAvaliable: Boolean=false,
 )

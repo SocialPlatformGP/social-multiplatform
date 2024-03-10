@@ -9,5 +9,6 @@ data class LoginUiState(
     var emailError: String = "",
     var password: String = "",
     var passwordError: String = "",
-    var signInResult: Result<User> = Result.Idle,
+    var token: String = "",
+    var serverErrorMessage: String = "",
 )
