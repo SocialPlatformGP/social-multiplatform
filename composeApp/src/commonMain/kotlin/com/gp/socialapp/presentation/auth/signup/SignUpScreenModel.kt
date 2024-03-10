@@ -58,7 +58,6 @@ class SignUpScreenModel(
                 authRepo.isEmailAvailable(email).collect{
                     when (it){
                         is Result.SuccessWithData -> {
-                            _uiState.value = _uiState.value.copy(userExists = it)
                             if (it.data) {
                                 _uiState.value = _uiState.value.copy(
                                     error = NoError,
