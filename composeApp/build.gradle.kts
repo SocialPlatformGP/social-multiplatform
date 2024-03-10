@@ -77,6 +77,7 @@ kotlin {
             implementation(libs.ktor.client.okhttp)
             implementation(libs.sqlDelight.driver.android)
             implementation(compose.preview)
+            implementation(libs.koin.android)
         }
 
         jvmMain.dependencies {

@@ -7,8 +7,8 @@ import kotlinx.coroutines.flow.Flow
 class AuthenticationRepositoryImpl(
     private val remoteDataSource: AuthenticationRemoteDataSource
 ): AuthenticationRepository {
-    override fun isUserExists(email: String, password: String): Flow<Result<Boolean>> =
-        remoteDataSource.isUserExists(email, password)
+    override fun isEmailAvailable(email: String): Flow<Result<Boolean>> =
+        remoteDataSource.isEmailAvailable(email)
 
     override fun signInUser(email: String, password: String) = remoteDataSource.signInUser(email, password)
 

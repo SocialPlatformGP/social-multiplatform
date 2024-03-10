@@ -1,16 +1,16 @@
 package com.gp.socialapp.data.auth.source.remote
 
-import com.gp.socialapp.data.auth.source.remote.model.CheckUserExistRequest
+import com.gp.socialapp.data.auth.source.remote.model.IsEmailAvailableRequest
 import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.util.Result
 import io.github.aakira.napier.Napier
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.HttpRequestBuilder
-import io.ktor.client.request.get
-import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsText
+import io.ktor.client.statement.readText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
@@ -39,22 +39,31 @@ class AuthenticationRemoteDataSourceImpl : AuthenticationRemoteDataSource {
             contentType(ContentType.Application.Json)
         }
     }
-    override fun isUserExists(email: String, password: String): Flow<Result<Boolean>> {
-
+    override fun isEmailAvailable(email: String): Flow<Result<Boolean>> {
+        println("isEmailAvailable: $email")
         return flow {
             emit(Result.Loading)
-            val response = httpClient.post {
-                endPoint("checkExistUser")
-                setBody(
-                    CheckUserExistRequest(
-                        email = email,
-                        password = password
+            try{
+                val response = httpClient.post {
+                    endPoint("isEmailAvailable")
+                    setBody(
+                        IsEmailAvailableRequest(
+                            email = email
+                        )
                     )
-                )
+                }
+                println("isUserExists: ${response.status.description}")
+                Napier.d("isUserExists: ${response.status.description}")
+                Napier.d("isUserExists: ${response.status.value}")
+                Napier.d("isUserExists: ${response.bodyAsText()}")
+                if (response.status == HttpStatusCode.OK) {
+                    emit(Result.SuccessWithData(response.status.isSuccess()))
+                } else {
+                    emit(Result.Error(response.bodyAsText()))
+                }
+            } catch (e: Exception) {
+                emit(Result.Error(e.message?:"Null"))
             }
-            Napier.d("isUserExists: ${response.status.description}")
-            Napier.d("isUserExists: ${response.status.value}")
-            emit(Result.SuccessWithData(response.status.isSuccess()))
         }
     }
 

@@ -2,22 +2,14 @@ package com.gp.socialapp.presentation.app
 
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.navigator.Navigator
-import cafe.adriel.voyager.navigator.tab.CurrentTab
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
-import cafe.adriel.voyager.navigator.tab.TabNavigator
-import com.gp.socialapp.di.appModule
-import com.gp.socialapp.navigation.tabs.ChatTab
-import com.gp.socialapp.navigation.tabs.MaterialTab
-import com.gp.socialapp.presentation.auth.login.LoginScreen
+import com.gp.socialapp.di.appModules
 import com.gp.socialapp.presentation.auth.signup.SignUpScreen
 
-import com.gp.socialapp.tabs.PostsTab
 import com.gp.socialapp.theme.AppTheme
 import org.koin.compose.KoinApplication
 import org.koin.compose.KoinContext
@@ -25,7 +17,7 @@ import org.koin.compose.KoinContext
 @Composable
 internal fun App() {
     KoinApplication(application = ({
-        modules(appModule)
+        modules(appModules)
     })) {
         AppTheme {
 //            TabNavigator(PostsTab) {

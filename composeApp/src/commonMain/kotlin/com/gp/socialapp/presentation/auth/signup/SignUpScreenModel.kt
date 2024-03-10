@@ -3,6 +3,8 @@ package com.gp.socialapp.presentation.auth.signup
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.gp.socialapp.data.auth.repository.AuthenticationRepository
+import com.gp.socialapp.util.Result
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -12,6 +14,7 @@ class SignUpScreenModel(
 ) : ScreenModel{
     val uiState = MutableStateFlow(SignUpUiState())
     fun onSignUp(){
+        //TODO: Validate Email & Password
         screenModelScope.launch {
             Napier.d ("onSignUp: ${uiState.value}")
             println("onSignUp: ${uiState.value}")
