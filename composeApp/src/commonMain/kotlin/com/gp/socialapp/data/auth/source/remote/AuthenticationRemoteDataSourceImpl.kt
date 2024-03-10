@@ -43,7 +43,7 @@ class AuthenticationRemoteDataSourceImpl : AuthenticationRemoteDataSource {
         return flow {
             emit(Result.Loading)
             val response = httpClient.post {
-                endPoint("isUserExists")
+                endPoint("checkExistUser")
                 setBody(
                     CheckUserExistRequest(
                         email = email,
