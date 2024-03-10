@@ -22,4 +22,8 @@
    <string name="date_of_birth">Date of Birth</string>
    <string name="about">About</string>
    <string name="complete_profile">Complete Profile</string>
+   <string name="invalid_email">Invalid Email</string>
+   <string name="email_already_exists">Email already exists</string>
+   <string name="invalid_password">Invalid Password</string>
+   <string name="passwords_dont_match">Passwords don't match</string>
 </resources>

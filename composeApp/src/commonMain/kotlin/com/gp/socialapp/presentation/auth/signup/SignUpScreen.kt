@@ -38,6 +38,12 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.getNavigatorScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.gp.socialapp.presentation.auth.userinfo.UserInformationScreen
+import com.gp.socialapp.util.Result
+import com.gp.socialapp.util.SignUpError.EmailError
+import com.gp.socialapp.util.SignUpError.NoError
+import com.gp.socialapp.util.SignUpError.PasswordError
+import com.gp.socialapp.util.SignUpError.RePasswordError
 import org.jetbrains.compose.resources.stringResource
 import socialmultiplatform.composeapp.generated.resources.Res
 
@@ -47,11 +53,14 @@ object SignUpScreen : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = navigator.getNavigatorScreenModel<SignUpScreenModel>()
         val state by screenModel.uiState.collectAsState()
+        if(state.isSignedUp is Result.Success) {
+            navigator.push(UserInformationScreen(state.email, state.password))
+        }
         Scaffold { paddingValues ->
             SignUpContent(
                 paddingValues = paddingValues,
                 state = state,
-                onNavigateToLoginScreen = {/*todo*/ },
+                onNavigateToLoginScreen = {navigator.pop()},
                 onCreateAccount = {screenModel.onSignUp()},
                 onEmailChange = { screenModel.onEmailChange(it) },
                 onPasswordChange = { screenModel.onPasswordChange(it) },
@@ -100,6 +109,12 @@ object SignUpScreen : Screen {
                         contentDescription = null,
                     )
                 },
+                isError = state.error is EmailError,
+                supportingText = {
+                    if (state.error is EmailError) {
+                        Text(text = (state.error as EmailError).message)
+                    }
+                },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
             )
@@ -115,6 +130,12 @@ object SignUpScreen : Screen {
                         imageVector = Icons.Filled.Lock,
                         contentDescription = null,
                     )
+                },
+                isError = state.error is PasswordError,
+                supportingText = {
+                    if (state.error is PasswordError) {
+                        Text(text = (state.error as PasswordError).message)
+                    }
                 },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -140,6 +161,12 @@ object SignUpScreen : Screen {
                         imageVector = Icons.Filled.Lock,
                         contentDescription = null,
                     )
+                },
+                isError = state.error is RePasswordError,
+                supportingText = {
+                    if (state.error is RePasswordError) {
+                        Text(text = (state.error as RePasswordError).message)
+                    }
                 },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
