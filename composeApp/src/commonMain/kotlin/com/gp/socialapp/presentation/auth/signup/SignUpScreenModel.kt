@@ -22,17 +22,16 @@ class SignUpScreenModel(
                 authRepo.isEmailAvailable(email).collect{
                     when (it){
                         is Result.SuccessWithData -> {
-                            uiState.value = uiState.value.copy(userExists = it)
+                            //server returned true if email is available
+                            uiState.value = uiState.value.copy(isEmailAvaliable = it.data)
                         }
                         is Result.Error -> {
                             Napier.d("onSignUp: Error ${it.message}")
-
                         }
                         else -> {
                             Napier.d("onSignUp: else")
                         }
                     }
-
                 }
             }
         }

@@ -6,14 +6,39 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class User(
+    val id: String = "",
     val firstName: String = "",
     val lastName: String = "",
     val password: String = "",
     val profilePictureURL: String = "",
     val email: String = "",
     val phoneNumber: String = "",
-    val birthdate: LocalDateTime = LocalDateTime.now(),
+    val birthdate: String ="",
     val bio: String = "",
-    val createdAt: LocalDateTime = LocalDateTime.now(),
+    val createdAt: LocalDateTime?=null,
+    val isAdmin: Boolean = false,
+){
+    fun toUserRequest() = UserRequest(
+        firstName = firstName,
+        lastName = lastName,
+        password = password,
+        profilePictureURL = profilePictureURL,
+        email = email,
+        phoneNumber = phoneNumber,
+        birthdate = birthdate,
+        bio = bio,
+        isAdmin = isAdmin
+    )
+}
+@Serializable
+data class UserRequest(
+    val firstName: String = "",
+    val lastName: String = "",
+    val password: String = "",
+    val profilePictureURL: String = "",
+    val email: String = "",
+    val phoneNumber: String = "",
+    val birthdate: String ="",
+    val bio: String = "",
     val isAdmin: Boolean = false,
 )

@@ -1,8 +1,11 @@
 package com.gp.socialapp.data.auth.repository
 
 import com.gp.socialapp.data.auth.source.remote.AuthenticationRemoteDataSource
+import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.util.Result
 import kotlinx.coroutines.flow.Flow
+import socialmultiplatform.composeapp.generated.resources.Res.string.email
+import socialmultiplatform.composeapp.generated.resources.Res.string.password
 
 class AuthenticationRepositoryImpl(
     private val remoteDataSource: AuthenticationRemoteDataSource
@@ -12,7 +15,7 @@ class AuthenticationRepositoryImpl(
 
     override fun signInUser(email: String, password: String) = remoteDataSource.signInUser(email, password)
 
-    override fun signUpUser(email: String, password: String) = remoteDataSource.signUpUser(email, password)
+    override fun signUpUser(user: User) = remoteDataSource.signUpUser(user.toUserRequest())
 
     override fun getSignedInUser() = remoteDataSource.getSignedInUser()
 

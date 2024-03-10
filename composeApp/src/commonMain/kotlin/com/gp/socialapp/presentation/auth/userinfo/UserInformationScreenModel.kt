@@ -20,7 +20,7 @@ class UserInformationScreenModel(
                     userRepo.createUser(
                         User(
                             firstName, lastName, password, "", email,
-                            phoneNumber, birthDate, bio,
+                            phoneNumber, birthDate.toString(), bio,
                         ), pfpLocalURI)
                 networkFlow.collect { state ->
                     uiState.value = uiState.value.copy(createdState = state)

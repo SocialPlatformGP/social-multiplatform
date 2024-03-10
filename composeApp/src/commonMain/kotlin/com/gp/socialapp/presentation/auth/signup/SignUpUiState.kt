@@ -8,5 +8,5 @@ data class SignUpUiState(
     var password: String = "",
     var rePassword: String = "",
     var isSignedUp: Result<User> = Result.Idle,
-    var userExists: Result<Boolean> = Result.Idle
+    var isEmailAvaliable: Boolean=false,
 )
