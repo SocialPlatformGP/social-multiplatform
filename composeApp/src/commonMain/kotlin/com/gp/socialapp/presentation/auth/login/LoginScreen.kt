@@ -50,6 +50,8 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.getNavigatorScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.gp.socialapp.presentation.auth.passwordreset.PasswordResetScreen
+import com.gp.socialapp.presentation.auth.signup.SignUpScreen
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import socialmultiplatform.composeapp.generated.resources.Res
@@ -65,8 +67,8 @@ object LoginScreen: Screen {
                 paddingValues = paddingValues,
                 onSignInWithGoogle = { /*todo*/},
                 state = state,
-                navigateToSignUp = { /*todo*/ },
-                navigateToForgotPassword = {/*todo*/},
+                navigateToSignUp = { navigator.push(SignUpScreen) },
+                navigateToForgotPassword = {navigator.push(PasswordResetScreen)},
                 onEmailChange = {screenModel.updateEmail(it)  },
                 onPasswordChange = { screenModel.updatePassword(it) },
                 onSignIn = { screenModel.onSignIn() }
@@ -156,6 +158,7 @@ object LoginScreen: Screen {
             )
             TextButton(
                 onClick = navigateToForgotPassword,
+                enabled = false,
                 modifier = Modifier
                     .padding(start = 16.dp),
             ) {

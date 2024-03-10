@@ -18,18 +18,16 @@ class LoginScreenModel(
     val uiState = _uiState.asStateFlow()
     fun onSignIn(){
         with(_uiState.value){
-            if(email.length< 6 || !Validator.EmailValidator.validateAll(email)){
+            if(!Validator.EmailValidator.validateAll(email)){
                 _uiState.value = _uiState.value.copy(emailError = "Invalid Email")
                 return
-            }
-            else{
+            } else {
                 _uiState.value = _uiState.value.copy(emailError = "")
             }
-            if(password.length < 6 || !Validator.PasswordValidator.validateAll(password)){
+            if (password.length < 6 || !Validator.PasswordValidator.validateAll(password)){
                 _uiState.value = _uiState.value.copy(passwordError = "Invalid Password")
                 return
-            }
-            else{
+            } else{
                 _uiState.value = _uiState.value.copy(passwordError = "")
             }
         }
