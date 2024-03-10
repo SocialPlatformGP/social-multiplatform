@@ -10,6 +10,7 @@ plugins {
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.sqlDelight)
     alias(libs.plugins.apollo)
+
 //    alias(libs.plugins.google.services)
 }
 
@@ -59,6 +60,9 @@ kotlin {
             implementation(libs.kstore)
             implementation(libs.apollo.runtime)
             implementation(libs.koin.compose)
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.serialization.kotlinx.json)
+
         }
 
         commonTest.dependencies {

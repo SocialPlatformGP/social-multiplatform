@@ -52,7 +52,7 @@ object SignUpScreen : Screen {
                 paddingValues = paddingValues,
                 state = state,
                 onNavigateToLoginScreen = {/*todo*/ },
-                onCreateAccount = {/*todo*/ },
+                onCreateAccount = {screenModel.onSignUp()},
                 onEmailChange = { screenModel.onEmailChange(it) },
                 onPasswordChange = { screenModel.onPasswordChange(it) },
                 onRePasswordChange = { screenModel.rePasswordChange(it) }
@@ -161,7 +161,7 @@ object SignUpScreen : Screen {
                     .height(52.dp),
             ) {
                 Text(
-                    text = Res.string.create_account,
+                    text = Res.string.create_account.toString(),
                     fontSize = 18.sp
                 )
             }

@@ -14,9 +14,9 @@ class SignUpScreenModel(
     fun onSignUp(){
         screenModelScope.launch {
             with(uiState.value){
-                val state = authRepo.signUpUser(email, password)
+                val state = authRepo.isUserExists(email, password)
                 state.collect{
-                    uiState.value = uiState.value.copy(isSignedUp = it)
+                    uiState.value = uiState.value.copy(userExists = it)
                 }
             }
         }

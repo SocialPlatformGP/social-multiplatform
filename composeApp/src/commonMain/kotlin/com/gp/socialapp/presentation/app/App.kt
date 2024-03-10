@@ -6,13 +6,17 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.tab.CurrentTab
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabNavigator
 import com.gp.socialapp.di.appModule
-import com.gp.socialapp.tabs.ChatTab
-import com.gp.socialapp.tabs.MaterialTab
+import com.gp.socialapp.navigation.tabs.ChatTab
+import com.gp.socialapp.navigation.tabs.MaterialTab
+import com.gp.socialapp.presentation.auth.login.LoginScreen
+import com.gp.socialapp.presentation.auth.signup.SignUpScreen
+
 import com.gp.socialapp.tabs.PostsTab
 import com.gp.socialapp.theme.AppTheme
 import org.koin.compose.KoinApplication
@@ -23,20 +27,23 @@ internal fun App() {
         modules(appModule)
     })) {
         AppTheme {
-            TabNavigator(PostsTab) {
-                Scaffold(
-                    content = {
-                        CurrentTab()
-                    },
-                    bottomBar = {
-                        NavigationBar {
-                            TabNavigationItem(tab = PostsTab)
-                            TabNavigationItem(tab = ChatTab)
-                            TabNavigationItem(tab = MaterialTab)
-                        }
-                    }
-                )
-            }
+//            TabNavigator(PostsTab) {
+//                Scaffold(
+//                    content = {
+//                        CurrentTab()
+//                    },
+//                    bottomBar = {
+//                        NavigationBar {
+//                            TabNavigationItem(tab = PostsTab)
+//                            TabNavigationItem(tab = ChatTab)
+//                            TabNavigationItem(tab = MaterialTab)
+//                        }
+//                    }
+//                )
+//            }
+            Navigator(
+                SignUpScreen
+            )
         }
     }
 }

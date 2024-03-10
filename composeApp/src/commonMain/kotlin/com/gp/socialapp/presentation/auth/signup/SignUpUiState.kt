@@ -7,5 +7,6 @@ data class SignUpUiState(
     var email: String = "",
     var password: String = "",
     var rePassword: String = "",
-    var isSignedUp: Result<User> = Result.Idle
+    var isSignedUp: Result<User> = Result.Idle,
+    var userExists: Result<Boolean> = Result.Idle
 )
