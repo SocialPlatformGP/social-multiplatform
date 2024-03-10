@@ -20,6 +20,7 @@ import com.gp.socialapp.presentation.auth.signup.SignUpScreen
 import com.gp.socialapp.tabs.PostsTab
 import com.gp.socialapp.theme.AppTheme
 import org.koin.compose.KoinApplication
+import org.koin.compose.KoinContext
 
 @Composable
 internal fun App() {

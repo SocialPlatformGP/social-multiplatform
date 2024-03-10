@@ -13,10 +13,23 @@ class SignUpScreenModel(
     val uiState = MutableStateFlow(SignUpUiState())
     fun onSignUp(){
         screenModelScope.launch {
+            Napier.d ("onSignUp: ${uiState.value}")
+            println("onSignUp: ${uiState.value}")
             with(uiState.value){
-                val state = authRepo.isUserExists(email, password)
-                state.collect{
-                    uiState.value = uiState.value.copy(userExists = it)
+                authRepo.isEmailAvailable(email).collect{
+                    when (it){
+                        is Result.SuccessWithData -> {
+                            uiState.value = uiState.value.copy(userExists = it)
+                        }
+                        is Result.Error -> {
+                            Napier.d("onSignUp: Error ${it.message}")
+
+                        }
+                        else -> {
+                            Napier.d("onSignUp: else")
+                        }
+                    }
+
                 }
             }
         }

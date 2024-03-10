@@ -161,7 +161,7 @@ object SignUpScreen : Screen {
                     .height(52.dp),
             ) {
                 Text(
-                    text = Res.string.create_account.toString(),
+                    text = stringResource(Res.string.create_account),
                     fontSize = 18.sp
                 )
             }
