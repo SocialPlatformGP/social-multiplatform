@@ -1,9 +1,9 @@
-package com.gp.socialapp.tabs
+package com.gp.socialapp.navigation.tabs
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.Chat
+import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.rounded.Chat
 import androidx.compose.material.icons.rounded.Public
 import androidx.compose.material3.Text
@@ -21,7 +21,7 @@ object ChatTab : Tab {
         @Composable
         get() {
             val title = "Chat"
-            val icon = rememberVectorPainter(Icons.AutoMirrored.Rounded.Chat)
+            val icon = rememberVectorPainter(Icons.Default.Chat)
 
             return remember {
                 TabOptions(
