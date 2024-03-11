@@ -10,6 +10,7 @@ plugins {
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.sqlDelight)
     alias(libs.plugins.apollo)
+
 //    alias(libs.plugins.google.services)
 }
 
@@ -45,6 +46,7 @@ kotlin {
             implementation(libs.voyager.screenmodel)
             implementation(libs.voyager.tabnavigator)
             implementation(libs.voyager.transitions)
+            implementation(libs.voyager.koin)
             implementation(libs.composeImageLoader)
             implementation(libs.napier)
             implementation(libs.kotlinx.coroutines.core)
@@ -57,6 +59,10 @@ kotlin {
             implementation(libs.koin.core)
             implementation(libs.kstore)
             implementation(libs.apollo.runtime)
+            implementation(libs.koin.compose)
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.serialization.kotlinx.json)
+
         }
 
         commonTest.dependencies {
@@ -71,6 +77,7 @@ kotlin {
             implementation(libs.ktor.client.okhttp)
             implementation(libs.sqlDelight.driver.android)
             implementation(compose.preview)
+            implementation(libs.koin.android)
         }
 
         jvmMain.dependencies {

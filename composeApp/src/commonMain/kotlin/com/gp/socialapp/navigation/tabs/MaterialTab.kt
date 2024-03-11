@@ -1,9 +1,8 @@
-package com.gp.socialapp.tabs
+package com.gp.socialapp.navigation.tabs
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.Chat
 import androidx.compose.material.icons.rounded.Folder
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
