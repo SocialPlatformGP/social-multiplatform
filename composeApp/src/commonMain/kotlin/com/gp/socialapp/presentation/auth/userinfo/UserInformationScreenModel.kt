@@ -14,6 +14,7 @@ class UserInformationScreenModel(
 ): ScreenModel {
     val uiState = MutableStateFlow(UserInformationUiState())
     fun onCompleteAccount(email: String, password: String) {
+        //TODO("Validate User Information")
         screenModelScope.launch {
             with(uiState.value) {
                 val networkFlow =

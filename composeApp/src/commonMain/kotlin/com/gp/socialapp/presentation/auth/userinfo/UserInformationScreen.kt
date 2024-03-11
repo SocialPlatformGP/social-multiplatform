@@ -76,7 +76,6 @@ data class UserInformationScreen(
                 onDateOfBirthChange = { screenModel.onBirthDateChange(it) },
                 onContinueClicked = { /*todo*/ }
             )
-
         }
     }
 
