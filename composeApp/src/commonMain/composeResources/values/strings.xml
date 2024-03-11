@@ -26,4 +26,6 @@
    <string name="email_already_exists">Email already exists</string>
    <string name="invalid_password">Invalid Password</string>
    <string name="passwords_dont_match">Passwords don't match</string>
+   <string name="select">Select</string>
+   <string name="cancel">Cancel</string>
 </resources>

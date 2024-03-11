@@ -20,11 +20,16 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.PhoneAndroid
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material3.Button
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
@@ -43,6 +48,8 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gp.socialapp.util.LocalDateTimeUtil.now
 import com.gp.socialapp.util.LocalDateTimeUtil.toDDMMYYYY
+import com.gp.socialapp.util.LocalDateTimeUtil.toLocalDateTime
+import com.gp.socialapp.util.LocalDateTimeUtil.toMillis
 import com.gp.socialapp.util.LocalDateTimeUtil.toYYYYMMDD
 import kotlinx.datetime.LocalDateTime
 import org.jetbrains.compose.resources.stringResource
@@ -66,20 +73,14 @@ data class UserInformationScreen(
                 onProfileImageClicked = { /*todo*/ },
                 onPhoneNumberChange = { screenModel.onPhoneNumberChange(it) },
                 onBioChange = { screenModel.onBioChange(it) },
-                onDateOfBirthChange = { localDate ->
-                    screenModel.onBirthDateChange(
-//                        Date.from(
-//                            localDate.atStartOfDay(ZoneId.systemDefault()).toInstant()
-//                        )
-                        LocalDateTime.now()
-                    )
-                },
+                onDateOfBirthChange = { screenModel.onBirthDateChange(it) },
                 onContinueClicked = { /*todo*/ }
             )
 
         }
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     private fun UserInformationContent(
         paddingValues: PaddingValues,
@@ -92,7 +93,7 @@ data class UserInformationScreen(
         onBioChange: (String) -> Unit = {},
         onContinueClicked: () -> Unit = {},
     ) {
-        val isDateDialogOpen by remember { mutableStateOf(false) }
+        var isDateDialogOpen by remember { mutableStateOf(false) }
         var pickedDate by remember { mutableStateOf(LocalDateTime.now()) }
         val formattedDate by remember {
             derivedStateOf {
@@ -138,17 +139,17 @@ data class UserInformationScreen(
 //                    placeholder = painterResource(id = R.drawable.baseline_person_24)
 //
 //                )
-                Icon(
-                    imageVector = Icons.Filled.PhotoCamera,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .padding(4.dp)
-                        .background(
-                            color = Color.White,
-                            shape = MaterialTheme.shapes.small
-                        ),
-                )
+//                Icon(
+//                    imageVector = Icons.Filled.PhotoCamera,
+//                    contentDescription = null,
+//                    modifier = Modifier
+//                        .align(Alignment.BottomEnd)
+//                        .padding(4.dp)
+//                        .background(
+//                            color = Color.White,
+//                            shape = MaterialTheme.shapes.small
+//                        ),
+//                )
             }
             Row {
                 OutlinedTextField(
@@ -184,7 +185,7 @@ data class UserInformationScreen(
             )
             Box(
                 modifier = Modifier.clickable {
-//                    dateDialogState.show()
+                    isDateDialogOpen = true
                 }
             ) {
                 OutlinedTextField(
@@ -195,7 +196,7 @@ data class UserInformationScreen(
                         .fillMaxWidth()
                         .padding(top = 4.dp)
                         .clickable {
-//                            dateDialogState.show()
+                            isDateDialogOpen = true
                         },
                     leadingIcon = {
                         Icon(
@@ -237,29 +238,45 @@ data class UserInformationScreen(
                 )
 
             }
-//            MaterialDialog(
-//                dialogState = dateDialogState,
-//                buttons = {
-//                    positiveButton(text = "Ok") {
-////                    Toast.makeText(context, "Date picked", Toast.LENGTH_SHORT).show()
-//                    }
-//                    negativeButton(text = "Cancel")
-//
-//                }
-//            ) {
-//                datepicker(
-//                    initialDate = LocalDate.now(),
-//                    title = "Select Date",
-//                    allowedDateValidator = { date ->
-//                        date.isBefore(LocalDate.now())
-//                    },
-//                    onDateChange = { date ->
-//                        pickedDate = date
-//                        onDateOfBirthChange(date)
-//                    }
-//                )
-//            }
-
+            if (isDateDialogOpen) {
+                val datePickerState = rememberDatePickerState(
+                    initialSelectedDateMillis = LocalDateTime.now().toMillis()
+                )
+                val confirmEnabled = remember {
+                    derivedStateOf { datePickerState.selectedDateMillis != null }
+                }
+                DatePickerDialog(
+                    onDismissRequest = {
+                        // Dismiss the dialog when the user clicks outside the dialog or on the back
+                        // button. If you want to disable that functionality, simply use an empty
+                        // onDismissRequest.
+                        isDateDialogOpen = false
+                    },
+                    confirmButton = {
+                        TextButton(
+                            onClick = {
+                                isDateDialogOpen = false
+                                val date = datePickerState.selectedDateMillis?.toLocalDateTime() ?: LocalDateTime.now()
+                                onDateOfBirthChange(date)
+                            },
+                            enabled = confirmEnabled.value
+                        ) {
+                            Text(stringResource(Res.string.select))
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(
+                            onClick = {
+                                isDateDialogOpen = false
+                            }
+                        ) {
+                            Text(stringResource(Res.string.cancel))
+                        }
+                    }
+                ) {
+                    DatePicker(state = datePickerState)
+                }
+            }
         }
     }
 }
