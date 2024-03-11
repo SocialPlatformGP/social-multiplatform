@@ -95,7 +95,7 @@ object LoginScreen: Screen {
                 .padding(paddingValues),
             verticalArrangement = Arrangement.Center,
         ) {
-            Image(painter = painterResource(resource = Res.drawable.login), contentDescription = null)
+//            Image(painter = painterResource(resource = Res.drawable.login), contentDescription = null)
             Text(
                 modifier = Modifier
                     .fillMaxWidth()

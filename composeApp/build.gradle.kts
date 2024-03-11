@@ -75,6 +75,7 @@ kotlin {
             implementation(libs.compose.uitooling)
             implementation(libs.kotlinx.coroutines.android)
             implementation(libs.ktor.client.okhttp)
+            implementation(libs.ktor.client.websockets)
             implementation(libs.sqlDelight.driver.android)
             implementation(compose.preview)
             implementation(libs.koin.android)

@@ -205,7 +205,7 @@ data class UserInformationScreen(
                     },
                     maxLines = 1,
                     readOnly = true,
-                    enabled = false
+                    enabled = true
                 )
             }
             OutlinedTextField(

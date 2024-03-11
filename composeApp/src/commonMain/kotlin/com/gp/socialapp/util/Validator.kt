@@ -11,7 +11,7 @@ object Validator {
 
     object EmailValidator {
         fun validateAll(email: String) =
-            email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{6,}\$".toRegex())
+            email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}\$".toRegex())
     }
     object PhoneNumberValidator{
         fun validateAll(phoneNumber: String) =

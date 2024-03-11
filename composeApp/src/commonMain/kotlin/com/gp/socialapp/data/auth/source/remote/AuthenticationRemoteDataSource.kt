@@ -10,6 +10,5 @@ interface AuthenticationRemoteDataSource {
     fun signInUser(email: String, password: String): Flow<Result<String>>
     fun signUpUser(userRequest: UserRequest): Flow<Result<String>>
     fun getSignedInUser(): User?
-//    fun authenticateWithGoogle(account: GoogleSignInAccount): Flow<State<FirebaseUser>>
     fun sendPasswordResetEmail(email: String): Flow<Result<Nothing>>
 }

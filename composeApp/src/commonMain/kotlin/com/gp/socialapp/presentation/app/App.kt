@@ -8,6 +8,7 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import com.gp.socialapp.di.appModules
+import com.gp.socialapp.presentation.auth.login.LoginScreen
 import com.gp.socialapp.presentation.auth.signup.SignUpScreen
 
 import com.gp.socialapp.theme.AppTheme
@@ -35,7 +36,7 @@ internal fun App() {
 //                )
 //            }
             Navigator(
-                SignUpScreen
+                LoginScreen
             )
         }
     }
