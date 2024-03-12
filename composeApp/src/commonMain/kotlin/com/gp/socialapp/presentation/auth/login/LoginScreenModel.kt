@@ -41,6 +41,7 @@ class LoginScreenModel(
                                 token = it.data,
                                 serverErrorMessage = ""
                             )
+                            //todo navigate to main and store token
                         }
                         is Result.Error -> {
                             _uiState.value = _uiState.value.copy(

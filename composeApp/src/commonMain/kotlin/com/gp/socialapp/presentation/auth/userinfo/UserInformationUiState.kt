@@ -11,5 +11,5 @@ data class UserInformationUiState (
     var birthDate:  LocalDateTime = LocalDateTime.now(),
     var bio: String ="",
     var pfpLocalURI: Uri = Uri.EMPTY,
-    val createdState: Result<Nothing> = Result.Idle
+    val createdState: Result<String> = Result.Idle
 )

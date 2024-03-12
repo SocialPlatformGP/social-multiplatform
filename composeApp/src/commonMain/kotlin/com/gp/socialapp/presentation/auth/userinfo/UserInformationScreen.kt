@@ -51,6 +51,7 @@ import com.gp.socialapp.util.LocalDateTimeUtil.toDDMMYYYY
 import com.gp.socialapp.util.LocalDateTimeUtil.toLocalDateTime
 import com.gp.socialapp.util.LocalDateTimeUtil.toMillis
 import com.gp.socialapp.util.LocalDateTimeUtil.toYYYYMMDD
+import com.gp.socialapp.util.Result
 import kotlinx.datetime.LocalDateTime
 import org.jetbrains.compose.resources.stringResource
 import socialmultiplatform.composeapp.generated.resources.Res
@@ -64,6 +65,11 @@ data class UserInformationScreen(
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = navigator.getNavigatorScreenModel<UserInformationScreenModel>()
         val state by screenModel.uiState.collectAsState()
+        if(state.createdState is Result.SuccessWithData){
+            val token = (state.createdState as Result.SuccessWithData).data
+            println("Token: $token")
+            //TODO("navigate to main with token)
+        }
         Scaffold { paddingValues ->
             UserInformationContent(
                 paddingValues = paddingValues,
@@ -74,7 +80,7 @@ data class UserInformationScreen(
                 onPhoneNumberChange = { screenModel.onPhoneNumberChange(it) },
                 onBioChange = { screenModel.onBioChange(it) },
                 onDateOfBirthChange = { screenModel.onBirthDateChange(it) },
-                onContinueClicked = { /*todo*/ }
+                onContinueClicked = { screenModel.onCompleteAccount(email, password) }
             )
         }
     }
