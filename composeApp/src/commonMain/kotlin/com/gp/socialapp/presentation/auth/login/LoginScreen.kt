@@ -71,6 +71,15 @@ object LoginScreen: Screen {
         val screenModel = navigator.getNavigatorScreenModel<LoginScreenModel>()
         val state by screenModel.uiState.collectAsState()
         if(state.token != null){
+            Button(
+                onClick = {
+                    screenModel.onLogOut()
+                },
+                modifier = Modifier.fillMaxWidth()){
+                Text(text = "LogOut")
+            }
+
+
             //todo navigate to main
         } else {
             LoginContent(

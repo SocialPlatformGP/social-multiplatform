@@ -237,9 +237,9 @@ data class UserInformationScreen(
                     }
                 )
                 Box(
-                    modifier = Modifier.clickable {
-                        isDateDialogOpen = true
-                    }
+//                    modifier = Modifier.clickable {
+//                        isDateDialogOpen = true
+//                    }
                 ) {
                     OutlinedTextField(
                         value = state.birthDate.let { if (it == LocalDateTime.now()) "" else pickedDate.toDDMMYYYY()},
@@ -251,6 +251,7 @@ data class UserInformationScreen(
                             .clickable {
                                 isDateDialogOpen = true
                             },
+
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Filled.CalendarMonth,
@@ -269,7 +270,7 @@ data class UserInformationScreen(
                         },
                         maxLines = 1,
                         readOnly = true,
-                        enabled = true
+                        enabled = false
                     )
                 }
                 OutlinedTextField(

@@ -16,4 +16,5 @@ interface AuthenticationRepository {
     fun sendPasswordResetEmail(email: String): Flow<Result<Nothing>>
     fun getLocalUserToken(): String?
     fun setLocalUserToken(token: String)
+    fun clearStorage()
 }

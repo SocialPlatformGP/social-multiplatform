@@ -29,4 +29,8 @@ class AuthenticationRepositoryImpl(
     override fun setLocalUserToken(token: String) {
         localKeyValueStorage.token = token
     }
+
+    override fun clearStorage() {
+        localKeyValueStorage.cleanStorage()
+    }
 }

@@ -62,9 +62,7 @@ object SignUpScreen : Screen {
         if(state.isSignedUp is Result.Success) {
             navigator.push(UserInformationScreen(state.email, state.password))
         }
-        Scaffold { paddingValues ->
             SignUpContent(
-                paddingValues = paddingValues,
                 state = state,
                 onNavigateToLoginScreen = {navigator.pop()},
                 onCreateAccount = {screenModel.onSignUp()},
@@ -73,12 +71,11 @@ object SignUpScreen : Screen {
                 onRePasswordChange = { screenModel.rePasswordChange(it) }
 
             )
-        }
+
     }
 
     @Composable
     private fun SignUpContent(
-        paddingValues: PaddingValues,
         state: SignUpUiState,
         onNavigateToLoginScreen: () -> Unit,
         onCreateAccount: () -> Unit,
@@ -99,7 +96,7 @@ object SignUpScreen : Screen {
             }
             Column(
                 modifier = Modifier
-                    .padding(paddingValues)
+                    .padding(it)
                     .fillMaxSize()
                     .widthIn(max = 600.dp)
                     .padding(16.dp),

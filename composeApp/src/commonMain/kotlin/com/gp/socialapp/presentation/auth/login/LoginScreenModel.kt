@@ -57,11 +57,12 @@ class LoginScreenModel(
                 state.collect{
                     when(it){
                         is Result.SuccessWithData -> {
-                            Napier.d("token: ${token?:"null"}")
+                            println("token: ${it.data}")
                             _uiState.value = _uiState.value.copy(
                                 token = it.data,
                                 error = NoError
                             )
+                            authRepo.setLocalUserToken(it.data)
                         }
                         is Result.Error -> {
                             _uiState.value = _uiState.value.copy(
@@ -82,5 +83,9 @@ class LoginScreenModel(
     }
     fun updatePassword(password: String){
         _uiState.update { it.copy(password = password) }
+    }
+
+    fun onLogOut() {
+        authRepo.clearStorage()
     }
 }
