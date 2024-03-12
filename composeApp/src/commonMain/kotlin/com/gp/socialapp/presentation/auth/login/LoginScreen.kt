@@ -112,7 +112,6 @@ object LoginScreen: Screen {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .widthIn(max = 600.dp)
                     .padding(it),
                 verticalArrangement = Arrangement.Center,
             ) {
