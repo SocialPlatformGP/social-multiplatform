@@ -5,10 +5,10 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import com.gp.auth.util.Validator
 import com.gp.socialapp.data.auth.repository.AuthenticationRepository
 import com.gp.socialapp.util.Result
-import com.gp.socialapp.util.SignUpError.EmailError
-import com.gp.socialapp.util.SignUpError.NoError
-import com.gp.socialapp.util.SignUpError.PasswordError
-import com.gp.socialapp.util.SignUpError.RePasswordError
+import com.gp.socialapp.util.AuthError.EmailError
+import com.gp.socialapp.util.AuthError.NoError
+import com.gp.socialapp.util.AuthError.PasswordError
+import com.gp.socialapp.util.AuthError.RePasswordError
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

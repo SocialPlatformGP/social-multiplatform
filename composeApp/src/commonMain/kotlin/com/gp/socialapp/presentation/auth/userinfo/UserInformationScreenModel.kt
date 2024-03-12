@@ -14,7 +14,6 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDateTime
 
 class UserInformationScreenModel(
-//    private val userRepo: UserRepository,
     private val authRepo: AuthenticationRepository,
 ): ScreenModel {
     private val _uiState = MutableStateFlow(UserInformationUiState())
