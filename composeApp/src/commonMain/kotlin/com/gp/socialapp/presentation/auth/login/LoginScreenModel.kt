@@ -4,11 +4,17 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.gp.auth.util.Validator
 import com.gp.socialapp.data.auth.repository.AuthenticationRepository
+import com.gp.socialapp.util.AuthError.ServerError
+import com.gp.socialapp.util.AuthError.PasswordError
+import com.gp.socialapp.util.AuthError.NoError
+import com.gp.socialapp.util.AuthError.EmailError
 import com.gp.socialapp.util.Result
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.getString
+import socialmultiplatform.composeapp.generated.resources.Res
 
 class LoginScreenModel(
     private val authRepo: AuthenticationRepository,
@@ -19,16 +25,22 @@ class LoginScreenModel(
     fun onSignIn(){
         with(_uiState.value){
             if(!Validator.EmailValidator.validateAll(email)){
-                _uiState.value = _uiState.value.copy(emailError = "Invalid Email")
+                screenModelScope.launch {
+                    val error = EmailError(getString(Res.string.invalid_email))
+                    _uiState.value = _uiState.value.copy(error = error)
+                }
                 return
             } else {
-                _uiState.value = _uiState.value.copy(emailError = "")
+                _uiState.value = _uiState.value.copy(error = NoError)
             }
             if (password.length < 6 || !Validator.PasswordValidator.validateAll(password)){
-                _uiState.value = _uiState.value.copy(passwordError = "Invalid Password")
+                screenModelScope.launch {
+                    val error = PasswordError(getString(Res.string.invalid_password))
+                    _uiState.value = _uiState.value.copy(error = error)
+                }
                 return
             } else{
-                _uiState.value = _uiState.value.copy(passwordError = "")
+                _uiState.value = _uiState.value.copy(error = NoError)
             }
         }
         screenModelScope.launch {
@@ -39,14 +51,14 @@ class LoginScreenModel(
                         is Result.SuccessWithData -> {
                             _uiState.value = _uiState.value.copy(
                                 token = it.data,
-                                serverErrorMessage = ""
+                                error = NoError
                             )
                             //todo navigate to main and store token
                         }
                         is Result.Error -> {
                             _uiState.value = _uiState.value.copy(
                                 token = "",
-                                serverErrorMessage = it.message
+                                error = ServerError(it.message)
                             )
                         }
                         else->Unit
