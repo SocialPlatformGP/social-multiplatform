@@ -1,5 +1,8 @@
 package com.gp.auth.util
 
+import com.gp.socialapp.util.LocalDateTimeUtil.now
+import kotlinx.datetime.LocalDateTime
+
 object Validator {
     object PasswordValidator {
         fun validateLength(password: String) = password.length >= 8
@@ -17,10 +20,13 @@ object Validator {
         fun validateAll(phoneNumber: String) =
             phoneNumber.matches("^01[0-2]{1}[0-9]{8}\$".toRegex())
     }
-    object BirthDateValidator{
+    object NameValidator{
         //min age is 17
-        fun validateAll(birthDate: String) =
-            birthDate.matches("^(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[012])/((19|20)\\d\\d)\$".toRegex())
-
+        fun validateAll(name: String) =
+            name.matches("^\\p{L}+\$".toRegex())
+    }
+    object BirthDateValidator {
+        fun validateAll(birthDate: LocalDateTime) =
+            birthDate.year <= LocalDateTime.now().year - 17
     }
 }

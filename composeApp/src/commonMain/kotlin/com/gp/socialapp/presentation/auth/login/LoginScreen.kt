@@ -97,18 +97,18 @@ object LoginScreen: Screen {
         var passwordVisible by remember { mutableStateOf(false) }
         val scope = rememberCoroutineScope()
         val snackbarHostState = remember { SnackbarHostState() }
-        if(state.error is ServerError){
-            scope.launch {
-                snackbarHostState.showSnackbar(
-                    message = (state.error as ServerError).message,
-                )
-            }
-        }
         Scaffold (
             snackbarHost = {
                 SnackbarHost(hostState = snackbarHostState) },
             modifier = Modifier.fillMaxSize(),
         ) {
+            if(state.error is ServerError){
+                scope.launch {
+                    snackbarHostState.showSnackbar(
+                        message = (state.error as ServerError).message,
+                    )
+                }
+            }
             Column(
                 modifier = Modifier
                     .fillMaxSize()

@@ -88,15 +88,15 @@ object SignUpScreen : Screen {
     ) {
         val scope = rememberCoroutineScope()
         val snackbarHostState = remember { SnackbarHostState() }
-        if(state.error is AuthError.ServerError) {
-            scope.launch {
-                snackbarHostState.showSnackbar((state.error as AuthError.ServerError).message)
-            }
-        }
         Scaffold(
             snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
             modifier = Modifier.fillMaxSize(),
         ) {
+            if(state.error is AuthError.ServerError) {
+                scope.launch {
+                    snackbarHostState.showSnackbar((state.error as AuthError.ServerError).message)
+                }
+            }
             Column(
                 modifier = Modifier
                     .padding(paddingValues)
