@@ -1,6 +1,8 @@
 package com.gp.socialapp.data.auth.source.remote.model
 
 import com.gp.socialapp.util.LocalDateTimeUtil.now
+import com.gp.socialapp.util.LocalDateTimeUtil.toMillis
+import kotlinx.datetime.Instant.Companion.now
 import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.Serializable
 
@@ -13,7 +15,7 @@ data class User(
     val profilePictureURL: String = "",
     val email: String = "",
     val phoneNumber: String = "",
-    val birthdate: String ="",
+    val birthdate: Long=0L,
     val bio: String = "",
     val createdAt: LocalDateTime?=null,
     val isAdmin: Boolean = false,
@@ -25,7 +27,7 @@ data class User(
         profilePictureURL = profilePictureURL,
         email = email,
         phoneNumber = phoneNumber,
-        birthdate = birthdate,
+        birthdate = birthdate?:LocalDateTime.now().toMillis(),
         bio = bio,
         isAdmin = isAdmin
     )
@@ -38,7 +40,7 @@ data class UserRequest(
     val profilePictureURL: String = "",
     val email: String = "",
     val phoneNumber: String = "",
-    val birthdate: String ="",
+    val birthdate: Long=LocalDateTime.now().toMillis(),
     val bio: String = "",
     val isAdmin: Boolean = false,
 )

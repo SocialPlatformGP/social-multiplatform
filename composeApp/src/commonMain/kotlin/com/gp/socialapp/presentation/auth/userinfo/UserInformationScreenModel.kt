@@ -2,46 +2,113 @@ package com.gp.socialapp.presentation.auth.userinfo
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import com.gp.socialapp.data.auth.repository.UserRepository
+import com.gp.auth.util.Validator
+import com.gp.socialapp.data.auth.repository.AuthenticationRepository
 import com.gp.socialapp.data.auth.source.remote.model.User
+import com.gp.socialapp.util.AuthError
+import com.gp.socialapp.util.LocalDateTimeUtil.toMillis
+import com.gp.socialapp.util.Result
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDateTime
+import org.jetbrains.compose.resources.getString
+import socialmultiplatform.composeapp.generated.resources.Res
 
 class UserInformationScreenModel(
-    private val userRepo: UserRepository
-): ScreenModel {
-    val uiState = MutableStateFlow(UserInformationUiState())
+    private val authRepo: AuthenticationRepository,
+) : ScreenModel {
+    private val _uiState = MutableStateFlow(UserInformationUiState())
+    val uiState = _uiState.asStateFlow()
     fun onCompleteAccount(email: String, password: String) {
-        //TODO("Validate User Information")
+        with(_uiState.value) {
+            if (!Validator.NameValidator.validateAll(firstName)) {
+                screenModelScope.launch {
+                    val error = AuthError.FirstNameError(getString(Res.string.invalid_first_name))
+                    _uiState.value = _uiState.value.copy(error = error)
+                }
+                return
+            } else {
+                _uiState.value = _uiState.value.copy(error = AuthError.NoError)
+            }
+            if (!Validator.NameValidator.validateAll(lastName)) {
+                screenModelScope.launch {
+                    val error = AuthError.LastNameError(getString(Res.string.invalid_last_name))
+                    _uiState.value = _uiState.value.copy(error = error)
+                }
+                return
+            } else {
+                _uiState.value = _uiState.value.copy(error = AuthError.NoError)
+            }
+            if (!Validator.PhoneNumberValidator.validateAll(phoneNumber)) {
+                screenModelScope.launch {
+                    val error =
+                        AuthError.PhoneNumberError(getString(Res.string.invalid_phone_number))
+                    _uiState.value = _uiState.value.copy(error = error)
+                }
+                return
+            } else {
+                _uiState.value = _uiState.value.copy(error = AuthError.NoError)
+            }
+            if (!Validator.BirthDateValidator.validateAll(birthDate)) {
+                screenModelScope.launch {
+                    val error =
+                        AuthError.BirthDateError(getString(Res.string.user_must_be_at_least_18_years_old))
+                    _uiState.value = _uiState.value.copy(error = error)
+                }
+                return
+            } else {
+                _uiState.value = _uiState.value.copy(error = AuthError.NoError)
+            }
+        }
         screenModelScope.launch {
             with(uiState.value) {
-                val networkFlow =
-                    userRepo.createUser(
-                        User(
-                            firstName, lastName, password, "", email,
-                            phoneNumber, birthDate.toString(), bio,
-                        ), pfpLocalURI)
-                networkFlow.collect { state ->
-                    uiState.value = uiState.value.copy(createdState = state)
+                authRepo.signUpUser(
+                    User(
+                        firstName = firstName,
+                        lastName = lastName,
+                        email = email,
+                        password = password,
+                        phoneNumber = phoneNumber,
+                        birthdate = birthDate.toMillis(),
+                        bio = bio,
+                    )
+                ).collect { state ->
+                    when (state) {
+                        is Result.SuccessWithData -> {
+                            _uiState.value = uiState.value.copy(createdState = state)
+                            authRepo.setLocalUserToken(state.data)
+                        }
+                        is Result.Error -> {
+                            val error = AuthError.ServerError(state.message)
+                            _uiState.value = uiState.value.copy(error = error)
+                        }
+
+                        else -> Unit
+                    }
                 }
             }
         }
     }
+
     fun onFirstNameChange(firstName: String) {
-        uiState.update { it.copy(firstName = firstName) }
+        _uiState.update { it.copy(firstName = firstName) }
     }
+
     fun onLastNameChange(lastName: String) {
-        uiState.update { it.copy(lastName = lastName) }
+        _uiState.update { it.copy(lastName = lastName) }
     }
+
     fun onPhoneNumberChange(phoneNumber: String) {
-        uiState.update { it.copy(phoneNumber = phoneNumber) }
+        _uiState.update { it.copy(phoneNumber = phoneNumber) }
     }
+
     fun onBirthDateChange(birthDate: LocalDateTime) {
-        uiState.update { it.copy(birthDate = birthDate) }
+        _uiState.update { it.copy(birthDate = birthDate) }
     }
+
     fun onBioChange(bio: String) {
-        uiState.update { it.copy(bio = bio) }
+        _uiState.update { it.copy(bio = bio) }
     }
 }

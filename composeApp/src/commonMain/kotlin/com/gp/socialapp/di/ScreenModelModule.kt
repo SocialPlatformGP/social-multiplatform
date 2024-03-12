@@ -10,5 +10,5 @@ val screenModelModule = module {
     factory { LoginScreenModel(get()) }
     factory { PasswordResetScreenModel(get()) }
     factory { SignUpScreenModel(get()) }
-//    factory { UserInformationScreenModel(get())}
+    factory { UserInformationScreenModel(get())}
 }

@@ -27,6 +27,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -34,6 +36,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,6 +55,11 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gp.socialapp.presentation.auth.passwordreset.PasswordResetScreen
 import com.gp.socialapp.presentation.auth.signup.SignUpScreen
+import com.gp.socialapp.util.AuthError
+import com.gp.socialapp.util.AuthError.ServerError
+import com.gp.socialapp.util.AuthError.EmailError
+import com.gp.socialapp.util.AuthError.PasswordError
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import socialmultiplatform.composeapp.generated.resources.Res
@@ -62,9 +70,19 @@ object LoginScreen: Screen {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = navigator.getNavigatorScreenModel<LoginScreenModel>()
         val state by screenModel.uiState.collectAsState()
-        Scaffold {paddingValues ->
+        if(state.token != null){
+            Button(
+                onClick = {
+                    screenModel.onLogOut()
+                },
+                modifier = Modifier.fillMaxWidth()){
+                Text(text = "LogOut")
+            }
+
+
+            //todo navigate to main
+        } else {
             LoginContent(
-                paddingValues = paddingValues,
                 onSignInWithGoogle = { /*todo*/},
                 state = state,
                 navigateToSignUp = { navigator.push(SignUpScreen) },
@@ -72,13 +90,11 @@ object LoginScreen: Screen {
                 onEmailChange = {screenModel.updateEmail(it)  },
                 onPasswordChange = { screenModel.updatePassword(it) },
                 onSignIn = { screenModel.onSignIn() }
-
             )
         }
     }
     @Composable
     private fun LoginContent(
-        paddingValues: PaddingValues,
         onSignInWithGoogle: () -> Unit,
         onSignIn : () -> Unit,
         state: LoginUiState,
@@ -88,154 +104,158 @@ object LoginScreen: Screen {
         onPasswordChange: (String) -> Unit,
     ) {
         var passwordVisible by remember { mutableStateOf(false) }
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .widthIn(max = 600.dp)
-                .padding(paddingValues),
-            verticalArrangement = Arrangement.Center,
+        val scope = rememberCoroutineScope()
+        val snackbarHostState = remember { SnackbarHostState() }
+        Scaffold (
+            snackbarHost = {
+                SnackbarHost(hostState = snackbarHostState) },
+            modifier = Modifier.fillMaxSize(),
         ) {
-            Image(painter = painterResource(resource = Res.drawable.login), contentDescription = null)
-            Text(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentWidth(Alignment.CenterHorizontally),
-                fontSize = 42.sp,
-                text= stringResource(resource = Res.string.welcome_back),
-                color = Color(0xff222f86)
-            )
-            OutlinedTextField(
-                value = state.email,
-                onValueChange = { onEmailChange(it) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                label = { Text(text = stringResource(Res.string.email), color = Color(0xff222f86).copy( alpha = 0.7f)) },
-                leadingIcon = { Icon(Icons.Filled.Email, contentDescription = null, tint = Color(0xff222f86)) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                isError = state.emailError.isNotEmpty(),
-                supportingText = {
-                    if(state.emailError.isNotEmpty()){
-                        Text(
-                            text = state.emailError,
-                            color = MaterialTheme.colorScheme.error,
-                            fontSize = 12.sp,
-                            modifier = Modifier.padding(start = 16.dp),
-                        )
-                    }
+            if(state.error is ServerError){
+                scope.launch {
+                    snackbarHostState.showSnackbar(
+                        message = (state.error as ServerError).message,
+                    )
                 }
-            )
-            OutlinedTextField(
-                value = state.password,
-                onValueChange = { onPasswordChange(it) },
+            }
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 4.dp),
-                label = { Text(text = stringResource(Res.string.password),color=Color(0xff222f86).copy( alpha = 0.7f)) },
-                leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = null,tint=Color(0xff222f86)) },
-                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                trailingIcon = {
-                    val image = if (passwordVisible)
-                        Icons.Filled.Visibility
-                    else Icons.Filled.VisibilityOff
-                    val description = stringResource(if (passwordVisible) Res.string.hide_password else Res.string.show_password)
-                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                        Icon(imageVector = image, description, tint = Color(0xff222f86))
-                    }
-                },
-                isError = state.passwordError.isNotEmpty(),
-                supportingText = {
-                    if(state.passwordError.isNotEmpty()){
-                        Text(
-                            text = state.passwordError,
-                            color = MaterialTheme.colorScheme.error,
-                            fontSize = 12.sp,
-                            modifier = Modifier.padding(start = 16.dp),
-                        )
-                    }
-                }
-            )
-            TextButton(
-                onClick = navigateToForgotPassword,
-                enabled = false,
-                modifier = Modifier
-                    .padding(start = 16.dp),
+                    .fillMaxSize()
+                    .padding(it),
+                verticalArrangement = Arrangement.Center,
             ) {
+//            Image(painter = painterResource(resource = Res.drawable.login), contentDescription = null)
                 Text(
-                    text = stringResource(resource = Res.string.forgot_password),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentWidth(Alignment.CenterHorizontally),
+                    fontSize = 42.sp,
+                    text= stringResource(resource = Res.string.welcome_back),
+                )
+                OutlinedTextField(
+                    value = state.email,
+                    onValueChange = { onEmailChange(it) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    label = { Text(text = stringResource(Res.string.email)) },
+                    leadingIcon = { Icon(Icons.Filled.Email, contentDescription = null,) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                    isError = state.error is EmailError,
+                    supportingText = {
+                        if(state.error is EmailError){
+                            Text(
+                                text = (state.error as EmailError).message,
+                                color = MaterialTheme.colorScheme.error,
+                                fontSize = 12.sp,
+                                modifier = Modifier.padding(start = 16.dp),
+                            )
+                        }
+                    }
+                )
+                OutlinedTextField(
+                    value = state.password,
+                    onValueChange = { onPasswordChange(it) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 4.dp),
+                    label = { Text(text = stringResource(Res.string.password),) },
+                    leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = null) },
+                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    trailingIcon = {
+                        val image = if (passwordVisible)
+                            Icons.Filled.Visibility
+                        else Icons.Filled.VisibilityOff
+                        val description = stringResource(if (passwordVisible) Res.string.hide_password else Res.string.show_password)
+                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                            Icon(imageVector = image, description,)
+                        }
+                    },
+                    isError = state.error is PasswordError,
+                    supportingText = {
+                        if(state.error is PasswordError ){
+                            Text(
+                                text = (state.error as PasswordError).message,
+                                color = MaterialTheme.colorScheme.error,
+                                fontSize = 12.sp,
+                                modifier = Modifier.padding(start = 16.dp),
+                            )
+                        }
+                    }
+                )
+                TextButton(
+                    onClick = navigateToForgotPassword,
+                    enabled = false,
+                    modifier = Modifier
+                        .padding(start = 16.dp),
+                ) {
+                    Text(
+                        text = stringResource(resource = Res.string.forgot_password),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        style = TextStyle(textDecoration = TextDecoration.Underline),
+                    )
+                }
+                Button(
+                    onClick = onSignIn,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 4.dp)
+                        .height(50.dp),
+                    shape = RoundedCornerShape(8.dp),
+                ) {
+                    Text(
+                        text = stringResource(resource = Res.string.login_str),
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
+                Text(
+                    text = stringResource(Res.string.or_login_with),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 4.dp)
+                        .wrapContentWidth(Alignment.CenterHorizontally),
                     fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    style = TextStyle(textDecoration = TextDecoration.Underline),
-                    color = Color(0xff222f86)
                 )
-            }
-            Button(
-                onClick = onSignIn,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 4.dp)
-                    .height(50.dp),
-                shape = RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xff222f86),
-                    contentColor = Color.White
-                )
-            ) {
-                Text(
-                    text = stringResource(resource = Res.string.login_str),
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                )
-            }
-            Text(
-                text = stringResource(Res.string.or_login_with),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 4.dp)
-                    .wrapContentWidth(Alignment.CenterHorizontally),
-                fontSize = 16.sp,
-                color = Color(0xff222f86).copy( alpha = 0.7f)
-            )
-            OutlinedButton(
-                onClick = { onSignInWithGoogle() },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 4.dp)
-                    .height(50.dp),
-                shape = RoundedCornerShape(8.dp),
-                border = BorderStroke(1.dp, Color.Black)
-            ) {
+                OutlinedButton(
+                    onClick = { onSignInWithGoogle() },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 4.dp)
+                        .height(50.dp),
+                    shape = RoundedCornerShape(8.dp),
+                ) {
 //            Icon(
 //                painter = painterResource(resource = Res.drawable.google),
 //                contentDescription = null,
 //                tint = androidx.compose.ui.graphics.Color.Unspecified,
 //                modifier = Modifier.size(24.dp)
 //            )
-                Text(
-                    text = stringResource(resource = Res.string.sign_in_with_google),
-                    fontSize = 18.sp,
-                    color = Color(0xff222f86)
-                )
-            }
-            Row(
-                modifier = Modifier
-                    .padding(start = 16.dp),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(text = stringResource(resource = Res.string.dont_have_an_account), fontSize = 16.sp)
-                TextButton(onClick = navigateToSignUp) {
                     Text(
-                        text = stringResource(resource = Res.string.sign_up),
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        style = TextStyle(textDecoration = TextDecoration.Underline),
-                        color =Color(0xff222f86).copy( alpha = 0.7f)
+                        text = stringResource(resource = Res.string.sign_in_with_google),
+                        fontSize = 18.sp,
                     )
                 }
-            }
+                Row(
+                    modifier = Modifier
+                        .padding(start = 16.dp),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(text = stringResource(resource = Res.string.dont_have_an_account), fontSize = 16.sp)
+                    TextButton(onClick = navigateToSignUp) {
+                        Text(
+                            text = stringResource(resource = Res.string.sign_up),
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            style = TextStyle(textDecoration = TextDecoration.Underline),
+                        )
+                    }
+                }
 
+            }
         }
     }
 
