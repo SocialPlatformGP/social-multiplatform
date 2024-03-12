@@ -70,9 +70,10 @@ object LoginScreen: Screen {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = navigator.getNavigatorScreenModel<LoginScreenModel>()
         val state by screenModel.uiState.collectAsState()
-        Scaffold {paddingValues ->
+        if(state.token != null){
+            //todo navigate to main
+        } else {
             LoginContent(
-                paddingValues = paddingValues,
                 onSignInWithGoogle = { /*todo*/},
                 state = state,
                 navigateToSignUp = { navigator.push(SignUpScreen) },
@@ -80,13 +81,11 @@ object LoginScreen: Screen {
                 onEmailChange = {screenModel.updateEmail(it)  },
                 onPasswordChange = { screenModel.updatePassword(it) },
                 onSignIn = { screenModel.onSignIn() }
-
             )
         }
     }
     @Composable
     private fun LoginContent(
-        paddingValues: PaddingValues,
         onSignInWithGoogle: () -> Unit,
         onSignIn : () -> Unit,
         state: LoginUiState,
@@ -114,7 +113,7 @@ object LoginScreen: Screen {
                 modifier = Modifier
                     .fillMaxSize()
                     .widthIn(max = 600.dp)
-                    .padding(paddingValues),
+                    .padding(it),
                 verticalArrangement = Arrangement.Center,
             ) {
 //            Image(painter = painterResource(resource = Res.drawable.login), contentDescription = null)

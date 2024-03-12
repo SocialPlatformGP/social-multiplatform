@@ -14,4 +14,6 @@ interface AuthenticationRepository {
 
     //    fun authenticateWithGoogle(account: GoogleSignInAccount): Flow<State<FirebaseUser>>
     fun sendPasswordResetEmail(email: String): Flow<Result<Nothing>>
+    fun getLocalUserToken(): String?
+    fun setLocalUserToken(token: String)
 }

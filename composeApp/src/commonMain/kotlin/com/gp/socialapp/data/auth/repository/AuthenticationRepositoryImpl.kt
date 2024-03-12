@@ -1,5 +1,6 @@
 package com.gp.socialapp.data.auth.repository
 
+import com.gp.socialapp.data.auth.source.local.AuthKeyValueStorage
 import com.gp.socialapp.data.auth.source.remote.AuthenticationRemoteDataSource
 import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.util.Result
@@ -8,7 +9,8 @@ import socialmultiplatform.composeapp.generated.resources.Res.string.email
 import socialmultiplatform.composeapp.generated.resources.Res.string.password
 
 class AuthenticationRepositoryImpl(
-    private val remoteDataSource: AuthenticationRemoteDataSource
+    private val remoteDataSource: AuthenticationRemoteDataSource,
+    private val localKeyValueStorage: AuthKeyValueStorage
 ): AuthenticationRepository {
     override fun isEmailAvailable(email: String): Flow<Result<Boolean>> =
         remoteDataSource.isEmailAvailable(email)
@@ -20,4 +22,11 @@ class AuthenticationRepositoryImpl(
     override fun getSignedInUser() = remoteDataSource.getSignedInUser()
 
     override fun sendPasswordResetEmail(email: String) = remoteDataSource.sendPasswordResetEmail(email)
+    override fun getLocalUserToken(): String? {
+        return localKeyValueStorage.token
+    }
+
+    override fun setLocalUserToken(token: String) {
+        localKeyValueStorage.token = token
+    }
 }

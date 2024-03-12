@@ -9,6 +9,7 @@ import com.gp.socialapp.util.AuthError.PasswordError
 import com.gp.socialapp.util.AuthError.NoError
 import com.gp.socialapp.util.AuthError.EmailError
 import com.gp.socialapp.util.Result
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -22,6 +23,13 @@ class LoginScreenModel(
 ): ScreenModel {
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState = _uiState.asStateFlow()
+    init {
+        val token = authRepo.getLocalUserToken()
+        Napier.d("token: ${token?:"null"}")
+        if(token != null){
+            _uiState.value = _uiState.value.copy(token = token)
+        }
+    }
     fun onSignIn(){
         with(_uiState.value){
             if(!Validator.EmailValidator.validateAll(email)){
@@ -49,15 +57,15 @@ class LoginScreenModel(
                 state.collect{
                     when(it){
                         is Result.SuccessWithData -> {
+                            Napier.d("token: ${token?:"null"}")
                             _uiState.value = _uiState.value.copy(
                                 token = it.data,
                                 error = NoError
                             )
-                            //todo navigate to main and store token
                         }
                         is Result.Error -> {
                             _uiState.value = _uiState.value.copy(
-                                token = "",
+                                token = null,
                                 error = ServerError(it.message)
                             )
                         }

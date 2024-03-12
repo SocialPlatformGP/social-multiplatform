@@ -9,5 +9,5 @@ data class LoginUiState(
     var email: String = "",
     var password: String = "",
     var error: AuthError = AuthError.NoError,
-    var token: String = "",
+    var token: String? = null,
 )
