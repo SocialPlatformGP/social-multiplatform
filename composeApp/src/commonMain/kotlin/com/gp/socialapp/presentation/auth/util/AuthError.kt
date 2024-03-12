@@ -1,4 +1,4 @@
-package com.gp.socialapp.util
+package com.gp.socialapp.presentation.auth.util
 
 sealed class AuthError {
     data class EmailError(var message: String) : AuthError()

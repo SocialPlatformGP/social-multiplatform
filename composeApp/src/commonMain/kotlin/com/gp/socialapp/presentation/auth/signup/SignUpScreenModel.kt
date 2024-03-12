@@ -2,14 +2,14 @@ package com.gp.socialapp.presentation.auth.signup
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import com.gp.auth.util.Validator
+import com.gp.socialapp.presentation.auth.util.Validator
 import com.gp.socialapp.data.auth.repository.AuthenticationRepository
-import com.gp.socialapp.util.AuthError
+import com.gp.socialapp.presentation.auth.util.AuthError
 import com.gp.socialapp.util.Result
-import com.gp.socialapp.util.AuthError.EmailError
-import com.gp.socialapp.util.AuthError.NoError
-import com.gp.socialapp.util.AuthError.PasswordError
-import com.gp.socialapp.util.AuthError.RePasswordError
+import com.gp.socialapp.presentation.auth.util.AuthError.EmailError
+import com.gp.socialapp.presentation.auth.util.AuthError.NoError
+import com.gp.socialapp.presentation.auth.util.AuthError.PasswordError
+import com.gp.socialapp.presentation.auth.util.AuthError.RePasswordError
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

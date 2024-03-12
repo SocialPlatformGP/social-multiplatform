@@ -1,4 +1,4 @@
-package com.gp.auth.util
+package com.gp.socialapp.presentation.auth.util
 
 import com.gp.socialapp.util.LocalDateTimeUtil.now
 import kotlinx.datetime.LocalDateTime

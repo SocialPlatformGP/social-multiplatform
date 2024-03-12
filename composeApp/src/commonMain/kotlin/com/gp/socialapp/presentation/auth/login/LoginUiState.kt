@@ -1,8 +1,6 @@
 package com.gp.socialapp.presentation.auth.login
 
-import com.gp.socialapp.data.auth.source.remote.model.User
-import com.gp.socialapp.util.AuthError
-import com.gp.socialapp.util.Result
+import com.gp.socialapp.presentation.auth.util.AuthError
 
 
 data class LoginUiState(

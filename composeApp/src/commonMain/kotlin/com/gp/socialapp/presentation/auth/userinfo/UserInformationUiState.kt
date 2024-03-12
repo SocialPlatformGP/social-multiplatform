@@ -1,7 +1,7 @@
 package com.gp.socialapp.presentation.auth.userinfo
 
 import com.eygraber.uri.Uri
-import com.gp.socialapp.util.AuthError
+import com.gp.socialapp.presentation.auth.util.AuthError
 import com.gp.socialapp.util.LocalDateTimeUtil.now
 import com.gp.socialapp.util.Result
 import kotlinx.datetime.LocalDateTime

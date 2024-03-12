@@ -2,7 +2,6 @@ package com.gp.socialapp.presentation.auth.signup
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -44,11 +43,11 @@ import cafe.adriel.voyager.koin.getNavigatorScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gp.socialapp.presentation.auth.userinfo.UserInformationScreen
-import com.gp.socialapp.util.AuthError
+import com.gp.socialapp.presentation.auth.util.AuthError
 import com.gp.socialapp.util.Result
-import com.gp.socialapp.util.AuthError.EmailError
-import com.gp.socialapp.util.AuthError.PasswordError
-import com.gp.socialapp.util.AuthError.RePasswordError
+import com.gp.socialapp.presentation.auth.util.AuthError.EmailError
+import com.gp.socialapp.presentation.auth.util.AuthError.PasswordError
+import com.gp.socialapp.presentation.auth.util.AuthError.RePasswordError
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import socialmultiplatform.composeapp.generated.resources.Res
