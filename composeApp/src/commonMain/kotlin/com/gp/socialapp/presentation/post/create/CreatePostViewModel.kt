@@ -5,6 +5,7 @@ import com.gp.socialapp.data.post.source.remote.model.PostFile
 import com.gp.socialapp.data.post.source.remote.model.Tag
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 class CreatePostViewModel(
 //    private val postRepository: PostRepository,
@@ -105,12 +106,12 @@ class CreatePostViewModel(
 
     //
     fun onTitleChange(title: String) {
-//        uiState.update { it.copy(title = title) }
+        _uiState.update { it.copy(title = title) }
     }
 
     //
     fun onBodyChange(body: String) {
-//        uiState.update { it.copy(body = body) }
+        _uiState.update { it.copy(body = body) }
     }
 
     //
