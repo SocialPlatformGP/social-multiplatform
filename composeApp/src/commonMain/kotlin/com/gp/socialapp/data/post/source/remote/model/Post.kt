@@ -18,7 +18,7 @@ data class Post(
     val editStatus: Boolean = false,
     val tags: List<Tag> = emptyList(),
     val type: String = "all",
-//    val attachments: List<PostAttachment> = emptyList()
+    val attachments: List<PostFile> = emptyList()
 ) {
     companion object{
         val sortByVotes = compareByDescending<Post>{ PostPopularityUtils.calculateInteractionValue(it.votes, it.replyCount)}

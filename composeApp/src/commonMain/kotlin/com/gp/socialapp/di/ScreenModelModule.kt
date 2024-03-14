@@ -4,6 +4,7 @@ import com.gp.socialapp.presentation.auth.login.LoginScreenModel
 import com.gp.socialapp.presentation.auth.passwordreset.PasswordResetScreenModel
 import com.gp.socialapp.presentation.auth.signup.SignUpScreenModel
 import com.gp.socialapp.presentation.auth.userinfo.UserInformationScreenModel
+import com.gp.socialapp.presentation.post.feed.FeedScreenModel
 import org.koin.dsl.module
 
 val screenModelModule = module {
@@ -11,4 +12,5 @@ val screenModelModule = module {
     factory { PasswordResetScreenModel(get()) }
     factory { SignUpScreenModel(get()) }
     factory { UserInformationScreenModel(get())}
+    factory { FeedScreenModel(get(), get(), get()) }
 }
