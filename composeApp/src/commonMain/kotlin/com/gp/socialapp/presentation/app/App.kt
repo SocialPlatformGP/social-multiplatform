@@ -8,13 +8,9 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import com.gp.socialapp.di.appModules
-import com.gp.socialapp.presentation.auth.login.LoginScreen
-import com.gp.socialapp.presentation.auth.signup.SignUpScreen
-import com.gp.socialapp.presentation.auth.userinfo.UserInformationScreen
-
+import com.gp.socialapp.presentation.post.create.CreatePostScreen
 import com.gp.socialapp.theme.AppTheme
 import org.koin.compose.KoinApplication
-import org.koin.compose.KoinContext
 
 @Composable
 internal fun App() {
@@ -37,11 +33,12 @@ internal fun App() {
 //                )
 //            }
             Navigator(
-                UserInformationScreen("","")
+                CreatePostScreen
             )
         }
     }
 }
+
 @Composable
 private fun RowScope.TabNavigationItem(tab: Tab) {
     val tabNavigator = LocalTabNavigator.current

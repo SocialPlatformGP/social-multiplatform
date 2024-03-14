@@ -1,22 +1,14 @@
 package com.gp.socialapp
 
 import android.app.Application
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import com.gp.socialapp.di.appModules
-import com.gp.socialapp.di.initKoin
 import com.gp.socialapp.presentation.app.App
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
-import org.koin.android.ext.koin.androidContext
-import org.koin.android.ext.koin.androidLogger
-import org.koin.core.context.startKoin
-import org.koin.dsl.module
 
 class AndroidApp : Application() {
     companion object {
@@ -27,16 +19,12 @@ class AndroidApp : Application() {
         super.onCreate()
         INSTANCE = this
         Napier.base(DebugAntilog())
-        startKoin {
-            androidContext(this@AndroidApp)
-            androidLogger()
-            modules(appModules)
-        }
-
-//        initKoin {
+//        startKoin {
 //            androidContext(this@AndroidApp)
 //            androidLogger()
+//            modules(appModules)
 //        }
+
     }
 }
 
@@ -54,3 +42,4 @@ class AppActivity : ComponentActivity() {
 fun PreviewApp() {
     App()
 }
+
