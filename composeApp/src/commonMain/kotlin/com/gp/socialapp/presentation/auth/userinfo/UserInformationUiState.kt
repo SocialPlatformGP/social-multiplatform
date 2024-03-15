@@ -13,7 +13,7 @@ data class UserInformationUiState(
     var phoneNumber: String = "",
     var birthDate: LocalDateTime = LocalDateTime.now(),
     var bio: String = "",
-    var pfpLocalURI: Uri = Uri.EMPTY,
+    var pfpImageByteArray: ByteArray = byteArrayOf(),
     var error: AuthError = AuthError.NoError,
     val createdState: Result<AuthResponse> = Result.Idle
 )

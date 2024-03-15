@@ -116,4 +116,7 @@ class UserInformationScreenModel(
     fun onBioChange(bio: String) {
         _uiState.update { it.copy(bio = bio) }
     }
+    fun onImageChange(image: ByteArray) {
+        _uiState.update { it.copy(pfpImageByteArray = image) }
+    }
 }

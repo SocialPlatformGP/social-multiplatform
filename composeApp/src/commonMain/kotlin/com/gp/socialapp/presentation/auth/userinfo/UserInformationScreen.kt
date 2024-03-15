@@ -1,5 +1,7 @@
 package com.gp.socialapp.presentation.auth.userinfo
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,15 +15,21 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.PhoneAndroid
+import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -40,6 +48,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
@@ -54,6 +65,12 @@ import com.gp.socialapp.util.LocalDateTimeUtil.toLocalDateTime
 import com.gp.socialapp.util.LocalDateTimeUtil.toMillis
 import com.gp.socialapp.util.LocalDateTimeUtil.toYYYYMMDD
 import com.gp.socialapp.util.Result
+import com.mohamedrejeb.calf.core.LocalPlatformContext
+import com.mohamedrejeb.calf.io.readByteArray
+import com.mohamedrejeb.calf.picker.FilePickerFileType
+import com.mohamedrejeb.calf.picker.FilePickerSelectionMode
+import com.mohamedrejeb.calf.picker.rememberFilePickerLauncher
+import com.mohamedrejeb.calf.picker.toImageBitmap
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDateTime
 import org.jetbrains.compose.resources.stringResource
@@ -77,6 +94,20 @@ data class UserInformationScreen(
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = navigator.getNavigatorScreenModel<UserInformationScreenModel>()
         val state by screenModel.uiState.collectAsState()
+        val scope = rememberCoroutineScope()
+        val context = LocalPlatformContext.current
+        val pickerLauncher = rememberFilePickerLauncher(
+            type = FilePickerFileType.Image,
+            selectionMode = FilePickerSelectionMode.Single,
+            onResult = { files ->
+                scope.launch {
+                    files.firstOrNull()?.let { file ->
+                        val image = file.readByteArray(context)
+                        screenModel.onImageChange(image)
+                    }
+                }
+            }
+        )
         if (state.createdState is Result.SuccessWithData) {
             val token = (state.createdState as Result.SuccessWithData).data
             println("Token: $token")
@@ -89,7 +120,7 @@ data class UserInformationScreen(
                 state = state,
                 onFirstNameChange = { screenModel.onFirstNameChange(it) },
                 onLastNameChange = { screenModel.onLastNameChange(it) },
-                onProfileImageClicked = { /*todo*/ },
+                onProfileImageClicked = { pickerLauncher.launch() },
                 onPhoneNumberChange = { screenModel.onPhoneNumberChange(it) },
                 onBioChange = { screenModel.onBioChange(it) },
                 onDateOfBirthChange = { screenModel.onBirthDateChange(it) },
@@ -155,31 +186,46 @@ data class UserInformationScreen(
                             onProfileImageClicked()
                         }
                 ) {
-//                AsyncImage(
-//                    model = ImageRequest.Builder(LocalContext.current)
-//                        .data(
-//                            if (state.pfpLocalURI == Uri.EMPTY) R.drawable.baseline_person_24 else state.pfpLocalURI
-//                        )
-//                        .crossfade(true)
-//                        .build(),
-//                    contentDescription = null,
-//                    modifier = Modifier
-//                        .fillMaxSize()
-//                        .align(Alignment.Center),
-//                    placeholder = painterResource(id = R.drawable.baseline_person_24)
-//
-//                )
-//                Icon(
-//                    imageVector = Icons.Filled.PhotoCamera,
-//                    contentDescription = null,
-//                    modifier = Modifier
-//                        .align(Alignment.BottomEnd)
-//                        .padding(4.dp)
-//                        .background(
-//                            color = Color.White,
-//                            shape = MaterialTheme.shapes.small
-//                        ),
-//                )
+                    val imageModifier = Modifier
+                        .fillMaxSize()
+                        .align(Alignment.Center)
+                        .clip(CircleShape)
+                if(state.pfpImageByteArray.isEmpty()){
+                    Icon(
+                        imageVector = Icons.Filled.AccountCircle,
+                        contentDescription = null,
+                        modifier = imageModifier
+                    )
+                } else {
+                    val bitmap = state.pfpImageByteArray.toImageBitmap()
+                    Image(
+                        bitmap = bitmap,
+                        contentDescription = null,
+                        modifier = imageModifier,
+                        contentScale = ContentScale.Crop
+                    )
+                }
+                IconButton(
+                    content = {
+                              Icon(
+                                  imageVector = Icons.Filled.Edit,
+                                  contentDescription = null,
+                              )
+                    },
+                    onClick = {
+                        onProfileImageClicked()
+                    },
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(4.dp)
+                        .clip(CircleShape),
+                    colors = IconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimary,
+                        disabledContainerColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                        disabledContentColor = MaterialTheme.colorScheme.onSecondary
+                    )
+                )
                 }
                 Row {
                     OutlinedTextField(
