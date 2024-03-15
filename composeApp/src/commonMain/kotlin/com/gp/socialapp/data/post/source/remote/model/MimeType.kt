@@ -1,5 +1,9 @@
 package com.gp.socialapp.data.post.source.remote.model
 
+import kotlinx.serialization.Serializable
+
+
+@Serializable
 enum class MimeType(val value: String, val readableType: String) {
     IMAGE("image/*", "Image"),
     JPEG("image/jpeg", "JPEG Image"),

@@ -73,10 +73,11 @@ fun FilesBottomSheet(
 
                     when (it.type) {
                         in listOf(
-                            MimeType.MKV,
-                            MimeType.MP4,
-                            MimeType.MOV,
-                            MimeType.AVI,
+                            MimeType.VIDEO.value,
+                            MimeType.MKV.value,
+                            MimeType.MP4.value,
+                            MimeType.MOV.value,
+                            MimeType.AVI.value,
                         ) -> {
                             Image(
                                 imageVector = Icons.Filled.VideoFile,
@@ -91,9 +92,13 @@ fun FilesBottomSheet(
                         }
 
                         in listOf(
-                            MimeType.JPEG,
-                            MimeType.PNG,
-                            MimeType.GIF,
+                            MimeType.IMAGE.value,
+                            MimeType.JPEG.value,
+                            MimeType.PNG.value,
+                            MimeType.GIF.value,
+                            MimeType.BMP.value,
+                            MimeType.TIFF.value,
+                            MimeType.WEBP.value,
                         ) -> {
 
                             Image(
@@ -108,9 +113,12 @@ fun FilesBottomSheet(
                         }
 
                         in listOf(
-                            MimeType.DOCX,
-                            MimeType.XLSX,
-                            MimeType.PPTX,
+                            MimeType.WORD.value,
+                            MimeType.DOCX.value,
+                            MimeType.EXCEL.value,
+                            MimeType.XLSX.value,
+                            MimeType.POWERPOINT.value,
+                            MimeType.PPTX.value,
                         ) -> {
                             Image(
                                 imageVector = Icons.Filled.InsertDriveFile,
@@ -123,7 +131,7 @@ fun FilesBottomSheet(
                             )
                         }
 
-                        MimeType.PDF -> {
+                        MimeType.PDF.value -> {
                             Image(
                                 imageVector = Icons.Filled.PictureAsPdf,
                                 contentDescription = "pdf file",
@@ -136,9 +144,9 @@ fun FilesBottomSheet(
                         }
 
                         in listOf(
-                            MimeType.ZIP,
-                            MimeType.RAR,
-                            MimeType.TAR,
+                            MimeType.ZIP.value,
+                            MimeType.RAR.value,
+                            MimeType.TAR.value,
                         ) -> {
                             Image(
                                 imageVector = Icons.Filled.FolderZip,
@@ -152,9 +160,9 @@ fun FilesBottomSheet(
                         }
 
                         in listOf(
-                            MimeType.MP3,
-                            MimeType.WAV,
-                            MimeType.FLAC,
+                            MimeType.MP3.value,
+                            MimeType.WAV.value,
+                            MimeType.FLAC.value,
                         ) -> {
                             Image(
                                 imageVector = Icons.Filled.AudioFile,

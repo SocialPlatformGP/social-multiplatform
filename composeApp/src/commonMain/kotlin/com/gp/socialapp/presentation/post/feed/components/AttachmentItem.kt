@@ -30,12 +30,12 @@ fun AttachmentItem(
     ) {
         when (attachment.type) {
             in listOf(
-                MimeType.VIDEO,
-                MimeType.MKV,
-                MimeType.AVI,
-                MimeType.MP4,
-                MimeType.MOV,
-                MimeType.WMV
+                MimeType.VIDEO.value,
+                MimeType.MKV.value,
+                MimeType.AVI.value,
+                MimeType.MP4.value,
+                MimeType.MOV.value,
+                MimeType.WMV.value
             ) -> {
                 Icon(
                     imageVector = Icons.Filled.VideoLibrary,
@@ -50,13 +50,13 @@ fun AttachmentItem(
             }
 
             in listOf(
-                MimeType.PDF,
-                MimeType.DOCX,
-                MimeType.WORD,
-                MimeType.EXCEL,
-                MimeType.XLSX,
-                MimeType.POWERPOINT,
-                MimeType.PPTX,
+                MimeType.PDF.value,
+                MimeType.DOCX.value,
+                MimeType.WORD.value,
+                MimeType.EXCEL.value,
+                MimeType.XLSX.value,
+                MimeType.POWERPOINT.value,
+                MimeType.PPTX.value,
             ) -> {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.InsertDriveFile,
@@ -71,12 +71,12 @@ fun AttachmentItem(
             }
 
             in listOf(
-                MimeType.AUDIO,
-                MimeType.MP3,
-                MimeType.AAC,
-                MimeType.WAV,
-                MimeType.OGG,
-                MimeType.FLAC
+                MimeType.AUDIO.value,
+                MimeType.MP3.value,
+                MimeType.AAC.value,
+                MimeType.WAV.value,
+                MimeType.OGG.value,
+                MimeType.FLAC.value
             ) -> {
                 Icon(
                     imageVector = Icons.Filled.MusicNote,
@@ -90,13 +90,13 @@ fun AttachmentItem(
                 )
             }
             in listOf (
-                MimeType.IMAGE,
-                MimeType.JPEG,
-                MimeType.PNG,
-                MimeType.GIF,
-                MimeType.BMP,
-                MimeType.TIFF,
-                MimeType.WEBP
+                MimeType.IMAGE.value,
+                MimeType.JPEG.value,
+                MimeType.PNG.value,
+                MimeType.GIF.value,
+                MimeType.BMP.value,
+                MimeType.TIFF.value,
+                MimeType.WEBP.value
             ) -> {
                 Icon(
                     imageVector = Icons.Filled.Image,

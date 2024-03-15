@@ -5,7 +5,10 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import com.gp.socialapp.data.auth.repository.UserRepository
 import com.gp.socialapp.data.post.repository.PostRepository
 import com.gp.socialapp.data.post.repository.ReplyRepository
+import com.gp.socialapp.data.post.source.remote.model.MimeType
 import com.gp.socialapp.data.post.source.remote.model.Post
+import com.gp.socialapp.data.post.source.remote.model.PostFile
+import com.gp.socialapp.data.post.source.remote.model.Tag
 import com.gp.socialapp.data.post.util.PostPopularityUtils
 import com.gp.socialapp.util.Result
 import kotlinx.coroutines.Dispatchers
@@ -20,37 +23,28 @@ class FeedScreenModel(
     val replyRepository: ReplyRepository,
     val userRepository: UserRepository
 ): ScreenModel {
-    private val _tags = mutableSetOf<String>()
-    val tags: Set<String> = _tags
-    private val _selectedTagFilters = MutableStateFlow<Set<String>>(emptySet())
-    val selectedTagFilters = _selectedTagFilters.asStateFlow()
-    private val _isSortedByNewest = MutableStateFlow(true)
-    val isSortedByNewest = _isSortedByNewest.asStateFlow()
-    private val _uiState = MutableStateFlow<Result<List<Post>>>(Result.Idle)
-    val uiState = _uiState.asStateFlow()
     private val _state = MutableStateFlow(FeedUiState())
     val state = _state.asStateFlow()
     private fun getAllPosts() {
         screenModelScope.launch() {
             repository.getAllLocalPosts().collect { posts ->
                 posts.forEach { post ->
-                    _tags.addAll(post.tags.map{it.label})
+                    _state.update { it.copy(allTags = _state.value.allTags + post.tags) }
                 }
-                val filteredPosts = if (selectedTagFilters.value.isNotEmpty()) {
+                val filteredPosts = if (_state.value.selectedTags.isNotEmpty()) {
                     posts.filter { post ->
-                        post.tags.map { it.label }.intersect(selectedTagFilters.value).isNotEmpty()
+                        post.tags.intersect(_state.value.selectedTags).isNotEmpty()
                     }
                 } else {
                     posts
                 }
-                val sortedPosts = if (isSortedByNewest.value) {
+                val sortedPosts = if (_state.value.isSortedByNewest) {
                     filteredPosts.sortedByDescending { /*DateUtils.convertStringToDate(it.publishedAt)*/ it.publishedAt }
                 } else {
                     filteredPosts.sortedByDescending { PostPopularityUtils.calculateInteractionValue(it.votes, it.replyCount) }
                 }
                 withContext(Dispatchers.Main) {
-                    _uiState.value = Result.SuccessWithData(sortedPosts)
-                    _state.update { it.copy(posts = sortedPosts,  result = Result.Success) }
+                    _state.update { it.copy(posts = sortedPosts,  isFeedLoaded = Result.Success) }
                 }
             }
         }
@@ -89,8 +83,10 @@ class FeedScreenModel(
 //            unfilteredPosts.addAll(posts)
 //            Log.d("TAG258", "New Data by Newest: ${(uiState.value as? State.SuccessWithData<List<Post>>)?.data?.map{"${it.title} : ${it.votes}"} ?: emptyList()}")
 //        }
-        _isSortedByNewest.value = true
-        getAllPosts()
+        screenModelScope.launch {
+            _state.update { it.copy(isSortedByNewest = true) }
+            getAllPosts()
+        }
     }
 
     fun sortPostsByPopularity() {
@@ -109,11 +105,12 @@ class FeedScreenModel(
 //            unfilteredPosts.addAll(posts)
 //            Log.d("TAG258", "New Data by most popular: ${(uiState.value as? State.SuccessWithData<List<Post>>)?.data?.map{"${it.title} : ${it.votes}"} ?: emptyList()}")
 //        }
-        _isSortedByNewest.value = false
-        getAllPosts()
+        screenModelScope.launch {
+            _state.update { it.copy(isSortedByNewest = false) }
+            getAllPosts()
+        }
     }
     fun updateTagFilters(newFilters: List<String>){
-        _selectedTagFilters.value = newFilters.toSet()
-        getAllPosts()
+        _state.update { it.copy(selectedTags = _state.value.allTags.filter { newFilters.contains(it.label) }.toSet()) }
     }
 }

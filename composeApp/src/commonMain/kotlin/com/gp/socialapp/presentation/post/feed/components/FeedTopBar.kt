@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.gp.socialapp.presentation.post.feed.NavigationAction
 
 @Composable
 fun FeedTopBar(navigationAction: (NavigationAction) -> Unit) {

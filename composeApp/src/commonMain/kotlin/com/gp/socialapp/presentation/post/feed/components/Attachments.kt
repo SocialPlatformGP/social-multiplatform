@@ -13,11 +13,11 @@ fun Attachments(
 ) {
     val images = attachments.filter {
         it.type in listOf(
-            MimeType.JPEG,
-            MimeType.PNG,
-            MimeType.GIF,
-            MimeType.BMP,
-            MimeType.WEBP
+            MimeType.JPEG.value,
+            MimeType.PNG.value,
+            MimeType.GIF.value,
+            MimeType.BMP.value,
+            MimeType.WEBP.value
         )
     }
     if (images.isNotEmpty()) {

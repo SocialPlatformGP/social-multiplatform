@@ -1,4 +1,4 @@
-package com.gp.socialapp.presentation.post.feed.components
+package com.gp.socialapp.presentation.post.feed
 
 import com.gp.socialapp.data.post.source.remote.model.Post
 
