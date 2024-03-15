@@ -90,7 +90,6 @@ object CreatePostScreen : Screen {
                     .padding(it)
                     .fillMaxSize()
             ) {
-
                 MyTextField(
                     value = state.title,
                     label = "Title",
@@ -119,7 +118,7 @@ object CreatePostScreen : Screen {
                 FilesRow()
                 HorizontalDivider()
                 BottomOptionRow(
-                    onAddFileClicked = { openFilePicker() },
+                    onAddFileClicked = { /**/ },
                     onAddImageClicked = {/*TODO: Add image picker*/ },
                     onAddTagClicked = {
                         scope.launch { bottomSheetState.show() }.invokeOnCompletion {
@@ -179,4 +178,3 @@ object CreatePostScreen : Screen {
 
 }
 
-expect fun openFilePicker()

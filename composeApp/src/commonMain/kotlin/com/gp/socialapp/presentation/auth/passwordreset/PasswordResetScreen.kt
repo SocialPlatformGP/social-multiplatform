@@ -35,6 +35,9 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import org.jetbrains.compose.resources.stringResource
 import socialmultiplatform.composeapp.generated.resources.Res
+import socialmultiplatform.composeapp.generated.resources.email
+import socialmultiplatform.composeapp.generated.resources.reset_your_password
+import socialmultiplatform.composeapp.generated.resources.send_reset_email
 
 object PasswordResetScreen : Screen {
     @Composable

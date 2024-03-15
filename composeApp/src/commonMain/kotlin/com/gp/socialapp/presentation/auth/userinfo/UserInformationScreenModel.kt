@@ -15,6 +15,10 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDateTime
 import org.jetbrains.compose.resources.getString
 import socialmultiplatform.composeapp.generated.resources.Res
+import socialmultiplatform.composeapp.generated.resources.invalid_first_name
+import socialmultiplatform.composeapp.generated.resources.invalid_last_name
+import socialmultiplatform.composeapp.generated.resources.invalid_phone_number
+import socialmultiplatform.composeapp.generated.resources.user_must_be_at_least_18_years_old
 
 class UserInformationScreenModel(
     private val authRepo: AuthenticationRepository,

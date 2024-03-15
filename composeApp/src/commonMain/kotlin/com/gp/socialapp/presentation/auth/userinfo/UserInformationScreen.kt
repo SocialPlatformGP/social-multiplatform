@@ -58,17 +58,26 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDateTime
 import org.jetbrains.compose.resources.stringResource
 import socialmultiplatform.composeapp.generated.resources.Res
+import socialmultiplatform.composeapp.generated.resources.about
+import socialmultiplatform.composeapp.generated.resources.cancel
+import socialmultiplatform.composeapp.generated.resources.complete_profile
+import socialmultiplatform.composeapp.generated.resources.complete_your_profile
+import socialmultiplatform.composeapp.generated.resources.date_of_birth
+import socialmultiplatform.composeapp.generated.resources.first_name
+import socialmultiplatform.composeapp.generated.resources.last_name
+import socialmultiplatform.composeapp.generated.resources.phone_number
+import socialmultiplatform.composeapp.generated.resources.select
 
 data class UserInformationScreen(
     val email: String = "",
     val password: String = "",
-): Screen {
+) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = navigator.getNavigatorScreenModel<UserInformationScreenModel>()
         val state by screenModel.uiState.collectAsState()
-        if(state.createdState is Result.SuccessWithData){
+        if (state.createdState is Result.SuccessWithData) {
             val token = (state.createdState as Result.SuccessWithData).data
             println("Token: $token")
             //TODO("navigate to main with token)
@@ -112,11 +121,11 @@ data class UserInformationScreen(
         val scope = rememberCoroutineScope()
         val snackbarHostState = remember { SnackbarHostState() }
 
-        Scaffold (
+        Scaffold(
             snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
             modifier = Modifier.fillMaxSize(),
         ) {
-            if(state.error is AuthError.ServerError){
+            if (state.error is AuthError.ServerError) {
                 scope.launch {
                     snackbarHostState.showSnackbar((state.error as AuthError.ServerError).message)
                 }
@@ -241,7 +250,7 @@ data class UserInformationScreen(
 //                    }
                 ) {
                     OutlinedTextField(
-                        value = state.birthDate.let { if (it == LocalDateTime.now()) "" else pickedDate.toDDMMYYYY()},
+                        value = state.birthDate.let { if (it == LocalDateTime.now()) "" else pickedDate.toDDMMYYYY() },
                         onValueChange = {},
                         label = { Text(text = stringResource(Res.string.date_of_birth)) },
                         modifier = Modifier
@@ -318,7 +327,8 @@ data class UserInformationScreen(
                             TextButton(
                                 onClick = {
                                     isDateDialogOpen = false
-                                    val date = datePickerState.selectedDateMillis?.toLocalDateTime() ?: LocalDateTime.now()
+                                    val date = datePickerState.selectedDateMillis?.toLocalDateTime()
+                                        ?: LocalDateTime.now()
                                     onDateOfBirthChange(date)
                                 },
                                 enabled = confirmEnabled.value

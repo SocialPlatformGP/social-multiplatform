@@ -2,14 +2,14 @@ package com.gp.socialapp.presentation.auth.signup
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import com.gp.socialapp.presentation.auth.util.Validator
 import com.gp.socialapp.data.auth.repository.AuthenticationRepository
 import com.gp.socialapp.presentation.auth.util.AuthError
-import com.gp.socialapp.util.Result
 import com.gp.socialapp.presentation.auth.util.AuthError.EmailError
 import com.gp.socialapp.presentation.auth.util.AuthError.NoError
 import com.gp.socialapp.presentation.auth.util.AuthError.PasswordError
 import com.gp.socialapp.presentation.auth.util.AuthError.RePasswordError
+import com.gp.socialapp.presentation.auth.util.Validator
+import com.gp.socialapp.util.Result
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,15 +17,19 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.getString
 import socialmultiplatform.composeapp.generated.resources.Res
+import socialmultiplatform.composeapp.generated.resources.email_already_exists
+import socialmultiplatform.composeapp.generated.resources.invalid_email
+import socialmultiplatform.composeapp.generated.resources.invalid_password
+import socialmultiplatform.composeapp.generated.resources.passwords_dont_match
 
 class SignUpScreenModel(
     private val authRepo: AuthenticationRepository
-) : ScreenModel{
+) : ScreenModel {
     private val _uiState = MutableStateFlow(SignUpUiState())
     val uiState = _uiState.asStateFlow()
-    fun onSignUp(){
-        with(_uiState.value){
-            if(!Validator.EmailValidator.validateAll(email)){
+    fun onSignUp() {
+        with(_uiState.value) {
+            if (!Validator.EmailValidator.validateAll(email)) {
                 screenModelScope.launch {
                     val error = EmailError(getString(Res.string.invalid_email))
                     _uiState.value = _uiState.value.copy(error = error)
@@ -34,30 +38,30 @@ class SignUpScreenModel(
             } else {
                 _uiState.value = _uiState.value.copy(error = NoError)
             }
-            if (!Validator.PasswordValidator.validateAll(password)){
+            if (!Validator.PasswordValidator.validateAll(password)) {
                 screenModelScope.launch {
                     val error = PasswordError(getString(Res.string.invalid_password))
                     _uiState.value = _uiState.value.copy(error = error)
                 }
                 return
-            } else{
+            } else {
                 _uiState.value = _uiState.value.copy(error = NoError)
             }
-            if (rePassword != password){
+            if (rePassword != password) {
                 screenModelScope.launch {
                     val error = RePasswordError(getString(Res.string.passwords_dont_match))
                     _uiState.value = _uiState.value.copy(error = error)
                 }
                 return
-            } else{
+            } else {
                 _uiState.value = _uiState.value.copy(error = NoError)
             }
         }
         screenModelScope.launch {
-            Napier.d ("onSignUp: ${uiState.value}")
-            with(uiState.value){
-                authRepo.isEmailAvailable(email).collect{
-                    when (it){
+            Napier.d("onSignUp: ${uiState.value}")
+            with(uiState.value) {
+                authRepo.isEmailAvailable(email).collect {
+                    when (it) {
                         is Result.SuccessWithData -> {
                             if (it.data) {
                                 _uiState.value = _uiState.value.copy(
@@ -65,15 +69,18 @@ class SignUpScreenModel(
                                     isSignedUp = Result.Success
                                 )
                             } else {
-                                _uiState.value = _uiState.value.copy(error = EmailError(getString(Res.string.email_already_exists)))
+                                _uiState.value =
+                                    _uiState.value.copy(error = EmailError(getString(Res.string.email_already_exists)))
                             }
                         }
+
                         is Result.Error -> {
                             Napier.d("onSignUp: Error ${it.message}")
                             _uiState.value = _uiState.value.copy(
                                 error = AuthError.ServerError(it.message),
                             )
                         }
+
                         else -> {
                             Napier.d("onSignUp: else")
                         }
@@ -83,13 +90,16 @@ class SignUpScreenModel(
             }
         }
     }
-    fun onEmailChange(email: String){
+
+    fun onEmailChange(email: String) {
         _uiState.update { it.copy(email = email) }
     }
-    fun onPasswordChange(password: String){
+
+    fun onPasswordChange(password: String) {
         _uiState.update { it.copy(password = password) }
     }
-    fun rePasswordChange(rePassword: String){
+
+    fun rePasswordChange(rePassword: String) {
         _uiState.update { it.copy(rePassword = rePassword) }
     }
 }

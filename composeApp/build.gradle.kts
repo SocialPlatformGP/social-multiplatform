@@ -63,7 +63,8 @@ kotlin {
             implementation(libs.koin.compose)
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.serialization.kotlinx.json)
-//            implementation("com.mohamedrejeb.calf:calf-file-picker:0.4.0")
+            implementation(libs.calf.file.picker)
+//            api(libs.calf.ui)
 
 
         }

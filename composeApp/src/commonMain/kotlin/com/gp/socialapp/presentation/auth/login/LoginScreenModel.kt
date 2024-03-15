@@ -16,6 +16,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.getString
 import socialmultiplatform.composeapp.generated.resources.Res
+import socialmultiplatform.composeapp.generated.resources.invalid_email
+import socialmultiplatform.composeapp.generated.resources.invalid_password
 
 class LoginScreenModel(
     private val authRepo: AuthenticationRepository,
