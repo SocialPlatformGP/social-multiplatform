@@ -98,7 +98,7 @@ class PostRemoteDataSourceImpl : PostRemoteDataSource {
     }
 
     override fun getAllTags(): Flow<List<Tag>> {
-        TODO("Not yet implemented")
+        return flow {}
     }
 
     override suspend fun insertTag(tag: Tag) {

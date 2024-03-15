@@ -21,20 +21,21 @@ class CreatePostViewModel(
     private val _uiState = MutableStateFlow(CreatePostUIState())
     val uiState = _uiState.asStateFlow()
     val currentUser = MutableStateFlow(User())
+    val channelTags = MutableStateFlow<List<Tag>>(emptyList())
 
 
     init {
         getCurrentUser()
-//        getChannelTags()
+        getChannelTags()
     }
 
 
-    fun getChannelTags() {
-//        screenModelScope.launch {
-//            postRepository.getAllTags().collect {
-//                channelTags.value = it
-//            }
-//        }
+    private fun getChannelTags() {
+        screenModelScope.launch {
+            postRepository.getAllTags().collect {
+                channelTags.value = it
+            }
+        }
     }
 
     //
