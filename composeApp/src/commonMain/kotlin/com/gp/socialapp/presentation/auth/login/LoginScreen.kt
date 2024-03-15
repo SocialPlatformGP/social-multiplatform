@@ -52,6 +52,7 @@ import com.gp.socialapp.presentation.auth.signup.SignUpScreen
 import com.gp.socialapp.presentation.auth.util.AuthError.ServerError
 import com.gp.socialapp.presentation.auth.util.AuthError.EmailError
 import com.gp.socialapp.presentation.auth.util.AuthError.PasswordError
+import com.gp.socialapp.presentation.main.MainContainer
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import socialmultiplatform.composeapp.generated.resources.Res
@@ -63,16 +64,7 @@ object LoginScreen: Screen {
         val screenModel = navigator.getNavigatorScreenModel<LoginScreenModel>()
         val state by screenModel.uiState.collectAsState()
         if(state.token != null){
-            Button(
-                onClick = {
-                    screenModel.onLogOut()
-                },
-                modifier = Modifier.fillMaxWidth()){
-                Text(text = "LogOut")
-            }
-
-
-            //todo navigate to main
+            navigator.replaceAll(MainContainer)
         } else {
             LoginContent(
                 onSignInWithGoogle = { /*todo*/},

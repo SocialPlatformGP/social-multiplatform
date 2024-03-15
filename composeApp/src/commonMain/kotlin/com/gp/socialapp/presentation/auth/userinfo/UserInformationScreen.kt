@@ -47,6 +47,7 @@ import cafe.adriel.voyager.koin.getNavigatorScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gp.socialapp.presentation.auth.util.AuthError
+import com.gp.socialapp.presentation.main.MainContainer
 import com.gp.socialapp.util.LocalDateTimeUtil.now
 import com.gp.socialapp.util.LocalDateTimeUtil.toDDMMYYYY
 import com.gp.socialapp.util.LocalDateTimeUtil.toLocalDateTime
@@ -71,6 +72,7 @@ data class UserInformationScreen(
             val token = (state.createdState as Result.SuccessWithData).data
             println("Token: $token")
             //TODO("navigate to main with token)
+            navigator.replaceAll(MainContainer)
         }
         Scaffold { paddingValues ->
             UserInformationContent(
