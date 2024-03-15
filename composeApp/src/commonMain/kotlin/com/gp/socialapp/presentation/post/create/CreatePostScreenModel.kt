@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class CreatePostViewModel(
+class CreatePostScreenModel(
     private val postRepository: PostRepository,
     private val authRepository: AuthenticationRepository,
 ) : ScreenModel {
