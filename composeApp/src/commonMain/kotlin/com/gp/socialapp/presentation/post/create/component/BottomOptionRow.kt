@@ -23,7 +23,10 @@ fun BottomOptionRow(
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         MyOutlinedTextButton(
-            onClick = onAddTagClicked,
+            onClick = {
+                println("MyOutlinedTextButtonBOR: onClick")
+                onAddTagClicked()
+            },
             label = "add tags"
         )
         MyIconButton(

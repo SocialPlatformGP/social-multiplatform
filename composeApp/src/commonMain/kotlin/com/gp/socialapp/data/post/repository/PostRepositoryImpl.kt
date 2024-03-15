@@ -4,12 +4,19 @@ import com.gp.socialapp.data.post.source.local.PostLocalDataSource
 import com.gp.socialapp.data.post.source.remote.PostRemoteDataSource
 import com.gp.socialapp.data.post.source.remote.model.Post
 import com.gp.socialapp.data.post.source.remote.model.Tag
+import com.gp.socialapp.util.Result
 import kotlinx.coroutines.flow.Flow
 
 class PostRepositoryImpl(
     private val postLocalSource: PostLocalDataSource,
     private val postRemoteSource: PostRemoteDataSource,
-): PostRepository{
+) : PostRepository {
+
+
+    override suspend fun createPost(post: Post): Flow<Result<String>> {
+        return postRemoteSource.createPost(post)
+    }
+
     override suspend fun insertLocalPost(vararg post: Post) {
         postLocalSource.insertPost(*post)
     }
@@ -93,10 +100,13 @@ class PostRepositoryImpl(
     }
 
 
-    override suspend fun incrementReplyCounter(postId: String) = postRemoteSource.incrementReplyCounter(postId)
+    override suspend fun incrementReplyCounter(postId: String) =
+        postRemoteSource.incrementReplyCounter(postId)
 
-    override suspend fun decrementReplyCounter(postId: String) = postRemoteSource.decrementReplyCounter(postId)
-    override fun getAllTags()=postRemoteSource.getAllTags()
+    override suspend fun decrementReplyCounter(postId: String) =
+        postRemoteSource.decrementReplyCounter(postId)
+
+    override fun getAllTags() = postRemoteSource.getAllTags()
 
     override suspend fun insertTag(tag: Tag) = postRemoteSource.insertTag(tag)
 }

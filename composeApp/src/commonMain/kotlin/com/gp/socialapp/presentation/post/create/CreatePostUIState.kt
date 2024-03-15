@@ -13,5 +13,5 @@ data class CreatePostUIState(
     var cancelPressed: Boolean = false,
     var tags: List<Tag> = emptyList(),
     var type: String = "all",
-    var files: List<PostFile> = emptyList()
+    var files: List<PostFile> = emptyList(),
 )

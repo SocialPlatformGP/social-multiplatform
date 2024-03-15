@@ -1,22 +1,30 @@
 package com.gp.socialapp.presentation.post.create
 
 import cafe.adriel.voyager.core.model.ScreenModel
+import cafe.adriel.voyager.core.model.screenModelScope
+import com.gp.socialapp.data.auth.repository.AuthenticationRepository
+import com.gp.socialapp.data.auth.source.remote.model.User
+import com.gp.socialapp.data.post.repository.PostRepository
+import com.gp.socialapp.data.post.source.remote.model.Post
 import com.gp.socialapp.data.post.source.remote.model.PostFile
 import com.gp.socialapp.data.post.source.remote.model.Tag
+import com.gp.socialapp.util.Result
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 class CreatePostViewModel(
-//    private val postRepository: PostRepository,
-//    private val userRepository: UserRepository
+    private val postRepository: PostRepository,
+    private val authRepository: AuthenticationRepository,
 ) : ScreenModel {
     private val _uiState = MutableStateFlow(CreatePostUIState())
     val uiState = _uiState.asStateFlow()
+    val currentUser = MutableStateFlow(User())
 
 
     init {
-//        getCurrentUser()
+        getCurrentUser()
 //        getChannelTags()
     }
 
@@ -39,27 +47,33 @@ class CreatePostViewModel(
     }
 
     fun onCreatePost() {
-//        screenModelScope.launch {
-//            with(uiState.value) {
-//                val state =
-//                    postRepository.createPost(
-//                        Post(
-//                            userPfp = userProfilePicURL,
-//                            userName = "${currentUser.value.userFirstName} ${currentUser.value.userLastName}",
-//                            authorEmail = currentUserName!!,
-//                            title = title,
-//                            body = body,
-//                            tags = tags,
-//                            type = type,
-//                            attachments = emptyList()
-//                        ), uiState.value.files
-//                    )
-//                state.collect { newState ->
-//                    uiState.value = uiState.value.copy(createdState = newState)
-//                }
-//            }
-//            delay(500)
-//        }
+        screenModelScope.launch {
+            with(uiState.value) {
+                postRepository.createPost(
+                    Post(
+                        title = title,
+                        body = body,
+                        tags = tags,
+                        type = type,
+                        userName = currentUser.value.firstName + " " + currentUser.value.lastName,
+                        userPfp = currentUser.value.profilePictureURL,
+                        authorEmail = currentUser.value.email,
+                    )
+                ).collect {
+                    when (it) {
+                        is Result.SuccessWithData -> {
+                            println(it.data)
+                        }
+
+                        is Result.Error -> {
+                            println(it.message)
+                        }
+
+                        else -> Unit
+                    }
+                }
+            }
+        }
     }
 
     fun onCancel() {
@@ -71,19 +85,24 @@ class CreatePostViewModel(
 //        uiState.value.cancelPressed = false
     }
 
-    fun getCurrentUser() {
-//        screenModelScope.launch(Dispatchers.Default) {
-//            when (userRepository.fetchUser(currentUserName!!)) {
-//                is State.SuccessWithData -> {
-//                    currentUser.value =
-//                        (userRepository.fetchUser(currentUserName) as State.SuccessWithData<NetworkUser>).data
-//                    uiState.value =
-//                        uiState.value.copy(userProfilePicURL = currentUser.value.userProfilePictureURL)
-//                }
-//
-//                else -> {}
-//            }
-//        }
+    private fun getCurrentUser() {
+        screenModelScope.launch {
+            authRepository.getCurrentLocalUserId().let { id ->
+                authRepository.getSignedInUser(id).collect {
+                    when (it) {
+                        is Result.SuccessWithData -> {
+                            currentUser.value = it.data
+                        }
+
+                        is Result.Error -> {
+                            println("Error: cant get user data")
+                        }
+
+                        else -> Unit
+                    }
+                }
+            }
+        }
     }
 
     //

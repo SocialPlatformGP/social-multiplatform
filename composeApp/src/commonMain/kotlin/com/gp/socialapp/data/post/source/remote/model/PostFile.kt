@@ -4,7 +4,7 @@ package com.gp.socialapp.data.post.source.remote.model
 data class PostFile(
     val url: String = "",
     val name: String = "",
-    val type: MimeType,
+    val type: String = "",
     val size: Long = 0
 )
 

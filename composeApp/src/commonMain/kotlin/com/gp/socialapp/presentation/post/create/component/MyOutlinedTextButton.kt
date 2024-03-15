@@ -14,7 +14,11 @@ fun MyOutlinedTextButton(
     label: String,
 ) {
     OutlinedButton(
-        onClick = onClick, shape = RoundedCornerShape(16.dp)
+        onClick = {
+            println("MyOutlinedTextButton: onClick")
+            onClick()
+        },
+        shape = RoundedCornerShape(16.dp)
     ) {
         Text(
             text = label,

@@ -11,7 +11,10 @@ fun MyIconButton(
     icon: ImageVector
 ) {
     IconButton(
-        onClick = onClick
+        onClick = {
+            println("MyIconButton: onClick")
+            onClick()
+        }
     ) {
         Icon(
             imageVector = icon,
