@@ -113,7 +113,6 @@ object CreatePostScreen : Screen {
                 ModalBottomSheet(
                     onDismissRequest = { openBottomSheet = false },
                     sheetState = bottomSheetState,
-//                    windowInsets = windowInsets,
                 ) {
                     LazyColumn {
                         items(50) {
