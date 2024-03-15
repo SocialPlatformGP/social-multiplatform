@@ -8,7 +8,9 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import com.gp.socialapp.di.appModules
+import com.gp.socialapp.presentation.main.MainContainer
 import com.gp.socialapp.presentation.post.create.CreatePostScreen
+import com.gp.socialapp.presentation.post.feed.FeedScreen
 import com.gp.socialapp.theme.AppTheme
 import org.koin.compose.KoinApplication
 
@@ -18,41 +20,10 @@ internal fun App() {
         modules(appModules)
     })) {
         AppTheme {
-//            TabNavigator(PostsTab) {
-//                Scaffold(
-//                    content = {
-//                        CurrentTab()
-//                    },
-//                    bottomBar = {
-//                        NavigationBar {
-//                            TabNavigationItem(tab = PostsTab)
-//                            TabNavigationItem(tab = ChatTab)
-//                            TabNavigationItem(tab = MaterialTab)
-//                        }
-//                    }
-//                )
-//            }
             Navigator(
-                CreatePostScreen
+                MainContainer
             )
         }
     }
 }
 
-@Composable
-private fun RowScope.TabNavigationItem(tab: Tab) {
-    val tabNavigator = LocalTabNavigator.current
-    NavigationBarItem(
-        selected = tabNavigator.current == tab,
-        onClick = { tabNavigator.current = tab },
-        icon = {
-            tab.options.icon?.let { icon ->
-                Icon(
-                    painter = icon,
-                    contentDescription =
-                    tab.options.title
-                )
-            }
-        }
-    )
-}
