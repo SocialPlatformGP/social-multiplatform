@@ -11,25 +11,24 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.PhoneAndroid
-import androidx.compose.material.icons.filled.PhotoCamera
+import androidx.compose.material.icons.rounded.Create
 import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -49,7 +48,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -178,54 +176,41 @@ data class UserInformationScreen(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Box(
-                    modifier = Modifier
-                        .width(100.dp)
-                        .height(100.dp)
-                        .wrapContentWidth(align = Alignment.CenterHorizontally)
-                        .clickable {
-                            onProfileImageClicked()
-                        }
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     val imageModifier = Modifier
-                        .fillMaxSize()
+                        .size(100.dp)
                         .align(Alignment.Center)
                         .clip(CircleShape)
-                if(state.pfpImageByteArray.isEmpty()){
-                    Icon(
-                        imageVector = Icons.Filled.AccountCircle,
-                        contentDescription = null,
-                        modifier = imageModifier
-                    )
-                } else {
-                    val bitmap = state.pfpImageByteArray.toImageBitmap()
-                    Image(
-                        bitmap = bitmap,
-                        contentDescription = null,
-                        modifier = imageModifier,
-                        contentScale = ContentScale.Crop
-                    )
-                }
-                IconButton(
-                    content = {
-                              Icon(
-                                  imageVector = Icons.Filled.Edit,
-                                  contentDescription = null,
-                              )
-                    },
-                    onClick = {
-                        onProfileImageClicked()
-                    },
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .padding(4.dp)
-                        .clip(CircleShape),
-                    colors = IconButtonColors(
-                        containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onPrimary,
-                        disabledContainerColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                        disabledContentColor = MaterialTheme.colorScheme.onSecondary
-                    )
-                )
+                    if (state.pfpImageByteArray.isEmpty()) {
+                        Icon(
+                            imageVector = Icons.Filled.AccountCircle,
+                            contentDescription = null,
+                            modifier = imageModifier,
+                            tint = MaterialTheme.colorScheme.outline
+                        )
+                    } else {
+                        val bitmap = state.pfpImageByteArray.toImageBitmap()
+                        Image(
+                            bitmap = bitmap,
+                            contentDescription = null,
+                            modifier = imageModifier,
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                    IconButton(
+                        onClick = { onProfileImageClicked() },
+                        modifier = Modifier
+                            .offset(x = 38.dp, y = 38.dp)
+                            .background(MaterialTheme.colorScheme.secondaryContainer, CircleShape)
+                            .size(32.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.Create,
+                            contentDescription = null,
+                        )
+                    }
                 }
                 Row {
                     OutlinedTextField(
@@ -245,7 +230,7 @@ data class UserInformationScreen(
                         },
                         modifier = Modifier
                             .weight(1f)
-                            .padding(end = 4.dp),
+                            .padding(top = 8.dp, end = 4.dp),
                     )
                     OutlinedTextField(
                         value = state.lastName,
@@ -290,11 +275,7 @@ data class UserInformationScreen(
                         )
                     }
                 )
-                Box(
-//                    modifier = Modifier.clickable {
-//                        isDateDialogOpen = true
-//                    }
-                ) {
+                Box {
                     OutlinedTextField(
                         value = state.birthDate.let { if (it == LocalDateTime.now()) "" else pickedDate.toDDMMYYYY() },
                         onValueChange = {},
