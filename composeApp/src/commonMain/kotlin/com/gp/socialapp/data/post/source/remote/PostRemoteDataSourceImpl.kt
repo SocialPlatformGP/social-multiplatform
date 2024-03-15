@@ -5,8 +5,10 @@ import com.gp.socialapp.data.post.source.remote.model.Tag
 import com.gp.socialapp.util.Result
 import io.github.aakira.napier.Napier
 import io.ktor.client.HttpClient
+import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.HttpRequestBuilder
+import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
@@ -65,6 +67,47 @@ class PostRemoteDataSourceImpl : PostRemoteDataSource {
         }
     }
 
+    override suspend fun insertTag(tag: Tag) {
+        try {
+            val response = httpClient.post {
+                endPoint("insertTag")
+                setBody(
+                    tag
+                )
+            }
+            val message = response.bodyAsText()
+            if (response.status == HttpStatusCode.OK) {
+                Napier.d("insertTag: $message")
+            } else {
+                Napier.e("insertTag: $message")
+            }
+        } catch (e: Exception) {
+            Napier.e("insertTag: ${e.message}")
+        }
+    }
+
+    override fun getAllTags(): Flow<List<Tag>> {
+        return flow {
+            try {
+                val response = httpClient.get {
+                    endPoint("getAllTags")
+                }
+                println("response: ${response.status}")
+                if (response.status == HttpStatusCode.OK) {
+                    val tags = response.body<List<Tag>>()
+                    println("tags: $tags")
+                    emit(tags)
+                } else {
+                    emit(emptyList())
+                }
+            } catch (e: Exception) {
+                Napier.e("getAllTags: ${e.message}")
+                emit(emptyList())
+            }
+        }
+    }
+
+
     override fun fetchPosts(): Flow<List<Post>> {
         TODO("Not yet implemented")
     }
@@ -97,11 +140,5 @@ class PostRemoteDataSourceImpl : PostRemoteDataSource {
         TODO("Not yet implemented")
     }
 
-    override fun getAllTags(): Flow<List<Tag>> {
-        return flow {}
-    }
 
-    override suspend fun insertTag(tag: Tag) {
-        TODO("Not yet implemented")
-    }
 }

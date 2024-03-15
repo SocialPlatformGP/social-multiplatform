@@ -25,26 +25,29 @@ class CreatePostScreenModel(
 
 
     init {
-        getCurrentUser()
+//        getCurrentUser()
         getChannelTags()
     }
 
 
     private fun getChannelTags() {
         screenModelScope.launch {
-            postRepository.getAllTags().collect {
-                channelTags.value = it
+            postRepository.getAllTags().collect { tags ->
+
+                channelTags.update { tags }
+                println(channelTags.value)
             }
         }
     }
 
     //
-    fun insertNewTags(tags: List<Tag>) {
-//        screenModelScope.launch {
-//            tags.forEach {
-//                postRepository.insertTag(it)
-//            }
-//        }
+    fun insertNewTags(tags: Set<Tag>) {
+        screenModelScope.launch {
+            tags.toSet().forEach {
+                postRepository.insertTag(it)
+            }
+        }
+        _uiState.update { it.copy(tags = (uiState.value.tags + tags)) }
     }
 
     fun onCreatePost() {

@@ -9,14 +9,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.gp.socialapp.data.post.source.remote.model.MimeType
 import com.gp.socialapp.data.post.source.remote.model.Post
 import com.gp.socialapp.data.post.source.remote.model.PostFile
-import com.gp.socialapp.data.post.source.remote.model.Tag
-import com.gp.socialapp.di.appModules
-import com.gp.socialapp.di.initKoin
 import com.gp.socialapp.presentation.app.App
-import com.gp.socialapp.presentation.post.feed.components.AttachmentItem
 import com.gp.socialapp.presentation.post.feed.components.FeedPostItem
-import com.gp.socialapp.presentation.post.feed.components.TagItem
-import com.gp.socialapp.presentation.post.feed.components.UserImage
 import com.gp.socialapp.theme.AppTheme
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
@@ -46,6 +40,8 @@ class AppActivity : ComponentActivity() {
             App()
         }
     }
+
+
 }
 
 //@Preview
@@ -64,7 +60,10 @@ fun AttachmentItemPreview() {
         userName = "Eminem",
         publishedAt = "Tomorrow",
         votes = 15,
-        attachments = listOf(PostFile(type = MimeType.PDF), PostFile(type = MimeType.VIDEO))
+        attachments = listOf(
+            PostFile(type = MimeType.PDF.value),
+            PostFile(type = MimeType.VIDEO.value)
+        )
     )
     AppTheme {
         FeedPostItem(post = post, onPostEvent = {}, currentUserID = "0000")

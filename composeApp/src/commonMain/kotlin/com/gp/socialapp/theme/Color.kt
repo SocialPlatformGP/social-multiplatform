@@ -76,3 +76,17 @@ val tag_color_9 = Color(0xFF424242)
 
 
 val seed = Color(0xFF222F86)
+
+object TagsColorPalette {
+    val fixedColor = listOf(
+        tag_color_1,
+        tag_color_2,
+        tag_color_3,
+        tag_color_4,
+        tag_color_5,
+        tag_color_6,
+        tag_color_7,
+        tag_color_8,
+        tag_color_9
+    ).shuffled()
+}

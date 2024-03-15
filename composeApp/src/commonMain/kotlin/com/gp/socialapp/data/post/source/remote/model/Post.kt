@@ -2,6 +2,7 @@ package com.gp.socialapp.data.post.source.remote.model
 
 import com.gp.socialapp.data.post.util.PostPopularityUtils
 
+@kotlinx.serialization.Serializable
 data class Post(
     val replyCount: Int = 0,
     val userName: String = "",
