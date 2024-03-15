@@ -69,7 +69,7 @@ object CreatePostScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val screenModel = navigator.getNavigatorScreenModel<CreatePostViewModel>()
+        val screenModel = navigator.getNavigatorScreenModel<CreatePostScreenModel>()
         val state by screenModel.uiState.collectAsState()
         MaterialTheme {
             CreatePostContent(
