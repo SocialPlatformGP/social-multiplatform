@@ -115,6 +115,7 @@ android {
         manifest.srcFile("src/androidMain/AndroidManifest.xml")
         res.srcDirs("src/androidMain/resources")
         resources.srcDirs("src/commonMain/resources")
+
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -168,10 +169,10 @@ apollo {
     }
 }
 
-tasks.withType<LintModelWriterTask>{
+tasks.withType<LintModelWriterTask> {
     dependsOn("copyFontsToAndroidAssets")
 }
 
-tasks.withType<AndroidLintAnalysisTask>{
+tasks.withType<AndroidLintAnalysisTask> {
     dependsOn("copyFontsToAndroidAssets")
 }

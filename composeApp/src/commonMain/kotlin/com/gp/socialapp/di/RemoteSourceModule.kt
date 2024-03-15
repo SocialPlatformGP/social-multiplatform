@@ -6,16 +6,15 @@ import com.gp.socialapp.data.auth.source.remote.AuthenticationRemoteDataSourceIm
 import com.gp.socialapp.data.auth.source.remote.UserRemoteDataSource
 import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.data.post.source.remote.PostRemoteDataSource
+import com.gp.socialapp.data.post.source.remote.PostRemoteDataSourceImpl
 import com.gp.socialapp.data.post.source.remote.ReplyRemoteDataSource
-import com.gp.socialapp.data.post.source.remote.model.Post
 import com.gp.socialapp.data.post.source.remote.model.Reply
-import com.gp.socialapp.data.post.source.remote.model.Tag
 import com.gp.socialapp.util.Result
-import io.ktor.client.HttpClient
 import kotlinx.coroutines.flow.Flow
 import org.koin.dsl.module
 
 val remoteDataSourceModule = module {
+    single<PostRemoteDataSource> { PostRemoteDataSourceImpl() }
     single<UserRemoteDataSource> {
         object : UserRemoteDataSource {
             override fun createUser(user: User, pfpURI: Uri): Flow<Result<Nothing>> {
@@ -48,54 +47,6 @@ val remoteDataSourceModule = module {
         }
     }
     single<AuthenticationRemoteDataSource> { AuthenticationRemoteDataSourceImpl() }
-    single<PostRemoteDataSource> {
-        object : PostRemoteDataSource {
-            override fun createPost(post: Post): Flow<Result<Nothing>> {
-                TODO("Not yet implemented")
-            }
-
-            override fun fetchPosts(): Flow<List<Post>> {
-                TODO("Not yet implemented")
-            }
-
-            override suspend fun updatePost(post: Post) {
-                TODO("Not yet implemented")
-            }
-
-            override suspend fun deletePost(post: Post) {
-                TODO("Not yet implemented")
-            }
-
-            override suspend fun upVotePost(post: Post) {
-                TODO("Not yet implemented")
-            }
-
-            override suspend fun downVotePost(post: Post) {
-                TODO("Not yet implemented")
-            }
-
-            override fun fetchPostById(id: String): Flow<Post> {
-                TODO("Not yet implemented")
-            }
-
-            override suspend fun incrementReplyCounter(postId: String) {
-                TODO("Not yet implemented")
-            }
-
-            override suspend fun decrementReplyCounter(postId: String) {
-                TODO("Not yet implemented")
-            }
-
-            override fun getAllTags(): Flow<List<Tag>> {
-                TODO("Not yet implemented")
-            }
-
-            override suspend fun insertTag(tag: Tag) {
-                TODO("Not yet implemented")
-            }
-
-        }
-    }
     single<ReplyRemoteDataSource> {
         object : ReplyRemoteDataSource {
             override suspend fun createReply(reply: Reply) {

@@ -1,8 +1,6 @@
 package com.gp.socialapp
 
 import android.app.Application
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -22,10 +20,6 @@ import com.gp.socialapp.presentation.post.feed.components.UserImage
 import com.gp.socialapp.theme.AppTheme
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
-import org.koin.android.ext.koin.androidContext
-import org.koin.android.ext.koin.androidLogger
-import org.koin.core.context.startKoin
-import org.koin.dsl.module
 
 class AndroidApp : Application() {
     companion object {
@@ -36,16 +30,12 @@ class AndroidApp : Application() {
         super.onCreate()
         INSTANCE = this
         Napier.base(DebugAntilog())
-        startKoin {
-            androidContext(this@AndroidApp)
-            androidLogger()
-            modules(appModules)
-        }
-
-//        initKoin {
+//        startKoin {
 //            androidContext(this@AndroidApp)
 //            androidLogger()
+//            modules(appModules)
 //        }
+
     }
 }
 
@@ -80,3 +70,4 @@ fun AttachmentItemPreview() {
         FeedPostItem(post = post, onPostEvent = {}, currentUserID = "0000")
     }
 }
+

@@ -2,10 +2,10 @@ package com.gp.socialapp.presentation.auth.userinfo
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import com.gp.socialapp.presentation.auth.util.Validator
 import com.gp.socialapp.data.auth.repository.AuthenticationRepository
 import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.presentation.auth.util.AuthError
+import com.gp.socialapp.presentation.auth.util.Validator
 import com.gp.socialapp.util.LocalDateTimeUtil.toMillis
 import com.gp.socialapp.util.Result
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -78,8 +78,9 @@ class UserInformationScreenModel(
                     when (state) {
                         is Result.SuccessWithData -> {
                             _uiState.value = uiState.value.copy(createdState = state)
-                            authRepo.setLocalUserToken(state.data)
+                            authRepo.setLocalUserToken(state.data.token)
                         }
+
                         is Result.Error -> {
                             val error = AuthError.ServerError(state.message)
                             _uiState.value = uiState.value.copy(error = error)

@@ -6,8 +6,9 @@ import com.gp.socialapp.util.Result
 import kotlinx.coroutines.flow.Flow
 
 interface PostRemoteDataSource {
-    fun createPost(post: Post): Flow<Result<Nothing>>
-//    fun createPostWithFiles(post: Post, files: List<PostFile>): Flow<Result<Nothing>>
+    suspend fun createPost(post: Post): Flow<Result<String>>
+
+    //    fun createPostWithFiles(post: Post, files: List<PostFile>): Flow<Result<Nothing>>
     fun fetchPosts(): Flow<List<Post>>
     suspend fun updatePost(post: Post)
     suspend fun deletePost(post: Post)

@@ -1,4 +1,5 @@
 package com.gp.socialapp.theme
+
 import androidx.compose.ui.graphics.Color
 
 val md_theme_light_primary = Color(0xFF4A57AE)
@@ -62,6 +63,16 @@ val md_theme_dark_shadow = Color(0xFF000000)
 val md_theme_dark_surfaceTint = Color(0xFFBCC3FF)
 val md_theme_dark_outlineVariant = Color(0xFF46464F)
 val md_theme_dark_scrim = Color(0xFF000000)
+
+val tag_color_1 = Color(0xFFB71C1C)
+val tag_color_2 = Color(0xFFC51162)
+val tag_color_3 = Color(0xFFAA00FF)
+val tag_color_4 = Color(0xFF4527A0)
+val tag_color_5 = Color(0xFF0D47A1)
+val tag_color_6 = Color(0xFF006064)
+val tag_color_7 = Color(0xFF1B5E20)
+val tag_color_8 = Color(0xFF3E2723)
+val tag_color_9 = Color(0xFF424242)
 
 
 val seed = Color(0xFF222F86)
