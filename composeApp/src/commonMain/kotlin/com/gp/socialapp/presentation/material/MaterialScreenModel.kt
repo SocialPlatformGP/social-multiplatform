@@ -1,6 +1,8 @@
 package com.gp.socialapp.presentation.material
 
 
+import cafe.adriel.voyager.core.model.ScreenModel
+import cafe.adriel.voyager.core.model.screenModelScope
 import com.eygraber.uri.Uri
 import com.gp.material.model.MaterialItem
 import com.gp.material.repository.MaterialRepository
@@ -10,7 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class MaterialViewModel(private val materialRepo: MaterialRepository) : ViewModel() {
+class MaterialScreenModel(private val materialRepo: MaterialRepository) : ScreenModel {
     private val _actionResult = MutableStateFlow<Result<String>>(Result.Idle)
     val actionResult = _actionResult.asStateFlow()
 
@@ -24,7 +26,7 @@ class MaterialViewModel(private val materialRepo: MaterialRepository) : ViewMode
     val items = _items.asStateFlow()
 
     init {
-        viewModelScope.launch {
+        screenModelScope.launch {
             _currentPath.collect {
                 fetchDataFromFirebaseStorage()
             }
@@ -32,7 +34,7 @@ class MaterialViewModel(private val materialRepo: MaterialRepository) : ViewMode
     }
 
     private fun fetchDataFromFirebaseStorage() {
-        viewModelScope.launch {
+        screenModelScope.launch {
             materialRepo.getListOfFiles(_currentPath.value).collect {
                 when (it) {
                     is Result.SuccessWithData -> {
@@ -65,7 +67,7 @@ class MaterialViewModel(private val materialRepo: MaterialRepository) : ViewMode
     }
 
     fun uploadFile(fileUri: Uri) {
-        viewModelScope.launch {
+        screenModelScope.launch {
             materialRepo.uploadFile(_currentPath.value, fileUri).collect {
                 when (it) {
                     is Result.Success -> {
@@ -89,7 +91,7 @@ class MaterialViewModel(private val materialRepo: MaterialRepository) : ViewMode
     }
 
     fun uploadFolder(name: String) {
-        viewModelScope.launch {
+        screenModelScope.launch {
             materialRepo.uploadFolder(_currentPath.value, name).collect {
                 when (it) {
                     is Result.Success -> {
@@ -113,7 +115,7 @@ class MaterialViewModel(private val materialRepo: MaterialRepository) : ViewMode
     }
 
     fun deleteFolder(currentPath: String) {
-        viewModelScope.launch {
+        screenModelScope.launch {
             materialRepo.deleteFolder(currentPath).collect {
                 when (it) {
                     is Result.Success -> {
@@ -137,7 +139,7 @@ class MaterialViewModel(private val materialRepo: MaterialRepository) : ViewMode
     }
 
     fun deleteFile(fileLocation: String) {
-        viewModelScope.launch {
+        screenModelScope.launch {
             materialRepo.deleteFile(fileLocation).collect {
                 when (it) {
                     is Result.Success -> {

@@ -60,7 +60,6 @@ class FabItem(
 fun MultiFloatingActionButton(
     fabIcon: ImageVector,
     items: List<FabItem>,
-    backgroundColor: Color,
     showLabels: Boolean = true,
     onStateChanged: ((state: MultiFabState) -> Unit)? = null
 ) {
@@ -124,8 +123,7 @@ fun MultiFloatingActionButton(
                     SmallFloatingActionButtonRow(
                         item = item,
                         stateTransition = stateTransition,
-                        showLabel = showLabels,
-                        backgroundColor = backgroundColor
+                        showLabel = showLabels
                     )
                     Spacer(modifier = Modifier.height(20.dp))
                 }
@@ -154,7 +152,6 @@ fun MultiFloatingActionButton(
 fun SmallFloatingActionButtonRow(
     item: FabItem,
     showLabel: Boolean,
-    backgroundColor: Color,
     stateTransition: Transition<MultiFabState>
 ) {
     val alpha: Float by stateTransition.animateFloat(
@@ -192,8 +189,8 @@ fun SmallFloatingActionButtonRow(
                 item.onFabItemClicked()
 //                onDismiss()
             },
-//            containerColor = Color(0xff222f86),
-//            contentColor = Color.White
+           containerColor = Color(0xff222f86),
+           contentColor = Color.White
         ) {
             Icon(
                 painter = item.icon,

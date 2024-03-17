@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
+import com.gp.material.presentation.MaterialScreen
 import com.gp.socialapp.di.appModules
 import com.gp.socialapp.presentation.auth.signup.SignUpScreen
 
@@ -35,7 +36,8 @@ internal fun App() {
 //                )
 //            }
             Navigator(
-                SignUpScreen
+
+                MaterialScreen
             )
         }
     }

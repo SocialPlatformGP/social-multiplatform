@@ -26,7 +26,7 @@ object ChatHomeScreen: Screen {
                 text = "Chat Screen",
                 style = MaterialTheme.typography.displaySmall,
                 modifier = Modifier.clickable {
-                    navigator.push(MaterialScreen("Mohammed"))
+                    //navigator.push(MaterialScreen("Mohammed"))
                 }
             )
         }

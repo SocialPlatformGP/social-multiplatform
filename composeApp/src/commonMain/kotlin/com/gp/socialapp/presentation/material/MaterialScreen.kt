@@ -38,6 +38,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -56,83 +57,135 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.koin.getNavigatorScreenModel
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gp.material.model.FileType
 import com.gp.material.model.MaterialItem
-import com.gp.socialapp.presentation.material.MaterialViewModel
+import com.gp.socialapp.presentation.auth.signup.SignUpScreenModel
+import com.gp.socialapp.presentation.material.MaterialScreenModel
 import com.gp.socialapp.theme.AppTheme
 import org.jetbrains.compose.resources.painterResource
+import socialmultiplatform.composeapp.generated.resources.Res
 
-@Composable
-fun MaterialScreen(
-    modifier: Modifier = Modifier,
-    isAdmin: Boolean,
-    onOpenFile: (MaterialItem) -> Unit,
-    onFolderClicked: (String) -> Unit,
-    onDownloadFile: (MaterialItem) -> Unit,
-    onShareLink: (MaterialItem) -> Unit,
-    onBackPressed: () -> Unit,
-    onNewFileClicked: () -> Unit,
-    viewModel: MaterialViewModel,
-) {
-    val items by viewModel.items.collectAsStateWithLifecycle()
-    val currentPath by viewModel.currentPath.collectAsStateWithLifecycle()
-    var isCreateDialogOpen by remember { mutableStateOf(false) }
-    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
-    var isFileDetailsDialogOpen by remember { mutableStateOf(false) }
-    var fileWithOpenDetails by remember { mutableStateOf(MaterialItem()) }
-    val folderDropDownItems = listOf("Delete")
-    val fileDropDownItems = listOf("Download", "Share", "Details", "Delete")
-    val onDropDownItemClicked: (String, MaterialItem) -> Unit = { dropDownItem, item ->
-        if (item.fileType == FileType.FOLDER) {
-            if (dropDownItem == "Delete") {
-                viewModel.deleteFolder(item.path)
+object MaterialScreen:Screen {
+        @Composable
+        override fun Content() {
+            val navigator = LocalNavigator.currentOrThrow
+            val screenModel = navigator.getNavigatorScreenModel<MaterialScreenModel>()
+           // val state by screenModel.items.collectAsState()
+            val state=listOf(
+                MaterialItem(
+                    name = "Folder 1",
+                    fileType = FileType.FOLDER,
+                    size = "N/A",
+                    createdBy = "User1",
+                    creationTime = "2022-01-01 12:00:00",
+                    path = "/materials/folder1"
+                ),
+                MaterialItem(
+                    name = "Folder 2",
+                    fileType = FileType.FOLDER,
+                    size = "N/A",
+                    createdBy = "User2",
+                    creationTime = "2022-01-02 12:00:00",
+                    path = "/materials/folder2"
+                ),
+                MaterialItem(
+                    name = "File PDF",
+                    fileType = FileType.PDF,
+                    size = "2 MB",
+                    createdBy = "User3",
+                    creationTime = "2022-01-03 12:00:00",
+                    path = "/materials/filepdf.pdf"
+                ),
+                MaterialItem(
+                    name = "File Video",
+                    fileType = FileType.VIDEO,
+                    size = "6.5 MB",
+                    createdBy = "User4",
+                    creationTime = "2022-01-04 12:00:00",
+                    path = "/materials/filevideo.mp4"
+                ),
+                MaterialItem(
+                    name = "File Image",
+                    fileType = FileType.IMAGE,
+                    size = "6.5 MB",
+                    createdBy = "User5",
+                    creationTime = "2022-01-05 12:00:00",
+                    path = "/materials/fileimage.jpg"
+                )
+            )
+            val currentPath by screenModel.currentPath.collectAsState()
+            val isLoading by screenModel.isLoading.collectAsState()
+            var isCreateDialogOpen by remember { mutableStateOf(false) }
+            var isFileDetailsDialogOpen by remember { mutableStateOf(false) }
+            var fileWithOpenDetails by remember { mutableStateOf(MaterialItem()) }
+            val folderDropDownItems = listOf("Delete")
+            val fileDropDownItems = listOf("Download", "Share", "Details", "Delete")
+            val onDropDownItemClicked: (String, MaterialItem) -> Unit = { dropDownItem, item ->
+                if (item.fileType == FileType.FOLDER) {
+                    if (dropDownItem == "Delete") {
+                        screenModel.deleteFolder(item.path)
+                    }
+                } else {
+                    when (dropDownItem) {
+                        "Delete" -> {
+                            screenModel.deleteFile(item.path)
+                        }
+
+                        "Download" -> {
+                           // onDownloadFile(item)
+                        }
+
+                        "Share" -> {
+                           // onShareLink(item)
+                        }
+
+                        "Details" -> {
+                            fileWithOpenDetails = item
+                            isFileDetailsDialogOpen = true
+                        }
+                    }
+                }
             }
-        } else {
-            when (dropDownItem) {
-                "Delete" -> {
-                    viewModel.deleteFile(item.path)
-                }
+            MaterialTheme{
 
-                "Download" -> {
-                    onDownloadFile(item)
-                }
-
-                "Share" -> {
-                    onShareLink(item)
-                }
-
-                "Details" -> {
-                    fileWithOpenDetails = item
-                    isFileDetailsDialogOpen = true
-                }
+                MaterialContent(
+                    currentPath = currentPath,
+                    onBackPressed ={} //onBackPressed
+                    ,
+                    currentFolderName = screenModel.getCurrentFolderName(currentPath),
+                    isAdmin = true//isAdmin
+                    ,
+                    isCreateDialogOpen = isCreateDialogOpen,
+                    onShowCreateDialog = { isCreateDialogOpen = true },
+                    onDismissCreateDialog = { isCreateDialogOpen = false },
+                    onNewFileClicked = { }//onNewFileClicked
+                    ,
+                    items = state,
+                    onFolderClicked = { }//onFolderClicked
+                    ,
+                    onOpenFile ={ } //onOpenFile
+                    ,
+                    folderDropDownItems = folderDropDownItems,
+                    fileDropDownItems = fileDropDownItems,
+                    onDropDownItemClicked = onDropDownItemClicked,
+                    isLoading = isLoading,
+                    onUploadFolder = screenModel::uploadFolder,
+                    isFileDetailsDialogOpen = isFileDetailsDialogOpen,
+                    onDismissFileDetailsDialog = { isFileDetailsDialogOpen = false },
+                    fileWithOpenDetails = fileWithOpenDetails
+                )
             }
+
         }
-    }
-    MaterialScreen(
-        currentPath = currentPath,
-        onBackPressed = onBackPressed,
-        currentFolderName = viewModel.getCurrentFolderName(currentPath),
-        isAdmin = isAdmin,
-        isCreateDialogOpen = isCreateDialogOpen,
-        onShowCreateDialog = { isCreateDialogOpen = true },
-        onDismissCreateDialog = { isCreateDialogOpen = false },
-        onNewFileClicked = onNewFileClicked,
-        items = items,
-        onFolderClicked = onFolderClicked,
-        onOpenFile = onOpenFile,
-        folderDropDownItems = folderDropDownItems,
-        fileDropDownItems = fileDropDownItems,
-        onDropDownItemClicked = onDropDownItemClicked,
-        isLoading = isLoading,
-        onUploadFolder = viewModel::uploadFolder,
-        isFileDetailsDialogOpen = isFileDetailsDialogOpen,
-        onDismissFileDetailsDialog = { isFileDetailsDialogOpen = false },
-        fileWithOpenDetails = fileWithOpenDetails
-    )
+
 }
 
 @Composable
-fun MaterialScreen(
+fun MaterialContent(
     modifier: Modifier = Modifier,
     currentPath: String,
     onBackPressed: () -> Unit,
@@ -159,7 +212,6 @@ fun MaterialScreen(
         modifier = modifier.fillMaxSize(),
         topBar = {
             Card(
-
                 shape = RoundedCornerShape(0.dp),
                 elevation = CardDefaults.cardElevation(
                     defaultElevation = 10.dp
@@ -196,19 +248,18 @@ fun MaterialScreen(
                     fabIcon = Icons.Filled.Add,
                     items = arrayListOf(
                         FabItem(
-                            icon = painterResource(id = R.drawable.baseline_create_new_folder_24),
+                            icon = painterResource(resource = Res.drawable.add_file),
                             label = "Create Folder",
-                            backgroundColor = Color(0xff222f86),
+                            backgroundColor = Color.White,
                             onFabItemClicked = onShowCreateDialog
                         ),
                         FabItem(
-                            icon = painterResource(id = R.drawable.baseline_upload_file_24),
+                            icon = painterResource(resource = Res.drawable.upload),
                             label = "Upload File",
-                            backgroundColor = Color.DarkGray,
+                            backgroundColor = Color.White,
                             onFabItemClicked = onNewFileClicked
                         )
                     ),
-                    backgroundColor = MaterialTheme.colorScheme.tertiaryContainer
                 )
             }
         },
@@ -376,18 +427,18 @@ fun MaterialItem(
 @Composable
 fun getItemPainterResource(type: FileType): Painter {
     return painterResource(
-        id = when (type) {
-            FileType.AUDIO -> R.drawable.ic_audio
-            FileType.EXCEL -> R.drawable.ic_excel
-            FileType.FOLDER -> R.drawable.ic_folder
-            FileType.IMAGE -> R.drawable.ic_image
-            FileType.PDF -> R.drawable.ic_pdf
-            FileType.PPT -> R.drawable.ic_ppt
-            FileType.TEXT -> R.drawable.ic_text
-            FileType.VIDEO -> R.drawable.ic_video
-            FileType.WORD -> R.drawable.ic_word
-            FileType.ZIP -> R.drawable.ic_zip
-            else -> R.drawable.ic_file
+        resource = when (type) {
+            FileType.AUDIO -> Res.drawable.sound
+            FileType.EXCEL -> Res.drawable.excel
+            FileType.FOLDER -> Res.drawable.folder
+            FileType.IMAGE -> Res.drawable.image
+            FileType.PDF -> Res.drawable.pdf
+            FileType.PPT -> Res.drawable.powerpoint
+            FileType.TEXT -> Res.drawable.text
+            FileType.VIDEO -> Res.drawable.img_3
+            FileType.WORD -> Res.drawable.word
+            FileType.ZIP -> Res.drawable.zip
+            else -> Res.drawable.file
         }
     )
 }
@@ -545,59 +596,6 @@ fun DetailsDialogField(
         Text(
             text = value,
             fontSize = 18.sp,
-        )
-    }
-}
-
-
-@Composable
-fun MaterialScreenPreview() {
-    val items = listOf<MaterialItem>(
-        MaterialItem(
-            name = "Folder 1",
-            fileType = FileType.FOLDER,
-        ),
-        MaterialItem(
-            name = "Folder 2",
-            fileType = FileType.FOLDER,
-        ),
-        MaterialItem(
-            name = "File PDF",
-            fileType = FileType.PDF,
-            size = "2 MB"
-        ),
-        MaterialItem(
-            name = "File Video",
-            fileType = FileType.VIDEO,
-            size = "6.5 MB",
-        ),
-        MaterialItem(
-            name = "File Image",
-            fileType = FileType.IMAGE,
-            size = "6.5 MB",
-        )
-    )
-    AppTheme {
-        MaterialScreen(
-            currentPath = "materials",
-            onBackPressed = { /*TODO*/ },
-            currentFolderName = "Home",
-            isAdmin = true,
-            isCreateDialogOpen = false,
-            onShowCreateDialog = { /*TODO*/ },
-            onDismissCreateDialog = { /*TODO*/ },
-            onNewFileClicked = { /*TODO*/ },
-            items = items,
-            onFolderClicked = {},
-            onOpenFile = {},
-            folderDropDownItems = emptyList(),
-            fileDropDownItems = emptyList(),
-            onDropDownItemClicked = { _, _ -> },
-            isLoading = false,
-            onUploadFolder = {},
-            isFileDetailsDialogOpen = false,
-            onDismissFileDetailsDialog = { /*TODO*/ },
-            fileWithOpenDetails = MaterialItem(name = "Preview File", path = "/materials/ggg/")
         )
     }
 }
