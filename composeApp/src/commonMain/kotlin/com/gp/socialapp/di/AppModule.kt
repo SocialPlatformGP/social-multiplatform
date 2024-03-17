@@ -1,7 +1,11 @@
 package com.gp.socialapp.di
 
-import org.koin.dsl.module
+import org.kodein.di.DI
 
-val appModules = module {
-    includes(remoteDataSourceModule, repositoryModule, screenModelModule, localSourceModule)
+
+val appModuleK = DI {
+    import(remoteDataSourceModuleK)
+    import(repositoryModuleK)
+    import(screenModelModuleK)
+    import(localSourceModuleK)
 }
