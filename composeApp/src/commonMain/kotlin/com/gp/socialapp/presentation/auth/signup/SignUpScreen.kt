@@ -2,7 +2,6 @@ package com.gp.socialapp.presentation.auth.signup
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -40,37 +39,45 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.koin.getNavigatorScreenModel
+import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gp.socialapp.presentation.auth.userinfo.UserInformationScreen
-import com.gp.socialapp.util.AuthError
+import com.gp.socialapp.presentation.auth.util.AuthError
+import com.gp.socialapp.presentation.auth.util.AuthError.EmailError
+import com.gp.socialapp.presentation.auth.util.AuthError.PasswordError
+import com.gp.socialapp.presentation.auth.util.AuthError.RePasswordError
 import com.gp.socialapp.util.Result
-import com.gp.socialapp.util.AuthError.EmailError
-import com.gp.socialapp.util.AuthError.PasswordError
-import com.gp.socialapp.util.AuthError.RePasswordError
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import socialmultiplatform.composeapp.generated.resources.Res
+import socialmultiplatform.composeapp.generated.resources.already_have_an_account
+import socialmultiplatform.composeapp.generated.resources.create_account
+import socialmultiplatform.composeapp.generated.resources.email
+import socialmultiplatform.composeapp.generated.resources.hide_password
+import socialmultiplatform.composeapp.generated.resources.login_str
+import socialmultiplatform.composeapp.generated.resources.password
+import socialmultiplatform.composeapp.generated.resources.retype_password
+import socialmultiplatform.composeapp.generated.resources.show_password
 
 object SignUpScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val screenModel = navigator.getNavigatorScreenModel<SignUpScreenModel>()
+        val screenModel = navigator.rememberNavigatorScreenModel<SignUpScreenModel>()
         val state by screenModel.uiState.collectAsState()
-        if(state.isSignedUp is Result.Success) {
+        if (state.isSignedUp is Result.Success) {
             navigator.push(UserInformationScreen(state.email, state.password))
         }
-            SignUpContent(
-                state = state,
-                onNavigateToLoginScreen = {navigator.pop()},
-                onCreateAccount = {screenModel.onSignUp()},
-                onEmailChange = { screenModel.onEmailChange(it) },
-                onPasswordChange = { screenModel.onPasswordChange(it) },
-                onRePasswordChange = { screenModel.rePasswordChange(it) }
+        SignUpContent(
+            state = state,
+            onNavigateToLoginScreen = { navigator.pop() },
+            onCreateAccount = { screenModel.onSignUp() },
+            onEmailChange = { screenModel.onEmailChange(it) },
+            onPasswordChange = { screenModel.onPasswordChange(it) },
+            onRePasswordChange = { screenModel.rePasswordChange(it) }
 
-            )
+        )
 
     }
 
@@ -89,7 +96,7 @@ object SignUpScreen : Screen {
             snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
             modifier = Modifier.fillMaxSize(),
         ) {
-            if(state.error is AuthError.ServerError) {
+            if (state.error is AuthError.ServerError) {
                 scope.launch {
                     snackbarHostState.showSnackbar((state.error as AuthError.ServerError).message)
                 }

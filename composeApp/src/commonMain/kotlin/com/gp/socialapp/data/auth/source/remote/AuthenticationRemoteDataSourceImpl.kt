@@ -2,16 +2,19 @@ package com.gp.socialapp.data.auth.source.remote
 
 import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.data.auth.source.remote.model.UserRequest
+import com.gp.socialapp.data.auth.source.remote.model.requests.GetUserRequest
 import com.gp.socialapp.data.auth.source.remote.model.requests.IsEmailAvailableRequest
 import com.gp.socialapp.data.auth.source.remote.model.requests.SignInRequest
 import com.gp.socialapp.data.auth.source.remote.model.responses.AuthResponse
 import com.gp.socialapp.data.auth.source.remote.model.responses.IsEmailAvailableResponse
+import com.gp.socialapp.data.auth.source.remote.model.responses.UserResponse
 import com.gp.socialapp.util.Result
 import io.github.aakira.napier.Napier
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.HttpRequestBuilder
+import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
@@ -23,8 +26,6 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.json.Json
-import socialmultiplatform.composeapp.generated.resources.Res.string.email
-import socialmultiplatform.composeapp.generated.resources.Res.string.password
 
 private const val BASE_URL = "http://192.168.1.4:8080/"
 
@@ -67,6 +68,7 @@ class AuthenticationRemoteDataSourceImpl : AuthenticationRemoteDataSource {
                         HttpStatusCode.OK -> {
                             emit(Result.SuccessWithData(response.isAvailable))
                         }
+
                         else -> {
                             emit(Result.Error(it.status.description + " " + response.message))
                         }
@@ -80,7 +82,7 @@ class AuthenticationRemoteDataSourceImpl : AuthenticationRemoteDataSource {
         }
     }
 
-    override fun signInUser(email: String, password: String): Flow<Result<String>> {
+    override fun signInUser(email: String, password: String): Flow<Result<AuthResponse>> {
         val request = SignInRequest(email, password)
         println("signinRequest:$request")
         return flow {
@@ -97,7 +99,7 @@ class AuthenticationRemoteDataSourceImpl : AuthenticationRemoteDataSource {
                     Napier.d("signin : ${it.status} ${response.errorMessage} ${response.token}")
                     when (it.status) {
                         HttpStatusCode.OK -> {
-                            emit(Result.SuccessWithData(response.token))
+                            emit(Result.SuccessWithData(response))
                         }
 
                         else -> {
@@ -112,7 +114,7 @@ class AuthenticationRemoteDataSourceImpl : AuthenticationRemoteDataSource {
         }
     }
 
-    override fun signUpUser(userRequest: UserRequest): Flow<Result<String>> {
+    override fun signUpUser(userRequest: UserRequest): Flow<Result<AuthResponse>> {
         println("signupRequest:$userRequest")
         return flow {
             emit(Result.Loading)
@@ -128,7 +130,7 @@ class AuthenticationRemoteDataSourceImpl : AuthenticationRemoteDataSource {
                     Napier.d("signup : ${it.status} ${response.errorMessage} ${response.token}")
                     when (it.status) {
                         HttpStatusCode.OK -> {
-                            emit(Result.SuccessWithData(response.token))
+                            emit(Result.SuccessWithData(response))
                         }
 
                         else -> {
@@ -143,8 +145,36 @@ class AuthenticationRemoteDataSourceImpl : AuthenticationRemoteDataSource {
         }
     }
 
-    override fun getSignedInUser(): User? {
-        TODO("Not yet implemented")
+    override fun getSignedInUser(id: String): Flow<Result<User>> {
+        println("getSignedInUserRequest:$id")
+        val request = GetUserRequest(id)
+        return flow {
+            emit(Result.Loading)
+            try {
+                httpClient.get {
+                    endPoint("getSignedUser")
+                    setBody(
+                        request
+                    )
+                }.let {
+                    val response = it.body<UserResponse>().toUser()
+                    println("getSignedInUserResponse:$response")
+                    Napier.d("getSignedInUser : ${it.status} ${response}")
+                    when (it.status) {
+                        HttpStatusCode.OK -> {
+                            emit(Result.SuccessWithData(response))
+                        }
+
+                        else -> {
+                            emit(Result.Error(it.status.description + " " + "Error"))
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Napier.e("getSignedInUser: ${e.message}")
+                emit(Result.Error(e.message ?: "Null"))
+            }
+        }
     }
 
     override fun sendPasswordResetEmail(email: String): Flow<Result<Nothing>> {

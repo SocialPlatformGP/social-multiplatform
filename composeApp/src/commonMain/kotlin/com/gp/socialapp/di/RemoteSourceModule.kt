@@ -5,17 +5,54 @@ import com.gp.socialapp.data.auth.source.remote.AuthenticationRemoteDataSource
 import com.gp.socialapp.data.auth.source.remote.AuthenticationRemoteDataSourceImpl
 import com.gp.socialapp.data.auth.source.remote.UserRemoteDataSource
 import com.gp.socialapp.data.auth.source.remote.model.User
+import com.gp.socialapp.data.post.source.remote.PostRemoteDataSource
+import com.gp.socialapp.data.post.source.remote.PostRemoteDataSourceImpl
+import com.gp.socialapp.data.post.source.remote.ReplyRemoteDataSource
+import com.gp.socialapp.data.post.source.remote.model.Reply
 import com.gp.socialapp.util.Result
-import io.ktor.client.HttpClient
 import kotlinx.coroutines.flow.Flow
-import org.koin.dsl.module
+import org.kodein.di.DI
+import org.kodein.di.bind
+import org.kodein.di.singleton
 
-val remoteDataSourceModule = module {
-    single<UserRemoteDataSource> {
-        object : UserRemoteDataSource {
-            val httpClient = HttpClient{
 
+val remoteDataSourceModuleK = DI.Module("remoteDataSourceModule") {
+    bind<PostRemoteDataSource>() with singleton { PostRemoteDataSourceImpl() }
+    bind<ReplyRemoteDataSource>() with singleton {
+        object : ReplyRemoteDataSource {
+            override suspend fun createReply(reply: Reply) {
+                TODO("Not yet implemented")
             }
+
+            override fun fetchReplies(postId: String): Flow<List<Reply>> {
+                TODO("Not yet implemented")
+            }
+
+            override suspend fun updateReplyRemote(reply: Reply) {
+                TODO("Not yet implemented")
+            }
+
+            override suspend fun deleteReply(reply: Reply) {
+                TODO("Not yet implemented")
+            }
+
+            override suspend fun upVoteReply(reply: Reply) {
+                TODO("Not yet implemented")
+            }
+
+            override suspend fun downVoteReply(reply: Reply) {
+                TODO("Not yet implemented")
+            }
+
+            override suspend fun getReplyCountByPostId(postId: String): Int {
+                TODO("Not yet implemented")
+            }
+
+        }
+    }
+    bind<AuthenticationRemoteDataSource>() with singleton { AuthenticationRemoteDataSourceImpl() }
+    bind<UserRemoteDataSource>() with singleton {
+        object : UserRemoteDataSource {
             override fun createUser(user: User, pfpURI: Uri): Flow<Result<Nothing>> {
                 TODO("Not yet implemented")
             }
@@ -45,5 +82,5 @@ val remoteDataSourceModule = module {
             }
         }
     }
-    single<AuthenticationRemoteDataSource> {AuthenticationRemoteDataSourceImpl()}
+
 }

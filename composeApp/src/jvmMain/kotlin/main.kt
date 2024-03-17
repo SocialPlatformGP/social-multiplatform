@@ -4,10 +4,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
-import com.gp.socialapp.di.appModules
-import java.awt.Dimension
 import com.gp.socialapp.presentation.app.App
-import org.koin.core.context.startKoin
+import java.awt.Dimension
 
 fun main() = application {
     Window(
@@ -19,8 +17,10 @@ fun main() = application {
         App()
     }
 }
+
 @Preview
 @Composable
 fun PreviewApp() {
     App()
 }
+

@@ -2,10 +2,10 @@ package com.gp.socialapp.presentation.auth.userinfo
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import com.gp.auth.util.Validator
 import com.gp.socialapp.data.auth.repository.AuthenticationRepository
 import com.gp.socialapp.data.auth.source.remote.model.User
-import com.gp.socialapp.util.AuthError
+import com.gp.socialapp.presentation.auth.util.AuthError
+import com.gp.socialapp.presentation.auth.util.Validator
 import com.gp.socialapp.util.LocalDateTimeUtil.toMillis
 import com.gp.socialapp.util.Result
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,6 +15,10 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDateTime
 import org.jetbrains.compose.resources.getString
 import socialmultiplatform.composeapp.generated.resources.Res
+import socialmultiplatform.composeapp.generated.resources.invalid_first_name
+import socialmultiplatform.composeapp.generated.resources.invalid_last_name
+import socialmultiplatform.composeapp.generated.resources.invalid_phone_number
+import socialmultiplatform.composeapp.generated.resources.user_must_be_at_least_18_years_old
 
 class UserInformationScreenModel(
     private val authRepo: AuthenticationRepository,
@@ -78,8 +82,9 @@ class UserInformationScreenModel(
                     when (state) {
                         is Result.SuccessWithData -> {
                             _uiState.value = uiState.value.copy(createdState = state)
-                            authRepo.setLocalUserToken(state.data)
+                            authRepo.setLocalUserToken(state.data.token)
                         }
+
                         is Result.Error -> {
                             val error = AuthError.ServerError(state.message)
                             _uiState.value = uiState.value.copy(error = error)
@@ -110,5 +115,8 @@ class UserInformationScreenModel(
 
     fun onBioChange(bio: String) {
         _uiState.update { it.copy(bio = bio) }
+    }
+    fun onImageChange(image: ByteArray) {
+        _uiState.update { it.copy(pfpImageByteArray = image) }
     }
 }
