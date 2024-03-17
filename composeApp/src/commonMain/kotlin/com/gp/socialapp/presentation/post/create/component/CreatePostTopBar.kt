@@ -7,20 +7,18 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import org.jetbrains.compose.resources.stringResource
-import socialmultiplatform.composeapp.generated.resources.Res
-import socialmultiplatform.composeapp.generated.resources.create_post
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreatePostTopBar(
     onBackClick: () -> Unit,
-    onPostClick: () -> Unit
+    onPostClick: () -> Unit,
+    title: String
 ) {
     TopAppBar(
         title = {
             Text(
-                text = stringResource(resource = Res.string.create_post),
+                text = title,
             )
         },
         navigationIcon = {

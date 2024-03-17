@@ -112,8 +112,8 @@ class PostRemoteDataSourceImpl : PostRemoteDataSource {
         TODO("Not yet implemented")
     }
 
-    override suspend fun updatePost(post: Post) {
-        TODO("Not yet implemented")
+    override suspend fun updatePost(post: Post):Flow<Result<String>> {
+        return flow {  }
     }
 
     override suspend fun deletePost(post: Post) {

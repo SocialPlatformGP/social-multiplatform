@@ -1,7 +1,6 @@
 package com.gp.socialapp.presentation.post.create
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -40,6 +39,9 @@ import com.mohamedrejeb.calf.picker.FilePickerFileType
 import com.mohamedrejeb.calf.picker.FilePickerSelectionMode
 import com.mohamedrejeb.calf.picker.rememberFilePickerLauncher
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
+import socialmultiplatform.composeapp.generated.resources.Res
+import socialmultiplatform.composeapp.generated.resources.create_post
 
 object CreatePostScreen : Screen {
     @Composable
@@ -69,7 +71,7 @@ object CreatePostScreen : Screen {
         }
     }
 
-    @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     private fun CreatePostContent(
         state: CreatePostUIState,
@@ -82,7 +84,7 @@ object CreatePostScreen : Screen {
         onAddImage: (PostFile) -> Unit
     ) {
         var openBottomSheet by rememberSaveable { mutableStateOf(false) }
-        var skipPartiallyExpanded by remember { mutableStateOf(false) }
+        val skipPartiallyExpanded by remember { mutableStateOf(false) }
         val scope = rememberCoroutineScope()
         val bottomSheetState = rememberModalBottomSheetState(
             skipPartiallyExpanded = skipPartiallyExpanded
@@ -114,7 +116,8 @@ object CreatePostScreen : Screen {
             topBar = {
                 CreatePostTopBar(
                     onBackClick = onBackClick,
-                    onPostClick = onPostClick
+                    onPostClick = onPostClick,
+                    stringResource(Res.string.create_post)
                 )
             }
         ) {
@@ -126,7 +129,9 @@ object CreatePostScreen : Screen {
                 MyTextField(
                     value = state.title,
                     label = "Title",
-                    onValueChange = { onTitleChange(it) },
+                    onValueChange = { newTitle ->
+                        onTitleChange(newTitle)
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(0.2f)
@@ -134,7 +139,9 @@ object CreatePostScreen : Screen {
                 MyTextField(
                     value = state.body,
                     label = "Body",
-                    onValueChange = { onBodyChange(it) },
+                    onValueChange = { newBody ->
+                        onBodyChange(newBody)
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f)
@@ -172,43 +179,43 @@ object CreatePostScreen : Screen {
             }
             if (openBottomSheet) {
                 MyBottomSheet(
-                    openBottomSheet = {
-                        openBottomSheet = it
+                    openBottomSheet = { value ->
+                        openBottomSheet = value
                     },
                     bottomSheetState = bottomSheetState,
-                    existingTagsDialogState = {
-                        existingTagsDialogState = it
+                    existingTagsDialogState = { value ->
+                        existingTagsDialogState = value
                     },
-                    newTagDialogState = {
-                        newTagDialogState = it
+                    newTagDialogState = { value ->
+                        newTagDialogState = value
                     },
                 )
             }
             if (existingTagsDialogState) {
                 MyExistingTagAlertDialog(
-                    existingTagsDialogState = {
-                        existingTagsDialogState = it
+                    existingTagsDialogState = { value ->
+                        existingTagsDialogState = value
                     },
                     channelTags = channelTags,
-                    selectedTags = {
-                        selectedTags += it
+                    selectedTags = { oldTags ->
+                        selectedTags += oldTags
                     },
-                    confirmNewTags = {
-                        confirmNewTags(it)
+                    confirmNewTags = { newTags ->
+                        confirmNewTags(newTags)
                     }
 
                 )
             }
             if (newTagDialogState) {
                 NewTagAlertDialog(
-                    newTagDialogState = {
-                        newTagDialogState = it
+                    newTagDialogState = { value ->
+                        newTagDialogState = value
                     },
-                    confirmNewTags = {
-                        confirmNewTags(it)
+                    confirmNewTags = { newTags ->
+                        confirmNewTags(newTags)
                     },
-                    selectedTags = {
-                        selectedTags += it
+                    selectedTags = { oldTags ->
+                        selectedTags += oldTags
                     }
                 )
 

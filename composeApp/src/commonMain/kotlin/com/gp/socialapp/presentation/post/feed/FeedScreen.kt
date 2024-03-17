@@ -1,5 +1,6 @@
 package com.gp.socialapp.presentation.post.feed
 
+import EditPostScreen
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -59,7 +60,7 @@ import com.gp.socialapp.presentation.post.feed.components.FilesBottomSheet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-object FeedScreen: Screen {
+object FeedScreen : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
@@ -82,42 +83,54 @@ object FeedScreen: Screen {
                     is PostEvent.OnAddPost -> {
                         navigator.push(CreatePostScreen)
                     }
+
                     is PostEvent.OnPostClicked -> {
                         //todo navigate to post details
                     }
+
                     is PostEvent.OnPostEdited -> {
-                        //todo navigate to edit post
+                        navigator.push(EditPostScreen(action.post))
                     }
+
                     is PostEvent.OnTagClicked -> {
                         //todo navigate to search by tag
                     }
+
                     is PostEvent.OnAudioClicked -> {
                         //todo navigate to audio player
                     }
+
                     is PostEvent.OnDocumentClicked -> {
                         //todo navigate to document viewer
                     }
+
                     is PostEvent.OnImageClicked -> {
                         //todo navigate to image viewer
                     }
+
                     is PostEvent.OnVideoClicked -> {
                         //todo navigate to video player
                     }
+
                     is PostEvent.OnPostUpVoted -> {
                         screenModel.upVote(action.post)
                     }
+
                     is PostEvent.OnPostDownVoted -> {
                         screenModel.downVote(action.post)
                     }
+
                     is PostEvent.OnPostDeleted -> {
                         screenModel.deletePost(action.post)
                     }
+
                     is PostEvent.OnViewFilesAttachmentClicked -> {
                         currentAttachments = action.files
                         scope.launch {
                             isFileBottomSheetOpen = true
                         }
                     }
+
                     else -> {}
                 }
             },
@@ -126,9 +139,11 @@ object FeedScreen: Screen {
                     is NavigationAction.NavigateToSearch -> {
                         //todo navigate to search
                     }
+
                     is NavigationAction.NavigateToPostDetails -> {
                         //todo navigate to post details
                     }
+
                     else -> {}
                 }
             },
@@ -145,6 +160,7 @@ object FeedScreen: Screen {
             bottomSheetState = bottomSheetState,
         )
     }
+
     @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
     @Composable
     fun FeedContent(
@@ -160,7 +176,7 @@ object FeedScreen: Screen {
         onDismissBottomSheet: () -> Unit = { },
         onShowBottomSheet: () -> Unit = { },
         bottomSheetState: SheetState,
-    ){
+    ) {
         var selectedTabIndex by remember { mutableIntStateOf(0) }
         val pagerState = rememberPagerState { tabItems.size }
         Scaffold(
@@ -188,9 +204,9 @@ object FeedScreen: Screen {
                         .height(40.dp)
                         .fillMaxWidth().clip(
                             RoundedCornerShape(
-                            bottomStart = 8.dp,
-                            bottomEnd = 8.dp
-                        )
+                                bottomStart = 8.dp,
+                                bottomEnd = 8.dp
+                            )
                         ),
                     selectedTabIndex = selectedTabIndex,
                     indicator = { tabPositions ->
@@ -207,7 +223,7 @@ object FeedScreen: Screen {
                     containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
                 ) {
                     tabItems.forEachIndexed { index, tabItem ->
-                        Tab (
+                        Tab(
                             selected = (index == selectedTabIndex),
                             onClick = {
                                 selectedTabIndex = index
@@ -238,6 +254,7 @@ object FeedScreen: Screen {
                                 currentUserID = currentUserID
                             )
                         }
+
                         1 -> {
                             FeedPosts(
                                 posts = state.posts.filter { it.type == "vip" },
@@ -247,7 +264,7 @@ object FeedScreen: Screen {
                         }
                     }
                 }
-                if(isFileBottomSheetOpen){
+                if (isFileBottomSheetOpen) {
                     FilesBottomSheet(
                         attachments = currentAttachments,
                         onDismiss = onDismissBottomSheet,
@@ -272,7 +289,7 @@ object FeedScreen: Screen {
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             LazyColumn(
-                contentPadding = PaddingValues( vertical = 8.dp),
+                contentPadding = PaddingValues(vertical = 8.dp),
             ) {
                 items(posts) { post ->
                     FeedPostItem(

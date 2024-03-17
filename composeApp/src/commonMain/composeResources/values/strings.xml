@@ -29,6 +29,7 @@
     <string name="select">Select</string>
     <string name="cancel">Cancel</string>
     <string name="create_post">Create Post</string>
+    <string name="edit_post">Edit Post</string>
     <string name="invalid_first_name">Invalid First Name</string>
     <string name="invalid_last_name">Invalid Last Name</string>
     <string name="invalid_phone_number">Invalid Phone Number</string>

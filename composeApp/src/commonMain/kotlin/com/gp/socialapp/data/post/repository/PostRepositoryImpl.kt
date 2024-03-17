@@ -52,9 +52,9 @@ class PostRepositoryImpl(
         return postRemoteSource.fetchPosts()
     }
 
-    override suspend fun updatePost(post: Post) {
+    override suspend fun updatePost(post: Post):Flow<Result<String>> =
         postRemoteSource.updatePost(post)
-    }
+
 
     override suspend fun deletePost(post: Post) {
         postRemoteSource.deletePost(post)
