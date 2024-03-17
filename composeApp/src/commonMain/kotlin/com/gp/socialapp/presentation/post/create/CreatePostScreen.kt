@@ -19,7 +19,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.koin.getNavigatorScreenModel
+import cafe.adriel.voyager.kodein.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gp.socialapp.data.post.source.remote.model.PostFile
@@ -46,14 +46,17 @@ import socialmultiplatform.composeapp.generated.resources.create_post
 object CreatePostScreen : Screen {
     @Composable
     override fun Content() {
+
+
         val navigator = LocalNavigator.currentOrThrow
-        val screenModel = navigator.getNavigatorScreenModel<CreatePostScreenModel>()
+        val screenModel = rememberScreenModel<CreatePostScreenModel>()
         val state by screenModel.uiState.collectAsState()
         val existingTags by screenModel.channelTags.collectAsState()
         if (state.createdState) {
             navigator.pop()
         }
         MaterialTheme {
+
             CreatePostContent(
                 state = state,
                 channelTags = existingTags,
@@ -69,6 +72,7 @@ object CreatePostScreen : Screen {
                 }
             )
         }
+
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
