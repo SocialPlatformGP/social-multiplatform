@@ -109,11 +109,28 @@ class PostRemoteDataSourceImpl : PostRemoteDataSource {
 
 
     override fun fetchPosts(): Flow<List<Post>> {
-        TODO("Not yet implemented")
+        return flow {
+            try {
+                val response = httpClient.get {
+                    endPoint("getAllPosts")
+                }
+                println("response: ${response.status}")
+                if (response.status == HttpStatusCode.OK) {
+                    val posts = response.body<List<Post>>()
+                    println("posts: $posts")
+                    emit(posts)
+                } else {
+                    emit(emptyList())
+                }
+            } catch (e: Exception) {
+                Napier.e("getAllPosts: ${e.message}")
+                emit(emptyList())
+            }
+        }
     }
 
-    override suspend fun updatePost(post: Post):Flow<Result<String>> {
-        return flow {  }
+    override suspend fun updatePost(post: Post): Flow<Result<String>> {
+        return flow { }
     }
 
     override suspend fun deletePost(post: Post) {
