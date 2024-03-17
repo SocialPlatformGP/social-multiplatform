@@ -95,9 +95,11 @@ fun ImagePager(
                                 contentScale = ContentScale.Crop
                             )
                         }
+
                         is ImageAction.Loading -> {
                             CircularProgressIndicator()
                         }
+
                         else -> {
                             Icon(
                                 imageVector = Icons.Filled.Error,
@@ -117,8 +119,7 @@ fun ImagePager(
                 .height(25.dp)
                 .width(((6 + 16) * 2 + 3 * (10 + 16)).dp)
                 .background(Color.LightGray.copy(alpha = 0.6f), RoundedCornerShape(16.dp))
-                .align(Alignment.BottomCenter)
-            ,
+                .align(Alignment.BottomCenter),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -136,9 +137,11 @@ fun ImagePager(
                             currentPage -> {
                                 10.dp
                             }
+
                             in firstVisibleIndex + 1..<lastVisibleIndex -> {
                                 10.dp
                             }
+
                             else -> {
                                 6.dp
                             }

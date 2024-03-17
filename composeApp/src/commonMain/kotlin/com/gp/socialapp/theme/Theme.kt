@@ -102,7 +102,7 @@ private val AppTypography = Typography(
     )
 )
 
-internal val LocalThemeIsDark = compositionLocalOf { mutableStateOf(true) }
+internal val LocalThemeIsDark = compositionLocalOf { mutableStateOf(false) }
 
 @Composable
 internal fun AppTheme(

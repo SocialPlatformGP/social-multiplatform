@@ -13,7 +13,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gp.socialapp.data.post.source.remote.model.Tag
-import com.gp.socialapp.util.toColor
 
 @Composable
 fun TagItem(
@@ -32,7 +31,8 @@ fun TagItem(
             Text(
                 text = tag.label,
                 fontSize = 12.sp,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = Color.White
             )
         },
         modifier = Modifier

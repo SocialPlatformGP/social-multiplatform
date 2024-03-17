@@ -9,6 +9,7 @@ import com.gp.socialapp.data.post.source.remote.model.Post
 import com.gp.socialapp.data.post.source.remote.model.PostFile
 import com.gp.socialapp.data.post.source.remote.model.Tag
 import com.gp.socialapp.util.Result
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -62,10 +63,12 @@ class CreatePostScreenModel(
                         userName = currentUser.value.firstName + " " + currentUser.value.lastName,
                         userPfp = currentUser.value.profilePictureURL,
                         authorEmail = currentUser.value.email,
+                        attachments = files
                     )
-                ).collect {
+                ).collect { it ->
                     when (it) {
                         is Result.SuccessWithData -> {
+                            _uiState.update { it.copy(createdState = true) }
                             println(it.data)
                         }
 
@@ -115,16 +118,16 @@ class CreatePostScreenModel(
     }
 
     fun addFile(postFile: PostFile) {
-//        viewModelScope.launch {
-//            uiState.update { it.copy(files = it.files + postFile) }
-//        }
+        screenModelScope.launch {
+            _uiState.update { it.copy(files = it.files + postFile) }
+        }
     }
 
     fun removeFile(file: PostFile) {
-//        viewModelScope.launch(Dispatchers.Default) {
-//            val newFiles = uiState.value.files.filter { it.uri != file.uri }
-//            uiState.value = uiState.value.copy(files = newFiles)
-//        }
+        screenModelScope.launch(Dispatchers.Default) {
+            val newFiles = uiState.value.files.filter { !it.file.contentEquals(file.file) }
+            _uiState.value = uiState.value.copy(files = newFiles)
+        }
     }
 
     //
@@ -139,12 +142,12 @@ class CreatePostScreenModel(
 
     //
     fun onAddTag(tag: Set<Tag>) {
-//        uiState.update { it.copy(tags = it.tags + tag) }
+        _uiState.update { it.copy(tags = it.tags + tag) }
     }
 
     //
     fun onRemoveTag(tag: Tag) {
-//        uiState.update { it.copy(tags = it.tags - tag) }
+        _uiState.update { it.copy(tags = it.tags - tag) }
     }
 
 }

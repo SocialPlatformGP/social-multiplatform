@@ -23,6 +23,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.getNavigatorScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.gp.socialapp.data.post.source.remote.model.PostFile
 import com.gp.socialapp.data.post.source.remote.model.Tag
 import com.gp.socialapp.presentation.post.create.component.BottomOptionRow
 import com.gp.socialapp.presentation.post.create.component.CreatePostTopBar
@@ -32,6 +33,12 @@ import com.gp.socialapp.presentation.post.create.component.MyExistingTagAlertDia
 import com.gp.socialapp.presentation.post.create.component.MyTextField
 import com.gp.socialapp.presentation.post.create.component.NewTagAlertDialog
 import com.gp.socialapp.presentation.post.create.component.TagsRow
+import com.mohamedrejeb.calf.core.LocalPlatformContext
+import com.mohamedrejeb.calf.io.getName
+import com.mohamedrejeb.calf.io.readByteArray
+import com.mohamedrejeb.calf.picker.FilePickerFileType
+import com.mohamedrejeb.calf.picker.FilePickerSelectionMode
+import com.mohamedrejeb.calf.picker.rememberFilePickerLauncher
 import kotlinx.coroutines.launch
 
 object CreatePostScreen : Screen {
@@ -41,6 +48,9 @@ object CreatePostScreen : Screen {
         val screenModel = navigator.getNavigatorScreenModel<CreatePostScreenModel>()
         val state by screenModel.uiState.collectAsState()
         val existingTags by screenModel.channelTags.collectAsState()
+        if (state.createdState) {
+            navigator.pop()
+        }
         MaterialTheme {
             CreatePostContent(
                 state = state,
@@ -51,6 +61,9 @@ object CreatePostScreen : Screen {
                 onBodyChange = { screenModel.onBodyChange(it) },
                 confirmNewTags = {
                     screenModel.insertNewTags(it)
+                },
+                onAddImage = { file ->
+                    screenModel.addFile(file)
                 }
             )
         }
@@ -66,6 +79,7 @@ object CreatePostScreen : Screen {
         onTitleChange: (String) -> Unit,
         onBodyChange: (String) -> Unit,
         confirmNewTags: (Set<Tag>) -> Unit,
+        onAddImage: (PostFile) -> Unit
     ) {
         var openBottomSheet by rememberSaveable { mutableStateOf(false) }
         var skipPartiallyExpanded by remember { mutableStateOf(false) }
@@ -76,7 +90,26 @@ object CreatePostScreen : Screen {
         var existingTagsDialogState by remember { mutableStateOf(false) }
         var newTagDialogState by remember { mutableStateOf(false) }
         var selectedTags: List<Tag> by remember { mutableStateOf(emptyList()) }
-
+        val context = LocalPlatformContext.current
+        val imagePicker = rememberFilePickerLauncher(
+            type = FilePickerFileType.Image,
+            selectionMode = FilePickerSelectionMode.Single,
+            onResult = { files ->
+                scope.launch {
+                    files.firstOrNull()?.let { file ->
+                        val image = file.readByteArray(context)
+                        onAddImage(
+                            PostFile(
+                                file = image,
+                                name = file.getName(context) ?: "",
+                                type = FilePickerFileType.Image.toString(),
+                                size = image.size.toLong()
+                            )
+                        )
+                    }
+                }
+            }
+        )
         Scaffold(
             topBar = {
                 CreatePostTopBar(
@@ -114,12 +147,19 @@ object CreatePostScreen : Screen {
                         selectedTags -= tag
                     }
                 )
-                //TODO: Add files row
-                FilesRow()
+                FilesRow(
+                    state.files,
+                    onFileClick = { file ->
+                        println("File clicked: $file")
+                    }
+                )
                 HorizontalDivider()
                 BottomOptionRow(
                     onAddFileClicked = { /**/ },
-                    onAddImageClicked = {/*TODO: Add image picker*/ },
+                    onAddImageClicked = {
+                        imagePicker.launch()
+
+                    },
                     onAddTagClicked = {
                         scope.launch { bottomSheetState.show() }.invokeOnCompletion {
                             if (bottomSheetState.isVisible) {

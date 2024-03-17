@@ -3,8 +3,7 @@ package com.gp.socialapp.presentation.app
 import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.navigator.Navigator
 import com.gp.socialapp.di.appModules
-import com.gp.socialapp.presentation.auth.userinfo.UserInformationScreen
-import com.gp.socialapp.presentation.post.create.CreatePostScreen
+import com.gp.socialapp.presentation.post.feed.FeedScreen
 import com.gp.socialapp.theme.AppTheme
 import org.koin.compose.KoinApplication
 
@@ -15,7 +14,8 @@ internal fun App() {
     })) {
         AppTheme {
             Navigator(
-                UserInformationScreen("", "")
+//                UserInformationScreen("", "")
+                FeedScreen
             )
         }
     }
