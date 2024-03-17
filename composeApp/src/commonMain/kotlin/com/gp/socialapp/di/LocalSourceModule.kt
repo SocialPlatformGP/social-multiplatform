@@ -7,11 +7,13 @@ import com.gp.socialapp.data.post.source.local.ReplyLocalDataSource
 import com.gp.socialapp.data.post.source.remote.model.Post
 import com.gp.socialapp.data.post.source.remote.model.Reply
 import kotlinx.coroutines.flow.Flow
-import org.koin.dsl.module
+import org.kodein.di.DI
+import org.kodein.di.bind
+import org.kodein.di.singleton
 
-val localSourceModule = module {
-    single<AuthKeyValueStorage> { AuthKeyValueStorageImpl() }
-    single<PostLocalDataSource> {
+val localSourceModuleK = DI.Module("localSourceModule") {
+    bind<AuthKeyValueStorage>() with singleton { AuthKeyValueStorageImpl() }
+    bind<PostLocalDataSource>() with singleton {
         object : PostLocalDataSource {
             override suspend fun insertPost(vararg post: Post) {
                 TODO("Not yet implemented")
@@ -43,62 +45,65 @@ val localSourceModule = module {
 
         }
     }
-    single<ReplyLocalDataSource>{object: ReplyLocalDataSource{
-        override suspend fun insertReply(replyEntity: Reply): Long {
-            TODO("Not yet implemented")
-        }
+    bind<ReplyLocalDataSource>() with singleton {
+        object : ReplyLocalDataSource {
+            override suspend fun insertReply(replyEntity: Reply): Long {
+                TODO("Not yet implemented")
+            }
 
-        override suspend fun insertReplies(replies: List<Reply>) {
-            TODO("Not yet implemented")
-        }
+            override suspend fun insertReplies(replies: List<Reply>) {
+                TODO("Not yet implemented")
+            }
 
-        override suspend fun updateReply(replyEntity: Reply) {
-            TODO("Not yet implemented")
-        }
+            override suspend fun updateReply(replyEntity: Reply) {
+                TODO("Not yet implemented")
+            }
 
-        override suspend fun updateReplies(replies: List<Reply>) {
-            TODO("Not yet implemented")
-        }
+            override suspend fun updateReplies(replies: List<Reply>) {
+                TODO("Not yet implemented")
+            }
 
-        override suspend fun deleteReply(replyEntity: Reply) {
-            TODO("Not yet implemented")
-        }
+            override suspend fun deleteReply(replyEntity: Reply) {
+                TODO("Not yet implemented")
+            }
 
-        override suspend fun deleteReplies(replies: List<Reply>) {
-            TODO("Not yet implemented")
-        }
+            override suspend fun deleteReplies(replies: List<Reply>) {
+                TODO("Not yet implemented")
+            }
 
-        override fun deleteAllReplies() {
-            TODO("Not yet implemented")
-        }
+            override fun deleteAllReplies() {
+                TODO("Not yet implemented")
+            }
 
-        override fun getAllReplies(): Flow<List<Reply>> {
-            TODO("Not yet implemented")
-        }
+            override fun getAllReplies(): Flow<List<Reply>> {
+                TODO("Not yet implemented")
+            }
 
-        override fun getRepliesByPostId(postId: String): Flow<List<Reply>> {
-            TODO("Not yet implemented")
-        }
+            override fun getRepliesByPostId(postId: String): Flow<List<Reply>> {
+                TODO("Not yet implemented")
+            }
 
-        override fun getReplyById(id: Long): Flow<Reply> {
-            TODO("Not yet implemented")
-        }
+            override fun getReplyById(id: Long): Flow<Reply> {
+                TODO("Not yet implemented")
+            }
 
-        override fun getRepliesByParentReplyId(parentReplyId: Long): Flow<List<Reply>> {
-            TODO("Not yet implemented")
-        }
+            override fun getRepliesByParentReplyId(parentReplyId: Long): Flow<List<Reply>> {
+                TODO("Not yet implemented")
+            }
 
-        override fun getTopLevelRepliesByPostId(postId: String): Flow<List<Reply>> {
-            TODO("Not yet implemented")
-        }
+            override fun getTopLevelRepliesByPostId(postId: String): Flow<List<Reply>> {
+                TODO("Not yet implemented")
+            }
 
-        override suspend fun upVoteLocal(id: String) {
-            TODO("Not yet implemented")
-        }
+            override suspend fun upVoteLocal(id: String) {
+                TODO("Not yet implemented")
+            }
 
-        override suspend fun downVoteLocal(id: String) {
-            TODO("Not yet implemented")
-        }
+            override suspend fun downVoteLocal(id: String) {
+                TODO("Not yet implemented")
+            }
 
-    }}
+
+        }
+    }
 }

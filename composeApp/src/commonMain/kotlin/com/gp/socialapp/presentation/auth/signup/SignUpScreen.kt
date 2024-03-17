@@ -39,7 +39,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.koin.getNavigatorScreenModel
+import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gp.socialapp.presentation.auth.userinfo.UserInformationScreen
@@ -64,7 +64,7 @@ object SignUpScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val screenModel = navigator.getNavigatorScreenModel<SignUpScreenModel>()
+        val screenModel = navigator.rememberNavigatorScreenModel<SignUpScreenModel>()
         val state by screenModel.uiState.collectAsState()
         if (state.isSignedUp is Result.Success) {
             navigator.push(UserInformationScreen(state.email, state.password))

@@ -52,7 +52,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.koin.getNavigatorScreenModel
+import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gp.socialapp.presentation.auth.util.AuthError
@@ -90,7 +90,7 @@ data class UserInformationScreen(
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val screenModel = navigator.getNavigatorScreenModel<UserInformationScreenModel>()
+        val screenModel = navigator.rememberNavigatorScreenModel<UserInformationScreenModel>()
         val state by screenModel.uiState.collectAsState()
         val scope = rememberCoroutineScope()
         val context = LocalPlatformContext.current

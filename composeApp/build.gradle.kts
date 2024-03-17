@@ -47,6 +47,7 @@ kotlin {
             implementation(libs.voyager.tabnavigator)
             implementation(libs.voyager.transitions)
             implementation(libs.voyager.koin)
+            implementation(libs.voyager.kodein)
             implementation(libs.composeImageLoader)
             implementation(libs.napier)
             implementation(libs.kotlinx.coroutines.core)
@@ -57,14 +58,12 @@ kotlin {
             implementation(libs.kotlinx.datetime)
             implementation(libs.multiplatformSettings)
             implementation(libs.multiplatformSettingsNoArgs)
-            implementation(libs.koin.core)
             implementation(libs.kstore)
             implementation(libs.apollo.runtime)
-            implementation(libs.koin.compose)
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.calf.file.picker)
-//            api(libs.calf.ui)
+            implementation(libs.kodein.di.framework.compose)
 
 
         }
@@ -82,7 +81,6 @@ kotlin {
             implementation(libs.ktor.client.websockets)
             implementation(libs.sqlDelight.driver.android)
             implementation(compose.preview)
-            implementation(libs.koin.android)
         }
 
         jvmMain.dependencies {
