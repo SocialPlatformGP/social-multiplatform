@@ -2,6 +2,14 @@ import com.android.build.gradle.internal.lint.AndroidLintAnalysisTask
 import com.android.build.gradle.internal.lint.LintModelWriterTask
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        maven("https://jitpack.io/")
+    }
+}
+
 plugins {
     alias(libs.plugins.multiplatform)
     alias(libs.plugins.compose)
@@ -10,6 +18,8 @@ plugins {
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.sqlDelight)
     alias(libs.plugins.apollo)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.realm)
 
 //    alias(libs.plugins.google.services)
 }
@@ -21,8 +31,10 @@ kotlin {
                 jvmTarget = "17"
             }
         }
+//        configurations.all{
+//            exclude(group = "com.github.UstadMobile.door", module = "room-annotations")
+//        }
     }
-
     jvm()
 
     js {
@@ -46,7 +58,6 @@ kotlin {
             implementation(libs.voyager.screenmodel)
             implementation(libs.voyager.tabnavigator)
             implementation(libs.voyager.transitions)
-            implementation(libs.voyager.koin)
             implementation(libs.voyager.kodein)
             implementation(libs.composeImageLoader)
             implementation(libs.napier)
@@ -64,7 +75,8 @@ kotlin {
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.calf.file.picker)
             implementation(libs.kodein.di.framework.compose)
-
+            implementation(libs.door.runtime)
+            implementation(libs.room.annotations)
 
         }
 
@@ -81,6 +93,15 @@ kotlin {
             implementation(libs.ktor.client.websockets)
             implementation(libs.sqlDelight.driver.android)
             implementation(compose.preview)
+            implementation(libs.androidx.room.runtime)
+            implementation(libs.androidx.room.ktx)
+            implementation(libs.androidx.paging.runtime)
+            implementation("io.realm.kotlin:library-base:1.11.0")
+            implementation("io.realm.kotlin:library-sync:1.11.0")
+//            compileOnly("io.realm.kotlin:library-base:1.11.0")
+//            configurations.all{
+//                exclude(group = "com.github.UstadMobile.door", module = "room-annotations")
+//            }
         }
 
         jvmMain.dependencies {
@@ -89,6 +110,8 @@ kotlin {
             implementation(libs.kotlinx.coroutines.swing)
             implementation(libs.ktor.client.okhttp)
             implementation(libs.sqlDelight.driver.sqlite)
+            implementation("io.realm.kotlin:library-base:1.11.0")
+            implementation("io.realm.kotlin:library-sync:1.11.0")
         }
 
         jsMain.dependencies {
@@ -142,6 +165,14 @@ compose.desktop {
         }
     }
 }
+val version_door by extra("0.0.63o10")
+val version_android_room by extra("2.6.1")
+dependencies {
+    add("kspJvm", "com.github.UstadMobile.door:door-compiler:$version_door")
+    add("kspJs", "com.github.UstadMobile.door:door-compiler:$version_door")
+    add("kspAndroid", "com.github.UstadMobile.door:door-compiler:$version_door")
+    add("kspAndroid", "androidx.room:room-compiler:$version_android_room")
+}
 
 compose.experimental {
     web.application {}
@@ -170,10 +201,10 @@ apollo {
     }
 }
 
-tasks.withType<LintModelWriterTask> {
-    dependsOn("copyFontsToAndroidAssets")
-}
-
-tasks.withType<AndroidLintAnalysisTask> {
-    dependsOn("copyFontsToAndroidAssets")
-}
+//tasks.withType<LintModelWriterTask> {
+//    dependsOn("copyFontsToAndroidAssets")
+//}
+//
+//tasks.withType<AndroidLintAnalysisTask> {
+//    dependsOn("copyFontsToAndroidAssets")
+//}

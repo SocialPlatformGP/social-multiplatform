@@ -23,13 +23,15 @@ kstore = "0.7.1"
 sqlDelight = "2.0.1"
 apollo = "4.0.0-beta.4"
 dotsIndicator = "5.0"
+door = "0.70b17"
+androidx-room = "2.6.1"
+androidx-paging = "3.2.1"
+ksp = "1.9.21-1.0.15"
+realm-plugin= "0.10.0"
 
 
 
 [libraries]
-kodein-di-framework-compose = { module = "org.kodein.di:kodein-di-framework-compose", version.ref = "kodeinDiFrameworkCompose" }
-voyager-kodein = { module = "cafe.adriel.voyager:voyager-kodein", version.ref = "voyager" }
-
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-appcompat" }
 androidx-activityCompose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
 calf-file-picker = { module = "com.mohamedrejeb.calf:calf-file-picker", version.ref = "calfFilePicker" }
@@ -38,7 +40,7 @@ voyager-navigator = { module = "cafe.adriel.voyager:voyager-navigator", version.
 voyager-screenmodel = { module = "cafe.adriel.voyager:voyager-screenmodel", version.ref = "voyager" }
 voyager-tabnavigator = { module = "cafe.adriel.voyager:voyager-tab-navigator", version.ref = "voyager" }
 voyager-transitions = { module = "cafe.adriel.voyager:voyager-transitions", version.ref = "voyager" }
-voyager-koin = { module = "cafe.adriel.voyager:voyager-koin", version.ref = "voyager" }
+voyager-kodein = { module = "cafe.adriel.voyager:voyager-kodein", version.ref = "voyager" }
 composeImageLoader = { module = "io.github.qdsfdhvh:image-loader", version.ref = "composeImageLoader" }
 napier = { module = "io.github.aakira:napier", version.ref = "napier" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
@@ -64,18 +66,27 @@ sqlDelight-driver-native = { module = "app.cash.sqldelight:native-driver", versi
 sqlDelight-driver-js = { module = "app.cash.sqldelight:web-worker-driver", version.ref = "sqlDelight" }
 apollo-runtime = { module = "com.apollographql.apollo3:apollo-runtime", version.ref = "apollo" }
 dotsindicator = { module = "com.tbuonomo:dotsindicator", version.ref = "dotsIndicator" }
+kodein-di-framework-compose = { module = "org.kodein.di:kodein-di-framework-compose", version.ref = "kodeinDiFrameworkCompose" }
 
 ktor-client-encoding = { module = "io.ktor:ktor-client-encoding", version.ref = "ktor-client" }
 ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor-client" }
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor-client" }
 ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor-client" }
 
+door-runtime = { module = "com.github.UstadMobile.door:door-runtime", version.ref = "door" }
+room-annotations = { module = "com.github.UstadMobile.door:room-annotations", version.ref = "door" }
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "androidx-room" }
+androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "androidx-room" }
+androidx-paging-runtime = { module = "androidx.paging:paging-runtime", version.ref = "androidx-paging" }
+
 [plugins]
 
 multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 compose = { id = "org.jetbrains.compose", version.ref = "compose" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 android-application = { id = "com.android.application", version.ref = "agp" }
 buildConfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildConfig" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 sqlDelight = { id = "app.cash.sqldelight", version.ref = "sqlDelight" }
+realm = { id = "io.realm.kotlin" , version.ref = "realm-plugin" }
 apollo = { id = "com.apollographql.apollo3", version.ref = "apollo" }
