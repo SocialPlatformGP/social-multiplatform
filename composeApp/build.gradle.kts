@@ -129,6 +129,9 @@ android {
         kotlinCompilerExtensionVersion = "1.5.4"
     }
 }
+dependencies {
+    implementation(libs.androidx.media3.exoplayer)
+}
 
 
 compose.desktop {

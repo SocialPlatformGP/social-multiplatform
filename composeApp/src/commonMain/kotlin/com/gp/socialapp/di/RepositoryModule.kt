@@ -1,5 +1,7 @@
 package com.gp.socialapp.di
 
+import com.gp.material.repository.MaterialRepository
+import com.gp.material.repository.MaterialRepositoryImpl
 import com.gp.socialapp.data.auth.repository.AuthenticationRepository
 import com.gp.socialapp.data.auth.repository.AuthenticationRepositoryImpl
 import com.gp.socialapp.data.auth.repository.UserRepository
@@ -12,6 +14,7 @@ import org.kodein.di.DI
 import org.kodein.di.bind
 import org.kodein.di.instance
 import org.kodein.di.singleton
+
 
 
 val repositoryModuleK = DI.Module("repositoryModule") {
@@ -31,3 +34,6 @@ val repositoryModuleK = DI.Module("repositoryModule") {
         )
     }
 }
+
+
+
