@@ -8,7 +8,7 @@ import app.cash.sqldelight.db.SqlSchema
 import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 
 actual class DatabaseDriver(private val context: Context) {
-    actual suspend fun createDriver(schema: SqlSchema<QueryResult.AsyncValue<Unit>>): SqlDriver {
+    actual fun createDriver(schema: SqlSchema<QueryResult.AsyncValue<Unit>>): SqlDriver {
         return AndroidSqliteDriver(schema.synchronous(), context, DB_NAME)
     }
 }

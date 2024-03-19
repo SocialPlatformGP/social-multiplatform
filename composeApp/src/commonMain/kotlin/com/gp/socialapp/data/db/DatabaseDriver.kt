@@ -5,6 +5,6 @@ import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.db.SqlSchema
 
 expect class DatabaseDriver {
-    suspend fun createDriver(schema: SqlSchema<QueryResult.AsyncValue<Unit>>): SqlDriver
+    fun createDriver(schema: SqlSchema<QueryResult.AsyncValue<Unit>>): SqlDriver
 }
 const val DB_NAME = "edulink.db"

@@ -15,13 +15,13 @@ import org.w3c.dom.Worker
 import kotlin.js.Promise
 
 actual class DatabaseDriver {
-    actual suspend fun createDriver(schema: SqlSchema<QueryResult.AsyncValue<Unit>>): SqlDriver {
+    actual fun createDriver(schema: SqlSchema<QueryResult.AsyncValue<Unit>>): SqlDriver {
         return WebWorkerDriver(
                 Worker(
                     js("""new URL("sqlite.worker.js", import.meta.url)""").unsafeCast<String>()
                 )
             ).also {
-                schema.awaitCreate(it)
+                schema.create(it)
             }
         }
 }

@@ -51,7 +51,6 @@ class PostRepositoryImpl(
     }
 
     override fun getAllPosts(scope: CoroutineScope): Flow<List<Post>>  = callbackFlow {
-        val databaseMutex = Mutex()
         val platform = getPlatform()
         scope.launch {
             while (isActive) {
@@ -71,12 +70,10 @@ class PostRepositoryImpl(
                                     )
                                 )
                             )
-                            databaseMutex.withLock {
-                                posts.collect {
-                                    lastUpdated = LocalDateTime.now().second
-                                    it.forEach { post ->
-                                        insertLocalPost(post)
-                                    }
+                            posts.collect {
+                                lastUpdated = LocalDateTime.now().second
+                                it.forEach { post ->
+                                    insertLocalPost(post)
                                 }
                             }
                             getAllLocalPosts().collect {
