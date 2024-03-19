@@ -14,18 +14,11 @@ import com.russhwolf.settings.Settings
 import com.russhwolf.settings.set
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withContext
-import kotlinx.datetime.Clock.System.now
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
@@ -42,6 +35,7 @@ class PostRepositoryImpl(
         set(value) {
             settings[AppConstants.StorageKeys.POST_LAST_UPDATED.key] = value
         }
+
     override suspend fun createPost(post: Post): Flow<Result<String>> {
         return postRemoteSource.createPost(post)
     }
@@ -50,7 +44,7 @@ class PostRepositoryImpl(
         postLocalSource.insertPost(post)
     }
 
-    override fun getAllPosts(scope: CoroutineScope): Flow<List<Post>>  = callbackFlow {
+    override fun getAllPosts(scope: CoroutineScope): Flow<List<Post>> = flow {
         val platform = getPlatform()
         scope.launch {
             while (isActive) {
@@ -58,7 +52,7 @@ class PostRepositoryImpl(
                     if (platform == Platform.JS) {
                         getRemotePosts().collect {
                             if (it.isNotEmpty()) {
-                                trySend(it)
+                                emit(it)
                             }
                         }
                     } else {
@@ -77,23 +71,29 @@ class PostRepositoryImpl(
                                 }
                             }
                             getAllLocalPosts().collect {
-                                trySend(it)
+                                emit(it)
                             }
                         }
                     }
                     delay(60000)
                 } catch (e: Exception) {
-                    Napier.e(message = e.message?:"Error in getAllPosts and null exception message")
+                    Napier.e(
+                        message = e.message ?: "Error in getAllPosts and null exception message"
+                    )
                 }
 
             }
-            awaitClose()
         }
     }
 
     override fun getRemotePosts(): Flow<List<Post>> {
-        return postRemoteSource.fetchPosts(FetchPostsRequest(Instant.fromEpochSeconds(lastUpdated.toLong()).toLocalDateTime(
-            TimeZone.UTC)))
+        return postRemoteSource.fetchPosts(
+            FetchPostsRequest(
+                Instant.fromEpochSeconds(lastUpdated.toLong()).toLocalDateTime(
+                    TimeZone.UTC
+                )
+            )
+        )
     }
 
     override fun getAllLocalPosts(): Flow<List<Post>> {
@@ -119,7 +119,7 @@ class PostRepositoryImpl(
     }
 
 
-    override suspend fun updatePost(post: Post):Flow<Result<String>> =
+    override suspend fun updatePost(post: Post): Flow<Result<String>> =
         postRemoteSource.updatePost(post)
 
 

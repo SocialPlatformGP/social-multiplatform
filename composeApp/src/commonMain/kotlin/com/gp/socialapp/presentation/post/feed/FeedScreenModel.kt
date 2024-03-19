@@ -5,10 +5,7 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import com.gp.socialapp.data.auth.repository.UserRepository
 import com.gp.socialapp.data.post.repository.PostRepository
 import com.gp.socialapp.data.post.repository.ReplyRepository
-import com.gp.socialapp.data.post.source.remote.model.MimeType
 import com.gp.socialapp.data.post.source.remote.model.Post
-import com.gp.socialapp.data.post.source.remote.model.PostFile
-import com.gp.socialapp.data.post.source.remote.model.Tag
 import com.gp.socialapp.data.post.util.PostPopularityUtils
 import com.gp.socialapp.util.Result
 import kotlinx.coroutines.Dispatchers
@@ -22,9 +19,15 @@ class FeedScreenModel(
     val repository: PostRepository,
     val replyRepository: ReplyRepository,
     val userRepository: UserRepository
-): ScreenModel {
+) : ScreenModel {
     private val _state = MutableStateFlow(FeedUiState())
     val state = _state.asStateFlow()
+
+
+    init {
+        getAllPosts()
+    }
+
     private fun getAllPosts() {
         screenModelScope.launch(Dispatchers.Default) {
             repository.getAllPosts(this).collect { posts ->
@@ -41,14 +44,20 @@ class FeedScreenModel(
                 val sortedPosts = if (_state.value.isSortedByNewest) {
                     filteredPosts.sortedByDescending { it.createdAt.second }
                 } else {
-                    filteredPosts.sortedByDescending { PostPopularityUtils.calculateInteractionValue(it.votes, it.replyCount) }
+                    filteredPosts.sortedByDescending {
+                        PostPopularityUtils.calculateInteractionValue(
+                            it.votes,
+                            it.replyCount
+                        )
+                    }
                 }
                 withContext(Dispatchers.Default) {
-                    _state.update { it.copy(posts = sortedPosts,  isFeedLoaded = Result.Success) }
+                    _state.update { it.copy(posts = sortedPosts, isFeedLoaded = Result.Success) }
                 }
             }
         }
     }
+
     fun upVote(post: Post) {
         screenModelScope.launch {
             repository.upVotePost(post)
@@ -110,7 +119,11 @@ class FeedScreenModel(
             getAllPosts()
         }
     }
-    fun updateTagFilters(newFilters: List<String>){
-        _state.update { it.copy(selectedTags = _state.value.allTags.filter { newFilters.contains(it.label) }.toSet()) }
+
+    fun updateTagFilters(newFilters: List<String>) {
+        _state.update {
+            it.copy(selectedTags = _state.value.allTags.filter { newFilters.contains(it.label) }
+                .toSet())
+        }
     }
 }
