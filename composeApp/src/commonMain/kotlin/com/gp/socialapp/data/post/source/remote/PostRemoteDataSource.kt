@@ -1,5 +1,6 @@
 package com.gp.socialapp.data.post.source.remote
 
+import com.gp.socialapp.data.post.source.remote.model.FetchPostsRequest
 import com.gp.socialapp.data.post.source.remote.model.Post
 import com.gp.socialapp.data.post.source.remote.model.Tag
 import com.gp.socialapp.util.Result
@@ -9,7 +10,7 @@ interface PostRemoteDataSource {
     suspend fun createPost(post: Post): Flow<Result<String>>
 
     //    fun createPostWithFiles(post: Post, files: List<PostFile>): Flow<Result<Nothing>>
-    fun fetchPosts(): Flow<List<Post>>
+    fun fetchPosts(request: FetchPostsRequest): Flow<List<Post>>
     suspend fun updatePost(post: Post):Flow<Result<String>>
     suspend fun deletePost(post: Post)
     suspend fun upVotePost(post: Post)

@@ -26,8 +26,8 @@ class FeedScreenModel(
     private val _state = MutableStateFlow(FeedUiState())
     val state = _state.asStateFlow()
     private fun getAllPosts() {
-        screenModelScope.launch() {
-            repository.getAllLocalPosts().collect { posts ->
+        screenModelScope.launch(Dispatchers.Default) {
+            repository.getAllPosts(this).collect { posts ->
                 posts.forEach { post ->
                     _state.update { it.copy(allTags = _state.value.allTags + post.tags) }
                 }
@@ -43,7 +43,7 @@ class FeedScreenModel(
                 } else {
                     filteredPosts.sortedByDescending { PostPopularityUtils.calculateInteractionValue(it.votes, it.replyCount) }
                 }
-                withContext(Dispatchers.Main) {
+                withContext(Dispatchers.Default) {
                     _state.update { it.copy(posts = sortedPosts,  isFeedLoaded = Result.Success) }
                 }
             }
@@ -64,7 +64,7 @@ class FeedScreenModel(
     fun deletePost(post: Post) {
         screenModelScope.launch() {
             repository.deletePost(post)
-            repository.deleteLocalPost(post)
+            repository.deleteLocalPostById(post.id)
         }
     }
 

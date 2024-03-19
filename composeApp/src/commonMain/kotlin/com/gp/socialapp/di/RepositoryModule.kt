@@ -6,8 +6,6 @@ import com.gp.socialapp.data.auth.repository.UserRepository
 import com.gp.socialapp.data.auth.repository.UserRepositoryImpl
 import com.gp.socialapp.data.post.repository.PostRepository
 import com.gp.socialapp.data.post.repository.PostRepositoryImpl
-import com.gp.socialapp.data.post.repository.ReplyRepository
-import com.gp.socialapp.data.post.repository.ReplyRepositoryImpl
 import org.kodein.di.DI
 import org.kodein.di.bind
 import org.kodein.di.instance
@@ -22,12 +20,12 @@ val repositoryModuleK = DI.Module("repositoryModule") {
             instance()
         )
     }
-    bind<PostRepository>() with singleton { PostRepositoryImpl(instance(), instance()) }
-    bind<ReplyRepository>() with singleton {
-        ReplyRepositoryImpl(
-            instance(),
-            instance(),
-            instance()
-        )
-    }
+    bind<PostRepository>() with singleton { PostRepositoryImpl(instance(), instance(), instance()) }
+//    bind<ReplyRepository>() with singleton {
+//        ReplyRepositoryImpl(
+//            instance(),
+//            instance(),
+//            instance()
+//        )
+//    }
 }

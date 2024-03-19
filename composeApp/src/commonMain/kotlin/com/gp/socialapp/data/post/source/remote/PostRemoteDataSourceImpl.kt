@@ -1,5 +1,6 @@
 package com.gp.socialapp.data.post.source.remote
 
+import com.gp.socialapp.data.post.source.remote.model.FetchPostsRequest
 import com.gp.socialapp.data.post.source.remote.model.Post
 import com.gp.socialapp.data.post.source.remote.model.Tag
 import com.gp.socialapp.util.Result
@@ -108,11 +109,14 @@ class PostRemoteDataSourceImpl : PostRemoteDataSource {
     }
 
 
-    override fun fetchPosts(): Flow<List<Post>> {
+    override fun fetchPosts(request: FetchPostsRequest): Flow<List<Post>> {
         return flow {
             try {
                 val response = httpClient.get {
                     endPoint("getAllPosts")
+                    setBody(
+                        request
+                    )
                 }
                 println("response: ${response.status}")
                 if (response.status == HttpStatusCode.OK) {

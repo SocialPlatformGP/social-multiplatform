@@ -12,7 +12,6 @@ interface PostRepository {
     fun getRemotePosts(): Flow<List<Post>>
     fun getAllLocalPosts(): Flow<List<Post>>
     suspend fun deleteLocalPostById(id: String)
-    fun fetchNetworkPosts(): Flow<List<Post>>
     suspend fun updatePost(post: Post): Flow<Result<String>>
     suspend fun deletePost(post: Post)
 

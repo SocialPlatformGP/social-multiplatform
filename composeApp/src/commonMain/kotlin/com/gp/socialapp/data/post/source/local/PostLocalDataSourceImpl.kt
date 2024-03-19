@@ -9,6 +9,7 @@ import com.gp.socialapp.data.post.source.remote.model.Post.Companion.toEntity
 import com.gp.socialapp.data.post.source.remote.model.PostFile
 import com.gp.socialapp.data.post.source.remote.model.Tag
 import com.gp.socialapp.db.PostQueries
+import com.russhwolf.settings.Settings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first

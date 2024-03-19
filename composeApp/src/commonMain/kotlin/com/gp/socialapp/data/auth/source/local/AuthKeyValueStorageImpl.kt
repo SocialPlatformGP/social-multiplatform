@@ -4,8 +4,9 @@ import com.gp.socialapp.util.AppConstants
 import com.russhwolf.settings.Settings
 import com.russhwolf.settings.set
 
-class AuthKeyValueStorageImpl : AuthKeyValueStorage {
-    private val settings: Settings by lazy { Settings() }
+class AuthKeyValueStorageImpl(
+    private val settings: Settings
+): AuthKeyValueStorage {
     override var token: String?
         get() = settings.getStringOrNull(AppConstants.StorageKeys.USER_TOKEN.key)
         set(value) {
