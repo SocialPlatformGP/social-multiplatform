@@ -128,6 +128,7 @@ class PostRemoteDataSourceImpl : PostRemoteDataSource {
                 }
             } catch (e: Exception) {
                 Napier.e("getAllPosts: ${e.message}")
+                println("getAllPosts: ${e.message}")
                 emit(emptyList())
             }
         }

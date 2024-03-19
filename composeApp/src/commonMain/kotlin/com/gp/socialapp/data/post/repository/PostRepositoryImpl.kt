@@ -68,11 +68,13 @@ class PostRepositoryImpl(
                                 lastUpdated = LocalDateTime.now().second
                                 it.forEach { post ->
                                     insertLocalPost(post)
+
+                                }
+                                getAllLocalPosts().collect {
+                                    emit(it)
                                 }
                             }
-                            getAllLocalPosts().collect {
-                                emit(it)
-                            }
+
                         }
                     }
                     delay(60000)
