@@ -1,0 +1,73 @@
+CREATE TABLE posts (
+  id TEXT PRIMARY KEY NOT NULL,
+  title TEXT NOT NULL DEFAULT "",
+  body TEXT NOT NULL DEFAULT "",
+  reply_count INTEGER NOT NULL DEFAULT 0,
+  author_name TEXT NOT NULL DEFAULT "",
+  author_pfp TEXT NOT NULL DEFAULT "",
+  author_id TEXT NOT NULL DEFAULT "",
+  created_at INTEGER NOT NULL DEFAULT 0,
+  votes INTEGER NOT NULL DEFAULT 0,
+  downvotes TEXT NOT NULL DEFAULT "",
+  upvotes TEXT NOT NULL DEFAULT "",
+  moderation_status TEXT NOT NULL DEFAULT "submitted",
+  edited_status INTEGER NOT NULL DEFAULT 0,
+  tags TEXT NOT NULL DEFAULT "",
+  type TEXT NOT NULL DEFAULT "general",
+  attachments TEXT NOT NULL DEFAULT "",
+  last_modified INTEGER NOT NULL DEFAULT 0
+);
+--QUERIES
+getAll:
+SELECT * FROM `posts` ORDER BY created_at DESC;
+
+getById:
+SELECT * FROM `posts` WHERE id = :id LIMIT 1;
+
+deleteWithIds:
+DELETE FROM `posts` WHERE id IN ?;
+
+deleteWithId:
+DELETE FROM `posts` WHERE id = :id;
+
+deleteAll:
+DELETE FROM `posts`;
+
+insert:
+INSERT OR REPLACE INTO `posts` (
+    `id`,
+    `title`,
+    `body`,
+    `reply_count`,
+    `author_name`,
+    `author_pfp`,
+    `author_id`,
+    `created_at`,
+    `votes`,
+    `downvotes`,
+    `upvotes`,
+    `moderation_status`,
+    `edited_status`,
+    `tags`,
+    `type`,
+    `attachments`,
+    `last_modified`
+) VALUES (
+    :id,
+    :title,
+    :body,
+    :reply_count,
+    :author_name,
+    :author_pfp,
+    :author_id,
+    :created_at,
+    :votes,
+    :downvotes,
+    :upvotes,
+    :moderation_status,
+    :edited_status,
+    :tags,
+    :type,
+    :attachments,
+    :last_modified
+);

@@ -50,23 +50,23 @@ class AppActivity : ComponentActivity() {
 //    App()
 //}
 
-@Preview
-@Composable
-fun AttachmentItemPreview() {
-    val post = Post(
-        title = "Hello, My name is who? my name is what?",
-        body = "My name is nigga nigga nigga slim shady",
-        replyCount = 5,
-        userName = "Eminem",
-        publishedAt = "Tomorrow",
-        votes = 15,
-        attachments = listOf(
-            PostFile(type = MimeType.PDF.value),
-            PostFile(type = MimeType.VIDEO.value)
-        )
-    )
-    AppTheme {
-        FeedPostItem(post = post, onPostEvent = {}, currentUserID = "0000")
-    }
-}
+//@Preview
+//@Composable
+//fun AttachmentItemPreview() {
+//    val post = Post(
+//        title = "Hello, My name is who? my name is what?",
+//        body = "My name is nigga nigga nigga slim shady",
+//        replyCount = 5,
+//        userName = "Eminem",
+//        publishedAt = "Tomorrow",
+//        votes = 15,
+//        attachments = listOf(
+//            PostFile(type = MimeType.PDF.value),
+//            PostFile(type = MimeType.VIDEO.value)
+//        )
+//    )
+//    AppTheme {
+//        FeedPostItem(post = post, onPostEvent = {}, currentUserID = "0000")
+//    }
+//}
 
