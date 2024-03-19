@@ -2,8 +2,10 @@ package com.gp.socialapp.di
 
 import com.gp.socialapp.data.auth.source.local.AuthKeyValueStorage
 import com.gp.socialapp.data.auth.source.local.AuthKeyValueStorageImpl
+import com.gp.socialapp.data.db.provideDbDriver
 import com.gp.socialapp.data.post.source.local.PostLocalDataSource
 import com.gp.socialapp.data.post.source.local.PostLocalDataSourceImpl
+import com.gp.socialapp.db.AppDatabase
 import com.russhwolf.settings.Settings
 import org.kodein.di.DI
 import org.kodein.di.bind
@@ -12,6 +14,9 @@ import org.kodein.di.singleton
 
 val localSourceModuleK = DI.Module("localSourceModule") {
     bind<Settings>() with singleton { Settings() }
+    bind<AppDatabase>() with singleton {
+        AppDatabase(provideDbDriver(AppDatabase.Schema))
+    }
     bind<AuthKeyValueStorage>() with singleton { AuthKeyValueStorageImpl(instance()) }
     bind<PostLocalDataSource>() with singleton { PostLocalDataSourceImpl(instance()) }
 }

@@ -109,10 +109,13 @@ kotlin {
             implementation(compose.html.core)
             implementation(libs.ktor.client.js)
             implementation(libs.sqlDelight.driver.js)
+            implementation(devNpm("copy-webpack-plugin", "9.1.0"))
+            implementation(npm("@cashapp/sqldelight-sqljs-worker", "2.0.1"))
+            implementation(npm("sql.js", "1.8.0"))
         }
-        jsMain.configure {
-            resources.srcDir(layout.buildDirectory.dir("sqlite"))
-        }
+//        jsMain.configure {
+//            resources.srcDir(layout.buildDirectory.dir("sqlite"))
+//        }
 
     }
 }
@@ -174,36 +177,36 @@ sqldelight {
             // Database configuration here.
             // https://cashapp.github.io/sqldelight
             packageName.set("com.gp.socialapp.db")
-            generateAsync.set(true)
+//            generateAsync.set(true)
         }
     }
 }
 
-val sqlite = 3450200
-
-val sqliteDownload = tasks.register("sqliteDownload", Download::class.java) {
-    src("https://sqlite.org/2024/sqlite-wasm-$sqlite.zip")
-    dest(layout.buildDirectory.dir("tmp"))
-    onlyIfModified(true)
-}
-
-val sqliteUnzip = tasks.register("sqliteUnzip", Copy::class.java) {
-    dependsOn(sqliteDownload)
-    from(zipTree(layout.buildDirectory.dir("tmp/sqlite-wasm-$sqlite.zip"))) {
-        include("sqlite-wasm-$sqlite/jswasm/**")
-        exclude("**/*worker1*")
-
-        eachFile {
-            relativePath = RelativePath(true, *relativePath.segments.drop(2).toTypedArray())
-        }
-    }
-    into(layout.buildDirectory.dir("sqlite"))
-    includeEmptyDirs = false
-}
-
-tasks.named("jsProcessResources").configure {
-    dependsOn(sqliteUnzip)
-}
+//val sqlite = 3450200
+//
+//val sqliteDownload = tasks.register("sqliteDownload", Download::class.java) {
+//    src("https://sqlite.org/2024/sqlite-wasm-$sqlite.zip")
+//    dest(layout.buildDirectory.dir("tmp"))
+//    onlyIfModified(true)
+//}
+//
+//val sqliteUnzip = tasks.register("sqliteUnzip", Copy::class.java) {
+//    dependsOn(sqliteDownload)
+//    from(zipTree(layout.buildDirectory.dir("tmp/sqlite-wasm-$sqlite.zip"))) {
+//        include("sqlite-wasm-$sqlite/jswasm/**")
+//        exclude("**/*worker1*")
+//
+//        eachFile {
+//            relativePath = RelativePath(true, *relativePath.segments.drop(2).toTypedArray())
+//        }
+//    }
+//    into(layout.buildDirectory.dir("sqlite"))
+//    includeEmptyDirs = false
+//}
+//
+//tasks.named("jsProcessResources").configure {
+//    dependsOn(sqliteUnzip)
+//}
 
 apollo {
     service("api") {

@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface PostRepository {
     suspend fun insertLocalPost(post: Post)
-    fun getAllPosts(scope: CoroutineScope): Flow<List<Post>>
+    fun getAllPosts(): Flow<List<Post>>
     fun getRemotePosts(): Flow<List<Post>>
     fun getAllLocalPosts(): Flow<List<Post>>
     suspend fun deleteLocalPostById(id: String)
@@ -19,7 +19,7 @@ interface PostRepository {
     fun onCleared()
     suspend fun upVotePost(post: Post)
     suspend fun downVotePost(post: Post)
-    fun fetchPostById(id: String): Flow<Post>
+    suspend fun fetchPostById(id: String): Flow<Post>
     fun deleteAllPosts()
     suspend fun createPost(post: Post): Flow<Result<String>>
 

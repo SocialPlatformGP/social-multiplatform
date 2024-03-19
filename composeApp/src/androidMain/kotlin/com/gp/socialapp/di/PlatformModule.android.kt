@@ -1,8 +1,5 @@
 package com.gp.socialapp.di
 
-import android.content.Context
-import app.cash.sqldelight.db.SqlDriver
-import com.gp.socialapp.data.db.DatabaseDriver
 import com.gp.socialapp.db.AppDatabase
 import com.gp.socialapp.db.PostQueries
 import kotlinx.coroutines.GlobalScope
@@ -16,6 +13,6 @@ actual val platformModule =  DI.Module("platformModule") {
 //    bind<SqlDriver>() with singleton {
 //        DatabaseDriver().createDriver()
 //    }
-    bind<AppDatabase>() with singleton { AppDatabase(instance()) }
-    bind<PostQueries>() with singleton { instance<AppDatabase>().postQueries }
+//    bind<AppDatabase>() with singleton { AppDatabase(instance()) }
+//    bind<PostQueries>() with singleton { instance<AppDatabase>().postQueries }
 }

@@ -12,13 +12,9 @@ import com.gp.socialapp.util.Result
 import com.gp.socialapp.util.getPlatform
 import com.russhwolf.settings.Settings
 import com.russhwolf.settings.set
-import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
@@ -29,6 +25,26 @@ class PostRepositoryImpl(
     private val postRemoteSource: PostRemoteDataSource,
     private val settings: Settings
 ) : PostRepository {
+    val posts = listOf<Post>(
+        Post(
+            id = "1",
+            title = "Post 1",
+            body = "This is post 1",
+            authorName = "Author 1",
+        ),
+        Post(
+            id = "2",
+            title = "Post 2",
+            body = "This is post 2",
+            authorName = "Author 2",
+        ),
+        Post(
+            id = "3",
+            title = "Post 3",
+            body = "This is post 3",
+            authorName = "Author 3",
+        ),
+    )
 
     private var lastUpdated: Int
         get() = settings.getInt(AppConstants.StorageKeys.POST_LAST_UPDATED.key, 0)
@@ -44,46 +60,29 @@ class PostRepositoryImpl(
         postLocalSource.insertPost(post)
     }
 
-    override fun getAllPosts(scope: CoroutineScope): Flow<List<Post>> = flow {
+    override fun getAllPosts(): Flow<List<Post>> {
         val platform = getPlatform()
-        scope.launch {
-            while (isActive) {
-                try {
-                    if (platform == Platform.JS) {
-                        getRemotePosts().collect {
-                            if (it.isNotEmpty()) {
-                                emit(it)
-                            }
-                        }
-                    } else {
-                        launch {
-                            val posts = postRemoteSource.fetchPosts(
-                                FetchPostsRequest(
-                                    Instant.fromEpochSeconds(lastUpdated.toLong()).toLocalDateTime(
-                                        TimeZone.UTC
-                                    )
-                                )
-                            )
-                            posts.collect {
-                                lastUpdated = LocalDateTime.now().second
-                                it.forEach { post ->
-                                    insertLocalPost(post)
-
-                                }
-                                getAllLocalPosts().collect {
-                                    emit(it)
-                                }
-                            }
-
-                        }
-                    }
-                    delay(60000)
-                } catch (e: Exception) {
-                    Napier.e(
-                        message = e.message ?: "Error in getAllPosts and null exception message"
+        return if (platform == Platform.JS) {
+            getRemotePosts()
+        } else {
+            flow{
+                val posts = postRemoteSource.fetchPosts(
+                    FetchPostsRequest(
+                        Instant.fromEpochSeconds(lastUpdated.toLong()).toLocalDateTime(
+                            TimeZone.UTC
+                        )
                     )
-                }
+                )
+                posts.collect {
+                    lastUpdated = LocalDateTime.now().second
+                    it.forEach { post ->
+                        insertLocalPost(post)
 
+                    }
+                }
+                getAllLocalPosts().collect {
+                    emit(it)
+                }
             }
         }
     }
@@ -145,7 +144,7 @@ class PostRepositoryImpl(
     override suspend fun upVotePost(post: Post) = postRemoteSource.upVotePost(post)
 
     override suspend fun downVotePost(post: Post) = postRemoteSource.downVotePost(post)
-    override fun fetchPostById(id: String): Flow<Post> {
+    override suspend fun fetchPostById(id: String): Flow<Post> {
 //        if (networkStatus.isOnline()) {
 //            val post = postRemoteSource.fetchPostById(id)
 //            repositoryScope.launch {

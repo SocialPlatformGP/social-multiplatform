@@ -11,6 +11,7 @@ import com.gp.socialapp.util.Result
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -30,7 +31,7 @@ class FeedScreenModel(
 
     private fun getAllPosts() {
         screenModelScope.launch(Dispatchers.Default) {
-            repository.getAllPosts(this).collect { posts ->
+            repository.getAllPosts().collectLatest { posts ->
                 posts.forEach { post ->
                     _state.update { it.copy(allTags = _state.value.allTags + post.tags) }
                 }

@@ -47,9 +47,9 @@ data class PostEntity(
                     upvoted = upvoted.split(","),
                     moderationStatus = moderationStatus,
                     editedStatus = editedStatus == 1,
-                    tags = tags.split(",").map { it.toTag() },
+                    tags = if(tags.isBlank()) emptyList() else tags.split(",").map { it.toTag() },
                     type = type,
-                    attachments = attachments.split(",").map { it.toPostFile() },
+                    attachments = if(attachments.isBlank()) emptyList() else attachments.split(",").map { it.toPostFile() },
                     lastModified = Instant.fromEpochSeconds(lastModified.toLong()).toLocalDateTime(TimeZone.UTC)
                 )
             }
