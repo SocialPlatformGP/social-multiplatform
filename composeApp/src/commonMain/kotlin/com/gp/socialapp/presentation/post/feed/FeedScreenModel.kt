@@ -39,7 +39,7 @@ class FeedScreenModel(
                     posts
                 }
                 val sortedPosts = if (_state.value.isSortedByNewest) {
-                    filteredPosts.sortedByDescending { /*DateUtils.convertStringToDate(it.publishedAt)*/ it.publishedAt }
+                    filteredPosts.sortedByDescending { it.createdAt.second }
                 } else {
                     filteredPosts.sortedByDescending { PostPopularityUtils.calculateInteractionValue(it.votes, it.replyCount) }
                 }

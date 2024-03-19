@@ -60,9 +60,9 @@ class CreatePostScreenModel(
                         body = body,
                         tags = tags,
                         type = type,
-                        userName = currentUser.value.firstName + " " + currentUser.value.lastName,
-                        userPfp = currentUser.value.profilePictureURL,
-                        authorEmail = currentUser.value.email,
+                        authorName = currentUser.value.firstName + " " + currentUser.value.lastName,
+                        authorPfp = currentUser.value.profilePictureURL,
+                        authorID = currentUser.value.email,
                         attachments = files
                     )
                 ).collect { it ->

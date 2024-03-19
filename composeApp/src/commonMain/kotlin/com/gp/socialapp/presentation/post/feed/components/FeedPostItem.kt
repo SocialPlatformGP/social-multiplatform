@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.gp.socialapp.data.post.source.remote.model.Post
 import com.gp.socialapp.presentation.post.feed.PostEvent
+import com.gp.socialapp.util.LocalDateTimeUtil.toYYYYMMDD
 
 @Composable
 fun FeedPostItem(
@@ -36,9 +37,9 @@ fun FeedPostItem(
                 .wrapContentHeight()
         ) {
             TopRow(
-                imageUrl = post.userPfp,
-                userName = post.userName,
-                publishedAt = post.publishedAt,
+                imageUrl = post.authorPfp,
+                userName = post.authorName,
+                publishedAt = post.createdAt.toYYYYMMDD(),
                 onEditPostClicked = { onPostEvent(PostEvent.OnPostEdited(post)) },
                 onDeletePostClicked = { onPostEvent(PostEvent.OnPostDeleted(post)) }
             )

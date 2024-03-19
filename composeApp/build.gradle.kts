@@ -1,12 +1,12 @@
 import com.android.build.gradle.internal.lint.AndroidLintAnalysisTask
 import com.android.build.gradle.internal.lint.LintModelWriterTask
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import de.undercouch.gradle.tasks.download.Download
 
 allprojects {
     repositories {
         google()
         mavenCentral()
-        maven("https://jitpack.io/")
     }
 }
 
@@ -18,10 +18,7 @@ plugins {
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.sqlDelight)
     alias(libs.plugins.apollo)
-    alias(libs.plugins.ksp)
-    alias(libs.plugins.realm)
-
-//    alias(libs.plugins.google.services)
+    alias(libs.plugins.undercouch.download)
 }
 
 kotlin {
@@ -40,6 +37,13 @@ kotlin {
     js {
         browser()
         binaries.executable()
+        browser {
+            commonWebpackConfig {
+                cssSupport {
+                    enabled.set(true)
+                }
+            }
+        }
     }
 
     sourceSets {
@@ -75,9 +79,7 @@ kotlin {
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.calf.file.picker)
             implementation(libs.kodein.di.framework.compose)
-            implementation(libs.door.runtime)
-            implementation(libs.room.annotations)
-
+            implementation(libs.sqlDelight.coroutines)
         }
 
         commonTest.dependencies {
@@ -93,15 +95,6 @@ kotlin {
             implementation(libs.ktor.client.websockets)
             implementation(libs.sqlDelight.driver.android)
             implementation(compose.preview)
-            implementation(libs.androidx.room.runtime)
-            implementation(libs.androidx.room.ktx)
-            implementation(libs.androidx.paging.runtime)
-            implementation("io.realm.kotlin:library-base:1.11.0")
-            implementation("io.realm.kotlin:library-sync:1.11.0")
-//            compileOnly("io.realm.kotlin:library-base:1.11.0")
-//            configurations.all{
-//                exclude(group = "com.github.UstadMobile.door", module = "room-annotations")
-//            }
         }
 
         jvmMain.dependencies {
@@ -110,14 +103,15 @@ kotlin {
             implementation(libs.kotlinx.coroutines.swing)
             implementation(libs.ktor.client.okhttp)
             implementation(libs.sqlDelight.driver.sqlite)
-            implementation("io.realm.kotlin:library-base:1.11.0")
-            implementation("io.realm.kotlin:library-sync:1.11.0")
         }
 
         jsMain.dependencies {
             implementation(compose.html.core)
             implementation(libs.ktor.client.js)
             implementation(libs.sqlDelight.driver.js)
+        }
+        jsMain.configure {
+            resources.srcDir(layout.buildDirectory.dir("sqlite"))
         }
 
     }
@@ -165,15 +159,6 @@ compose.desktop {
         }
     }
 }
-val version_door by extra("0.0.63o10")
-val version_android_room by extra("2.6.1")
-dependencies {
-    add("kspJvm", "com.github.UstadMobile.door:door-compiler:$version_door")
-    add("kspJs", "com.github.UstadMobile.door:door-compiler:$version_door")
-    add("kspAndroid", "com.github.UstadMobile.door:door-compiler:$version_door")
-    add("kspAndroid", "androidx.room:room-compiler:$version_android_room")
-}
-
 compose.experimental {
     web.application {}
 }
@@ -185,12 +170,39 @@ buildConfig {
 
 sqldelight {
     databases {
-        create("MyDatabase") {
+        create("AppDatabase") {
             // Database configuration here.
             // https://cashapp.github.io/sqldelight
             packageName.set("com.gp.socialapp.db")
+            generateAsync.set(true)
         }
     }
+}
+
+val sqlite = 3450200
+
+val sqliteDownload = tasks.register("sqliteDownload", Download::class.java) {
+    src("https://sqlite.org/2024/sqlite-wasm-$sqlite.zip")
+    dest(layout.buildDirectory.dir("tmp"))
+    onlyIfModified(true)
+}
+
+val sqliteUnzip = tasks.register("sqliteUnzip", Copy::class.java) {
+    dependsOn(sqliteDownload)
+    from(zipTree(layout.buildDirectory.dir("tmp/sqlite-wasm-$sqlite.zip"))) {
+        include("sqlite-wasm-$sqlite/jswasm/**")
+        exclude("**/*worker1*")
+
+        eachFile {
+            relativePath = RelativePath(true, *relativePath.segments.drop(2).toTypedArray())
+        }
+    }
+    into(layout.buildDirectory.dir("sqlite"))
+    includeEmptyDirs = false
+}
+
+tasks.named("jsProcessResources").configure {
+    dependsOn(sqliteUnzip)
 }
 
 apollo {
