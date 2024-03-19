@@ -4,8 +4,17 @@ import com.gp.socialapp.data.post.source.local.PostLocalDataSource
 import com.gp.socialapp.data.post.source.remote.PostRemoteDataSource
 import com.gp.socialapp.data.post.source.remote.model.Post
 import com.gp.socialapp.data.post.source.remote.model.Tag
+import com.gp.socialapp.util.Platform
 import com.gp.socialapp.util.Result
+import com.gp.socialapp.util.getPlatform
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 
 class PostRepositoryImpl(
     private val postLocalSource: PostLocalDataSource,
@@ -17,12 +26,36 @@ class PostRepositoryImpl(
         return postRemoteSource.createPost(post)
     }
 
-    override suspend fun insertLocalPost(vararg post: Post) {
-        postLocalSource.insertPost(*post)
+    override suspend fun insertLocalPost(post: Post) {
+        postLocalSource.insertPost(post)
     }
 
-    override suspend fun updateLocalPost(post: Post) {
-        postLocalSource.updatePost(post)
+    override fun getAllPosts(scope: CoroutineScope): Flow<List<Post>> {
+        val databaseMutex = Mutex()
+        if(getPlatform() == Platform.JS) {
+            return getRemotePosts()
+        } else {
+            scope.launch {
+                while (true) {
+                    launch {
+                        val posts = postRemoteSource.fetchPosts()
+                        databaseMutex.withLock {
+                            posts.collect {
+                                it.forEach { post ->
+                                    insertLocalPost(post)
+                                }
+                            }
+                        }
+                    }
+                    delay(60000)
+                }
+            }
+            return getAllLocalPosts()
+        }
+    }
+
+    override fun getRemotePosts(): Flow<List<Post>> {
+        TODO("Not yet implemented")
     }
 
     override fun getAllLocalPosts(): Flow<List<Post>> {
@@ -43,8 +76,8 @@ class PostRepositoryImpl(
         return postLocalSource.getAllPosts()
     }
 
-    override suspend fun deleteLocalPost(post: Post) {
-        postLocalSource.deletePost(post)
+    override suspend fun deleteLocalPostById(id: String) {
+        postLocalSource.deletePostById(id)
     }
 
 
@@ -72,9 +105,6 @@ class PostRepositoryImpl(
 //        repositoryScope.cancel()
     }
 
-    override fun searchPostsByTitle(searchText: String): Flow<List<Post>> {
-        return postLocalSource.searchPostsByTitle(searchText)
-    }
 
     override suspend fun upVotePost(post: Post) = postRemoteSource.upVotePost(post)
 
