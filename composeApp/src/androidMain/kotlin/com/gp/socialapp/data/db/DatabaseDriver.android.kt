@@ -1,14 +1,16 @@
 package com.gp.socialapp.data.db
 
 import android.content.Context
-import app.cash.sqldelight.async.coroutines.synchronous
-import app.cash.sqldelight.db.QueryResult
 import app.cash.sqldelight.db.SqlDriver
-import app.cash.sqldelight.db.SqlSchema
 import app.cash.sqldelight.driver.android.AndroidSqliteDriver
+import com.gp.socialapp.db.AppDatabase
 
 actual class DatabaseDriver(private val context: Context) {
-    actual fun createDriver(schema: SqlSchema<QueryResult.AsyncValue<Unit>>): SqlDriver {
-        return AndroidSqliteDriver(schema.synchronous(), context, DB_NAME)
+    actual fun createDriver(): SqlDriver {
+        return AndroidSqliteDriver(
+            schema = AppDatabase.Schema,
+            context = context,
+            name = DB_NAME
+        )
     }
 }

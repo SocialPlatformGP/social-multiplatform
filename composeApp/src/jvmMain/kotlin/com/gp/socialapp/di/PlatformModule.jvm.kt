@@ -20,7 +20,7 @@ actual val platformModule =  DI.Module("platformModule") {
 //            DatabaseDriver().createDriver(AppDatabase.Schema)
 //        }
 //        driverPromise.getCompleted()
-        DatabaseDriver().createDriver(AppDatabase.Schema)
+        DatabaseDriver().createDriver()
     }
     bind<AppDatabase>() with singleton { AppDatabase(instance()) }
     bind<PostQueries>() with singleton { instance<AppDatabase>().postQueries }
