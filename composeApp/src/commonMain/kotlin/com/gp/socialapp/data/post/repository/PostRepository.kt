@@ -7,23 +7,16 @@ import kotlinx.coroutines.flow.Flow
 
 interface PostRepository {
     suspend fun insertLocalPost(post: Post)
-    fun getAllPosts(): Flow<Result<List<Post>>>
+    fun getPosts(): Flow<Result<List<Post>>>
     fun getRemotePosts(): Flow<Result<List<Post>>>
-    fun getAllLocalPosts(): Flow<List<Post>>
-    suspend fun deleteLocalPostById(id: String)
+    fun getLocalPosts(): Flow<List<Post>>
     suspend fun updatePost(post: Post): Flow<Result<String>>
-    suspend fun deletePost(post: Post)
-
-    //    fun createPost(post: Post, files: List<PostFile>): Flow<State<Nothing>>
-    fun onCleared()
-    suspend fun upVotePost(post: Post)
-    suspend fun downVotePost(post: Post)
+    suspend fun deletePost(post: Post): Result<Nothing>
+    suspend fun upvotePost(post: Post): Result<Nothing>
+    suspend fun downvotePost(post: Post): Result<Nothing>
     suspend fun fetchPostById(id: String): Flow<Post>
-    fun deleteAllPosts()
     suspend fun createPost(post: Post): Flow<Result<String>>
 
-    suspend fun incrementReplyCounter(postId: String)
-    suspend fun decrementReplyCounter(postId: String)
     fun getAllTags(): Flow<List<Tag>>
     suspend fun insertTag(tag: Tag)
 }

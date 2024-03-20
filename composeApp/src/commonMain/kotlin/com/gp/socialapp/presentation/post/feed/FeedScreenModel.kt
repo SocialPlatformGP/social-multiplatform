@@ -17,15 +17,13 @@ import kotlinx.coroutines.launch
 
 class FeedScreenModel(
     val repository: PostRepository,
-    val replyRepository: ReplyRepository,
-    val userRepository: UserRepository
 ) : ScreenModel {
     private val _state = MutableStateFlow(FeedUiState())
     val state = _state.asStateFlow()
 
     fun getAllPosts() {
         screenModelScope.launch(Dispatchers.Default) {
-            repository.getAllPosts().collectLatest { result ->
+            repository.getPosts().collectLatest { result ->
                 when (result) {
                     is Result.SuccessWithData -> {
                         result.data.forEach { post ->
@@ -70,39 +68,33 @@ class FeedScreenModel(
     }
 
     fun upVote(post: Post) {
-        screenModelScope.launch {
-            repository.upVotePost(post)
+        screenModelScope.launch(Dispatchers.Default) {
+            val result = repository.upvotePost(post)
+            if(result is Result.Error) {
+                _state.update { it.copy(error = FeedError.NetworkError(result.message)) }
+            }
         }
     }
 
     fun downVote(post: Post) {
-        screenModelScope.launch() {
-            repository.downVotePost(post)
+        screenModelScope.launch(Dispatchers.Default) {
+            val result = repository.downvotePost(post)
+            if(result is Result.Error) {
+                _state.update { it.copy(error = FeedError.NetworkError(result.message)) }
+            }
         }
     }
 
     fun deletePost(post: Post) {
         screenModelScope.launch() {
-            repository.deletePost(post)
-            repository.deleteLocalPostById(post.id)
+            val result = repository.deletePost(post)
+            if(result is Result.Error) {
+                _state.update { it.copy(error = FeedError.NetworkError(result.message)) }
+            }
         }
     }
 
     fun sortPostsByNewest() {
-//        viewModelScope.launch {
-//            _isSortedByNewest.value = true
-//            val posts = (uiState.value as? State.SuccessWithData)?.data ?: return@launch
-//            withContext(Dispatchers.Default) {
-//                Collections.sort(posts, Post.sortByDate)
-//            }
-//            withContext(Dispatchers.Main) {
-//                _uiState.value = State.Loading
-//                _uiState.value = State.SuccessWithData(posts)
-//            }
-//            unfilteredPosts.clear()
-//            unfilteredPosts.addAll(posts)
-//            Log.d("TAG258", "New Data by Newest: ${(uiState.value as? State.SuccessWithData<List<Post>>)?.data?.map{"${it.title} : ${it.votes}"} ?: emptyList()}")
-//        }
         screenModelScope.launch {
             _state.update { it.copy(isSortedByNewest = true) }
             getAllPosts()
@@ -110,21 +102,6 @@ class FeedScreenModel(
     }
 
     fun sortPostsByPopularity() {
-//        viewModelScope.launch {
-//            _isSortedByNewest.value = false
-//            val posts = (uiState.value as? State.SuccessWithData)?.data ?: return@launch
-//
-//            withContext(Dispatchers.Default) {
-//                Collections.sort(posts, Post.sortByVotes)
-//            }
-//            withContext(Dispatchers.Main) {
-//                _uiState.value = State.Loading
-//                _uiState.value = State.SuccessWithData(posts)
-//            }
-//            unfilteredPosts.clear()
-//            unfilteredPosts.addAll(posts)
-//            Log.d("TAG258", "New Data by most popular: ${(uiState.value as? State.SuccessWithData<List<Post>>)?.data?.map{"${it.title} : ${it.votes}"} ?: emptyList()}")
-//        }
         screenModelScope.launch {
             _state.update { it.copy(isSortedByNewest = false) }
             getAllPosts()

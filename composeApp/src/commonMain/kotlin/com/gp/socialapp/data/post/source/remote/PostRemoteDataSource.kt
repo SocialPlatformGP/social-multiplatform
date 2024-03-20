@@ -1,23 +1,21 @@
 package com.gp.socialapp.data.post.source.remote
 
-import com.gp.socialapp.data.post.source.remote.model.FetchPostsRequest
+import com.gp.socialapp.data.post.source.remote.model.PostRequest.UpvoteRequest
+import com.gp.socialapp.data.post.source.remote.model.PostRequest.DownvoteRequest
+import com.gp.socialapp.data.post.source.remote.model.PostRequest.FetchRequest
 import com.gp.socialapp.data.post.source.remote.model.Post
+import com.gp.socialapp.data.post.source.remote.model.PostRequest.DeleteRequest
 import com.gp.socialapp.data.post.source.remote.model.Tag
 import com.gp.socialapp.util.Result
 import kotlinx.coroutines.flow.Flow
 
 interface PostRemoteDataSource {
     suspend fun createPost(post: Post): Flow<Result<String>>
-
-    //    fun createPostWithFiles(post: Post, files: List<PostFile>): Flow<Result<Nothing>>
-    fun fetchPosts(request: FetchPostsRequest): Flow<Result<List<Post>>>
+    fun fetchPosts(request: FetchRequest): Flow<Result<List<Post>>>
     suspend fun updatePost(post: Post): Flow<Result<String>>
-    suspend fun deletePost(post: Post)
-    suspend fun upVotePost(post: Post)
-    suspend fun downVotePost(post: Post)
-    fun fetchPostById(id: String): Flow<Post>
-    suspend fun incrementReplyCounter(postId: String)
-    suspend fun decrementReplyCounter(postId: String)
+    suspend fun deletePost(request: DeleteRequest): Result<Nothing>
+    suspend fun upvotePost(request: UpvoteRequest): Result<Nothing>
+    suspend fun downvotePost(request: DownvoteRequest): Result<Nothing>
 
     fun getAllTags(): Flow<List<Tag>>
     suspend fun insertTag(tag: Tag)

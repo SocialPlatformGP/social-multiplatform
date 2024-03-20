@@ -1,7 +1,10 @@
 package com.gp.socialapp.data.post.source.remote
 
-import com.gp.socialapp.data.post.source.remote.model.FetchPostsRequest
 import com.gp.socialapp.data.post.source.remote.model.Post
+import com.gp.socialapp.data.post.source.remote.model.PostRequest.DeleteRequest
+import com.gp.socialapp.data.post.source.remote.model.PostRequest.UpvoteRequest
+import com.gp.socialapp.data.post.source.remote.model.PostRequest.DownvoteRequest
+import com.gp.socialapp.data.post.source.remote.model.PostRequest.FetchRequest
 import com.gp.socialapp.data.post.source.remote.model.Tag
 import com.gp.socialapp.util.Result
 import io.github.aakira.napier.Napier
@@ -109,7 +112,7 @@ class PostRemoteDataSourceImpl : PostRemoteDataSource {
     }
 
 
-    override fun fetchPosts(request: FetchPostsRequest): Flow<Result<List<Post>>> = flow {
+    override fun fetchPosts(request: FetchRequest): Flow<Result<List<Post>>> = flow {
         println("fetchPosts: $request *********************125")
         emit(Result.Loading)
         try {
@@ -138,29 +141,60 @@ class PostRemoteDataSourceImpl : PostRemoteDataSource {
         return flow { }
     }
 
-    override suspend fun deletePost(post: Post) {
-        TODO("Not yet implemented")
+    override suspend fun deletePost(request: DeleteRequest): Result<Nothing> {
+        try {
+            val response = httpClient.post {
+                endPoint("deletePost")
+                setBody(
+                    request
+                )
+            }
+            val message = response.bodyAsText()
+            return if (response.status == HttpStatusCode.OK) {
+                Result.Success
+            } else {
+                Result.Error(message)
+            }
+        } catch (e: Exception) {
+            return Result.Error(e.message ?: "An unknown error occurred")
+        }
     }
 
-    override suspend fun upVotePost(post: Post) {
-        TODO("Not yet implemented")
+    override suspend fun upvotePost(request: UpvoteRequest): Result<Nothing> {
+        try {
+            val response = httpClient.post {
+                endPoint("upvotePost")
+                setBody(
+                    request
+                )
+            }
+            val message = response.bodyAsText()
+            return if (response.status == HttpStatusCode.OK) {
+                Result.Success
+            } else {
+                Result.Error(message)
+            }
+        } catch (e: Exception) {
+            return Result.Error(e.message ?: "An unknown error occurred")
+        }
     }
 
-    override suspend fun downVotePost(post: Post) {
-        TODO("Not yet implemented")
+    override suspend fun downvotePost(request: DownvoteRequest): Result<Nothing> {
+        try {
+            val response = httpClient.post {
+                endPoint("downvotePost")
+                setBody(
+                    request
+                )
+            }
+            val message = response.bodyAsText()
+            return if (response.status == HttpStatusCode.OK) {
+                Result.Success
+            } else {
+                Result.Error(message)
+            }
+        } catch (e: Exception) {
+            return Result.Error(e.message ?: "An unknown error occurred")
+        }
     }
-
-    override fun fetchPostById(id: String): Flow<Post> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun incrementReplyCounter(postId: String) {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun decrementReplyCounter(postId: String) {
-        TODO("Not yet implemented")
-    }
-
-
 }

@@ -1,9 +1,10 @@
 package com.gp.socialapp.data.post.repository
 
+import com.gp.socialapp.data.auth.source.local.AuthKeyValueStorage
 import com.gp.socialapp.data.post.source.local.PostLocalDataSource
 import com.gp.socialapp.data.post.source.remote.PostRemoteDataSource
-import com.gp.socialapp.data.post.source.remote.model.FetchPostsRequest
 import com.gp.socialapp.data.post.source.remote.model.Post
+import com.gp.socialapp.data.post.source.remote.model.PostRequest
 import com.gp.socialapp.data.post.source.remote.model.Tag
 import com.gp.socialapp.util.AppConstants
 import com.gp.socialapp.util.LocalDateTimeUtil.now
@@ -14,15 +15,14 @@ import com.russhwolf.settings.Settings
 import com.russhwolf.settings.set
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
-import kotlinx.datetime.toLocalDateTime
 
 class PostRepositoryImpl(
     private val postLocalSource: PostLocalDataSource,
     private val postRemoteSource: PostRemoteDataSource,
+    private val authStorage: AuthKeyValueStorage,
     private val settings: Settings
 ) : PostRepository {
 
@@ -40,7 +40,7 @@ class PostRepositoryImpl(
         postLocalSource.insertPost(post)
     }
 
-    override fun getAllPosts(): Flow<Result<List<Post>>> = flow {
+    override fun getPosts(): Flow<Result<List<Post>>> = flow {
         emit(Result.Loading)
         val platform = getPlatform()
         try{
@@ -59,7 +59,7 @@ class PostRepositoryImpl(
                             }
                         }
                     }
-                    getAllLocalPosts().collect {
+                    getLocalPosts().collect {
                         emit(it)
                     }
                 }
@@ -71,52 +71,36 @@ class PostRepositoryImpl(
 
     override fun getRemotePosts(): Flow<Result<List<Post>>> {
         return postRemoteSource.fetchPosts(
-            FetchPostsRequest(
+            PostRequest.FetchRequest(
                 lastUpdated = lastUpdated
             )
         )
     }
 
-    override fun getAllLocalPosts(): Flow<List<Post>> {
+    override fun getLocalPosts(): Flow<List<Post>> {
         return postLocalSource.getAllPosts()
     }
-
-    override suspend fun deleteLocalPostById(id: String) {
-        postLocalSource.deletePostById(id)
-    }
-
-
     override suspend fun updatePost(post: Post): Flow<Result<String>> =
         postRemoteSource.updatePost(post)
 
 
-    override suspend fun deletePost(post: Post) {
-        postRemoteSource.deletePost(post)
+    override suspend fun deletePost(post: Post) : Result<Nothing> {
+        val request = PostRequest.DeleteRequest(post.id)
+        postLocalSource.deletePostById(post.id)
+        return postRemoteSource.deletePost(request)
+    }
+    override suspend fun upvotePost(post: Post): Result<Nothing>  {
+        val request = PostRequest.UpvoteRequest(post.id, authStorage.userId?:"")
+        return postRemoteSource.upvotePost(request)
     }
 
-
-    override fun onCleared() {
-//        repositoryScope.cancel()
+    override suspend fun downvotePost(post: Post): Result<Nothing>  {
+        val request = PostRequest.DownvoteRequest(post.id, authStorage.userId?:"")
+        return postRemoteSource.downvotePost(request)
     }
-
-
-    override suspend fun upVotePost(post: Post) = postRemoteSource.upVotePost(post)
-
-    override suspend fun downVotePost(post: Post) = postRemoteSource.downVotePost(post)
     override suspend fun fetchPostById(id: String): Flow<Post> {
         return postLocalSource.getPostById(id)
     }
-
-    override fun deleteAllPosts() {
-
-    }
-
-
-    override suspend fun incrementReplyCounter(postId: String) =
-        postRemoteSource.incrementReplyCounter(postId)
-
-    override suspend fun decrementReplyCounter(postId: String) =
-        postRemoteSource.decrementReplyCounter(postId)
 
     override fun getAllTags() = postRemoteSource.getAllTags()
 
