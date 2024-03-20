@@ -1,7 +1,4 @@
-import com.android.build.gradle.internal.lint.AndroidLintAnalysisTask
-import com.android.build.gradle.internal.lint.LintModelWriterTask
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import de.undercouch.gradle.tasks.download.Download
 
 allprojects {
     repositories {
@@ -149,7 +146,6 @@ android {
         kotlinCompilerExtensionVersion = "1.5.4"
     }
 }
-
 
 compose.desktop {
     application {

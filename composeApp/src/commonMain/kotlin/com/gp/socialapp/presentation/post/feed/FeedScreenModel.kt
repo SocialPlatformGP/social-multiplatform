@@ -25,11 +25,11 @@ class FeedScreenModel(
     val state = _state.asStateFlow()
 
 
-    init {
-        getAllPosts()
-    }
+//    init {
+//        getAllPosts()
+//    }
 
-    private fun getAllPosts() {
+    fun getAllPosts() {
         screenModelScope.launch(Dispatchers.Default) {
             repository.getAllPosts().collectLatest { posts ->
                 posts.forEach { post ->

@@ -75,6 +75,7 @@ object FeedScreen : Screen {
             TabItem("General", Icons.Filled.AllInclusive),
             TabItem("Spotlight", Icons.Filled.NotificationImportant),
         )
+        screenModel.getAllPosts()
         FeedContent(
             state = state,
             currentUserID = "",

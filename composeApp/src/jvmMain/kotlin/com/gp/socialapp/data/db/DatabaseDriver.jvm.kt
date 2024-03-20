@@ -8,8 +8,9 @@ import com.gp.socialapp.db.AppDatabase
 
 
 actual fun provideDbDriver(schema: SqlSchema<QueryResult.Value<Unit>>): SqlDriver {
-    return JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY)
-        .also{ driver ->
+    return JdbcSqliteDriver("jdbc:sqlite:${DB_NAME}")
+
+        .also { driver ->
             AppDatabase.Schema.create(driver)
         }
 }

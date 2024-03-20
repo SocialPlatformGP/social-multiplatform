@@ -12,12 +12,12 @@ import com.gp.socialapp.util.Result
 import com.gp.socialapp.util.getPlatform
 import com.russhwolf.settings.Settings
 import com.russhwolf.settings.set
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 
 class PostRepositoryImpl(
@@ -65,7 +65,7 @@ class PostRepositoryImpl(
         return if (platform == Platform.JS) {
             getRemotePosts()
         } else {
-            flow{
+            flow {
                 val posts = postRemoteSource.fetchPosts(
                     FetchPostsRequest(
                         Instant.fromEpochSeconds(lastUpdated.toLong()).toLocalDateTime(
@@ -74,13 +74,18 @@ class PostRepositoryImpl(
                     )
                 )
                 posts.collect {
-                    lastUpdated = LocalDateTime.now().second
-                    it.forEach { post ->
-                        insertLocalPost(post)
+                    if (it.isNotEmpty()) {
+                        lastUpdated =
+                            LocalDateTime.now().toInstant(TimeZone.UTC).epochSeconds.toInt()
+                        it.forEach { post ->
+                            insertLocalPost(post)
 
+                        }
                     }
+
                 }
                 getAllLocalPosts().collect {
+                    println("Local Posts: $it*********************'")
                     emit(it)
                 }
             }

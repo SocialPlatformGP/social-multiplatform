@@ -110,10 +110,11 @@ class PostRemoteDataSourceImpl : PostRemoteDataSource {
 
 
     override fun fetchPosts(request: FetchPostsRequest): Flow<List<Post>> {
+        println("fetchPosts: $request *********************125")
         return flow {
             try {
-                val response = httpClient.get {
-                    endPoint("getAllPosts")
+                val response = httpClient.post {
+                    endPoint("getNewPosts")
                     setBody(
                         request
                     )

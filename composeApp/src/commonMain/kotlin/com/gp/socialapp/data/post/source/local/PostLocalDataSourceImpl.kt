@@ -4,23 +4,17 @@ import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import com.gp.socialapp.data.db.model.PostEntity
 import com.gp.socialapp.data.db.model.PostEntity.Companion.toPost
-import com.gp.socialapp.data.db.provideDbDriver
 import com.gp.socialapp.data.post.source.remote.model.Post
 import com.gp.socialapp.data.post.source.remote.model.Post.Companion.toEntity
-import com.gp.socialapp.data.post.source.remote.model.PostFile
-import com.gp.socialapp.data.post.source.remote.model.Tag
 import com.gp.socialapp.db.AppDatabase
 import com.gp.socialapp.db.PostQueries
-import com.russhwolf.settings.Settings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.withContext
 
-class PostLocalDataSourceImpl (
+class PostLocalDataSourceImpl(
     private val db: AppDatabase
-): PostLocalDataSource{
+) : PostLocalDataSource {
     val postQueries: PostQueries = db.postQueries
     override suspend fun insertPost(post: Post) {
         val entity = post.toEntity()
@@ -49,6 +43,7 @@ class PostLocalDataSourceImpl (
 
     override fun getAllPosts(): Flow<List<Post>> {
         return postQueries.getAll().asFlow().mapToList(Dispatchers.Default).map { list ->
+            println("PostLocalDataSourceImpl.getAllPosts: list = $list")
             list.map {
                 PostEntity(
                     replyCount = it.reply_count.toInt(),
@@ -75,7 +70,7 @@ class PostLocalDataSourceImpl (
 
     override fun getPostById(id: String): Flow<Post> {
         return postQueries.getById(id).asFlow().mapToList(Dispatchers.Default).map { list ->
-            list.map {posts ->
+            list.map { posts ->
                 PostEntity(
                     replyCount = posts.reply_count.toInt(),
                     authorName = posts.author_name,

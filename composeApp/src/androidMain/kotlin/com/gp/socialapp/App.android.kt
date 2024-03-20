@@ -4,18 +4,16 @@ import android.app.Application
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
-import com.gp.socialapp.data.post.source.remote.model.MimeType
-import com.gp.socialapp.data.post.source.remote.model.Post
-import com.gp.socialapp.data.post.source.remote.model.PostFile
 import com.gp.socialapp.presentation.app.App
-import com.gp.socialapp.presentation.post.feed.components.FeedPostItem
-import com.gp.socialapp.theme.AppTheme
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
 
-class AndroidApp : Application() {
+class AndroidApp() : Application() {
+//    override val di = DI.lazy {
+//        appModuleK
+//        bind<Context>() with singleton { applicationContext }
+//    }
+
     companion object {
         lateinit var INSTANCE: AndroidApp
     }
@@ -24,12 +22,6 @@ class AndroidApp : Application() {
         super.onCreate()
         INSTANCE = this
         Napier.base(DebugAntilog())
-//        startKoin {
-//            androidContext(this@AndroidApp)
-//            androidLogger()
-//            modules(appModules)
-//        }
-
     }
 }
 
