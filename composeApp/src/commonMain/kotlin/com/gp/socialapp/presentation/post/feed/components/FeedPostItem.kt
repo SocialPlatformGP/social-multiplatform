@@ -1,6 +1,5 @@
 package com.gp.socialapp.presentation.post.feed.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -17,6 +16,9 @@ import androidx.compose.ui.unit.dp
 import com.gp.socialapp.data.post.source.remote.model.Post
 import com.gp.socialapp.presentation.post.feed.PostEvent
 import com.gp.socialapp.util.LocalDateTimeUtil.toYYYYMMDD
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 @Composable
 fun FeedPostItem(
@@ -39,7 +41,7 @@ fun FeedPostItem(
             TopRow(
                 imageUrl = post.authorPfp,
                 userName = post.authorName,
-                publishedAt = post.createdAt.toYYYYMMDD(),
+                publishedAt = Instant.fromEpochSeconds(post.createdAt).toLocalDateTime(TimeZone.UTC).toYYYYMMDD(),
                 onEditPostClicked = { onPostEvent(PostEvent.OnPostEdited(post)) },
                 onDeletePostClicked = { onPostEvent(PostEvent.OnPostDeleted(post)) }
             )
@@ -76,7 +78,7 @@ fun FeedPostItem(
                 },
                 filesCount = post.attachments.size,
                 currentUserID = currentUserID,
-                onShowFilesClicked = {TODO()}
+                onShowFilesClicked = { TODO() }
             )
         }
     }

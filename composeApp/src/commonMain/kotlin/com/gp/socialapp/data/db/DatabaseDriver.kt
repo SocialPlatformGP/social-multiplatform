@@ -6,5 +6,6 @@ import app.cash.sqldelight.db.SqlSchema
 
 expect fun provideDbDriver(
     schema: SqlSchema<QueryResult.Value<Unit>>
-    ): SqlDriver
+): SqlDriver
+
 const val DB_NAME = "edulink.db"

@@ -3,13 +3,12 @@ package com.gp.socialapp.data.post.repository
 import com.gp.socialapp.data.post.source.remote.model.Post
 import com.gp.socialapp.data.post.source.remote.model.Tag
 import com.gp.socialapp.util.Result
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 
 interface PostRepository {
     suspend fun insertLocalPost(post: Post)
-    fun getAllPosts(): Flow<List<Post>>
-    fun getRemotePosts(): Flow<List<Post>>
+    fun getAllPosts(): Flow<Result<List<Post>>>
+    fun getRemotePosts(): Flow<Result<List<Post>>>
     fun getAllLocalPosts(): Flow<List<Post>>
     suspend fun deleteLocalPostById(id: String)
     suspend fun updatePost(post: Post): Flow<Result<String>>

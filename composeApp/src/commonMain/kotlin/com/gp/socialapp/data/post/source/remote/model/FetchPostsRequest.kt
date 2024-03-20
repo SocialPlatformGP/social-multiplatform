@@ -5,5 +5,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class FetchPostsRequest(
-    val lastUpdated: LocalDateTime
+    val lastUpdated: Long
 )

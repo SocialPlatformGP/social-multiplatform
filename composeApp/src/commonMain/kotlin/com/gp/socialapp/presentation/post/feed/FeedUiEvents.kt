@@ -19,9 +19,10 @@ sealed class PostEvent() {
     data class OnDocumentClicked(val file: PostFile) : PostEvent()
     data class OnCommentClicked(val postId: String) : PostEvent()
     data class onCommentAdded(
-        val text:String,
+        val text: String,
         val postId: String,
     ) : PostEvent()
+
     object Initial : PostEvent()
     data class OnViewFilesAttachmentClicked(val files: List<PostFile>) : PostEvent()
 

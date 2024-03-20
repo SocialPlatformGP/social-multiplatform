@@ -26,6 +26,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetState
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults.SecondaryIndicator
@@ -53,6 +55,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gp.socialapp.data.post.source.remote.model.Post
 import com.gp.socialapp.data.post.source.remote.model.PostFile
+import com.gp.socialapp.presentation.auth.util.AuthError
 import com.gp.socialapp.presentation.post.create.CreatePostScreen
 import com.gp.socialapp.presentation.post.feed.components.FeedPostItem
 import com.gp.socialapp.presentation.post.feed.components.FeedTopBar
@@ -180,7 +183,11 @@ object FeedScreen : Screen {
     ) {
         var selectedTabIndex by remember { mutableIntStateOf(0) }
         val pagerState = rememberPagerState { tabItems.size }
+        val snackbarHostState = remember { SnackbarHostState() }
         Scaffold(
+            snackbarHost = {
+                SnackbarHost(hostState = snackbarHostState)
+            },
             floatingActionButton = {
                 FloatingActionButton(
                     onClick = { onPostEvent(PostEvent.OnAddPost) }
@@ -195,6 +202,13 @@ object FeedScreen : Screen {
                 FeedTopBar(onNavigationAction)
             }
         ) { paddingValues ->
+            if (state.error !is FeedError.NoError) {
+                scope.launch {
+                    snackbarHostState.showSnackbar(
+                        message = (state.error as FeedError.NetworkError).message,
+                    )
+                }
+            }
             Column(
                 modifier = Modifier
                     .padding(paddingValues)

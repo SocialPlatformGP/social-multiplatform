@@ -32,6 +32,7 @@ fun UserImage(
                     contentScale = ContentScale.Crop
                 )
             }
+
             else -> {
                 Icon(
                     imageVector = Icons.Filled.AccountCircle,

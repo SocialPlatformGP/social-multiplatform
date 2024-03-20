@@ -1,14 +1,13 @@
 package com.gp.socialapp.data.db.model
 
 import com.gp.socialapp.data.post.source.remote.model.Post
-import com.gp.socialapp.data.post.source.remote.model.PostFile
 import com.gp.socialapp.data.post.source.remote.model.PostFile.Companion.toPostFile
-import com.gp.socialapp.data.post.source.remote.model.Tag
 import com.gp.socialapp.data.post.source.remote.model.Tag.Companion.toTag
 import com.gp.socialapp.util.LocalDateTimeUtil.now
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 
 data class PostEntity(
@@ -17,7 +16,7 @@ data class PostEntity(
     val authorPfp: String = "",
     val id: String = "",
     val authorID: String = "",
-    val createdAt: Int = LocalDateTime.now().second,
+    val createdAt: Long = LocalDateTime.now().toInstant(TimeZone.UTC).epochSeconds,
     val title: String = "",
     val body: String = "",
     val votes: Int = 0,
@@ -28,18 +27,18 @@ data class PostEntity(
     val tags: String = "",
     val type: String = "general",
     val attachments: String = "",
-    val lastModified: Int = LocalDateTime.now().second
-){
-    companion object{
+    val lastModified: Long = LocalDateTime.now().toInstant(TimeZone.UTC).epochSeconds
+) {
+    companion object {
         fun PostEntity.toPost(): Post {
-            return with(this){
+            return with(this) {
                 Post(
                     replyCount = replyCount,
                     authorName = authorName,
                     authorPfp = authorPfp,
                     id = id,
                     authorID = authorID,
-                    createdAt = Instant.fromEpochSeconds(createdAt.toLong()).toLocalDateTime(TimeZone.UTC),
+                    createdAt = createdAt.toLong(),
                     title = title,
                     body = body,
                     votes = votes,
@@ -47,10 +46,11 @@ data class PostEntity(
                     upvoted = upvoted.split(","),
                     moderationStatus = moderationStatus,
                     editedStatus = editedStatus == 1,
-                    tags = if(tags.isBlank()) emptyList() else tags.split(",").map { it.toTag() },
+                    tags = if (tags.isBlank()) emptyList() else tags.split(",").map { it.toTag() },
                     type = type,
-                    attachments = if(attachments.isBlank()) emptyList() else attachments.split(",").map { it.toPostFile() },
-                    lastModified = Instant.fromEpochSeconds(lastModified.toLong()).toLocalDateTime(TimeZone.UTC)
+                    attachments = if (attachments.isBlank()) emptyList() else attachments.split(",")
+                        .map { it.toPostFile() },
+                    lastModified = lastModified.toLong()
                 )
             }
         }

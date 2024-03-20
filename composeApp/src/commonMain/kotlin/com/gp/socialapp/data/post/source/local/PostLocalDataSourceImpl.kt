@@ -43,7 +43,6 @@ class PostLocalDataSourceImpl(
 
     override fun getAllPosts(): Flow<List<Post>> {
         return postQueries.getAll().asFlow().mapToList(Dispatchers.Default).map { list ->
-            println("PostLocalDataSourceImpl.getAllPosts: list = $list")
             list.map {
                 PostEntity(
                     replyCount = it.reply_count.toInt(),
@@ -51,7 +50,7 @@ class PostLocalDataSourceImpl(
                     authorPfp = it.author_pfp,
                     id = it.id,
                     authorID = it.author_id,
-                    createdAt = it.created_at.toInt(),
+                    createdAt = it.created_at,
                     title = it.title,
                     body = it.body,
                     votes = it.votes.toInt(),
@@ -62,7 +61,7 @@ class PostLocalDataSourceImpl(
                     tags = it.tags,
                     type = it.type,
                     attachments = it.attachments,
-                    lastModified = it.last_modified.toInt()
+                    lastModified = it.last_modified
                 ).toPost()
             }
         }
@@ -77,7 +76,7 @@ class PostLocalDataSourceImpl(
                     authorPfp = posts.author_pfp,
                     id = posts.id,
                     authorID = posts.author_id,
-                    createdAt = posts.created_at.toInt(),
+                    createdAt = posts.created_at,
                     title = posts.title,
                     body = posts.body,
                     votes = posts.votes.toInt(),
@@ -88,7 +87,7 @@ class PostLocalDataSourceImpl(
                     tags = posts.tags,
                     type = posts.type,
                     attachments = posts.attachments,
-                    lastModified = posts.last_modified.toInt()
+                    lastModified = posts.last_modified
                 ).toPost()
             }.first()
         }

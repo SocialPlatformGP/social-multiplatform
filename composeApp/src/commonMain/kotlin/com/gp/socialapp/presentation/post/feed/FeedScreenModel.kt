@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class FeedScreenModel(
     val repository: PostRepository,
@@ -24,36 +23,47 @@ class FeedScreenModel(
     private val _state = MutableStateFlow(FeedUiState())
     val state = _state.asStateFlow()
 
-
-//    init {
-//        getAllPosts()
-//    }
-
     fun getAllPosts() {
         screenModelScope.launch(Dispatchers.Default) {
-            repository.getAllPosts().collectLatest { posts ->
-                posts.forEach { post ->
-                    _state.update { it.copy(allTags = _state.value.allTags + post.tags) }
-                }
-                val filteredPosts = if (_state.value.selectedTags.isNotEmpty()) {
-                    posts.filter { post ->
-                        post.tags.intersect(_state.value.selectedTags).isNotEmpty()
+            repository.getAllPosts().collectLatest { result ->
+                when (result) {
+                    is Result.SuccessWithData -> {
+                        result.data.forEach { post ->
+                            _state.update { it.copy(allTags = _state.value.allTags + post.tags) }
+                        }
+                        val filteredPosts = if (_state.value.selectedTags.isNotEmpty()) {
+                            result.data.filter { post ->
+                                post.tags.intersect(_state.value.selectedTags).isNotEmpty()
+                            }
+                        } else {
+                            result.data
+                        }
+                        val sortedPosts = if (_state.value.isSortedByNewest) {
+                            filteredPosts.sortedByDescending { it.createdAt }
+                        } else {
+                            filteredPosts.sortedByDescending {
+                                PostPopularityUtils.calculateInteractionValue(
+                                    it.votes,
+                                    it.replyCount
+                                )
+                            }
+                        }
+                        _state.update {
+                            it.copy(
+                                posts = sortedPosts,
+                                isFeedLoaded = Result.Success
+                            )
+                        }
                     }
-                } else {
-                    posts
-                }
-                val sortedPosts = if (_state.value.isSortedByNewest) {
-                    filteredPosts.sortedByDescending { it.createdAt.second }
-                } else {
-                    filteredPosts.sortedByDescending {
-                        PostPopularityUtils.calculateInteractionValue(
-                            it.votes,
-                            it.replyCount
-                        )
+                    is Result.Error -> {
+                        _state.update {
+                            it.copy(
+                                isFeedLoaded = Result.Error(result.message),
+                                error = FeedError.NetworkError(result.message))
+                        }
                     }
-                }
-                withContext(Dispatchers.Default) {
-                    _state.update { it.copy(posts = sortedPosts, isFeedLoaded = Result.Success) }
+                    is Result.Loading -> { /*do nothing*/}
+                    else -> Unit
                 }
             }
         }

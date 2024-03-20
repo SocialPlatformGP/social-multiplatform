@@ -10,7 +10,7 @@ import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import com.gp.socialapp.presentation.post.feed.FeedScreen
 
-object PostsTab: Tab {
+object PostsTab : Tab {
     override val options: TabOptions
         @Composable
         get() {

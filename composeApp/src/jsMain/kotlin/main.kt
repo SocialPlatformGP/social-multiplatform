@@ -1,4 +1,5 @@
 package com.gp.socialapp.presentation.app
+
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.CanvasBasedWindow
 import org.jetbrains.skiko.wasm.onWasmReady

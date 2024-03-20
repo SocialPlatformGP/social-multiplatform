@@ -25,7 +25,7 @@ val repositoryModuleK = DI.Module("repositoryModule") {
     }
     bind<PostRepository>() with singleton { PostRepositoryImpl(instance(), instance(), instance()) }
     bind<ReplyRepository>() with singleton {
-        object: ReplyRepository{
+        object : ReplyRepository {
             override fun getReplies(postId: String): Flow<List<Reply>> {
                 TODO("Not yet implemented")
             }

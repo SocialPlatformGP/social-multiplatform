@@ -6,6 +6,8 @@ import com.gp.socialapp.data.post.source.remote.model.Tag.Companion.toDbString
 import com.gp.socialapp.data.post.util.PostPopularityUtils
 import com.gp.socialapp.util.LocalDateTimeUtil.now
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
 
 @kotlinx.serialization.Serializable
 data class Post(
@@ -14,7 +16,7 @@ data class Post(
     val authorPfp: String = "",
     val id: String = "",
     val authorID: String = "",
-    val createdAt: LocalDateTime = kotlinx.datetime.LocalDateTime.now(),
+    val createdAt: Long = LocalDateTime.now().toInstant(TimeZone.UTC).epochSeconds,
     val title: String = "",
     val body: String = "",
     val votes: Int = 0,
@@ -25,7 +27,7 @@ data class Post(
     val tags: List<Tag> = emptyList(),
     val type: String = "general",
     val attachments: List<PostFile> = emptyList(),
-    val lastModified: LocalDateTime = LocalDateTime.now()
+    val lastModified: Long = LocalDateTime.now().toInstant(TimeZone.UTC).epochSeconds
 ) {
     companion object {
         val sortByVotes = compareByDescending<Post> {
@@ -34,6 +36,7 @@ data class Post(
                 it.replyCount
             )
         }
+
         fun Post.toEntity(): PostEntity {
             return PostEntity(
                 replyCount = replyCount,
@@ -41,18 +44,18 @@ data class Post(
                 authorPfp = authorPfp,
                 id = id,
                 authorID = authorID,
-                createdAt = createdAt.second,
+                createdAt = createdAt,
                 title = title,
                 body = body,
                 votes = votes,
                 downvoted = downvoted.joinToString(separator = ","),
                 upvoted = upvoted.joinToString(separator = ","),
                 moderationStatus = moderationStatus,
-                editedStatus = if(editedStatus) 1 else 0,
+                editedStatus = if (editedStatus) 1 else 0,
                 tags = tags.map { it.toDbString() }.joinToString(separator = ","),
                 type = type,
                 attachments = attachments.map { it.toDbString() }.joinToString(separator = ","),
-                lastModified = lastModified.second
+                lastModified = lastModified
             )
         }
 //        val sortByDate = compareByDescending<Post>{convertStringToDate(it.publishedAt)}

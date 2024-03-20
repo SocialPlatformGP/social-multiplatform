@@ -109,29 +109,28 @@ class PostRemoteDataSourceImpl : PostRemoteDataSource {
     }
 
 
-    override fun fetchPosts(request: FetchPostsRequest): Flow<List<Post>> {
+    override fun fetchPosts(request: FetchPostsRequest): Flow<Result<List<Post>>> = flow {
         println("fetchPosts: $request *********************125")
-        return flow {
-            try {
-                val response = httpClient.post {
-                    endPoint("getNewPosts")
-                    setBody(
-                        request
-                    )
-                }
-                println("response: ${response.status}")
-                if (response.status == HttpStatusCode.OK) {
-                    val posts = response.body<List<Post>>()
-                    println("posts: $posts")
-                    emit(posts)
-                } else {
-                    emit(emptyList())
-                }
-            } catch (e: Exception) {
-                Napier.e("getAllPosts: ${e.message}")
-                println("getAllPosts: ${e.message}")
-                emit(emptyList())
+        emit(Result.Loading)
+        try {
+            val response = httpClient.post {
+                endPoint("getNewPosts")
+                setBody(
+                    request
+                )
             }
+            println("response: ${response.status}")
+            if (response.status == HttpStatusCode.OK) {
+                val posts = response.body<List<Post>>()
+                println("posts: $posts")
+                emit(Result.SuccessWithData(posts))
+            } else {
+                emit(Result.Error("An error occurred"))
+            }
+        } catch (e: Exception) {
+            Napier.e("getAllPosts: ${e.message}")
+            println("getAllPosts: ${e.message}")
+            emit(Result.Error(e.message ?: "An unknown error occurred"))
         }
     }
 

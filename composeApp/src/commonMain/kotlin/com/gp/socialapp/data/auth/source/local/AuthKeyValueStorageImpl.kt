@@ -6,7 +6,7 @@ import com.russhwolf.settings.set
 
 class AuthKeyValueStorageImpl(
     private val settings: Settings
-): AuthKeyValueStorage {
+) : AuthKeyValueStorage {
     override var token: String?
         get() = settings.getStringOrNull(AppConstants.StorageKeys.USER_TOKEN.key)
         set(value) {

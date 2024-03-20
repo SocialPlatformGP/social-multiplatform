@@ -8,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -49,7 +50,7 @@ fun ImagePager(
 ) {
     //todo handle width correctly
     Box(
-        modifier = Modifier.size(width, 300.dp),
+        modifier = Modifier.height(300.dp).fillMaxWidth(),
     ) {
         val pagerState = rememberPagerState(
             pageCount = { pageCount },

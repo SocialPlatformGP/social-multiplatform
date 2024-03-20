@@ -15,13 +15,11 @@ import org.kodein.di.singleton
 
 
 val screenModelModuleK = DI.Module("screenModelModule") {
-    bindProvider { CreatePostScreenModel(instance(), instance()) }
+    bind<CreatePostScreenModel>() with singleton { CreatePostScreenModel(instance(), instance()) }
     bind<LoginScreenModel>() with singleton { LoginScreenModel(instance()) }
     bind<PasswordResetScreenModel>() with singleton { PasswordResetScreenModel(instance()) }
     bind<SignUpScreenModel>() with singleton { SignUpScreenModel(instance()) }
     bind<UserInformationScreenModel>() with singleton { UserInformationScreenModel(instance()) }
     bind<FeedScreenModel>() with singleton { FeedScreenModel(instance(), instance(), instance()) }
     bind<EditPostScreenModel>() with singleton { EditPostScreenModel(instance()) }
-
-
 }

@@ -10,8 +10,8 @@ interface PostRemoteDataSource {
     suspend fun createPost(post: Post): Flow<Result<String>>
 
     //    fun createPostWithFiles(post: Post, files: List<PostFile>): Flow<Result<Nothing>>
-    fun fetchPosts(request: FetchPostsRequest): Flow<List<Post>>
-    suspend fun updatePost(post: Post):Flow<Result<String>>
+    fun fetchPosts(request: FetchPostsRequest): Flow<Result<List<Post>>>
+    suspend fun updatePost(post: Post): Flow<Result<String>>
     suspend fun deletePost(post: Post)
     suspend fun upVotePost(post: Post)
     suspend fun downVotePost(post: Post)

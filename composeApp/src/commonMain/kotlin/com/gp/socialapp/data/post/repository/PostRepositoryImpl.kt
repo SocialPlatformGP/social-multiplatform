@@ -25,29 +25,9 @@ class PostRepositoryImpl(
     private val postRemoteSource: PostRemoteDataSource,
     private val settings: Settings
 ) : PostRepository {
-    val posts = listOf<Post>(
-        Post(
-            id = "1",
-            title = "Post 1",
-            body = "This is post 1",
-            authorName = "Author 1",
-        ),
-        Post(
-            id = "2",
-            title = "Post 2",
-            body = "This is post 2",
-            authorName = "Author 2",
-        ),
-        Post(
-            id = "3",
-            title = "Post 3",
-            body = "This is post 3",
-            authorName = "Author 3",
-        ),
-    )
 
-    private var lastUpdated: Int
-        get() = settings.getInt(AppConstants.StorageKeys.POST_LAST_UPDATED.key, 0)
+    private var lastUpdated: Long
+        get() = settings.getLong(AppConstants.StorageKeys.POST_LAST_UPDATED.key, 0L)
         set(value) {
             settings[AppConstants.StorageKeys.POST_LAST_UPDATED.key] = value
         }
@@ -60,63 +40,44 @@ class PostRepositoryImpl(
         postLocalSource.insertPost(post)
     }
 
-    override fun getAllPosts(): Flow<List<Post>> {
+    override fun getAllPosts(): Flow<Result<List<Post>>> = flow {
+        emit(Result.Loading)
         val platform = getPlatform()
-        return if (platform == Platform.JS) {
-            getRemotePosts()
-        } else {
-            flow {
-                val posts = postRemoteSource.fetchPosts(
-                    FetchPostsRequest(
-                        Instant.fromEpochSeconds(lastUpdated.toLong()).toLocalDateTime(
-                            TimeZone.UTC
-                        )
-                    )
-                )
-                posts.collect {
-                    if (it.isNotEmpty()) {
-                        lastUpdated =
-                            LocalDateTime.now().toInstant(TimeZone.UTC).epochSeconds.toInt()
-                        it.forEach { post ->
-                            insertLocalPost(post)
-
-                        }
-                    }
-
-                }
-                getAllLocalPosts().collect {
-                    println("Local Posts: $it*********************'")
+        try{
+            if (platform == Platform.JS) {
+                getRemotePosts().collect {
                     emit(it)
                 }
+            } else {
+                flow {
+                    getRemotePosts().collect {
+                        if(it is Result.SuccessWithData && it.data.isNotEmpty()) {
+                            lastUpdated =
+                                LocalDateTime.now().toInstant(TimeZone.UTC).epochSeconds
+                            it.data.forEach { post ->
+                                insertLocalPost(post)
+                            }
+                        }
+                    }
+                    getAllLocalPosts().collect {
+                        emit(it)
+                    }
+                }
             }
+        } catch (e: Exception) {
+            emit(Result.Error(e.message?: "An error occurred"))
         }
     }
 
-    override fun getRemotePosts(): Flow<List<Post>> {
+    override fun getRemotePosts(): Flow<Result<List<Post>>> {
         return postRemoteSource.fetchPosts(
             FetchPostsRequest(
-                Instant.fromEpochSeconds(lastUpdated.toLong()).toLocalDateTime(
-                    TimeZone.UTC
-                )
+                lastUpdated = lastUpdated
             )
         )
     }
 
     override fun getAllLocalPosts(): Flow<List<Post>> {
-//        if (networkStatus.isOnline()) {
-//            val posts = postRemoteSource.fetchPosts()
-//            repositoryScope.launch {
-//                postLocalSource.deleteAllPosts()
-//                posts.collect {
-//                    it.forEach { post ->
-//                        insertLocalPost(post.toEntity())
-//                    }
-//                }
-//            }
-//            return posts
-//        } else {
-//            return postLocalSource.getAllPosts().toPostFlow()
-//        }
         return postLocalSource.getAllPosts()
     }
 
@@ -133,13 +94,6 @@ class PostRepositoryImpl(
         postRemoteSource.deletePost(post)
     }
 
-//    override fun createPost(post: Post, files: List<PostFile>): Flow<State<Nothing>> {
-//        return if(files.isEmpty()) {
-//            postRemoteSource.createPost(post)
-//        } else {
-//            postRemoteSource.createPostWithFiles(post, files)
-//        }
-//    }
 
     override fun onCleared() {
 //        repositoryScope.cancel()
@@ -150,18 +104,6 @@ class PostRepositoryImpl(
 
     override suspend fun downVotePost(post: Post) = postRemoteSource.downVotePost(post)
     override suspend fun fetchPostById(id: String): Flow<Post> {
-//        if (networkStatus.isOnline()) {
-//            val post = postRemoteSource.fetchPostById(id)
-//            repositoryScope.launch {
-//                post.collect {
-//                    insertLocalPost(it.toEntity())
-//                }
-//            }
-//            return post
-//        }
-//        else{
-//            return postLocalSource.getPostById(id).toModel()
-//        }
         return postLocalSource.getPostById(id)
     }
 

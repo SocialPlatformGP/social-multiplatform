@@ -12,15 +12,7 @@ internal fun App() =
     withDI(appModuleK) {
         AppTheme {
             Navigator(
-//                UserInformationScreen("", "")
-//                EditPostScreen(
-//                    Post(
-//                        title = "title",
-//                        body = "body",
-//                    )
-//                )
                 FeedScreen
-
             )
         }
     }

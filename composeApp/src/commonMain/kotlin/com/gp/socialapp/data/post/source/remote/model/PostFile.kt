@@ -16,7 +16,12 @@ data class PostFile(
         fun String.toPostFile(): PostFile {
             val parts = this.split("|")
             require(parts.size == 4) { "Invalid string format for PostFile" }
-            return PostFile(url = parts[0], name = parts[1], type = parts[2], size = parts[3].toLong())
+            return PostFile(
+                url = parts[0],
+                name = parts[1],
+                type = parts[2],
+                size = parts[3].toLong()
+            )
         }
     }
 }

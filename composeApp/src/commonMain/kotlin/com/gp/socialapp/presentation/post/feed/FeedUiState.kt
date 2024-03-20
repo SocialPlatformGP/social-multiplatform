@@ -5,9 +5,12 @@ import com.gp.socialapp.data.post.source.remote.model.Tag
 import com.gp.socialapp.util.Result
 
 data class FeedUiState(
-    val posts :List<Post> = emptyList(),
+    val posts: List<Post> = emptyList(),
     val isFeedLoaded: Result<Nothing> = Result.Idle,
     val isSortedByNewest: Boolean = true,
     val allTags: Set<Tag> = emptySet(),
-    val selectedTags: Set<Tag> = emptySet()
+    val selectedTags: Set<Tag> = emptySet(),
+    val error: FeedError = FeedError.NoError
 )
+
+
