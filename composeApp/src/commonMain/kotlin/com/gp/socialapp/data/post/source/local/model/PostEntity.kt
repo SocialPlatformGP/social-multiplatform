@@ -1,4 +1,4 @@
-package com.gp.socialapp.data.db.model
+package com.gp.socialapp.data.post.source.local.model
 
 import com.gp.socialapp.data.post.source.remote.model.Post
 import com.gp.socialapp.data.post.source.remote.model.PostFile.Companion.toPostFile

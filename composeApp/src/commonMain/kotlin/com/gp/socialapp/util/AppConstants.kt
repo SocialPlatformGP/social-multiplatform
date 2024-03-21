@@ -8,4 +8,5 @@ object AppConstants {
 
         val key get() = this.name
     }
+    val DB_NAME = "edulink.db"
 }
