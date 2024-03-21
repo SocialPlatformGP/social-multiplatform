@@ -41,35 +41,41 @@ class PostRepositoryImpl(
     }
 
     override fun getPosts(): Flow<Result<List<Post>>> = flow {
+        println("getPosts: $lastUpdated repo *********************125")
         emit(Result.Loading)
         val platform = getPlatform()
-        try{
+        println("platform: $platform")
+        try {
             if (platform == Platform.JS) {
-                getRemotePosts().collect {
+                println("getPosts: $lastUpdated repo *********************126")
+                postRemoteSource.fetchAllPosts().collect {
                     emit(it)
                 }
             } else {
-                flow {
-                    getRemotePosts().collect {
-                        if(it is Result.SuccessWithData && it.data.isNotEmpty()) {
-                            lastUpdated =
-                                LocalDateTime.now().toInstant(TimeZone.UTC).epochSeconds
-                            it.data.forEach { post ->
-                                insertLocalPost(post)
-                            }
+                println("getPosts: $lastUpdated repo *********************126")
+
+                getRemotePosts().collect {
+                    if (it is Result.SuccessWithData && it.data.isNotEmpty()) {
+                        println("getPosts: $lastUpdated repo *********************127")
+                        lastUpdated =
+                            LocalDateTime.now().toInstant(TimeZone.UTC).epochSeconds
+                        it.data.forEach { post ->
+                            insertLocalPost(post)
                         }
                     }
-                    getLocalPosts().collect {
-                        emit(it)
-                    }
                 }
+                getLocalPosts().collect {
+                    emit(Result.SuccessWithData(it))
+                }
+
             }
         } catch (e: Exception) {
-            emit(Result.Error(e.message?: "An error occurred"))
+            emit(Result.Error(e.message ?: "An error occurred"))
         }
     }
 
-    override fun getRemotePosts(): Flow<Result<List<Post>>> {
+    private fun getRemotePosts(): Flow<Result<List<Post>>> {
+        println("getRemotePosts: $lastUpdated repo *********************1255")
         return postRemoteSource.fetchPosts(
             PostRequest.FetchRequest(
                 lastUpdated = lastUpdated
@@ -77,27 +83,30 @@ class PostRepositoryImpl(
         )
     }
 
-    override fun getLocalPosts(): Flow<List<Post>> {
+    private fun getLocalPosts(): Flow<List<Post>> {
         return postLocalSource.getAllPosts()
     }
+
     override suspend fun updatePost(post: Post): Flow<Result<String>> =
         postRemoteSource.updatePost(post)
 
 
-    override suspend fun deletePost(post: Post) : Result<Nothing> {
+    override suspend fun deletePost(post: Post): Result<Nothing> {
         val request = PostRequest.DeleteRequest(post.id)
         postLocalSource.deletePostById(post.id)
         return postRemoteSource.deletePost(request)
     }
-    override suspend fun upvotePost(post: Post): Result<Nothing>  {
-        val request = PostRequest.UpvoteRequest(post.id, authStorage.userId?:"")
+
+    override suspend fun upvotePost(post: Post): Result<Nothing> {
+        val request = PostRequest.UpvoteRequest(post.id, authStorage.userId ?: "")
         return postRemoteSource.upvotePost(request)
     }
 
-    override suspend fun downvotePost(post: Post): Result<Nothing>  {
-        val request = PostRequest.DownvoteRequest(post.id, authStorage.userId?:"")
+    override suspend fun downvotePost(post: Post): Result<Nothing> {
+        val request = PostRequest.DownvoteRequest(post.id, authStorage.userId ?: "")
         return postRemoteSource.downvotePost(request)
     }
+
     override suspend fun fetchPostById(id: String): Flow<Post> {
         return postLocalSource.getPostById(id)
     }

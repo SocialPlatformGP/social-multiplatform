@@ -3,6 +3,7 @@ package com.gp.socialapp.di
 import com.gp.socialapp.data.db.provideDbDriver
 import com.gp.socialapp.data.post.source.local.PostLocalDataSource
 import com.gp.socialapp.data.post.source.local.PostLocalDataSourceImpl
+import com.gp.socialapp.db.AppDatabase
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.kodein.di.DI

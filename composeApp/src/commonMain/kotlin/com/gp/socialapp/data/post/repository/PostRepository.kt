@@ -8,8 +8,6 @@ import kotlinx.coroutines.flow.Flow
 interface PostRepository {
     suspend fun insertLocalPost(post: Post)
     fun getPosts(): Flow<Result<List<Post>>>
-    fun getRemotePosts(): Flow<Result<List<Post>>>
-    fun getLocalPosts(): Flow<List<Post>>
     suspend fun updatePost(post: Post): Flow<Result<String>>
     suspend fun deletePost(post: Post): Result<Nothing>
     suspend fun upvotePost(post: Post): Result<Nothing>

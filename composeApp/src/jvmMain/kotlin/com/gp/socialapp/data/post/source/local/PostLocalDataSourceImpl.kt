@@ -1,11 +1,17 @@
 package com.gp.socialapp.data.post.source.local
 
-import com.gp.socialapp.data.db.model.PostEntity
-import com.gp.socialapp.data.db.model.PostEntity.Companion.toPost
+
+import app.cash.sqldelight.coroutines.asFlow
+import app.cash.sqldelight.coroutines.mapToList
+import com.gp.socialapp.data.post.source.local.model.PostEntity
+import com.gp.socialapp.data.post.source.local.model.PostEntity.Companion.toPost
 import com.gp.socialapp.data.post.source.remote.model.Post
 import com.gp.socialapp.data.post.source.remote.model.Post.Companion.toEntity
+import com.gp.socialapp.db.AppDatabase
+import com.gp.socialapp.db.PostQueries
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class PostLocalDataSourceImpl(
     private val db: AppDatabase

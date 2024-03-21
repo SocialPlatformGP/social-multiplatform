@@ -1,6 +1,6 @@
 package com.gp.socialapp.data.post.source.remote.model
 
-import com.gp.socialapp.data.db.model.PostEntity
+import com.gp.socialapp.data.post.source.local.model.PostEntity
 import com.gp.socialapp.data.post.source.remote.model.PostFile.Companion.toDbString
 import com.gp.socialapp.data.post.source.remote.model.Tag.Companion.toDbString
 import com.gp.socialapp.data.post.util.PostPopularityUtils

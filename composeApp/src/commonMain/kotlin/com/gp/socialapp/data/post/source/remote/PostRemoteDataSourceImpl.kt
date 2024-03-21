@@ -2,9 +2,9 @@ package com.gp.socialapp.data.post.source.remote
 
 import com.gp.socialapp.data.post.source.remote.model.Post
 import com.gp.socialapp.data.post.source.remote.model.PostRequest.DeleteRequest
-import com.gp.socialapp.data.post.source.remote.model.PostRequest.UpvoteRequest
 import com.gp.socialapp.data.post.source.remote.model.PostRequest.DownvoteRequest
 import com.gp.socialapp.data.post.source.remote.model.PostRequest.FetchRequest
+import com.gp.socialapp.data.post.source.remote.model.PostRequest.UpvoteRequest
 import com.gp.socialapp.data.post.source.remote.model.Tag
 import com.gp.socialapp.util.Result
 import io.github.aakira.napier.Napier
@@ -49,6 +49,7 @@ class PostRemoteDataSourceImpl : PostRemoteDataSource {
     }
 
     override suspend fun createPost(post: Post): Flow<Result<String>> {
+//        println("createPost: $post *********************125")
         return flow {
             emit(Result.Loading)
             try {
@@ -58,8 +59,10 @@ class PostRemoteDataSourceImpl : PostRemoteDataSource {
                         post
                     )
                 }
+//                println("response: ${response.status}")
                 val message = response.bodyAsText()
                 if (response.status == HttpStatusCode.OK) {
+//                    println("message: $message")
                     emit(Result.SuccessWithData(message))
                 } else {
                     emit(Result.Error(message))
@@ -121,6 +124,28 @@ class PostRemoteDataSourceImpl : PostRemoteDataSource {
                 setBody(
                     request
                 )
+            }
+            println("response: ${response.status}")
+            if (response.status == HttpStatusCode.OK) {
+                val posts = response.body<List<Post>>()
+                println("posts: $posts")
+                emit(Result.SuccessWithData(posts))
+            } else {
+                emit(Result.Error("An error occurred"))
+            }
+        } catch (e: Exception) {
+            Napier.e("getAllPosts: ${e.message}")
+            println("getAllPosts: ${e.message}")
+            emit(Result.Error(e.message ?: "An unknown error occurred"))
+        }
+    }
+
+    override fun fetchAllPosts(): Flow<Result<List<Post>>> = flow {
+        emit(Result.Loading)
+        try {
+            val response = httpClient.get {
+                endPoint("getAllPosts")
+
             }
             println("response: ${response.status}")
             if (response.status == HttpStatusCode.OK) {

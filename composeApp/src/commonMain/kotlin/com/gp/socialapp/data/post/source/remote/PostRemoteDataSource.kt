@@ -1,10 +1,10 @@
 package com.gp.socialapp.data.post.source.remote
 
-import com.gp.socialapp.data.post.source.remote.model.PostRequest.UpvoteRequest
-import com.gp.socialapp.data.post.source.remote.model.PostRequest.DownvoteRequest
-import com.gp.socialapp.data.post.source.remote.model.PostRequest.FetchRequest
 import com.gp.socialapp.data.post.source.remote.model.Post
 import com.gp.socialapp.data.post.source.remote.model.PostRequest.DeleteRequest
+import com.gp.socialapp.data.post.source.remote.model.PostRequest.DownvoteRequest
+import com.gp.socialapp.data.post.source.remote.model.PostRequest.FetchRequest
+import com.gp.socialapp.data.post.source.remote.model.PostRequest.UpvoteRequest
 import com.gp.socialapp.data.post.source.remote.model.Tag
 import com.gp.socialapp.util.Result
 import kotlinx.coroutines.flow.Flow
@@ -19,4 +19,5 @@ interface PostRemoteDataSource {
 
     fun getAllTags(): Flow<List<Tag>>
     suspend fun insertTag(tag: Tag)
+    fun fetchAllPosts(): Flow<Result<List<Post>>>
 }
