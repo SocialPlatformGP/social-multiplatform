@@ -11,6 +11,8 @@ sealed class PostEvent() {
     data class OnPostEdited(val post: Post) : PostEvent()
     data class OnPostUpVoted(val post: Post) : PostEvent()
     data class OnPostDownVoted(val post: Post) : PostEvent()
+    data class OnPostReported(val post: Post) : PostEvent()
+    data class OnPostShareClicked(val post: Post) : PostEvent()
     object OnAddPost : PostEvent()
     data class OnTagClicked(val tag: Tag) : PostEvent()
     data class OnAudioClicked(val file: PostFile) : PostEvent()

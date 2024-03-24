@@ -78,7 +78,8 @@ fun FeedPostItem(
                 },
                 filesCount = post.attachments.size,
                 currentUserID = currentUserID,
-                onShowFilesClicked = { TODO() }
+                onShowFilesClicked = { onPostEvent(PostEvent.OnViewFilesAttachmentClicked(post.attachments)) },
+                onShareClicked =  {onPostEvent(PostEvent.OnPostShareClicked(post))}
             )
         }
     }

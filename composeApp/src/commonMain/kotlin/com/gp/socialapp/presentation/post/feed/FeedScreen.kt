@@ -134,7 +134,12 @@ object FeedScreen : Screen {
                             isFileBottomSheetOpen = true
                         }
                     }
-
+                    is PostEvent.OnPostReported -> {
+                        TODO()
+                    }
+                    is PostEvent.OnPostShareClicked -> {
+                        TODO()
+                    }
                     else -> {}
                 }
             },

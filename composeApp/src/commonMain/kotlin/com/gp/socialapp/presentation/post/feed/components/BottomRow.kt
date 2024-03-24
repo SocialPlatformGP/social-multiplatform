@@ -43,6 +43,7 @@ fun BottomRow(
     currentUserID: String,
     filesCount: Int = 0,
     onShowFilesClicked: () -> Unit,
+    onShareClicked: () -> Unit,
 ) {
     Row(
         modifier = Modifier
@@ -159,7 +160,7 @@ fun BottomRow(
         }
         Spacer(modifier = Modifier.weight(1f))
         OutlinedButton(
-            onClick = { /*TODO  handle share button in post item*/ },
+            onClick = { onShareClicked() },
             contentPadding = PaddingValues(),
             border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outline),
 

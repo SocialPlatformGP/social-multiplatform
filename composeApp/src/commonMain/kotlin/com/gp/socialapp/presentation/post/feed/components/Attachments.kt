@@ -1,6 +1,7 @@
 package com.gp.socialapp.presentation.post.feed.components
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.gp.socialapp.data.post.source.remote.model.MimeType
 import com.gp.socialapp.data.post.source.remote.model.PostFile
@@ -9,6 +10,7 @@ import com.gp.socialapp.presentation.post.feed.PostEvent
 @Composable
 fun Attachments(
     attachments: List<PostFile>,
+    width: Dp,
     onPostEvent: (PostEvent) -> Unit
 ) {
     val images = attachments.filter {
@@ -24,7 +26,7 @@ fun Attachments(
         ImagePager(
             pageCount = images.size,
             images = images,
-            width = 300.dp,
+            width = width,
             onImageClicked = { selectedImage ->
                 onPostEvent(
                     PostEvent.OnImageClicked(
