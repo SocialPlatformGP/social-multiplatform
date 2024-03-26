@@ -7,6 +7,7 @@ import com.gp.socialapp.presentation.auth.userinfo.UserInformationScreenModel
 import com.gp.socialapp.presentation.post.create.CreatePostScreenModel
 import com.gp.socialapp.presentation.post.edit.EditPostScreenModel
 import com.gp.socialapp.presentation.post.feed.FeedScreenModel
+import com.gp.socialapp.presentation.post.postDetails.PostDetailsScreenModel
 import org.kodein.di.DI
 import org.kodein.di.bind
 import org.kodein.di.instance
@@ -21,4 +22,5 @@ val screenModelModuleK = DI.Module("screenModelModule") {
     bind<UserInformationScreenModel>() with singleton { UserInformationScreenModel(instance()) }
     bind<FeedScreenModel>() with singleton { FeedScreenModel(instance()) }
     bind<EditPostScreenModel>() with singleton { EditPostScreenModel(instance()) }
+    bind<PostDetailsScreenModel>() with singleton { PostDetailsScreenModel(instance(), instance()) }
 }

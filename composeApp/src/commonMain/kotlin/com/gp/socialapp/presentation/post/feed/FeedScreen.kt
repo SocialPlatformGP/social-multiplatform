@@ -59,6 +59,7 @@ import com.gp.socialapp.presentation.post.create.CreatePostScreen
 import com.gp.socialapp.presentation.post.feed.components.FeedPostItem
 import com.gp.socialapp.presentation.post.feed.components.FeedTopBar
 import com.gp.socialapp.presentation.post.feed.components.FilesBottomSheet
+import com.gp.socialapp.presentation.post.postDetails.PostDetailsScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -66,7 +67,6 @@ object FeedScreen : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
-        println("FeedScreen")
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = navigator.rememberNavigatorScreenModel<FeedScreenModel>()
         var currentAttachments by remember { mutableStateOf(emptyList<PostFile>()) }
@@ -89,7 +89,7 @@ object FeedScreen : Screen {
                     }
 
                     is PostEvent.OnPostClicked -> {
-                        //todo navigate to post details
+                        navigator.push(PostDetailsScreen(action.post))
                     }
 
                     is PostEvent.OnPostEdited -> {
@@ -150,7 +150,7 @@ object FeedScreen : Screen {
                     }
 
                     is NavigationAction.NavigateToPostDetails -> {
-                        //todo navigate to post details
+                        navigator.push(PostDetailsScreen(action.post))
                     }
 
                     else -> {}
