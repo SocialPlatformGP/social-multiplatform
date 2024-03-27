@@ -1,5 +1,6 @@
 package com.gp.socialapp.di
 
+import com.gp.socialapp.presentatDefaultn.post.postDetails.PostDetailsScreenModel
 import com.gp.socialapp.presentation.auth.login.LoginScreenModel
 import com.gp.socialapp.presentation.auth.passwordreset.PasswordResetScreenModel
 import com.gp.socialapp.presentation.auth.signup.SignUpScreenModel

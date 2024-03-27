@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.seiko.imageloader.model.ImageAction
 import com.seiko.imageloader.rememberImageSuccessPainter
@@ -18,7 +19,8 @@ import com.seiko.imageloader.ui.AutoSizeBox
 
 @Composable
 fun UserImage(
-    imageLink: String
+    imageLink: String,
+    size: Dp =36.dp
 ) {
     AutoSizeBox(imageLink) { action ->
         when (action) {
@@ -27,7 +29,7 @@ fun UserImage(
                     rememberImageSuccessPainter(action),
                     contentDescription = "User Avatar",
                     modifier = Modifier.padding(start = 8.dp, end = 8.dp)
-                        .size(36.dp)
+                        .size(size)
                         .clip(CircleShape),
                     contentScale = ContentScale.Crop
                 )
@@ -38,7 +40,7 @@ fun UserImage(
                     imageVector = Icons.Filled.AccountCircle,
                     contentDescription = null,
                     modifier = Modifier.padding(start = 8.dp, end = 8.dp)
-                        .size(36.dp)
+                        .size(size)
                         .clip(CircleShape)
                 )
             }
