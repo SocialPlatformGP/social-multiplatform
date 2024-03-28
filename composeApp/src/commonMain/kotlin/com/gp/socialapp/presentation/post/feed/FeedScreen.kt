@@ -172,7 +172,7 @@ object FeedScreen : Screen {
 
     @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
     @Composable
-    fun FeedContent(
+    private fun FeedContent(
         modifier: Modifier = Modifier,
         onPostEvent: (PostEvent) -> Unit,
         onNavigationAction: (NavigationAction) -> Unit,
