@@ -26,6 +26,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gp.socialapp.data.post.source.remote.model.NestedReply
 import com.gp.socialapp.data.post.source.remote.model.Post
+import com.gp.socialapp.data.post.source.remote.model.Reply
 import com.gp.socialapp.presentatDefaultn.post.postDetails.PostDetailsScreenModel
 import com.gp.socialapp.presentation.post.feed.PostEvent
 import com.gp.socialapp.presentation.post.feed.ReplyEvent
@@ -42,8 +43,9 @@ data class PostDetailsScreen(val post: Post): Screen {
         val screenModel = navigator.rememberNavigatorScreenModel<PostDetailsScreenModel>()
         screenModel.initScreenModel(post)
         val state by screenModel.uiState.collectAsState()
-        val keyboardController = LocalSoftwareKeyboardController.current
         val scope = rememberCoroutineScope()
+        val currentUserID by remember { mutableStateOf("") }
+        var clickedReply by remember { mutableStateOf<Reply?>(null) }
         val bottomSheetState = rememberModalBottomSheetState()
         PostDetailsContent(
             replies = state.currentReplies,
@@ -69,6 +71,7 @@ data class PostDetailsScreen(val post: Post): Screen {
                                 bottomSheetState.hide()
                             } else {
                                 bottomSheetState.show()
+                                clickedReply = replyEvent.reply
                             }
                         }
                     }
@@ -76,24 +79,12 @@ data class PostDetailsScreen(val post: Post): Screen {
                 }
             },
             currentUserID = "",/*TODO add actual user id*/
+            clickedReply = clickedReply,
             bottomSheetState = bottomSheetState,
             onDismissAddReplyBottomSheet = {
                 scope.launch {
                     bottomSheetState.hide()
                 }
-            },
-            onAddReply = { reply ->
-//                screenModel.insertReply(
-//                    NestedReply(
-//                        id = "",
-//                        postID = post.id,
-//                        userID = state.currentUserID,
-//                        content = reply,
-//                        replies = emptyList()
-//                    )
-//                )
-//                screenModel.setAddReplyBottomSheetVisibility(false)
-//                keyboardController?.hide()
             }
         )
     }
@@ -106,9 +97,9 @@ data class PostDetailsScreen(val post: Post): Screen {
         onPostEvent: (PostEvent) -> Unit,
         onReplyEvent: (ReplyEvent) -> Unit,
         currentUserID: String,
+        clickedReply: Reply?,
         bottomSheetState: SheetState,
         onDismissAddReplyBottomSheet: () -> Unit,
-        onAddReply: (String) -> Unit
     ) {
         Box(
             modifier = modifier
@@ -135,7 +126,11 @@ data class PostDetailsScreen(val post: Post): Screen {
             if(bottomSheetState.isVisible){
                 AddReplySheet(
                     onDismiss = onDismissAddReplyBottomSheet,
-                    onDone = onAddReply,
+                    onDone = {
+                        onReplyEvent(ReplyEvent.OnAddReply(clickedReply!!))
+                        onReplyEvent(ReplyEvent.OnReplyAdded(it, clickedReply))
+                        onDismissAddReplyBottomSheet()
+                    },
                     bottomSheetState = bottomSheetState
                 )
             }

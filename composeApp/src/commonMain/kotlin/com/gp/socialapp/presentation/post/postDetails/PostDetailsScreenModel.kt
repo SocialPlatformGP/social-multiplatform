@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import com.gp.socialapp.util.Result
 
 class PostDetailsScreenModel(
     private val postRepo: PostRepository,
@@ -38,65 +39,177 @@ class PostDetailsScreenModel(
 
     private fun insertReply(reply: Reply) {
         screenModelScope.launch(Dispatchers.Default) {
-            replyRepo.insertReply(reply)
+            val result = replyRepo.insertReply(reply)
+            when (result) {
+                is Result.Success -> {
+                    getRepliesById(reply.postId)
+                }
+                is Result.Error -> {
+                    TODO("Handle error here")
+                }
+                is Result.Loading -> {
+                    //TODO Handle loading here
+                }
+                else -> Unit
+            }
+        }
+    }
+    private fun updatePost() {
+        screenModelScope.launch(Dispatchers.Default) {
+//            TODO
         }
     }
 
-    private fun upVote(post: Post) {
+    private fun upvotePost(post: Post) {
         screenModelScope.launch(Dispatchers.Default) {
-            postRepo.upvotePost(post)
+            val result = postRepo.upvotePost(post)
+            when (result) {
+                is Result.Success -> {
+                    updatePost()
+                }
+                is Result.Error -> {
+                    //TODO Handle error here
+                }
+                is Result.Loading -> {
+                    //TODO Handle loading here
+                }
+                else -> Unit
+            }
         }
     }
 
-    private fun downVote(post: Post) {
+    private fun downvotePost(post: Post) {
         screenModelScope.launch(Dispatchers.Default) {
-            postRepo.downvotePost(post)
+            val result = postRepo.downvotePost(post)
+            when (result) {
+                is Result.Success -> {
+                    updatePost()
+                }
+                is Result.Error -> {
+                    //TODO Handle error here
+                }
+                is Result.Loading -> {
+                    //TODO Handle loading here
+                }
+                else -> Unit
+            }
         }
     }
 
     private fun deletePost(post: Post) {
         screenModelScope.launch(Dispatchers.Default) {
-            postRepo.deletePost(post)
+            val result = postRepo.deletePost(post)
+            when (result) {
+                is Result.Success -> {
+                    //TODO Handle success here
+                }
+                is Result.Error -> {
+                    //TODO Handle error here
+                }
+                is Result.Loading -> {
+                    //TODO Handle loading here
+                }
+                else -> Unit
+            }
         }
     }
 
     private fun updatePost(post: Post) {
         screenModelScope.launch(Dispatchers.Default) {
-            postRepo.updatePost(post)
+            val result = postRepo.updatePost(post)
+            when (result) {
+                is Result.Success -> {
+                    updatePost()
+                }
+                is Result.Error -> {
+                    //TODO Handle error here
+                }
+                is Result.Loading -> {
+                    //TODO Handle loading here
+                }
+                else -> Unit
+            }
         }
     }
 
-    private fun replyUpVote(reply: Reply) {
+    private fun upvoteReply(reply: Reply) {
         screenModelScope.launch(Dispatchers.Default) {
-            replyRepo.upVoteReply(reply)
+            val result = replyRepo.upvoteReply(reply.id, _uiState.value.currentUser.id)
+            when (result) {
+                is Result.Success -> {
+                    getRepliesById(reply.postId)
+                }
+                is Result.Error -> {
+                    //TODO Handle error here
+                }
+                is Result.Loading -> {
+                    //TODO Handle loading here
+                }
+                else -> Unit
+            }
         }
     }
 
-    private fun replyDownVote(reply: Reply) {
+    private fun downvoteReply(reply: Reply) {
         screenModelScope.launch(Dispatchers.Default) {
-            replyRepo.downVoteReply(reply)
+            val result = replyRepo.downvoteReply(reply.id, _uiState.value.currentUser.id)
+            when (result) {
+                is Result.Success -> {
+                    getRepliesById(reply.postId)
+                }
+                is Result.Error -> {
+                    //TODO Handle error here
+                }
+                is Result.Loading -> {
+                    //TODO Handle loading here
+                }
+                else -> Unit
+            }
         }
     }
 
     private fun deleteReply(reply: Reply) {
         screenModelScope.launch(Dispatchers.Default) {
-            var deletedReply = reply.copy(content = "content is deleted by owner", deleted = true)
-            replyRepo.deleteReply(deletedReply)
+            val result = replyRepo.deleteReply(reply.id)
+            when (result) {
+                is Result.Success -> {
+                    getRepliesById(reply.postId)
+                }
+                is Result.Error -> {
+                    //TODO Handle error here
+                }
+                is Result.Loading -> {
+                    //TODO Handle loading here
+                }
+                else -> Unit
+            }
         }
 
     }
 
     private fun updateReply(reply: Reply) {
         screenModelScope.launch(Dispatchers.Default) {
-            replyRepo.updateReply(reply)
+            val result = replyRepo.updateReply(reply)
+            when (result) {
+                is Result.Success -> {
+                    getRepliesById(reply.postId)
+                }
+                is Result.Error -> {
+                    //TODO Handle error here
+                }
+                is Result.Loading -> {
+                    //TODO Handle loading here
+                }
+                else -> Unit
+            }
         }
     }
 
     fun handlePostEvent(event: PostEvent) {
         when (event) {
             is PostEvent.OnPostDeleted -> deletePost(event.post)
-            is PostEvent.OnPostUpVoted -> upVote(event.post)
-            is PostEvent.OnPostDownVoted -> downVote(event.post)
+            is PostEvent.OnPostUpVoted -> upvotePost(event.post)
+            is PostEvent.OnPostDownVoted -> downvotePost(event.post)
             is PostEvent.onCommentAdded -> {
                 val reply = Reply(
                     postId = event.postId,
@@ -115,8 +228,8 @@ class PostDetailsScreenModel(
     fun handleReplyEvent(event: ReplyEvent) {
         when (event) {
             is ReplyEvent.OnReplyDeleted -> deleteReply(event.reply)
-            is ReplyEvent.OnReplyUpVoted -> replyUpVote(event.reply)
-            is ReplyEvent.OnReplyDownVoted -> replyDownVote(event.reply)
+            is ReplyEvent.OnReplyUpVoted -> upvoteReply(event.reply)
+            is ReplyEvent.OnReplyDownVoted -> downvoteReply(event.reply)
 
             is ReplyEvent.OnReplyAdded -> {
                 val reply = Reply(

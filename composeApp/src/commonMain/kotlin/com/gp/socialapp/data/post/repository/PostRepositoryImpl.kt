@@ -87,7 +87,7 @@ class PostRepositoryImpl(
         return postLocalSource.getAllPosts()
     }
 
-    override suspend fun updatePost(post: Post): Flow<Result<String>> =
+    override suspend fun updatePost(post: Post): Result<Nothing> =
         postRemoteSource.updatePost(post)
 
 

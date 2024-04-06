@@ -7,6 +7,7 @@ import com.gp.socialapp.data.auth.repository.UserRepositoryImpl
 import com.gp.socialapp.data.post.repository.PostRepository
 import com.gp.socialapp.data.post.repository.PostRepositoryImpl
 import com.gp.socialapp.data.post.repository.ReplyRepository
+import com.gp.socialapp.data.post.repository.ReplyRepositoryImpl
 import com.gp.socialapp.data.post.source.remote.model.Reply
 import kotlinx.coroutines.flow.Flow
 import org.kodein.di.DI
@@ -24,44 +25,5 @@ val repositoryModuleK = DI.Module("repositoryModule") {
         )
     }
     bind<PostRepository>() with singleton { PostRepositoryImpl(instance(), instance(), instance(), instance()) }
-    bind<ReplyRepository>() with singleton {
-        object : ReplyRepository {
-            override fun getReplies(postId: String): Flow<List<Reply>> {
-                TODO("Not yet implemented")
-            }
-
-            override suspend fun insertReplies(replies: List<Reply>) {
-                TODO("Not yet implemented")
-            }
-
-            override suspend fun updateReply(replyEntity: Reply) {
-                TODO("Not yet implemented")
-            }
-
-            override suspend fun deleteReply(replyEntity: Reply) {
-                TODO("Not yet implemented")
-            }
-
-            override fun deleteAllReplies() {
-                TODO("Not yet implemented")
-            }
-
-            override suspend fun upVoteReply(reply: Reply) {
-                TODO("Not yet implemented")
-            }
-
-            override suspend fun downVoteReply(reply: Reply) {
-                TODO("Not yet implemented")
-            }
-
-            override suspend fun insertReply(reply: Reply) {
-                TODO("Not yet implemented")
-            }
-
-            override suspend fun getReplyCountByPostId(postId: String): Int {
-                TODO("Not yet implemented")
-            }
-
-        }
-    }
+    bind<ReplyRepository>() with singleton { ReplyRepositoryImpl(instance(), instance()) }
 }

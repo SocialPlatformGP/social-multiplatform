@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 interface PostRemoteDataSource {
     suspend fun createPost(post: Post): Flow<Result<String>>
     fun fetchPosts(request: FetchRequest): Flow<Result<List<Post>>>
-    suspend fun updatePost(post: Post): Flow<Result<String>>
+    suspend fun updatePost(post: Post): Result<Nothing>
     suspend fun deletePost(request: DeleteRequest): Result<Nothing>
     suspend fun upvotePost(request: UpvoteRequest): Result<Nothing>
     suspend fun downvotePost(request: DownvoteRequest): Result<Nothing>

@@ -6,6 +6,7 @@ import com.gp.socialapp.data.post.source.remote.model.PostRequest.DownvoteReques
 import com.gp.socialapp.data.post.source.remote.model.PostRequest.FetchRequest
 import com.gp.socialapp.data.post.source.remote.model.PostRequest.UpvoteRequest
 import com.gp.socialapp.data.post.source.remote.model.Tag
+import com.gp.socialapp.util.AppConstants.BASE_URL
 import com.gp.socialapp.util.Result
 import io.github.aakira.napier.Napier
 import io.ktor.client.HttpClient
@@ -25,8 +26,6 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.json.Json
-
-private const val BASE_URL = "http://192.168.1.4:8080/"
 
 class PostRemoteDataSourceImpl : PostRemoteDataSource {
     val httpClient = HttpClient {
@@ -162,8 +161,8 @@ class PostRemoteDataSourceImpl : PostRemoteDataSource {
         }
     }
 
-    override suspend fun updatePost(post: Post): Flow<Result<String>> {
-        return flow { }
+    override suspend fun updatePost(post: Post): Result<Nothing> {
+        TODO()
     }
 
     override suspend fun deletePost(request: DeleteRequest): Result<Nothing> {
