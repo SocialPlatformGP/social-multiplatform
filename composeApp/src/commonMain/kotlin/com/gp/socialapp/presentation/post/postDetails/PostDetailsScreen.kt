@@ -7,8 +7,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SheetState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -34,6 +38,13 @@ import com.gp.socialapp.presentation.post.feed.components.FeedPostItem
 import com.gp.socialapp.presentation.post.postDetails.components.AddReplySheet
 import com.gp.socialapp.presentation.post.postDetails.components.RepliesList
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
+import socialmultiplatform.composeapp.generated.resources.Res
+import socialmultiplatform.composeapp.generated.resources.confirm
+import socialmultiplatform.composeapp.generated.resources.confirm_report_reply
+import socialmultiplatform.composeapp.generated.resources.dismiss
+import socialmultiplatform.composeapp.generated.resources.login_str
+import socialmultiplatform.composeapp.generated.resources.report_reply
 
 data class PostDetailsScreen(val post: Post): Screen {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -46,6 +57,7 @@ data class PostDetailsScreen(val post: Post): Screen {
         val scope = rememberCoroutineScope()
         val currentUserID by remember { mutableStateOf("") }
         var clickedReply by remember { mutableStateOf<Reply?>(null) }
+        var isReportDialogVisible by remember { mutableStateOf(false) }
         val bottomSheetState = rememberModalBottomSheetState()
         PostDetailsContent(
             replies = state.currentReplies,
@@ -65,6 +77,10 @@ data class PostDetailsScreen(val post: Post): Screen {
             },
             onReplyEvent = { replyEvent ->
                 when(replyEvent){
+                    is ReplyEvent.OnReportReply -> {
+                        isReportDialogVisible = true
+                        clickedReply = replyEvent.reply
+                    }
                     is ReplyEvent.OnAddReply -> {
                         scope.launch {
                             if (bottomSheetState.isVisible) {
@@ -85,6 +101,14 @@ data class PostDetailsScreen(val post: Post): Screen {
                 scope.launch {
                     bottomSheetState.hide()
                 }
+            },
+            isReportDialogVisible = isReportDialogVisible,
+            onDismissReportDialog = {
+                isReportDialogVisible = false
+            },
+            onConfirmReport = {
+                isReportDialogVisible = false
+                screenModel.handleReplyEvent(ReplyEvent.OnReplyReported(reply = clickedReply!!))
             }
         )
     }
@@ -99,6 +123,9 @@ data class PostDetailsScreen(val post: Post): Screen {
         currentUserID: String,
         clickedReply: Reply?,
         bottomSheetState: SheetState,
+        isReportDialogVisible: Boolean = false,
+        onDismissReportDialog: () -> Unit,
+        onConfirmReport: () -> Unit,
         onDismissAddReplyBottomSheet: () -> Unit,
     ) {
         Box(
@@ -120,7 +147,39 @@ data class PostDetailsScreen(val post: Post): Screen {
                 }
                 RepliesList(
                     replies = replies,
-                    onReplyEvent = onReplyEvent
+                    onReplyEvent = onReplyEvent,
+                    currentUserId = currentUserID
+                )
+            }
+            if(isReportDialogVisible){
+                AlertDialog(
+                    title = {
+                        Text(text = stringResource(resource = Res.string.report_reply))
+                    },
+                    text = {
+                        Text(text = stringResource(resource = Res.string.confirm_report_reply))
+                    },
+                    onDismissRequest = {
+                        onDismissReportDialog()
+                    },
+                    confirmButton = {
+                        TextButton(
+                            onClick = {
+                                onConfirmReport()
+                            }
+                        ) {
+                            Text(text = stringResource(resource = Res.string.confirm))
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(
+                            onClick = {
+                                onDismissReportDialog()
+                            }
+                        ) {
+                            Text(text = stringResource(resource = Res.string.dismiss))
+                        }
+                    }
                 )
             }
             if(bottomSheetState.isVisible){

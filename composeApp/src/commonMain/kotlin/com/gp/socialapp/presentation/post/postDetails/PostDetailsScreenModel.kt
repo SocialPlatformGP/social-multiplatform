@@ -54,6 +54,23 @@ class PostDetailsScreenModel(
             }
         }
     }
+    private fun reportReply(reply: Reply) {
+        screenModelScope.launch(Dispatchers.Default) {
+            val result = replyRepo.reportReply(reply.id, _uiState.value.currentUser.id)
+            when (result) {
+                is Result.Success -> {
+                    //TODO Handle success here
+                }
+                is Result.Error -> {
+                    //TODO Handle error here
+                }
+                is Result.Loading -> {
+                    //TODO Handle loading here
+                }
+                else -> Unit
+            }
+        }
+    }
     private fun updatePost() {
         screenModelScope.launch(Dispatchers.Default) {
 //            TODO
@@ -230,7 +247,6 @@ class PostDetailsScreenModel(
             is ReplyEvent.OnReplyDeleted -> deleteReply(event.reply)
             is ReplyEvent.OnReplyUpVoted -> upvoteReply(event.reply)
             is ReplyEvent.OnReplyDownVoted -> downvoteReply(event.reply)
-
             is ReplyEvent.OnReplyAdded -> {
                 val reply = Reply(
                     postId = event.reply.postId,
@@ -241,7 +257,9 @@ class PostDetailsScreenModel(
                 )
                 insertReply(reply)
             }
-
+            is ReplyEvent.OnReplyReported -> {
+                reportReply(event.reply)
+            }
             else -> {}
         }
     }

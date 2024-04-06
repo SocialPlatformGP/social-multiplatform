@@ -31,6 +31,9 @@ sealed class PostEvent() {
 }
 
 sealed class ReplyEvent {
+    data class OnReportReply(val reply: Reply) : ReplyEvent()
+    data class OnReplyReported(val reply: Reply) : ReplyEvent()
+    data class OnShareReply(val reply: Reply) : ReplyEvent()
     data class OnReplyClicked(val reply: Reply) : ReplyEvent()
     data class OnReplyDeleted(val reply: Reply) : ReplyEvent()
     data class OnReplyEdited(val reply: Reply) : ReplyEvent()

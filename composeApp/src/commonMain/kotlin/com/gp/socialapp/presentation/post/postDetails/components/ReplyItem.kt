@@ -39,11 +39,18 @@ import androidx.compose.ui.unit.sp
 import com.gp.socialapp.data.post.source.remote.model.NestedReply
 import com.gp.socialapp.presentation.post.feed.ReplyEvent
 import com.gp.socialapp.presentation.post.feed.components.UserImage
+import org.jetbrains.compose.resources.stringResource
+import socialmultiplatform.composeapp.generated.resources.Res
+import socialmultiplatform.composeapp.generated.resources.delete
+import socialmultiplatform.composeapp.generated.resources.edit
+import socialmultiplatform.composeapp.generated.resources.report
+import socialmultiplatform.composeapp.generated.resources.share
 
 
 @Composable
 fun ReplyItem(
     nestedReply: NestedReply,
+    currentUserId: String,
     level: Int,
     replyEvent: (ReplyEvent)->Unit
 ) {
@@ -144,18 +151,41 @@ fun ReplyItem(
                                 contentDescription = "More options"
                             )
                         }
+                        val dropDownItems = if(nestedReply.reply.authorID == currentUserId){
+                            listOf(
+                                ReplyDropDownItem(stringResource(Res.string.edit)) {
+                                    //TODO(Implement Reply Editing)
+                                    replyEvent(ReplyEvent.OnReplyEdited(reply = nestedReply.reply))
+                                },
+                                ReplyDropDownItem(stringResource(Res.string.delete)) {
+                                    replyEvent(ReplyEvent.OnReplyDeleted(reply = nestedReply.reply))
+                                },
+                                ReplyDropDownItem(stringResource(Res.string.share)) {
+                                    replyEvent(ReplyEvent.OnShareReply(reply = nestedReply.reply))
+                                }
+                            )
+                        } else {
+                            listOf(
+                                ReplyDropDownItem(stringResource(Res.string.share)) {
+                                    replyEvent(ReplyEvent.OnShareReply(reply = nestedReply.reply))
+                                },
+                                ReplyDropDownItem(stringResource(Res.string.report)) {
+                                    replyEvent(ReplyEvent.OnReportReply(reply = nestedReply.reply))
+                                }
+                            )
+                        }
                         DropdownMenu(
                             expanded = visible,
                             onDismissRequest = { visible = false },
                         ) {
-                            DropdownMenuItem(
-                                text = { Text("Edit") },
-                                onClick = { replyEvent(ReplyEvent.OnReplyEdited(reply = nestedReply.reply)) }
-                            )
-                            DropdownMenuItem(
-                                text = { Text("Delete") },
-                                onClick = { replyEvent(ReplyEvent.OnReplyDeleted(reply = nestedReply.reply)) }
-                            )
+                            dropDownItems.forEach { item ->
+                                DropdownMenuItem(
+                                    text = {Text(text = item.text)},
+                                    onClick = {
+                                    item.onClick()
+                                    visible = false
+                                })
+                            }
                         }
                     }
                     IconButton(
@@ -198,3 +228,8 @@ fun ReplyItem(
         Spacer(modifier = Modifier.height(4.dp))
     }
 }
+
+data class ReplyDropDownItem(
+    val text: String,
+    val onClick: ()->Unit
+)

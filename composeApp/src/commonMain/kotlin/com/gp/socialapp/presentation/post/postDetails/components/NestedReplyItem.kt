@@ -10,13 +10,12 @@ import com.gp.socialapp.data.post.source.remote.model.NestedReply
 import com.gp.socialapp.presentation.post.feed.ReplyEvent
 
 
-fun LazyListScope.NestedReplyItem(comment: NestedReply, level: Int, onReplyEvent: (ReplyEvent)->Unit) {
+fun LazyListScope.NestedReplyItem(comment: NestedReply, level: Int, onReplyEvent: (ReplyEvent)->Unit, currentUserId: String) {
     item {
         val ltrLayoutDirection = remember { LayoutDirection.Ltr }
         CompositionLocalProvider(LocalLayoutDirection provides ltrLayoutDirection) {
-            ReplyItem(comment, level,onReplyEvent)
+            ReplyItem(comment, currentUserId, level, onReplyEvent)
         }
-//        ReplyItem(comment, level,onReplyEvent)
     }
-    RepliesList(comment.replies, level + 1,onReplyEvent)
+    RepliesList(comment.replies, level + 1, onReplyEvent, currentUserId)
 }

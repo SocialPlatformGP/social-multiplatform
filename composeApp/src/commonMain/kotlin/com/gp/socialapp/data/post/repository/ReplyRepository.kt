@@ -11,5 +11,6 @@ interface ReplyRepository {
     suspend fun upvoteReply(replyId: String, currentUserId: String): Result<Nothing>
     suspend fun downvoteReply(replyId: String, currentUserId: String): Result<Nothing>
     suspend fun insertReply(reply: Reply): Result<Nothing>
+    suspend fun reportReply(replyId: String, reporterId: String): Result<Nothing>
 //    suspend fun getReplyCountByPostId(postId: String): Result<Int>
 }

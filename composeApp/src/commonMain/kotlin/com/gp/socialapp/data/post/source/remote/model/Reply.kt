@@ -5,7 +5,9 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class Reply(
     val id: String = "",
     val authorID: String = "",

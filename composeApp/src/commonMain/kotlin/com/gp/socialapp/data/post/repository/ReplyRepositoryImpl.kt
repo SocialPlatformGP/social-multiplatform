@@ -41,6 +41,11 @@ class ReplyRepositoryImpl(
         return remoteSource.createReply(request)
     }
 
+    override suspend fun reportReply(replyId: String, reporterId: String): Result<Nothing> {
+        val request = ReplyRequest.ReportRequest(replyId, reporterId)
+        return remoteSource.reportReply(request)
+    }
+
 //    override suspend fun getReplyCountByPostId(postId: String): Result<Int> {
 //        return remoteSource.getReplyCountByPostId(postId)
 //    }

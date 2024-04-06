@@ -162,6 +162,25 @@ class ReplyRemoteDataSourceImpl: ReplyRemoteDataSource {
         }
     }
 
+    override suspend fun reportReply(request: ReplyRequest.ReportRequest): Result<Nothing> {
+        try {
+            val response = httpClient.post {
+                endPoint("reportReply")
+                setBody(
+                    request
+                )
+            }
+            val message = response.bodyAsText()
+            return if (response.status == HttpStatusCode.OK) {
+                Result.Success
+            } else {
+                Result.Error(message)
+            }
+        } catch (e: Exception) {
+            return Result.Error(e.message ?: "An unknown error occurred")
+        }
+    }
+
 //    override suspend fun getReplyCountByPostId(postId: String): Result<Int>{
 //        TODO("Not yet implemented")
 //    }

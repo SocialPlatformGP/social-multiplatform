@@ -14,5 +14,6 @@ interface ReplyRemoteDataSource {
 
     suspend fun upvoteReply(request: ReplyRequest.UpvoteRequest): Result<Nothing>
     suspend fun downvoteReply(request: ReplyRequest.DownvoteRequest): Result<Nothing>
+    suspend fun reportReply(request: ReplyRequest.ReportRequest): Result<Nothing>
 //    suspend fun getReplyCountByPostId(postId: String): Result<Int>
 }

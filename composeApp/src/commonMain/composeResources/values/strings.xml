@@ -34,5 +34,12 @@
     <string name="invalid_last_name">Invalid Last Name</string>
     <string name="invalid_phone_number">Invalid Phone Number</string>
     <string name="user_must_be_at_least_18_years_old">User must be at least 18 years old.</string>
-    <string name="test_test">Test Test</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="confirm">Confirm</string>
+    <string name="report_reply">Report reply?</string>
+    <string name="confirm_report_reply">Are you sure you want to report this reply?</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="report">Report</string>
+    <string name="share">Share</string>
 </resources>
