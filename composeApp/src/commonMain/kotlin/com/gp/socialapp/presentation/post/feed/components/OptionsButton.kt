@@ -17,6 +17,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
+import org.jetbrains.compose.resources.stringResource
+import socialmultiplatform.composeapp.generated.resources.Res
+import socialmultiplatform.composeapp.generated.resources.delete
+import socialmultiplatform.composeapp.generated.resources.edit
 
 @Composable
 fun OptionButton(
@@ -56,7 +60,7 @@ fun OptionButton(
                     expanded = false
                 },
                 text = {
-                    Text(text = "Edit")
+                    Text(text = stringResource(Res.string.edit))
                 }
             )
             DropdownMenuItem(
@@ -65,7 +69,7 @@ fun OptionButton(
                     expanded = false
                 },
                 text = {
-                    Text(text = "Delete")
+                    Text(text = stringResource(Res.string.delete))
                 }
             )
         }

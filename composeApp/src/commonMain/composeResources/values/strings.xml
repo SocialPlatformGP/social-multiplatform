@@ -42,4 +42,13 @@
     <string name="delete">Delete</string>
     <string name="report">Report</string>
     <string name="share">Share</string>
+    <string name="general">General</string>
+    <string name="spotlight">Spotlight</string>
+    <string name="reply_delete_completed">Reply has been deleted successfully</string>
+    <string name="reply_report_completed">Reply has been reported successfully</string>
+    <string name="reply_update_completed">Reply has been updated successfully</string>
+    <string name="post_delete_completed">Post has been deleted successfully</string>
+    <string name="post_report_completed">Post has been reported successfully</string>
+    <string name="post_update_completed">Post has been updated successfully</string>
+    <string name="unknown_action_result">xD?</string>
 </resources>
