@@ -6,15 +6,17 @@ import com.gp.socialapp.data.post.repository.PostRepository
 import com.gp.socialapp.data.post.repository.ReplyRepository
 import com.gp.socialapp.data.post.source.remote.model.Post
 import com.gp.socialapp.data.post.source.remote.model.Reply
+import com.gp.socialapp.data.post.util.ToNestedReplies.toNestedReplies
 import com.gp.socialapp.presentation.post.feed.PostEvent
 import com.gp.socialapp.presentation.post.feed.ReplyEvent
+import com.gp.socialapp.presentation.post.postDetails.PostDetailsActionResult
 import com.gp.socialapp.presentation.post.postDetails.PostDetailsUiState
+import com.gp.socialapp.util.Result
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import com.gp.socialapp.util.Result
 
 class PostDetailsScreenModel(
     private val postRepo: PostRepository,
@@ -31,8 +33,34 @@ class PostDetailsScreenModel(
 
     private fun getRepliesById(id: String) {
         screenModelScope.launch(Dispatchers.Default) {
-            replyRepo.getReplies(id).collect { replies ->
-//               _uiState.update { it.copy(currentReplies = replies) }
+            replyRepo.getReplies(id).collect { result ->
+                when (result) {
+                    is Result.SuccessWithData -> {
+                        val nestedReplies = result.data.toNestedReplies()
+                        _uiState.update {
+                            it.copy(
+                                currentReplies = nestedReplies,
+                                isLoading = false
+                            )
+                        }
+                    }
+
+                    is Result.Error -> {
+                        _uiState.update {
+                            it.copy(
+                                actionResult = PostDetailsActionResult.NetworkError(
+                                    result.message
+                                ), isLoading = false
+                            )
+                        }
+                    }
+
+                    is Result.Loading -> {
+                        _uiState.update { it.copy(isLoading = true) }
+                    }
+
+                    else -> Unit
+                }
             }
         }
     }
@@ -44,33 +72,45 @@ class PostDetailsScreenModel(
                 is Result.Success -> {
                     getRepliesById(reply.postId)
                 }
+
                 is Result.Error -> {
-                    TODO("Handle error here")
+                    _uiState.update {
+                        it.copy(
+                            actionResult = PostDetailsActionResult.NetworkError(
+                                result.message
+                            )
+                        )
+                    }
                 }
-                is Result.Loading -> {
-                    //TODO Handle loading here
-                }
+
                 else -> Unit
             }
         }
     }
+
     private fun reportReply(reply: Reply) {
         screenModelScope.launch(Dispatchers.Default) {
             val result = replyRepo.reportReply(reply.id, _uiState.value.currentUser.id)
             when (result) {
                 is Result.Success -> {
-                    //TODO Handle success here
+                    _uiState.update { it.copy(actionResult = PostDetailsActionResult.ReplyReported) }
                 }
+
                 is Result.Error -> {
-                    //TODO Handle error here
+                    _uiState.update {
+                        it.copy(
+                            actionResult = PostDetailsActionResult.NetworkError(
+                                result.message
+                            )
+                        )
+                    }
                 }
-                is Result.Loading -> {
-                    //TODO Handle loading here
-                }
+
                 else -> Unit
             }
         }
     }
+
     private fun updatePost() {
         screenModelScope.launch(Dispatchers.Default) {
 //            TODO
@@ -84,12 +124,17 @@ class PostDetailsScreenModel(
                 is Result.Success -> {
                     updatePost()
                 }
+
                 is Result.Error -> {
-                    //TODO Handle error here
+                    _uiState.update {
+                        it.copy(
+                            actionResult = PostDetailsActionResult.NetworkError(
+                                result.message
+                            )
+                        )
+                    }
                 }
-                is Result.Loading -> {
-                    //TODO Handle loading here
-                }
+
                 else -> Unit
             }
         }
@@ -102,12 +147,17 @@ class PostDetailsScreenModel(
                 is Result.Success -> {
                     updatePost()
                 }
+
                 is Result.Error -> {
-                    //TODO Handle error here
+                    _uiState.update {
+                        it.copy(
+                            actionResult = PostDetailsActionResult.NetworkError(
+                                result.message
+                            )
+                        )
+                    }
                 }
-                is Result.Loading -> {
-                    //TODO Handle loading here
-                }
+
                 else -> Unit
             }
         }
@@ -118,14 +168,19 @@ class PostDetailsScreenModel(
             val result = postRepo.deletePost(post)
             when (result) {
                 is Result.Success -> {
-                    //TODO Handle success here
+                    _uiState.update { it.copy(actionResult = PostDetailsActionResult.PostDeleted) }
                 }
+
                 is Result.Error -> {
-                    //TODO Handle error here
+                    _uiState.update {
+                        it.copy(
+                            actionResult = PostDetailsActionResult.NetworkError(
+                                result.message
+                            )
+                        )
+                    }
                 }
-                is Result.Loading -> {
-                    //TODO Handle loading here
-                }
+
                 else -> Unit
             }
         }
@@ -137,13 +192,19 @@ class PostDetailsScreenModel(
             when (result) {
                 is Result.Success -> {
                     updatePost()
+                    _uiState.update { it.copy(actionResult = PostDetailsActionResult.PostUpdated) }
                 }
+
                 is Result.Error -> {
-                    //TODO Handle error here
+                    _uiState.update {
+                        it.copy(
+                            actionResult = PostDetailsActionResult.NetworkError(
+                                result.message
+                            )
+                        )
+                    }
                 }
-                is Result.Loading -> {
-                    //TODO Handle loading here
-                }
+
                 else -> Unit
             }
         }
@@ -156,12 +217,17 @@ class PostDetailsScreenModel(
                 is Result.Success -> {
                     getRepliesById(reply.postId)
                 }
+
                 is Result.Error -> {
-                    //TODO Handle error here
+                    _uiState.update {
+                        it.copy(
+                            actionResult = PostDetailsActionResult.NetworkError(
+                                result.message
+                            )
+                        )
+                    }
                 }
-                is Result.Loading -> {
-                    //TODO Handle loading here
-                }
+
                 else -> Unit
             }
         }
@@ -174,12 +240,17 @@ class PostDetailsScreenModel(
                 is Result.Success -> {
                     getRepliesById(reply.postId)
                 }
+
                 is Result.Error -> {
-                    //TODO Handle error here
+                    _uiState.update {
+                        it.copy(
+                            actionResult = PostDetailsActionResult.NetworkError(
+                                result.message
+                            )
+                        )
+                    }
                 }
-                is Result.Loading -> {
-                    //TODO Handle loading here
-                }
+
                 else -> Unit
             }
         }
@@ -191,13 +262,19 @@ class PostDetailsScreenModel(
             when (result) {
                 is Result.Success -> {
                     getRepliesById(reply.postId)
+                    _uiState.update { it.copy(actionResult = PostDetailsActionResult.ReplyDeleted) }
                 }
+
                 is Result.Error -> {
-                    //TODO Handle error here
+                    _uiState.update {
+                        it.copy(
+                            actionResult = PostDetailsActionResult.NetworkError(
+                                result.message
+                            )
+                        )
+                    }
                 }
-                is Result.Loading -> {
-                    //TODO Handle loading here
-                }
+
                 else -> Unit
             }
         }
@@ -210,15 +287,27 @@ class PostDetailsScreenModel(
             when (result) {
                 is Result.Success -> {
                     getRepliesById(reply.postId)
+                    _uiState.update { it.copy(actionResult = PostDetailsActionResult.ReplyUpdated) }
                 }
+
                 is Result.Error -> {
-                    //TODO Handle error here
+                    _uiState.update {
+                        it.copy(
+                            actionResult = PostDetailsActionResult.NetworkError(
+                                result.message
+                            )
+                        )
+                    }
                 }
-                is Result.Loading -> {
-                    //TODO Handle loading here
-                }
+
                 else -> Unit
             }
+        }
+    }
+
+    fun resetActionResult() {
+        screenModelScope.launch {
+            _uiState.update { it.copy(actionResult = PostDetailsActionResult.NoActionResult) }
         }
     }
 
@@ -257,9 +346,11 @@ class PostDetailsScreenModel(
                 )
                 insertReply(reply)
             }
+
             is ReplyEvent.OnReplyReported -> {
                 reportReply(event.reply)
             }
+
             else -> {}
         }
     }
