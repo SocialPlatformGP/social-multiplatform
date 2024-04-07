@@ -3,14 +3,15 @@ package com.gp.socialapp.presentation.post.postDetails
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetState
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -22,7 +23,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
@@ -37,16 +37,24 @@ import com.gp.socialapp.presentation.post.feed.ReplyEvent
 import com.gp.socialapp.presentation.post.feed.components.FeedPostItem
 import com.gp.socialapp.presentation.post.postDetails.components.AddReplySheet
 import com.gp.socialapp.presentation.post.postDetails.components.RepliesList
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import socialmultiplatform.composeapp.generated.resources.Res
 import socialmultiplatform.composeapp.generated.resources.confirm
 import socialmultiplatform.composeapp.generated.resources.confirm_report_reply
 import socialmultiplatform.composeapp.generated.resources.dismiss
-import socialmultiplatform.composeapp.generated.resources.login_str
+import socialmultiplatform.composeapp.generated.resources.post_delete_completed
+import socialmultiplatform.composeapp.generated.resources.post_report_completed
+import socialmultiplatform.composeapp.generated.resources.post_update_completed
+import socialmultiplatform.composeapp.generated.resources.reply_delete_completed
+import socialmultiplatform.composeapp.generated.resources.reply_report_completed
+import socialmultiplatform.composeapp.generated.resources.reply_update_completed
 import socialmultiplatform.composeapp.generated.resources.report_reply
+import socialmultiplatform.composeapp.generated.resources.unknown_action_result
 
-data class PostDetailsScreen(val post: Post): Screen {
+data class PostDetailsScreen(val post: Post) : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
@@ -55,14 +63,12 @@ data class PostDetailsScreen(val post: Post): Screen {
         screenModel.initScreenModel(post)
         val state by screenModel.uiState.collectAsState()
         val scope = rememberCoroutineScope()
-        val currentUserID by remember { mutableStateOf("") }
         var clickedReply by remember { mutableStateOf<Reply?>(null) }
         var isReportDialogVisible by remember { mutableStateOf(false) }
         val bottomSheetState = rememberModalBottomSheetState()
-        PostDetailsContent(
-            replies = state.currentReplies,
+        PostDetailsContent(replies = state.currentReplies,
             onPostEvent = { postEvent ->
-                when(postEvent){
+                when (postEvent) {
                     is PostEvent.OnCommentClicked -> {
                         scope.launch {
                             if (bottomSheetState.isVisible) {
@@ -72,15 +78,17 @@ data class PostDetailsScreen(val post: Post): Screen {
                             }
                         }
                     }
+
                     else -> screenModel.handlePostEvent(postEvent)
                 }
             },
             onReplyEvent = { replyEvent ->
-                when(replyEvent){
+                when (replyEvent) {
                     is ReplyEvent.OnReportReply -> {
                         isReportDialogVisible = true
                         clickedReply = replyEvent.reply
                     }
+
                     is ReplyEvent.OnAddReply -> {
                         scope.launch {
                             if (bottomSheetState.isVisible) {
@@ -91,10 +99,11 @@ data class PostDetailsScreen(val post: Post): Screen {
                             }
                         }
                     }
+
                     else -> screenModel.handleReplyEvent(replyEvent)
                 }
             },
-            currentUserID = "",/*TODO add actual user id*/
+            currentUserID = state.currentUser.id,
             clickedReply = clickedReply,
             bottomSheetState = bottomSheetState,
             onDismissAddReplyBottomSheet = {
@@ -109,18 +118,22 @@ data class PostDetailsScreen(val post: Post): Screen {
             onConfirmReport = {
                 isReportDialogVisible = false
                 screenModel.handleReplyEvent(ReplyEvent.OnReplyReported(reply = clickedReply!!))
-            }
+            },
+            onResetActionResult = screenModel::resetActionResult
         )
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     private fun PostDetailsContent(
-        modifier: Modifier =Modifier,
-        replies: List<NestedReply>,
+        modifier: Modifier = Modifier,
+        replies: NestedReply,
         onPostEvent: (PostEvent) -> Unit,
         onReplyEvent: (ReplyEvent) -> Unit,
         currentUserID: String,
+        actionResult: PostDetailsActionResult = PostDetailsActionResult.NoActionResult,
+        scope: CoroutineScope = rememberCoroutineScope(),
+        onResetActionResult: () -> Unit,
         clickedReply: Reply?,
         bottomSheetState: SheetState,
         isReportDialogVisible: Boolean = false,
@@ -128,70 +141,77 @@ data class PostDetailsScreen(val post: Post): Screen {
         onConfirmReport: () -> Unit,
         onDismissAddReplyBottomSheet: () -> Unit,
     ) {
-        Box(
-            modifier = modifier
-                .fillMaxSize(),
+        val snackbarHostState = remember { SnackbarHostState() }
+        Scaffold(
+            snackbarHost = { SnackbarHost(hostState = snackbarHostState) }, modifier = modifier
         ) {
-            LazyColumn (
-                modifier = Modifier
-                    .systemBarsPadding()
-                    .fillMaxSize()
-            ) {
-                item {
-                    FeedPostItem(
-                        post = post,
-                        onPostEvent = onPostEvent,
-                        currentUserID = currentUserID
-                    )
-                    Spacer(modifier = Modifier.padding(4.dp))
+            if (actionResult !is PostDetailsActionResult.NoActionResult) {
+                val message = when (actionResult) {
+                    is PostDetailsActionResult.NetworkError -> actionResult.message
+                    is PostDetailsActionResult.ReplyDeleted -> stringResource(resource = Res.string.reply_delete_completed)
+                    is PostDetailsActionResult.ReplyUpdated -> stringResource(resource = Res.string.reply_update_completed)
+                    is PostDetailsActionResult.ReplyReported -> stringResource(resource = Res.string.reply_report_completed)
+                    is PostDetailsActionResult.PostDeleted -> stringResource(resource = Res.string.post_delete_completed)
+                    is PostDetailsActionResult.PostReported -> stringResource(resource = Res.string.post_report_completed)
+                    is PostDetailsActionResult.PostUpdated -> stringResource(resource = Res.string.post_update_completed)
+                    else -> stringResource(resource = Res.string.unknown_action_result)
                 }
-                RepliesList(
-                    replies = replies,
-                    onReplyEvent = onReplyEvent,
-                    currentUserId = currentUserID
-                )
+                scope.launch {
+                    snackbarHostState.showSnackbar(
+                        message = message
+                    )
+                    delay(1500)
+                    onResetActionResult()
+                }
             }
-            if(isReportDialogVisible){
-                AlertDialog(
-                    title = {
+            Box(
+                modifier = Modifier.fillMaxSize().padding(it),
+            ) {
+                LazyColumn(
+                    modifier = Modifier.systemBarsPadding().fillMaxSize()
+                ) {
+                    item {
+                        FeedPostItem(
+                            post = post, onPostEvent = onPostEvent, currentUserID = currentUserID
+                        )
+                        Spacer(modifier = Modifier.padding(4.dp))
+                    }
+                    RepliesList(
+                        replies = listOf(replies),
+                        onReplyEvent = onReplyEvent,
+                        currentUserId = currentUserID
+                    )
+                }
+                if (isReportDialogVisible) {
+                    AlertDialog(title = {
                         Text(text = stringResource(resource = Res.string.report_reply))
-                    },
-                    text = {
+                    }, text = {
                         Text(text = stringResource(resource = Res.string.confirm_report_reply))
-                    },
-                    onDismissRequest = {
+                    }, onDismissRequest = {
                         onDismissReportDialog()
-                    },
-                    confirmButton = {
-                        TextButton(
-                            onClick = {
-                                onConfirmReport()
-                            }
-                        ) {
+                    }, confirmButton = {
+                        TextButton(onClick = {
+                            onConfirmReport()
+                        }) {
                             Text(text = stringResource(resource = Res.string.confirm))
                         }
-                    },
-                    dismissButton = {
-                        TextButton(
-                            onClick = {
-                                onDismissReportDialog()
-                            }
-                        ) {
+                    }, dismissButton = {
+                        TextButton(onClick = {
+                            onDismissReportDialog()
+                        }) {
                             Text(text = stringResource(resource = Res.string.dismiss))
                         }
-                    }
-                )
-            }
-            if(bottomSheetState.isVisible){
-                AddReplySheet(
-                    onDismiss = onDismissAddReplyBottomSheet,
-                    onDone = {
-                        onReplyEvent(ReplyEvent.OnAddReply(clickedReply!!))
-                        onReplyEvent(ReplyEvent.OnReplyAdded(it, clickedReply))
-                        onDismissAddReplyBottomSheet()
-                    },
-                    bottomSheetState = bottomSheetState
-                )
+                    })
+                }
+                if (bottomSheetState.isVisible) {
+                    AddReplySheet(
+                        onDismiss = onDismissAddReplyBottomSheet, onDone = { reply ->
+                            onReplyEvent(ReplyEvent.OnAddReply(clickedReply!!))
+                            onReplyEvent(ReplyEvent.OnReplyAdded(reply, clickedReply))
+                            onDismissAddReplyBottomSheet()
+                        }, bottomSheetState = bottomSheetState
+                    )
+                }
             }
         }
     }
