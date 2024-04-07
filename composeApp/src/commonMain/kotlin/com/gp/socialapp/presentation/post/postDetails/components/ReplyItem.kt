@@ -37,6 +37,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gp.socialapp.data.post.source.remote.model.NestedReply
+import com.gp.socialapp.data.post.source.remote.model.Reply
 import com.gp.socialapp.presentation.post.feed.ReplyEvent
 import com.gp.socialapp.presentation.post.feed.components.UserImage
 import org.jetbrains.compose.resources.stringResource
@@ -52,7 +53,7 @@ fun ReplyItem(
     nestedReply: NestedReply,
     currentUserId: String,
     level: Int,
-    replyEvent: (ReplyEvent)->Unit
+    replyEvent: (ReplyEvent) -> Unit
 ) {
     val padding = with(LocalDensity.current) { 16.dp.toPx() }
     Column {
@@ -88,22 +89,29 @@ fun ReplyItem(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     UserImage(
-                        imageLink = nestedReply.reply!!.authorImageLink,
+                        imageLink = nestedReply.reply?.authorImageLink ?: "",
                         size = 26.dp
                     )
                     Text(
-                        text = nestedReply.reply!!.authorName.run { if(this.length > 10) this.substring(0, 10) else this },
+                        text = nestedReply.reply?.authorName?.run {
+                            if (this.length > 10) this.substring(
+                                0,
+                                10
+                            ) else this
+                        } ?: " ",
                         modifier = Modifier
                             .padding(
                                 start = 8.dp,
                                 end = 4.dp
                             ),
-                        overflow = if ((nestedReply.reply!!.authorName.length) > 10) TextOverflow.Ellipsis else TextOverflow.Clip,
+                        overflow = if ((nestedReply.reply?.authorName?.length
+                                ?: 0) > 10
+                        ) TextOverflow.Ellipsis else TextOverflow.Clip,
                         fontSize = 12.sp,
                         color = androidx.compose.material3.MaterialTheme.colorScheme.onPrimaryContainer
                     )
                     Text(
-                        text = nestedReply.reply!!.createdAt.toString(),
+                        text = nestedReply.reply?.createdAt.toString(),
                         modifier = Modifier
                             .padding(
                                 start = 4.dp,
@@ -119,7 +127,7 @@ fun ReplyItem(
                 }
 
                 Text(
-                    text = nestedReply.reply!!.content,
+                    text = nestedReply.reply?.content ?: "",
                     modifier = Modifier
                         .padding(
                             start = 8.dp,
@@ -151,26 +159,46 @@ fun ReplyItem(
                                 contentDescription = "More options"
                             )
                         }
-                        val dropDownItems = if(nestedReply.reply!!.authorID == currentUserId){
+                        val dropDownItems = if (nestedReply.reply?.authorID == currentUserId) {
                             listOf(
                                 ReplyDropDownItem(stringResource(Res.string.edit)) {
                                     //TODO(Implement Reply Editing)
-                                    replyEvent(ReplyEvent.OnReplyEdited(reply = nestedReply.reply!!))
+                                    replyEvent(
+                                        ReplyEvent.OnReplyEdited(
+                                            reply = nestedReply.reply ?: Reply()
+                                        )
+                                    )
                                 },
                                 ReplyDropDownItem(stringResource(Res.string.delete)) {
-                                    replyEvent(ReplyEvent.OnReplyDeleted(reply = nestedReply.reply!!))
+                                    replyEvent(
+                                        ReplyEvent.OnReplyDeleted(
+                                            reply = nestedReply.reply ?: Reply()
+                                        )
+                                    )
                                 },
                                 ReplyDropDownItem(stringResource(Res.string.share)) {
-                                    replyEvent(ReplyEvent.OnShareReply(reply = nestedReply.reply!!))
+                                    replyEvent(
+                                        ReplyEvent.OnShareReply(
+                                            reply = nestedReply.reply ?: Reply()
+                                        )
+                                    )
                                 }
                             )
                         } else {
                             listOf(
                                 ReplyDropDownItem(stringResource(Res.string.share)) {
-                                    replyEvent(ReplyEvent.OnShareReply(reply = nestedReply.reply!!))
+                                    replyEvent(
+                                        ReplyEvent.OnShareReply(
+                                            reply = nestedReply.reply ?: Reply()
+                                        )
+                                    )
                                 },
                                 ReplyDropDownItem(stringResource(Res.string.report)) {
-                                    replyEvent(ReplyEvent.OnReportReply(reply = nestedReply.reply!!))
+                                    replyEvent(
+                                        ReplyEvent.OnReportReply(
+                                            reply = nestedReply.reply ?: Reply()
+                                        )
+                                    )
                                 }
                             )
                         }
@@ -180,17 +208,17 @@ fun ReplyItem(
                         ) {
                             dropDownItems.forEach { item ->
                                 DropdownMenuItem(
-                                    text = {Text(text = item.text)},
+                                    text = { Text(text = item.text) },
                                     onClick = {
-                                    item.onClick()
-                                    visible = false
-                                })
+                                        item.onClick()
+                                        visible = false
+                                    })
                             }
                         }
                     }
                     IconButton(
                         onClick = {
-                            replyEvent(ReplyEvent.OnAddReply(reply = nestedReply.reply!!))
+                            replyEvent(ReplyEvent.OnAddReply(reply = nestedReply.reply ?: Reply()))
                         }
                     ) {
                         Icon(
@@ -200,7 +228,11 @@ fun ReplyItem(
                     }
                     IconButton(
                         onClick = {
-                            replyEvent(ReplyEvent.OnReplyUpVoted(reply = nestedReply.reply!!))
+                            replyEvent(
+                                ReplyEvent.OnReplyUpVoted(
+                                    reply = nestedReply.reply ?: Reply()
+                                )
+                            )
                         }
                     ) {
                         Icon(
@@ -211,7 +243,11 @@ fun ReplyItem(
                     Text(text = "0")
                     IconButton(
                         onClick = {
-                            replyEvent(ReplyEvent.OnReplyDownVoted(reply = nestedReply.reply!!))
+                            replyEvent(
+                                ReplyEvent.OnReplyDownVoted(
+                                    reply = nestedReply.reply ?: Reply()
+                                )
+                            )
                         }
                     ) {
                         Icon(
@@ -231,5 +267,5 @@ fun ReplyItem(
 
 data class ReplyDropDownItem(
     val text: String,
-    val onClick: ()->Unit
+    val onClick: () -> Unit
 )

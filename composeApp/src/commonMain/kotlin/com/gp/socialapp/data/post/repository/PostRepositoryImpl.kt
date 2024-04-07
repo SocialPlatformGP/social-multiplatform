@@ -93,7 +93,7 @@ class PostRepositoryImpl(
         return postLocalSource.getAllPosts()
     }
 
-    override suspend fun updatePost(post: Post): Result<Nothing>{
+    override suspend fun updatePost(post: Post): Result<Nothing> {
         val request = PostRequest.UpdateRequest(post)
         return postRemoteSource.updatePost(request)
     }
@@ -106,12 +106,18 @@ class PostRepositoryImpl(
     }
 
     override suspend fun upvotePost(post: Post): Result<Nothing> {
-        val request = PostRequest.UpvoteRequest(post.id, authStorage.userId ?: "")
+        val request = PostRequest.UpvoteRequest(
+            post.id,
+            authStorage.userId ?: "25"
+        )
         return postRemoteSource.upvotePost(request)
     }
 
     override suspend fun downvotePost(post: Post): Result<Nothing> {
-        val request = PostRequest.DownvoteRequest(post.id, authStorage.userId ?: "")
+        val request = PostRequest.DownvoteRequest(
+            post.id,
+            authStorage.userId ?: "25"
+        )
         return postRemoteSource.downvotePost(request)
     }
 

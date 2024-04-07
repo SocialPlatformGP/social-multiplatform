@@ -81,12 +81,15 @@ object FeedScreen : Screen {
         val bottomSheetState = rememberModalBottomSheetState()
         val tabItems = listOf(
             TabItem(stringResource(resource = Res.string.general), Icons.Filled.AllInclusive),
-            TabItem(stringResource(resource = Res.string.spotlight), Icons.Filled.NotificationImportant),
+            TabItem(
+                stringResource(resource = Res.string.spotlight),
+                Icons.Filled.NotificationImportant
+            ),
         )
         screenModel.getAllPosts()
         FeedContent(
             state = state,
-            currentUserID = "",
+            currentUserID = "25",
             onPostEvent = { action ->
                 when (action) {
                     is PostEvent.OnAddPost -> {
@@ -139,12 +142,15 @@ object FeedScreen : Screen {
                             isFileBottomSheetOpen = true
                         }
                     }
+
                     is PostEvent.OnPostReported -> {
                         screenModel.reportPost(action.post)
                     }
+
                     is PostEvent.OnPostShareClicked -> {
                         TODO()
                     }
+
                     else -> {}
                 }
             },

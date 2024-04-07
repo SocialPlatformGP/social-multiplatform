@@ -2,9 +2,7 @@ package com.gp.socialapp.presentation.post.feed
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import com.gp.socialapp.data.auth.repository.UserRepository
 import com.gp.socialapp.data.post.repository.PostRepository
-import com.gp.socialapp.data.post.repository.ReplyRepository
 import com.gp.socialapp.data.post.source.remote.model.Post
 import com.gp.socialapp.data.post.util.PostPopularityUtils
 import com.gp.socialapp.util.Result
@@ -20,7 +18,7 @@ class FeedScreenModel(
 ) : ScreenModel {
     private val _state = MutableStateFlow(FeedUiState())
     val state = _state.asStateFlow()
-    private val currentUserId: String = ""
+    private val currentUserId: String = "25"
     //TODO: Implement currentUserId
 
     fun getAllPosts() {
@@ -55,20 +53,26 @@ class FeedScreenModel(
                             )
                         }
                     }
+
                     is Result.Error -> {
                         _state.update {
                             it.copy(
                                 isFeedLoaded = Result.Error(result.message),
-                                error = FeedError.NetworkError(result.message))
+                                error = FeedError.NetworkError(result.message)
+                            )
                         }
                     }
-                    is Result.Loading -> { /*do nothing*/}
+
+                    is Result.Loading -> { /*do nothing*/
+                    }
+
                     else -> Unit
                 }
             }
         }
     }
-    fun resetError(){
+
+    fun resetError() {
         screenModelScope.launch {
             _state.update { it.copy(error = FeedError.NoError) }
         }
@@ -77,24 +81,42 @@ class FeedScreenModel(
     fun upVote(post: Post) {
         screenModelScope.launch(Dispatchers.Default) {
             val result = repository.upvotePost(post)
-            if(result is Result.Error) {
-                _state.update { it.copy(error = FeedError.NetworkError(result.message)) }
+            when (result) {
+                is Result.Error -> {
+                    _state.update { it.copy(error = FeedError.NetworkError(result.message)) }
+                }
+
+                is Result.Success -> {
+                    getAllPosts()
+                }
+
+                else -> Unit
             }
+
         }
     }
 
     fun downVote(post: Post) {
         screenModelScope.launch(Dispatchers.Default) {
             val result = repository.downvotePost(post)
-            if(result is Result.Error) {
-                _state.update { it.copy(error = FeedError.NetworkError(result.message)) }
+            when (result) {
+                is Result.Error -> {
+                    _state.update { it.copy(error = FeedError.NetworkError(result.message)) }
+                }
+
+                is Result.Success -> {
+                    getAllPosts()
+                }
+
+                else -> Unit
             }
         }
     }
+
     fun reportPost(post: Post) {
         screenModelScope.launch(Dispatchers.Default) {
             val result = repository.reportPost(post.id, currentUserId)
-            if(result is Result.Error) {
+            if (result is Result.Error) {
                 _state.update { it.copy(error = FeedError.NetworkError(result.message)) }
             }
         }
@@ -103,8 +125,16 @@ class FeedScreenModel(
     fun deletePost(post: Post) {
         screenModelScope.launch() {
             val result = repository.deletePost(post)
-            if(result is Result.Error) {
-                _state.update { it.copy(error = FeedError.NetworkError(result.message)) }
+            when (result) {
+                is Result.Error -> {
+                    _state.update { it.copy(error = FeedError.NetworkError(result.message)) }
+                }
+
+                is Result.Success -> {
+                    getAllPosts()
+                }
+
+                else -> Unit
             }
         }
     }
