@@ -61,7 +61,12 @@ import com.gp.socialapp.presentation.post.feed.components.FeedTopBar
 import com.gp.socialapp.presentation.post.feed.components.FilesBottomSheet
 import com.gp.socialapp.presentation.post.postDetails.PostDetailsScreen
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
+import socialmultiplatform.composeapp.generated.resources.Res
+import socialmultiplatform.composeapp.generated.resources.general
+import socialmultiplatform.composeapp.generated.resources.spotlight
 
 object FeedScreen : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -75,8 +80,8 @@ object FeedScreen : Screen {
         var isFileBottomSheetOpen by remember { mutableStateOf(false) }
         val bottomSheetState = rememberModalBottomSheetState()
         val tabItems = listOf(
-            TabItem("General", Icons.Filled.AllInclusive),
-            TabItem("Spotlight", Icons.Filled.NotificationImportant),
+            TabItem(stringResource(resource = Res.string.general), Icons.Filled.AllInclusive),
+            TabItem(stringResource(resource = Res.string.spotlight), Icons.Filled.NotificationImportant),
         )
         screenModel.getAllPosts()
         FeedContent(
@@ -135,7 +140,7 @@ object FeedScreen : Screen {
                         }
                     }
                     is PostEvent.OnPostReported -> {
-                        TODO()
+                        screenModel.reportPost(action.post)
                     }
                     is PostEvent.OnPostShareClicked -> {
                         TODO()
@@ -167,6 +172,7 @@ object FeedScreen : Screen {
                 isFileBottomSheetOpen = true
             },
             bottomSheetState = bottomSheetState,
+            onResetError = screenModel::resetError
         )
     }
 
@@ -183,6 +189,7 @@ object FeedScreen : Screen {
         isFileBottomSheetOpen: Boolean,
         tabItems: List<TabItem>,
         onDismissBottomSheet: () -> Unit = { },
+        onResetError: () -> Unit,
         onShowBottomSheet: () -> Unit = { },
         bottomSheetState: SheetState,
     ) {
@@ -212,6 +219,8 @@ object FeedScreen : Screen {
                     snackbarHostState.showSnackbar(
                         message = (state.error as FeedError.NetworkError).message,
                     )
+                    delay(1500)
+                    onResetError()
                 }
             }
             Column(

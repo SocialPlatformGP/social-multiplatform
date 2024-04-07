@@ -20,6 +20,8 @@ class FeedScreenModel(
 ) : ScreenModel {
     private val _state = MutableStateFlow(FeedUiState())
     val state = _state.asStateFlow()
+    private val currentUserId: String = ""
+    //TODO: Implement currentUserId
 
     fun getAllPosts() {
         screenModelScope.launch(Dispatchers.Default) {
@@ -66,6 +68,11 @@ class FeedScreenModel(
             }
         }
     }
+    fun resetError(){
+        screenModelScope.launch {
+            _state.update { it.copy(error = FeedError.NoError) }
+        }
+    }
 
     fun upVote(post: Post) {
         screenModelScope.launch(Dispatchers.Default) {
@@ -79,6 +86,14 @@ class FeedScreenModel(
     fun downVote(post: Post) {
         screenModelScope.launch(Dispatchers.Default) {
             val result = repository.downvotePost(post)
+            if(result is Result.Error) {
+                _state.update { it.copy(error = FeedError.NetworkError(result.message)) }
+            }
+        }
+    }
+    fun reportPost(post: Post) {
+        screenModelScope.launch(Dispatchers.Default) {
+            val result = repository.reportPost(post.id, currentUserId)
             if(result is Result.Error) {
                 _state.update { it.copy(error = FeedError.NetworkError(result.message)) }
             }
