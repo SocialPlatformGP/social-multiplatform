@@ -14,6 +14,7 @@ interface PostRepository {
     suspend fun downvotePost(post: Post): Result<Nothing>
     suspend fun fetchPostById(id: String): Flow<Post>
     suspend fun createPost(post: Post): Flow<Result<String>>
+    suspend fun reportPost(postId: String, reporterId: String): Result<Nothing>
 
     fun getAllTags(): Flow<List<Tag>>
     suspend fun insertTag(tag: Tag)

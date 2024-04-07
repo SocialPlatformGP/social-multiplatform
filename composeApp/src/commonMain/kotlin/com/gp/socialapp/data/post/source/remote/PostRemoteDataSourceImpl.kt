@@ -1,6 +1,7 @@
 package com.gp.socialapp.data.post.source.remote
 
 import com.gp.socialapp.data.post.source.remote.model.Post
+import com.gp.socialapp.data.post.source.remote.model.PostRequest
 import com.gp.socialapp.data.post.source.remote.model.PostRequest.DeleteRequest
 import com.gp.socialapp.data.post.source.remote.model.PostRequest.DownvoteRequest
 import com.gp.socialapp.data.post.source.remote.model.PostRequest.FetchRequest
@@ -47,7 +48,7 @@ class PostRemoteDataSourceImpl : PostRemoteDataSource {
         }
     }
 
-    override suspend fun createPost(post: Post): Flow<Result<String>> {
+    override suspend fun createPost(request: PostRequest.CreateRequest): Flow<Result<String>> {
 //        println("createPost: $post *********************125")
         return flow {
             emit(Result.Loading)
@@ -55,7 +56,7 @@ class PostRemoteDataSourceImpl : PostRemoteDataSource {
                 val response = httpClient.post {
                     endPoint("createPost")
                     setBody(
-                        post
+                        request
                     )
                 }
 //                println("response: ${response.status}")
@@ -161,8 +162,23 @@ class PostRemoteDataSourceImpl : PostRemoteDataSource {
         }
     }
 
-    override suspend fun updatePost(post: Post): Result<Nothing> {
-        TODO()
+    override suspend fun updatePost(request: PostRequest.UpdateRequest): Result<Nothing> {
+        try {
+            val response = httpClient.post {
+                endPoint("updatePost")
+                setBody(
+                    request
+                )
+            }
+            val message = response.bodyAsText()
+            if (response.status == HttpStatusCode.OK) {
+                return Result.Success
+            } else {
+                return Result.Error(message)
+            }
+        } catch (e: Exception) {
+            return Result.Error(e.message ?: "An unknown error occurred")
+        }
     }
 
     override suspend fun deletePost(request: DeleteRequest): Result<Nothing> {
@@ -207,6 +223,25 @@ class PostRemoteDataSourceImpl : PostRemoteDataSource {
         try {
             val response = httpClient.post {
                 endPoint("downvotePost")
+                setBody(
+                    request
+                )
+            }
+            val message = response.bodyAsText()
+            return if (response.status == HttpStatusCode.OK) {
+                Result.Success
+            } else {
+                Result.Error(message)
+            }
+        } catch (e: Exception) {
+            return Result.Error(e.message ?: "An unknown error occurred")
+        }
+    }
+
+    override suspend fun reportPost(request: PostRequest.ReportRequest): Result<Nothing> {
+        try {
+            val response = httpClient.post {
+                endPoint("reportPost")
                 setBody(
                     request
                 )

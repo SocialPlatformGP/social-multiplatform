@@ -180,8 +180,4 @@ class ReplyRemoteDataSourceImpl: ReplyRemoteDataSource {
             return Result.Error(e.message ?: "An unknown error occurred")
         }
     }
-
-//    override suspend fun getReplyCountByPostId(postId: String): Result<Int>{
-//        TODO("Not yet implemented")
-//    }
 }

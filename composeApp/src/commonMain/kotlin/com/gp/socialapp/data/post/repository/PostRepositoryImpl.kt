@@ -33,7 +33,13 @@ class PostRepositoryImpl(
         }
 
     override suspend fun createPost(post: Post): Flow<Result<String>> {
-        return postRemoteSource.createPost(post)
+        val request = PostRequest.CreateRequest(post)
+        return postRemoteSource.createPost(request)
+    }
+
+    override suspend fun reportPost(postId: String, reporterId: String): Result<Nothing> {
+        val request = PostRequest.ReportRequest(postId, reporterId)
+        return postRemoteSource.reportPost(request)
     }
 
     override suspend fun insertLocalPost(post: Post) {
@@ -87,8 +93,10 @@ class PostRepositoryImpl(
         return postLocalSource.getAllPosts()
     }
 
-    override suspend fun updatePost(post: Post): Result<Nothing> =
-        postRemoteSource.updatePost(post)
+    override suspend fun updatePost(post: Post): Result<Nothing>{
+        val request = PostRequest.UpdateRequest(post)
+        return postRemoteSource.updatePost(request)
+    }
 
 
     override suspend fun deletePost(post: Post): Result<Nothing> {
