@@ -34,7 +34,6 @@ class CreatePostScreenModel(
     private fun getChannelTags() {
         screenModelScope.launch {
             postRepository.getAllTags().collect { tags ->
-
                 channelTags.update { tags }
                 println(channelTags.value)
             }
@@ -51,7 +50,7 @@ class CreatePostScreenModel(
         _uiState.update { it.copy(tags = (uiState.value.tags + tags)) }
     }
 
-    fun onCreatePost() {
+    fun onCreatePost(title: String, body: String, postType: String) {
         screenModelScope.launch {
             with(uiState.value) {
                 postRepository.createPost(
@@ -59,7 +58,7 @@ class CreatePostScreenModel(
                         title = title,
                         body = body,
                         tags = tags,
-                        type = type,
+                        type = postType,
                         authorName = currentUser.value.firstName + " " + currentUser.value.lastName,
                         authorPfp = currentUser.value.profilePictureURL,
                         authorID = currentUser.value.email,
@@ -148,6 +147,12 @@ class CreatePostScreenModel(
     //
     fun onRemoveTag(tag: Tag) {
         _uiState.update { it.copy(tags = it.tags - tag) }
+    }
+
+    fun resetUiState() {
+        screenModelScope.launch {
+            _uiState.update { it.copy(createdState = false, title = "", body = "", tags = emptyList(), files = emptyList(), cancelPressed = false) }
+        }
     }
 
 }
