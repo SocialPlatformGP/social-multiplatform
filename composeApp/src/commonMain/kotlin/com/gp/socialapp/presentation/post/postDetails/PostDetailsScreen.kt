@@ -66,7 +66,8 @@ data class PostDetailsScreen(val post: Post) : Screen {
         var clickedReply by remember { mutableStateOf<Reply?>(null) }
         var isReportDialogVisible by remember { mutableStateOf(false) }
         val bottomSheetState = rememberModalBottomSheetState()
-        PostDetailsContent(replies = state.currentReplies,
+        PostDetailsContent(
+            replies = state.currentReplies,
             onPostEvent = { postEvent ->
                 when (postEvent) {
                     is PostEvent.OnCommentClicked -> {

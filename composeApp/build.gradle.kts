@@ -1,4 +1,5 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 allprojects {
     repositories {
@@ -16,7 +17,20 @@ plugins {
     alias(libs.plugins.sqlDelight)
     alias(libs.plugins.apollo)
     alias(libs.plugins.undercouch.download)
+    alias(libs.plugins.ktlint)
 }
+ktlint {
+    android = true
+    ignoreFailures = false
+    reporters {
+        reporter(reporterType = ReporterType.PLAIN)
+        reporter(reporterType = ReporterType.CHECKSTYLE)
+        reporter(reporterType = ReporterType.SARIF)
+
+    }
+}
+
+tasks.getByPath("preBuild").dependsOn("ktlintFormat")
 
 kotlin {
     androidTarget {
