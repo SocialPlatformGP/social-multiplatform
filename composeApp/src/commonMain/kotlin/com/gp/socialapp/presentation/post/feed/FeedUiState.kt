@@ -10,7 +10,8 @@ data class FeedUiState(
     val isSortedByNewest: Boolean = true,
     val allTags: Set<Tag> = emptySet(),
     val selectedTags: Set<Tag> = emptySet(),
-    val error: FeedError = FeedError.NoError
+    val error: FeedError = FeedError.NoError,
+    val openedTabItem: FeedTab = FeedTab.GENERAL
 )
 
 

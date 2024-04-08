@@ -159,4 +159,9 @@ class FeedScreenModel(
                 .toSet())
         }
     }
+    fun changeOpenedTab(tab: Int){
+        _state.update {
+            it.copy(openedTabItem = FeedTab.entries[tab])
+        }
+    }
 }

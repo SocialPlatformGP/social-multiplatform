@@ -93,7 +93,7 @@ object FeedScreen : Screen {
             onPostEvent = { action ->
                 when (action) {
                     is PostEvent.OnAddPost -> {
-                        navigator.push(CreatePostScreen)
+                        navigator.push(CreatePostScreen(state.openedTabItem))
                     }
 
                     is PostEvent.OnPostClicked -> {
@@ -178,7 +178,8 @@ object FeedScreen : Screen {
                 isFileBottomSheetOpen = true
             },
             bottomSheetState = bottomSheetState,
-            onResetError = screenModel::resetError
+            onResetError = screenModel::resetError,
+            onChangeOpenedTab = screenModel::changeOpenedTab
         )
     }
 
@@ -194,6 +195,7 @@ object FeedScreen : Screen {
         currentAttachments: List<PostFile>,
         isFileBottomSheetOpen: Boolean,
         tabItems: List<TabItem>,
+        onChangeOpenedTab: (Int) -> Unit = { },
         onDismissBottomSheet: () -> Unit = { },
         onResetError: () -> Unit,
         onShowBottomSheet: () -> Unit = { },
@@ -262,6 +264,7 @@ object FeedScreen : Screen {
                             selected = (index == selectedTabIndex),
                             onClick = {
                                 selectedTabIndex = index
+                                onChangeOpenedTab(index)
                                 scope.launch {
                                     pagerState.animateScrollToPage(index)
                                 }
@@ -284,7 +287,7 @@ object FeedScreen : Screen {
                     when (index) {
                         0 -> {
                             FeedPosts(
-                                posts = state.posts,
+                                posts = state.posts.filter { it.type == FeedTab.GENERAL.title },
                                 onPostEvent = onPostEvent,
                                 currentUserID = currentUserID
                             )
@@ -292,7 +295,7 @@ object FeedScreen : Screen {
 
                         1 -> {
                             FeedPosts(
-                                posts = state.posts.filter { it.type == "vip" },
+                                posts = state.posts.filter { it.type == FeedTab.SPOTLIGHT.title },
                                 onPostEvent = onPostEvent,
                                 currentUserID = currentUserID
                             )
