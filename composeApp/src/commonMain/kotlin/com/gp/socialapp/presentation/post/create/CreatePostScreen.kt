@@ -65,8 +65,10 @@ data class CreatePostScreen(val openedFeedTab: FeedTab) : Screen {
                     screenModel.insertNewTags(it)
                 },
                 onAddImage = { file ->
-                    screenModel.addFile(file)
-                }
+                    screenModel.onAddFile(file)
+                },
+                onAddTags = screenModel::onAddTags,
+                onRemoveTags = screenModel::onRemoveTags
             )
         }
 
@@ -79,6 +81,8 @@ data class CreatePostScreen(val openedFeedTab: FeedTab) : Screen {
         channelTags: List<Tag>,
         onBackClick: () -> Unit,
         onPostClick: (String, String) -> Unit,
+        onAddTags: (Set<Tag>) -> Unit,
+        onRemoveTags: (Set<Tag>) -> Unit,
         confirmNewTags: (Set<Tag>) -> Unit,
         onAddImage: (PostFile) -> Unit
     ) {
@@ -121,7 +125,7 @@ data class CreatePostScreen(val openedFeedTab: FeedTab) : Screen {
                     stringResource(Res.string.create_post)
                 )
             }
-        ) {
+        ) { it ->
             Column(
                 modifier = Modifier
                     .padding(it)
@@ -148,12 +152,9 @@ data class CreatePostScreen(val openedFeedTab: FeedTab) : Screen {
                         .weight(1f)
                 )
                 TagsRow(
-                    tags = selectedTags.toSet().toList(),
-                    onTagClick = { tag ->
-                        println("Tag clicked: $tag")
-                        println("Selected tags before removal: $selectedTags")
-                        selectedTags -= tag
-                        println("Selected tags after removal: $selectedTags")
+                    tags = state.tags,
+                    onTagClick = {tag ->
+                        onRemoveTags(setOf(tag))
                     }
                 )
                 FilesRow(
@@ -199,13 +200,7 @@ data class CreatePostScreen(val openedFeedTab: FeedTab) : Screen {
                         existingTagsDialogState = value
                     },
                     channelTags = channelTags,
-                    selectedTags = { oldTags ->
-                        selectedTags += oldTags
-                    },
-                    confirmNewTags = { newTags ->
-                        confirmNewTags(newTags)
-                    }
-
+                    selectedTags = onAddTags,
                 )
             }
             if (newTagDialogState) {
@@ -213,12 +208,7 @@ data class CreatePostScreen(val openedFeedTab: FeedTab) : Screen {
                     newTagDialogState = { value ->
                         newTagDialogState = value
                     },
-                    confirmNewTags = { newTags ->
-                        confirmNewTags(newTags)
-                    },
-                    selectedTags = { oldTags ->
-                        selectedTags += oldTags
-                    }
+                    confirmNewTags = confirmNewTags,
                 )
 
             }

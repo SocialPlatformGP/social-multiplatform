@@ -39,7 +39,6 @@ import com.gp.socialapp.theme.TagsColorPalette.fixedColor
 @Composable
 fun NewTagAlertDialog(
     newTagDialogState: (Boolean) -> Unit,
-    selectedTags: (Set<Tag>) -> Unit,
     confirmNewTags: (Set<Tag>) -> Unit
 ) {
     var tempTag by remember { mutableStateOf(Tag("", 0)) }
@@ -100,7 +99,6 @@ fun NewTagAlertDialog(
         confirmButton = {
             Button(onClick = {
                 confirmNewTags(setOf(tempTag))
-                selectedTags(setOf(tempTag))
                 newTagDialogState(false)
             }) {
                 Text(text = "Add")

@@ -201,9 +201,6 @@ private fun EditPostContent(
                 selectedTags = {
                     selectedTags += it
                 },
-                confirmNewTags = {
-                    confirmNewTags(it)
-                }
 
             )
         }
@@ -215,9 +212,6 @@ private fun EditPostContent(
                 confirmNewTags = {
                     confirmNewTags(it)
                 },
-                selectedTags = {
-                    selectedTags += it
-                }
             )
 
         }
