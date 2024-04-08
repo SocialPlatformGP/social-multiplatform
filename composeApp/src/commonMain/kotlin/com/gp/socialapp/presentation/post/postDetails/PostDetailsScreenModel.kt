@@ -316,14 +316,15 @@ class PostDetailsScreenModel(
             is PostEvent.OnPostDeleted -> deletePost(event.post)
             is PostEvent.OnPostUpVoted -> upvotePost(event.post)
             is PostEvent.OnPostDownVoted -> downvotePost(event.post)
-            is PostEvent.onCommentAdded -> {
+            is PostEvent.OnCommentAdded -> {
                 val reply = Reply(
                     postId = event.postId,
-                    parentReplyId = null,
+                    parentReplyId = "-1",
                     depth = 0,
                     content = event.text,
                     authorID = _uiState.value.currentUser.id,
                 )
+                println("reply in screen model: $reply")
                 insertReply(reply)
             }
 
@@ -344,6 +345,7 @@ class PostDetailsScreenModel(
                     content = event.text,
                     authorID = _uiState.value.currentUser.id,
                 )
+                println("nested reply in screen model: $reply")
                 insertReply(reply)
             }
 

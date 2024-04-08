@@ -49,7 +49,7 @@ class PostRemoteDataSourceImpl : PostRemoteDataSource {
     }
 
     override suspend fun createPost(request: PostRequest.CreateRequest): Flow<Result<String>> {
-//        println("createPost: $post *********************125")
+        println("createPost: $request *********************125")
         return flow {
             emit(Result.Loading)
             try {

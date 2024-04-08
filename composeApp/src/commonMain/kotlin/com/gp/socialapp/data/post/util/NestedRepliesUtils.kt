@@ -4,16 +4,16 @@ import com.gp.socialapp.data.post.source.remote.model.NestedReply
 import com.gp.socialapp.data.post.source.remote.model.Reply
 
 object ToNestedReplies {
-    fun List<Reply>.toNestedReplies(): NestedReply {
-        val nestedRepliesList = buildNestedReplies(this, null)
-        return NestedReply(null, replies = nestedRepliesList)
+    fun List<Reply>.toNestedReplies(): List<NestedReply> {
+        val nestedRepliesList = buildNestedReplies(this, "-1")
+        return nestedRepliesList
 
 
     }
 
     private fun buildNestedReplies(
         replies: List<Reply>,
-        parentReplyId: String?
+        parentReplyId: String
     ): List<NestedReply> {
         return replies
             .filter { it.parentReplyId == parentReplyId }
