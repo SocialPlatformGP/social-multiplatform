@@ -38,6 +38,7 @@ class ReplyRepositoryImpl(
 
     override suspend fun insertReply(reply: Reply): Result<Nothing>{
         val request = ReplyRequest.CreateRequest(reply)
+        println("request: $request")
         return remoteSource.createReply(request)
     }
 

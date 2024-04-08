@@ -20,7 +20,7 @@ sealed class PostEvent() {
     data class OnVideoClicked(val file: PostFile) : PostEvent()
     data class OnDocumentClicked(val file: PostFile) : PostEvent()
     data class OnCommentClicked(val postId: String) : PostEvent()
-    data class onCommentAdded(
+    data class OnCommentAdded(
         val text: String,
         val postId: String,
     ) : PostEvent()

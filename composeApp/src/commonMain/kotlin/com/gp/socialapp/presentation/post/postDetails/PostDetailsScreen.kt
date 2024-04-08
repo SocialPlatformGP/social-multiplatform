@@ -6,14 +6,19 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -66,7 +71,8 @@ data class PostDetailsScreen(val post: Post) : Screen {
         var clickedReply by remember { mutableStateOf<Reply?>(null) }
         var isReportDialogVisible by remember { mutableStateOf(false) }
         val bottomSheetState = rememberModalBottomSheetState()
-        PostDetailsContent(replies = state.currentReplies,
+        PostDetailsContent(
+            replies = state.currentReplies,
             onPostEvent = { postEvent ->
                 when (postEvent) {
                     is PostEvent.OnCommentClicked -> {
@@ -92,6 +98,7 @@ data class PostDetailsScreen(val post: Post) : Screen {
                     is ReplyEvent.OnAddReply -> {
                         scope.launch {
                             if (bottomSheetState.isVisible) {
+                                clickedReply = null
                                 bottomSheetState.hide()
                             } else {
                                 bottomSheetState.show()
@@ -118,8 +125,10 @@ data class PostDetailsScreen(val post: Post) : Screen {
             onConfirmReport = {
                 isReportDialogVisible = false
                 screenModel.handleReplyEvent(ReplyEvent.OnReplyReported(reply = clickedReply!!))
+                clickedReply = null
             },
-            onResetActionResult = screenModel::resetActionResult
+            onResetActionResult = screenModel::resetActionResult,
+            onBackPressed = {navigator.pop()},
         )
     }
 
@@ -127,7 +136,7 @@ data class PostDetailsScreen(val post: Post) : Screen {
     @Composable
     private fun PostDetailsContent(
         modifier: Modifier = Modifier,
-        replies: NestedReply,
+        replies: List<NestedReply>,
         onPostEvent: (PostEvent) -> Unit,
         onReplyEvent: (ReplyEvent) -> Unit,
         currentUserID: String,
@@ -140,10 +149,23 @@ data class PostDetailsScreen(val post: Post) : Screen {
         onDismissReportDialog: () -> Unit,
         onConfirmReport: () -> Unit,
         onDismissAddReplyBottomSheet: () -> Unit,
+        onBackPressed: () -> Unit
     ) {
         val snackbarHostState = remember { SnackbarHostState() }
         Scaffold(
-            snackbarHost = { SnackbarHost(hostState = snackbarHostState) }, modifier = modifier
+            snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+            topBar = {
+                     TopAppBar(
+                         title = {Text("Post Details")},
+                            navigationIcon = {
+                                IconButton(onClick = {
+                                    onBackPressed()
+                                }) {
+                                    Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                                }
+                            }
+                         )
+            }, modifier = modifier
         ) {
             if (actionResult !is PostDetailsActionResult.NoActionResult) {
                 val message = when (actionResult) {
@@ -177,7 +199,7 @@ data class PostDetailsScreen(val post: Post) : Screen {
                         Spacer(modifier = Modifier.padding(4.dp))
                     }
                     RepliesList(
-                        replies = listOf(replies),
+                        replies = replies,
                         onReplyEvent = onReplyEvent,
                         currentUserId = currentUserID
                     )
@@ -205,9 +227,14 @@ data class PostDetailsScreen(val post: Post) : Screen {
                 }
                 if (bottomSheetState.isVisible) {
                     AddReplySheet(
-                        onDismiss = onDismissAddReplyBottomSheet, onDone = { reply ->
-                            onReplyEvent(ReplyEvent.OnAddReply(clickedReply!!))
-                            onReplyEvent(ReplyEvent.OnReplyAdded(reply, clickedReply))
+                        onDismiss = onDismissAddReplyBottomSheet,
+                        onDone = { textReply ->
+                            if(clickedReply == null){
+                                onPostEvent(PostEvent.OnCommentAdded(textReply, post.id))
+                            } else {
+                                onReplyEvent(ReplyEvent.OnReplyAdded(textReply, clickedReply))
+                                onReplyEvent(ReplyEvent.OnAddReply(clickedReply))
+                            }
                             onDismissAddReplyBottomSheet()
                         }, bottomSheetState = bottomSheetState
                     )

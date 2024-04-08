@@ -34,6 +34,7 @@ class PostRepositoryImpl(
 
     override suspend fun createPost(post: Post): Flow<Result<String>> {
         val request = PostRequest.CreateRequest(post)
+        println("request: $request")
         return postRemoteSource.createPost(request)
     }
 

@@ -218,6 +218,7 @@ fun ReplyItem(
                     }
                     IconButton(
                         onClick = {
+                            println("nested reply in reply item: ${nestedReply.reply}")
                             replyEvent(ReplyEvent.OnAddReply(reply = nestedReply.reply ?: Reply()))
                         }
                     ) {
