@@ -20,8 +20,10 @@ class FeedScreenModel(
     val state = _state.asStateFlow()
     private val currentUserId: String = "25"
     //TODO: Implement currentUserId
-
-    fun getAllPosts() {
+    init {
+        getAllPosts()
+    }
+    private fun getAllPosts() {
         screenModelScope.launch(Dispatchers.Default) {
             repository.getPosts().collectLatest { result ->
                 when (result) {
@@ -85,7 +87,6 @@ class FeedScreenModel(
                 is Result.Error -> {
                     _state.update { it.copy(error = FeedError.NetworkError(result.message)) }
                 }
-
                 is Result.Success -> {
                     getAllPosts()
                 }

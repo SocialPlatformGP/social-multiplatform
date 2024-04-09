@@ -109,7 +109,7 @@ data class CreatePostScreen(val openedFeedTab: FeedTab) : Screen {
                             PostFile(
                                 file = image,
                                 name = file.getName(context) ?: "",
-                                type = FilePickerFileType.Image.toString(),
+                                type = FilePickerFileType.ImageContentType,
                                 size = image.size.toLong()
                             )
                         )

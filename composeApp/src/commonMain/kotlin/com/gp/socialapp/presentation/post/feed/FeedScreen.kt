@@ -86,7 +86,6 @@ object FeedScreen : Screen {
                 Icons.Filled.NotificationImportant
             ),
         )
-        screenModel.getAllPosts()
         FeedContent(
             state = state,
             currentUserID = "25",

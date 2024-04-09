@@ -33,6 +33,7 @@ fun FeedPostItem(
             .fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onSecondary)
     ) {
+        println("\n\n\n\npost in FeedPostItem: $post\n\n\n\n")
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -55,7 +56,6 @@ fun FeedPostItem(
                 attachments = post.attachments,
                 moderationStatus = post.moderationStatus,
                 onPostEvent = onPostEvent
-
             )
             HorizontalDivider(
                 modifier = Modifier
