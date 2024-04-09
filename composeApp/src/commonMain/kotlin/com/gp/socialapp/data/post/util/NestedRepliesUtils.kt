@@ -7,8 +7,6 @@ object ToNestedReplies {
     fun List<Reply>.toNestedReplies(): List<NestedReply> {
         val nestedRepliesList = buildNestedReplies(this, "-1")
         return nestedRepliesList
-
-
     }
 
     private fun buildNestedReplies(
@@ -25,7 +23,4 @@ object ToNestedReplies {
                 )
             }
     }
-
-
-
 }

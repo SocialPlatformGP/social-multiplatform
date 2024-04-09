@@ -128,7 +128,7 @@ fun BottomRow(
                 )
             }
         }
-        if (filesCount > 0) {
+        if (filesCount > 0 ) {
             Spacer(modifier = Modifier.width(16.dp))
             OutlinedButton(
                 onClick = onShowFilesClicked,

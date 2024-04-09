@@ -175,7 +175,8 @@ private fun EditPostContent(
                         }
                     }
                 },
-                onAddVideoClicked = {/*TODO: Add video picker*/ }
+                onAddVideoClicked = {/*TODO: Add video picker*/ },
+                pickedFileType = state.attachments.firstOrNull()?.type ?: ""
             )
         }
         if (openBottomSheet) {

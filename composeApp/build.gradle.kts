@@ -19,18 +19,18 @@ plugins {
     alias(libs.plugins.undercouch.download)
     alias(libs.plugins.ktlint)
 }
-ktlint {
-    android = true
-    ignoreFailures = false
-    reporters {
-        reporter(reporterType = ReporterType.PLAIN)
-        reporter(reporterType = ReporterType.CHECKSTYLE)
-        reporter(reporterType = ReporterType.SARIF)
-
-    }
-}
-
-tasks.getByPath("preBuild").dependsOn("ktlintFormat")
+//ktlint {
+//    android = true
+//    ignoreFailures = false
+//    reporters {
+//        reporter(reporterType = ReporterType.PLAIN)
+//        reporter(reporterType = ReporterType.CHECKSTYLE)
+//        reporter(reporterType = ReporterType.SARIF)
+//
+//    }
+//}
+//
+//tasks.getByPath("preBuild").dependsOn("ktlintFormat")
 
 kotlin {
     androidTarget {

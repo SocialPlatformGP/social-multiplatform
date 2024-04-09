@@ -218,7 +218,6 @@ fun ReplyItem(
                     }
                     IconButton(
                         onClick = {
-                            println("nested reply in reply item: ${nestedReply.reply}")
                             replyEvent(ReplyEvent.OnAddReply(reply = nestedReply.reply ?: Reply()))
                         }
                     ) {
@@ -241,7 +240,7 @@ fun ReplyItem(
                             contentDescription = "Like"
                         )
                     }
-                    Text(text = "0")
+                    Text(text = (nestedReply.reply?.votes?:0).toString())
                     IconButton(
                         onClick = {
                             replyEvent(
@@ -257,10 +256,7 @@ fun ReplyItem(
                         )
                     }
                 }
-
-
             }
-
         }
         Spacer(modifier = Modifier.height(4.dp))
     }

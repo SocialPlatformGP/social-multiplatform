@@ -42,10 +42,6 @@ fun AddReplySheet(
         sheetState = bottomSheetState,
         onDismissRequest = { onDismiss()},
         shape = RoundedCornerShape(16.dp),
-        properties = ModalBottomSheetProperties(
-            isFocusable = true,
-            shouldDismissOnBackPress = true
-        ),
         tonalElevation = 8.dp
     ) {
         var value by remember { mutableStateOf("") }

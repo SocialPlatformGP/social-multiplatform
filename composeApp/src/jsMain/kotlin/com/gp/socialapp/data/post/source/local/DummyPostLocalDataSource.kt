@@ -5,12 +5,12 @@ import com.gp.socialapp.data.post.source.remote.model.Post
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
-object DummyLocalSource: PostLocalDataSource {
-    override suspend fun insertPost(post: Post){}
+object DummyLocalSource : PostLocalDataSource {
+    override suspend fun insertPost(post: Post) {}
 
-    override fun getAllPosts(): Flow<List<Post>> = flow{}
+    override fun getAllPosts(): Flow<List<Post>> = flow {}
 
-    override fun getPostById(id: String): Flow<Post> = flow{}
+    override fun getPostById(id: String): Flow<Post> = flow {}
 
     override suspend fun deletePostById(id: String) {}
 

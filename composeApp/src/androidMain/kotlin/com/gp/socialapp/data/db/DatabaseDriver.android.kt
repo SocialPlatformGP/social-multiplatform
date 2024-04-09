@@ -6,8 +6,9 @@ import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.db.SqlSchema
 import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 import com.gp.socialapp.AndroidApp
+import com.gp.socialapp.util.AppConstants.DB_NAME
 
-actual fun provideDbDriver(schema: SqlSchema<QueryResult.Value<Unit>>): SqlDriver {
+fun provideDbDriver(schema: SqlSchema<QueryResult.Value<Unit>>): SqlDriver {
     val context: Context = AndroidApp.INSTANCE.applicationContext
     return AndroidSqliteDriver(schema, context, DB_NAME)
 }

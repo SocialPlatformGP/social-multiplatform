@@ -177,7 +177,8 @@ data class CreatePostScreen(val openedFeedTab: FeedTab) : Screen {
                             }
                         }
                     },
-                    onAddVideoClicked = {/*TODO: Add video picker*/ }
+                    onAddVideoClicked = {/*TODO: Add video picker*/ },
+                    pickedFileType = state.files.firstOrNull()?.type ?: ""
                 )
             }
             if (openBottomSheet) {

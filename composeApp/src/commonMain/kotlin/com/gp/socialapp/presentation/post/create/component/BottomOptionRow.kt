@@ -9,6 +9,7 @@ import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.VideoFile
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.mohamedrejeb.calf.picker.FilePickerFileType
 
 @Composable
 fun BottomOptionRow(
@@ -16,6 +17,7 @@ fun BottomOptionRow(
     onAddImageClicked: () -> Unit,
     onAddVideoClicked: () -> Unit,
     onAddFileClicked: () -> Unit,
+    pickedFileType: String,
 ) {
     Row(
         modifier = Modifier
@@ -29,18 +31,24 @@ fun BottomOptionRow(
             },
             label = "add tags"
         )
-        MyIconButton(
-            onClick = onAddImageClicked,
-            icon = Icons.Filled.Image,
-        )
-        MyIconButton(
-            onClick = onAddVideoClicked,
-            icon = Icons.Filled.VideoFile,
-        )
-        MyIconButton(
-            onClick = onAddFileClicked,
-            icon = Icons.Filled.AttachFile,
-        )
+        if(pickedFileType.isBlank() || pickedFileType == FilePickerFileType.ImageContentType) {
+            MyIconButton(
+                onClick = onAddImageClicked,
+                icon = Icons.Filled.Image,
+            )
+        }
+        if(pickedFileType.isBlank() || pickedFileType == FilePickerFileType.VideoContentType) {
+            MyIconButton(
+                onClick = onAddVideoClicked,
+                icon = Icons.Filled.VideoFile,
+            )
+        }
+        if(pickedFileType.isBlank() || pickedFileType == FilePickerFileType.AllContentType){
+            MyIconButton(
+                onClick = onAddFileClicked,
+                icon = Icons.Filled.AttachFile,
+            )
+        }
 
     }
 

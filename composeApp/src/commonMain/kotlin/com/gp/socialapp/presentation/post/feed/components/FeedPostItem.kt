@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import com.gp.socialapp.data.post.source.remote.model.Post
 import com.gp.socialapp.presentation.post.feed.PostEvent
 import com.gp.socialapp.util.LocalDateTimeUtil.toYYYYMMDD
+import com.mohamedrejeb.calf.picker.FilePickerFileType
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -33,7 +34,6 @@ fun FeedPostItem(
             .fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onSecondary)
     ) {
-        println("\n\n\n\npost in FeedPostItem: $post\n\n\n\n")
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -76,7 +76,7 @@ fun FeedPostItem(
                 onCommentClicked = {
                     onPostEvent(PostEvent.OnCommentClicked(post.id))
                 },
-                filesCount = post.attachments.size,
+                filesCount = (if(post.attachments.first().type == FilePickerFileType.ImageContentType) 0 else post.attachments.size),
                 currentUserID = currentUserID,
                 onShowFilesClicked = { onPostEvent(PostEvent.OnViewFilesAttachmentClicked(post.attachments)) },
                 onShareClicked =  {onPostEvent(PostEvent.OnPostShareClicked(post))}

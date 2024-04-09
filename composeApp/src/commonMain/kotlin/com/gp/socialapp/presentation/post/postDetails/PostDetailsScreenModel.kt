@@ -212,13 +212,17 @@ class PostDetailsScreenModel(
 
     private fun upvoteReply(reply: Reply) {
         screenModelScope.launch(Dispatchers.Default) {
-            val result = replyRepo.upvoteReply(reply.id, _uiState.value.currentUser.id)
+            println("\n\nReply to be upvoted: $reply\n\n")
+            val result = replyRepo.upvoteReply(reply.id, "user25")
+//            val result = replyRepo.upvoteReply(reply.id, _uiState.value.currentUser.id)
             when (result) {
                 is Result.Success -> {
                     getRepliesById(reply.postId)
+                    println("\n\nReply upvoted\n\n")
                 }
 
                 is Result.Error -> {
+                    println("\n\nReply upvote error: ${result.message}\n\n")
                     _uiState.update {
                         it.copy(
                             actionResult = PostDetailsActionResult.NetworkError(
