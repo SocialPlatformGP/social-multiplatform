@@ -1,5 +1,6 @@
 package com.gp.socialapp.data.post.repository
 
+import com.apollographql.apollo3.mpp.platform
 import com.gp.socialapp.data.auth.source.local.AuthKeyValueStorage
 import com.gp.socialapp.data.post.source.local.PostLocalDataSource
 import com.gp.socialapp.data.post.source.remote.PostRemoteDataSource
@@ -41,6 +42,28 @@ class PostRepositoryImpl(
     override suspend fun reportPost(postId: String, reporterId: String): Result<Nothing> {
         val request = PostRequest.ReportRequest(postId, reporterId)
         return postRemoteSource.reportPost(request)
+    }
+
+    override suspend fun searchByTitle(title: String): Flow<Result<List<Post>>> = flow {
+        emit(Result.Loading)
+        val platform = getPlatform()
+        try {
+            if(title.isEmpty()) {
+                emit(Result.SuccessWithData(emptyList()))
+                return@flow
+            } else if(platform == Platform.JS) {
+                postRemoteSource.searchByTitle(title).collect {
+                    emit(it)
+                }
+                return@flow
+            } else {
+                postLocalSource.searchByTitle(title).collect {
+                    emit(Result.SuccessWithData(it))
+                }
+            }
+        } catch (e: Exception) {
+            emit(Result.Error(e.message ?: "An error occurred"))
+        }
     }
 
     override suspend fun insertLocalPost(post: Post) {
