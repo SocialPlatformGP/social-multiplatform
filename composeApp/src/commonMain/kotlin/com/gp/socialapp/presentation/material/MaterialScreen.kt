@@ -1,4 +1,4 @@
-package com.gp.material.presentation
+package com.gp.socialapp.presentation.material
 
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -58,129 +58,128 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.koin.getNavigatorScreenModel
+import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gp.material.model.FileType
 import com.gp.material.model.MaterialItem
-import com.gp.socialapp.presentation.auth.signup.SignUpScreenModel
-import com.gp.socialapp.presentation.material.MaterialScreenModel
-import com.gp.socialapp.theme.AppTheme
+import com.gp.material.presentation.FabItem
+import com.gp.material.presentation.MultiFloatingActionButton
 import org.jetbrains.compose.resources.painterResource
 import socialmultiplatform.composeapp.generated.resources.Res
 
-object MaterialScreen:Screen {
-        @Composable
-        override fun Content() {
-            val navigator = LocalNavigator.currentOrThrow
-            val screenModel = navigator.getNavigatorScreenModel<MaterialScreenModel>()
-           // val state by screenModel.items.collectAsState()
-            val state=listOf(
-                MaterialItem(
-                    name = "Folder 1",
-                    fileType = FileType.FOLDER,
-                    size = "N/A",
-                    createdBy = "User1",
-                    creationTime = "2022-01-01 12:00:00",
-                    path = "/materials/folder1"
-                ),
-                MaterialItem(
-                    name = "Folder 2",
-                    fileType = FileType.FOLDER,
-                    size = "N/A",
-                    createdBy = "User2",
-                    creationTime = "2022-01-02 12:00:00",
-                    path = "/materials/folder2"
-                ),
-                MaterialItem(
-                    name = "File PDF",
-                    fileType = FileType.PDF,
-                    size = "2 MB",
-                    createdBy = "User3",
-                    creationTime = "2022-01-03 12:00:00",
-                    path = "/materials/filepdf.pdf"
-                ),
-                MaterialItem(
-                    name = "File Video",
-                    fileType = FileType.VIDEO,
-                    size = "6.5 MB",
-                    createdBy = "User4",
-                    creationTime = "2022-01-04 12:00:00",
-                    path = "/materials/filevideo.mp4"
-                ),
-                MaterialItem(
-                    name = "File Image",
-                    fileType = FileType.IMAGE,
-                    size = "6.5 MB",
-                    createdBy = "User5",
-                    creationTime = "2022-01-05 12:00:00",
-                    path = "/materials/fileimage.jpg"
-                )
+object MaterialScreen : Screen {
+    @Composable
+    override fun Content() {
+        val navigator = LocalNavigator.currentOrThrow
+        val screenModel = navigator.rememberNavigatorScreenModel<MaterialScreenModel>()
+        // val state by screenModel.items.collectAsState()
+        val state = listOf(
+            MaterialItem(
+                name = "Folder 1",
+                fileType = FileType.FOLDER,
+                size = "N/A",
+                createdBy = "User1",
+                creationTime = "2022-01-01 12:00:00",
+                path = "/materials/folder1"
+            ),
+            MaterialItem(
+                name = "Folder 2",
+                fileType = FileType.FOLDER,
+                size = "N/A",
+                createdBy = "User2",
+                creationTime = "2022-01-02 12:00:00",
+                path = "/materials/folder2"
+            ),
+            MaterialItem(
+                name = "File PDF",
+                fileType = FileType.PDF,
+                size = "2 MB",
+                createdBy = "User3",
+                creationTime = "2022-01-03 12:00:00",
+                path = "/materials/filepdf.pdf"
+            ),
+            MaterialItem(
+                name = "File Video",
+                fileType = FileType.VIDEO,
+                size = "6.5 MB",
+                createdBy = "User4",
+                creationTime = "2022-01-04 12:00:00",
+                path = "/materials/filevideo.mp4"
+            ),
+            MaterialItem(
+                name = "File Image",
+                fileType = FileType.IMAGE,
+                size = "6.5 MB",
+                createdBy = "User5",
+                creationTime = "2022-01-05 12:00:00",
+                path = "/materials/fileimage.jpg"
             )
-            val currentPath by screenModel.currentPath.collectAsState()
-            val isLoading by screenModel.isLoading.collectAsState()
-            var isCreateDialogOpen by remember { mutableStateOf(false) }
-            var isFileDetailsDialogOpen by remember { mutableStateOf(false) }
-            var fileWithOpenDetails by remember { mutableStateOf(MaterialItem()) }
-            val folderDropDownItems = listOf("Delete")
-            val fileDropDownItems = listOf("Download", "Share", "Details", "Delete")
-            val onDropDownItemClicked: (String, MaterialItem) -> Unit = { dropDownItem, item ->
-                if (item.fileType == FileType.FOLDER) {
-                    if (dropDownItem == "Delete") {
-                        screenModel.deleteFolder(item.path)
+        )
+        val currentPath by screenModel.currentPath.collectAsState()
+        val isLoading by screenModel.isLoading.collectAsState()
+        var isCreateDialogOpen by remember { mutableStateOf(false) }
+        var isFileDetailsDialogOpen by remember { mutableStateOf(false) }
+        var fileWithOpenDetails by remember { mutableStateOf(MaterialItem()) }
+        val folderDropDownItems = listOf("Delete")
+        val fileDropDownItems = listOf("Download", "Share", "Details", "Delete")
+        val onDropDownItemClicked: (String, MaterialItem) -> Unit = { dropDownItem, item ->
+            if (item.fileType == FileType.FOLDER) {
+                if (dropDownItem == "Delete") {
+                    screenModel.deleteFolder(item.path)
+                }
+            } else {
+                when (dropDownItem) {
+                    "Delete" -> {
+                        screenModel.deleteFile(item.path)
                     }
-                } else {
-                    when (dropDownItem) {
-                        "Delete" -> {
-                            screenModel.deleteFile(item.path)
-                        }
 
-                        "Download" -> {
-                           // onDownloadFile(item)
-                        }
+                    "Download" -> {
+                        // onDownloadFile(item)
+                    }
 
-                        "Share" -> {
-                           // onShareLink(item)
-                        }
+                    "Share" -> {
+                        // onShareLink(item)
+                    }
 
-                        "Details" -> {
-                            fileWithOpenDetails = item
-                            isFileDetailsDialogOpen = true
-                        }
+                    "Details" -> {
+                        fileWithOpenDetails = item
+                        isFileDetailsDialogOpen = true
                     }
                 }
             }
-            MaterialTheme{
-
-                MaterialContent(
-                    currentPath = currentPath,
-                    onBackPressed ={} //onBackPressed
-                    ,
-                    currentFolderName = screenModel.getCurrentFolderName(currentPath),
-                    isAdmin = true//isAdmin
-                    ,
-                    isCreateDialogOpen = isCreateDialogOpen,
-                    onShowCreateDialog = { isCreateDialogOpen = true },
-                    onDismissCreateDialog = { isCreateDialogOpen = false },
-                    onNewFileClicked = { }//onNewFileClicked
-                    ,
-                    items = state,
-                    onFolderClicked = { }//onFolderClicked
-                    ,
-                    onOpenFile ={ } //onOpenFile
-                    ,
-                    folderDropDownItems = folderDropDownItems,
-                    fileDropDownItems = fileDropDownItems,
-                    onDropDownItemClicked = onDropDownItemClicked,
-                    isLoading = isLoading,
-                    onUploadFolder = screenModel::uploadFolder,
-                    isFileDetailsDialogOpen = isFileDetailsDialogOpen,
-                    onDismissFileDetailsDialog = { isFileDetailsDialogOpen = false },
-                    fileWithOpenDetails = fileWithOpenDetails
-                )
-            }
-
         }
+        MaterialTheme {
+
+            MaterialContent(
+                currentPath = currentPath,
+                onBackPressed = {} //onBackPressed
+                ,
+                currentFolderName = screenModel.getCurrentFolderName(currentPath),
+                isAdmin = true//isAdmin
+                ,
+                isCreateDialogOpen = isCreateDialogOpen,
+                onShowCreateDialog = { isCreateDialogOpen = true },
+                onDismissCreateDialog = { isCreateDialogOpen = false },
+                onNewFileClicked = { }//onNewFileClicked
+                ,
+                items = state,
+                onFolderClicked = { }//onFolderClicked
+                ,
+                onOpenFile = { } //onOpenFile
+                ,
+                folderDropDownItems = folderDropDownItems,
+                fileDropDownItems = fileDropDownItems,
+                onDropDownItemClicked = onDropDownItemClicked,
+                isLoading = isLoading,
+                onUploadFolder = screenModel::uploadFolder,
+                isFileDetailsDialogOpen = isFileDetailsDialogOpen,
+                onDismissFileDetailsDialog = { isFileDetailsDialogOpen = false },
+                fileWithOpenDetails = fileWithOpenDetails
+            )
+        }
+
+    }
 
 }
 

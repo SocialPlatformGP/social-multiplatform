@@ -16,6 +16,7 @@ import com.gp.socialapp.data.post.source.remote.model.Tag
 
 @Composable
 fun TagItem(
+    modifier: Modifier = Modifier,
     onTagClicked: (Tag) -> Unit,
     tag: Tag
 ) {
@@ -35,7 +36,7 @@ fun TagItem(
                 color = Color.White
             )
         },
-        modifier = Modifier
+        modifier = modifier
             .sizeIn(
                 maxHeight = 24.dp,
             )

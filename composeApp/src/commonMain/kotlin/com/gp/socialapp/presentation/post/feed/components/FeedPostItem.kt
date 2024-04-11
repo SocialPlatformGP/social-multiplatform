@@ -1,6 +1,5 @@
 package com.gp.socialapp.presentation.post.feed.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -16,6 +15,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.gp.socialapp.data.post.source.remote.model.Post
 import com.gp.socialapp.presentation.post.feed.PostEvent
+import com.gp.socialapp.util.LocalDateTimeUtil.toYYYYMMDD
+import com.mohamedrejeb.calf.picker.FilePickerFileType
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 @Composable
 fun FeedPostItem(
@@ -36,9 +40,9 @@ fun FeedPostItem(
                 .wrapContentHeight()
         ) {
             TopRow(
-                imageUrl = post.userPfp,
-                userName = post.userName,
-                publishedAt = post.publishedAt,
+                imageUrl = post.authorPfp,
+                userName = post.authorName,
+                publishedAt = Instant.fromEpochSeconds(post.createdAt).toLocalDateTime(TimeZone.UTC).toYYYYMMDD(),
                 onEditPostClicked = { onPostEvent(PostEvent.OnPostEdited(post)) },
                 onDeletePostClicked = { onPostEvent(PostEvent.OnPostDeleted(post)) }
             )
@@ -52,7 +56,6 @@ fun FeedPostItem(
                 attachments = post.attachments,
                 moderationStatus = post.moderationStatus,
                 onPostEvent = onPostEvent
-
             )
             HorizontalDivider(
                 modifier = Modifier
@@ -73,9 +76,10 @@ fun FeedPostItem(
                 onCommentClicked = {
                     onPostEvent(PostEvent.OnCommentClicked(post.id))
                 },
-                filesCount = post.attachments.size,
+                filesCount = (if(post.attachments.firstOrNull()?.type == FilePickerFileType.ImageContentType) 0 else post.attachments.size),
                 currentUserID = currentUserID,
-                onShowFilesClicked = {TODO()}
+                onShowFilesClicked = { onPostEvent(PostEvent.OnViewFilesAttachmentClicked(post.attachments)) },
+                onShareClicked =  {onPostEvent(PostEvent.OnPostShareClicked(post))}
             )
         }
     }

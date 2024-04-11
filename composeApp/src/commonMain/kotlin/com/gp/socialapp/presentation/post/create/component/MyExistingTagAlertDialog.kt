@@ -29,7 +29,6 @@ import com.gp.socialapp.data.post.source.remote.model.Tag
 fun MyExistingTagAlertDialog(
     existingTagsDialogState: (Boolean) -> Unit,
     channelTags: List<Tag>,
-    confirmNewTags: (Set<Tag>) -> Unit,
     selectedTags: (Set<Tag>) -> Unit
 ) {
     var tempTags by remember { mutableStateOf(emptySet<Tag>()) }
@@ -67,7 +66,6 @@ fun MyExistingTagAlertDialog(
         },
         confirmButton = {
             Button(onClick = {
-                confirmNewTags(tempTags)
                 selectedTags(tempTags)
                 existingTagsDialogState(false)
             }) {

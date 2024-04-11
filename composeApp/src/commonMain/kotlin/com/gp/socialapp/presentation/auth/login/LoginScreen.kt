@@ -74,7 +74,7 @@ object LoginScreen : Screen {
         val screenModel = navigator.rememberNavigatorScreenModel<LoginScreenModel>()
         val state by screenModel.uiState.collectAsState()
         if (state.token != null) {
-            navigator.replaceAll(MainContainer)
+            navigator.replaceAll(MainContainer(state.token!!))
         } else {
             LoginContent(
                 onSignInWithGoogle = { /*todo*/ },

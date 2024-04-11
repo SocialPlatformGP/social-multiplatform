@@ -1,6 +1,12 @@
-import com.android.build.gradle.internal.lint.AndroidLintAnalysisTask
-import com.android.build.gradle.internal.lint.LintModelWriterTask
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
 
 plugins {
     alias(libs.plugins.multiplatform)
@@ -10,9 +16,21 @@ plugins {
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.sqlDelight)
     alias(libs.plugins.apollo)
-
-//    alias(libs.plugins.google.services)
+    alias(libs.plugins.undercouch.download)
+    alias(libs.plugins.ktlint)
 }
+//ktlint {
+//    android = true
+//    ignoreFailures = false
+//    reporters {
+//        reporter(reporterType = ReporterType.PLAIN)
+//        reporter(reporterType = ReporterType.CHECKSTYLE)
+//        reporter(reporterType = ReporterType.SARIF)
+//
+//    }
+//}
+//
+//tasks.getByPath("preBuild").dependsOn("ktlintFormat")
 
 kotlin {
     androidTarget {
@@ -21,13 +39,22 @@ kotlin {
                 jvmTarget = "17"
             }
         }
+//        configurations.all{
+//            exclude(group = "com.github.UstadMobile.door", module = "room-annotations")
+//        }
     }
-
     jvm()
 
     js {
         browser()
         binaries.executable()
+        browser {
+            commonWebpackConfig {
+                cssSupport {
+                    enabled.set(true)
+                }
+            }
+        }
     }
 
     sourceSets {
@@ -46,7 +73,6 @@ kotlin {
             implementation(libs.voyager.screenmodel)
             implementation(libs.voyager.tabnavigator)
             implementation(libs.voyager.transitions)
-            implementation(libs.voyager.koin)
             implementation(libs.voyager.kodein)
             implementation(libs.composeImageLoader)
             implementation(libs.napier)
@@ -64,8 +90,7 @@ kotlin {
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.calf.file.picker)
             implementation(libs.kodein.di.framework.compose)
-
-
+            implementation(libs.sqlDelight.coroutines)
         }
 
         commonTest.dependencies {
@@ -94,8 +119,10 @@ kotlin {
         jsMain.dependencies {
             implementation(compose.html.core)
             implementation(libs.ktor.client.js)
-            implementation(libs.sqlDelight.driver.js)
         }
+//        jsMain.configure {
+//            resources.srcDir(layout.buildDirectory.dir("sqlite"))
+//        }
 
     }
 }
@@ -133,7 +160,6 @@ dependencies {
     implementation(libs.androidx.media3.exoplayer)
 }
 
-
 compose.desktop {
     application {
         mainClass = "MainKt"
@@ -145,7 +171,6 @@ compose.desktop {
         }
     }
 }
-
 compose.experimental {
     web.application {}
 }
@@ -157,26 +182,17 @@ buildConfig {
 
 sqldelight {
     databases {
-        create("MyDatabase") {
+        create("AppDatabase") {
             // Database configuration here.
             // https://cashapp.github.io/sqldelight
             packageName.set("com.gp.socialapp.db")
         }
     }
 }
-
 apollo {
     service("api") {
         // GraphQL configuration here.
         // https://www.apollographql.com/docs/kotlin/advanced/plugin-configuration/
         packageName.set("com.gp.socialapp.graphql")
     }
-}
-
-tasks.withType<LintModelWriterTask> {
-    dependsOn("copyFontsToAndroidAssets")
-}
-
-tasks.withType<AndroidLintAnalysisTask> {
-    dependsOn("copyFontsToAndroidAssets")
 }

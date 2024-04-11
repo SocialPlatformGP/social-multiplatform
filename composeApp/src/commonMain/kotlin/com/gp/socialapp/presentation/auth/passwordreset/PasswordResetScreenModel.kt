@@ -9,18 +9,19 @@ import kotlinx.coroutines.launch
 
 class PasswordResetScreenModel(
     private val authRepo: AuthenticationRepository
-) : ScreenModel{
+) : ScreenModel {
     val uiState = MutableStateFlow(PasswordResetUiState())
-    fun onSendResetEmail(){
+    fun onSendResetEmail() {
         screenModelScope.launch {
             val state = authRepo.sendPasswordResetEmail(uiState.value.email)
-            state.collect{
+            state.collect {
                 uiState.value = uiState.value.copy(sentState = it)
             }
         }
 
     }
-    fun onEmailChange(email: String){
+
+    fun onEmailChange(email: String) {
         uiState.update { it.copy(email = email) }
     }
 }

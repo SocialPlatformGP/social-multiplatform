@@ -2,6 +2,7 @@ package com.gp.socialapp.presentation.post.create
 
 import com.gp.socialapp.data.post.source.remote.model.PostFile
 import com.gp.socialapp.data.post.source.remote.model.Tag
+import com.gp.socialapp.presentation.post.feed.FeedTab
 
 
 data class CreatePostUIState(
@@ -11,6 +12,6 @@ data class CreatePostUIState(
     var createdState: Boolean = false,
     var cancelPressed: Boolean = false,
     var tags: List<Tag> = emptyList(),
-    var type: String = "all",
+    var type: String = FeedTab.entries.first().title,
     var files: List<PostFile> = emptyList(),
 )

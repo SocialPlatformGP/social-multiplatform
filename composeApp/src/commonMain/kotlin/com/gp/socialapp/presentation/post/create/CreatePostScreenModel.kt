@@ -34,7 +34,6 @@ class CreatePostScreenModel(
     private fun getChannelTags() {
         screenModelScope.launch {
             postRepository.getAllTags().collect { tags ->
-
                 channelTags.update { tags }
                 println(channelTags.value)
             }
@@ -50,8 +49,18 @@ class CreatePostScreenModel(
         }
         _uiState.update { it.copy(tags = (uiState.value.tags + tags)) }
     }
+    fun onAddTags(tags: Set<Tag>) {
+        screenModelScope.launch {
+            _uiState.update { it.copy(tags = it.tags + tags) }
+        }
+    }
+    fun onRemoveTags(tags: Set<Tag>) {
+        screenModelScope.launch {
+            _uiState.update { it.copy(tags = it.tags - tags) }
+        }
+    }
 
-    fun onCreatePost() {
+    fun onCreatePost(title: String, body: String, postType: String) {
         screenModelScope.launch {
             with(uiState.value) {
                 postRepository.createPost(
@@ -59,10 +68,10 @@ class CreatePostScreenModel(
                         title = title,
                         body = body,
                         tags = tags,
-                        type = type,
-                        userName = currentUser.value.firstName + " " + currentUser.value.lastName,
-                        userPfp = currentUser.value.profilePictureURL,
-                        authorEmail = currentUser.value.email,
+                        type = postType,
+                        authorName = currentUser.value.firstName + " " + currentUser.value.lastName,
+                        authorPfp = currentUser.value.profilePictureURL,
+                        authorID = currentUser.value.email,
                         attachments = files
                     )
                 ).collect { it ->
@@ -112,42 +121,23 @@ class CreatePostScreenModel(
         }
     }
 
-    //
-    fun setType(type: String) {
-//        uiState.value = uiState.value.copy(type = type)
-    }
-
-    fun addFile(postFile: PostFile) {
+    fun onAddFile(postFile: PostFile) {
         screenModelScope.launch {
             _uiState.update { it.copy(files = it.files + postFile) }
         }
     }
 
-    fun removeFile(file: PostFile) {
+    fun onRemoveFile(file: PostFile) {
         screenModelScope.launch(Dispatchers.Default) {
             val newFiles = uiState.value.files.filter { !it.file.contentEquals(file.file) }
             _uiState.value = uiState.value.copy(files = newFiles)
         }
     }
 
-    //
-    fun onTitleChange(title: String) {
-        _uiState.update { it.copy(title = title) }
-    }
-
-    //
-    fun onBodyChange(body: String) {
-        _uiState.update { it.copy(body = body) }
-    }
-
-    //
-    fun onAddTag(tag: Set<Tag>) {
-        _uiState.update { it.copy(tags = it.tags + tag) }
-    }
-
-    //
-    fun onRemoveTag(tag: Tag) {
-        _uiState.update { it.copy(tags = it.tags - tag) }
+    fun resetUiState() {
+        screenModelScope.launch {
+            _uiState.update { it.copy(createdState = false, title = "", body = "", tags = emptyList(), files = emptyList(), cancelPressed = false) }
+        }
     }
 
 }

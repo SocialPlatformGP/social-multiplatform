@@ -11,12 +11,13 @@ import cafe.adriel.voyager.navigator.tab.CurrentTab
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabNavigator
+import com.gp.socialapp.data.auth.source.remote.model.responses.AuthResponse
 import com.gp.socialapp.navigation.tabs.ChatTab
 import com.gp.socialapp.navigation.tabs.MaterialTab
 import com.gp.socialapp.tabs.PostsTab
 
 
-object MainContainer : Screen {
+data class MainContainer(val userToken: String) : Screen {
 
     @Composable
     override fun Content() {

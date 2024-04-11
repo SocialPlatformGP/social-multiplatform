@@ -19,7 +19,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.kodein.rememberScreenModel
+import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gp.socialapp.data.post.source.remote.model.PostFile
@@ -32,6 +32,7 @@ import com.gp.socialapp.presentation.post.create.component.MyExistingTagAlertDia
 import com.gp.socialapp.presentation.post.create.component.MyTextField
 import com.gp.socialapp.presentation.post.create.component.NewTagAlertDialog
 import com.gp.socialapp.presentation.post.create.component.TagsRow
+import com.gp.socialapp.presentation.post.feed.FeedTab
 import com.mohamedrejeb.calf.core.LocalPlatformContext
 import com.mohamedrejeb.calf.io.getName
 import com.mohamedrejeb.calf.io.readByteArray
@@ -43,33 +44,31 @@ import org.jetbrains.compose.resources.stringResource
 import socialmultiplatform.composeapp.generated.resources.Res
 import socialmultiplatform.composeapp.generated.resources.create_post
 
-object CreatePostScreen : Screen {
+data class CreatePostScreen(val openedFeedTab: FeedTab) : Screen {
     @Composable
     override fun Content() {
-
-
         val navigator = LocalNavigator.currentOrThrow
-        val screenModel = rememberScreenModel<CreatePostScreenModel>()
+        val screenModel = navigator.rememberNavigatorScreenModel<CreatePostScreenModel>()
         val state by screenModel.uiState.collectAsState()
         val existingTags by screenModel.channelTags.collectAsState()
         if (state.createdState) {
             navigator.pop()
+            screenModel.resetUiState()
         }
         MaterialTheme {
-
             CreatePostContent(
                 state = state,
                 channelTags = existingTags,
                 onBackClick = { navigator.pop() },
-                onPostClick = { screenModel.onCreatePost() },
-                onTitleChange = { screenModel.onTitleChange(it) },
-                onBodyChange = { screenModel.onBodyChange(it) },
+                onPostClick = { title, body -> screenModel.onCreatePost(title, body, openedFeedTab.title) },
                 confirmNewTags = {
                     screenModel.insertNewTags(it)
                 },
                 onAddImage = { file ->
-                    screenModel.addFile(file)
-                }
+                    screenModel.onAddFile(file)
+                },
+                onAddTags = screenModel::onAddTags,
+                onRemoveTags = screenModel::onRemoveTags
             )
         }
 
@@ -81,9 +80,9 @@ object CreatePostScreen : Screen {
         state: CreatePostUIState,
         channelTags: List<Tag>,
         onBackClick: () -> Unit,
-        onPostClick: () -> Unit,
-        onTitleChange: (String) -> Unit,
-        onBodyChange: (String) -> Unit,
+        onPostClick: (String, String) -> Unit,
+        onAddTags: (Set<Tag>) -> Unit,
+        onRemoveTags: (Set<Tag>) -> Unit,
         confirmNewTags: (Set<Tag>) -> Unit,
         onAddImage: (PostFile) -> Unit
     ) {
@@ -96,6 +95,8 @@ object CreatePostScreen : Screen {
         var existingTagsDialogState by remember { mutableStateOf(false) }
         var newTagDialogState by remember { mutableStateOf(false) }
         var selectedTags: List<Tag> by remember { mutableStateOf(emptyList()) }
+        var title by remember { mutableStateOf("") }
+        var body by remember { mutableStateOf("") }
         val context = LocalPlatformContext.current
         val imagePicker = rememberFilePickerLauncher(
             type = FilePickerFileType.Image,
@@ -108,7 +109,7 @@ object CreatePostScreen : Screen {
                             PostFile(
                                 file = image,
                                 name = file.getName(context) ?: "",
-                                type = FilePickerFileType.Image.toString(),
+                                type = FilePickerFileType.ImageContentType,
                                 size = image.size.toLong()
                             )
                         )
@@ -120,42 +121,40 @@ object CreatePostScreen : Screen {
             topBar = {
                 CreatePostTopBar(
                     onBackClick = onBackClick,
-                    onPostClick = onPostClick,
+                    onPostClick = {onPostClick(title, body)},
                     stringResource(Res.string.create_post)
                 )
             }
-        ) {
+        ) { it ->
             Column(
                 modifier = Modifier
                     .padding(it)
                     .fillMaxSize()
             ) {
                 MyTextField(
-                    value = state.title,
+                    value = title,
                     label = "Title",
                     onValueChange = { newTitle ->
-                        onTitleChange(newTitle)
+                        title =newTitle
                     },
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(0.2f)
                 )
                 MyTextField(
-                    value = state.body,
+                    value = body,
                     label = "Body",
                     onValueChange = { newBody ->
-                        onBodyChange(newBody)
+                        body = newBody
                     },
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f)
                 )
                 TagsRow(
-                    tags = selectedTags.toSet().toList(),
-                    onTagClick = { tag ->
-                        println("Tag clicked: $tag")
-                        println("Selected tags: $selectedTags")
-                        selectedTags -= tag
+                    tags = state.tags,
+                    onTagClick = {tag ->
+                        onRemoveTags(setOf(tag))
                     }
                 )
                 FilesRow(
@@ -178,7 +177,8 @@ object CreatePostScreen : Screen {
                             }
                         }
                     },
-                    onAddVideoClicked = {/*TODO: Add video picker*/ }
+                    onAddVideoClicked = {/*TODO: Add video picker*/ },
+                    pickedFileType = state.files.firstOrNull()?.type ?: ""
                 )
             }
             if (openBottomSheet) {
@@ -201,13 +201,7 @@ object CreatePostScreen : Screen {
                         existingTagsDialogState = value
                     },
                     channelTags = channelTags,
-                    selectedTags = { oldTags ->
-                        selectedTags += oldTags
-                    },
-                    confirmNewTags = { newTags ->
-                        confirmNewTags(newTags)
-                    }
-
+                    selectedTags = onAddTags,
                 )
             }
             if (newTagDialogState) {
@@ -215,12 +209,7 @@ object CreatePostScreen : Screen {
                     newTagDialogState = { value ->
                         newTagDialogState = value
                     },
-                    confirmNewTags = { newTags ->
-                        confirmNewTags(newTags)
-                    },
-                    selectedTags = { oldTags ->
-                        selectedTags += oldTags
-                    }
+                    confirmNewTags = confirmNewTags,
                 )
 
             }

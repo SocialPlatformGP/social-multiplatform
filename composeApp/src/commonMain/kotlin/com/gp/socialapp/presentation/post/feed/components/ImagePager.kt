@@ -7,7 +7,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -35,6 +37,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.gp.socialapp.data.post.source.remote.model.PostFile
+import com.gp.socialapp.util.AppConstants.BASE_URL
 import com.seiko.imageloader.model.ImageAction
 import com.seiko.imageloader.rememberImageSuccessPainter
 import com.seiko.imageloader.ui.AutoSizeBox
@@ -47,9 +50,8 @@ fun ImagePager(
     width: Dp,
     onImageClicked: (PostFile) -> Unit
 ) {
-    //todo handle width correctly
     Box(
-        modifier = Modifier.size(width, 300.dp),
+        modifier = Modifier.size(height = 300.dp, width = width)
     ) {
         val pagerState = rememberPagerState(
             pageCount = { pageCount },
@@ -80,27 +82,27 @@ fun ImagePager(
                     .clickable {
                         onImageClicked(images[pagerState.currentPage])
                     }
-                    .background(Color.Black),
+                    .background(Color.Transparent),
                 contentAlignment = Alignment.Center
             ) {
-
-                AutoSizeBox(images[pagerState.currentPage].url) { action ->
+                val imageURL = BASE_URL+images[pagerState.currentPage].url
+                AutoSizeBox(imageURL) { action ->
                     when (action) {
                         is ImageAction.Success -> {
                             Image(
                                 rememberImageSuccessPainter(action),
                                 contentDescription = null,
                                 modifier = Modifier
-                                    .align(Alignment.Center),
-                                contentScale = ContentScale.Crop
+                                    .align(Alignment.Center).fillMaxSize(),
+                                contentScale = ContentScale.FillWidth
                             )
                         }
 
                         is ImageAction.Loading -> {
                             CircularProgressIndicator()
                         }
-
-                        else -> {
+                        is ImageAction.Failure -> {
+                            println("\n\n\n\nImage loading failed url: $imageURL, error: ${(action as ImageAction.Failure).error}\n\n\n\n")
                             Icon(
                                 imageVector = Icons.Filled.Error,
                                 contentDescription = null,
@@ -108,6 +110,7 @@ fun ImagePager(
                                     .align(Alignment.Center),
                             )
                         }
+                        else -> Unit
                     }
                 }
             }

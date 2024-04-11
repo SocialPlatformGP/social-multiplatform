@@ -4,9 +4,9 @@ import com.eygraber.uri.Uri
 import com.gp.socialapp.data.auth.source.remote.UserRemoteDataSource
 import com.gp.socialapp.data.auth.source.remote.model.User
 
-class UserRepositoryImpl (
+class UserRepositoryImpl(
     private val userRemoteSource: UserRemoteDataSource
-) :UserRepository {
+) : UserRepository {
     override fun createUser(user: User, pfpURI: Uri) = userRemoteSource.createUser(user, pfpURI)
     override fun updateUser(user: User) = userRemoteSource.updateUser(user)
     override fun deleteUser(user: User) = userRemoteSource.deleteUser(user)

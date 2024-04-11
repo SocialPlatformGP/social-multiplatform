@@ -1,6 +1,5 @@
 package com.gp.socialapp.presentation.auth.userinfo
 
-import com.eygraber.uri.Uri
 import com.gp.socialapp.data.auth.source.remote.model.responses.AuthResponse
 import com.gp.socialapp.presentation.auth.util.AuthError
 import com.gp.socialapp.util.LocalDateTimeUtil.now

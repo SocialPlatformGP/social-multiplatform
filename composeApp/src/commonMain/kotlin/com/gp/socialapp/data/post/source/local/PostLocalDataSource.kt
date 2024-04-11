@@ -4,11 +4,11 @@ import com.gp.socialapp.data.post.source.remote.model.Post
 import kotlinx.coroutines.flow.Flow
 
 interface PostLocalDataSource {
-    suspend fun insertPost(vararg post: Post)
-    suspend fun updatePost(post: Post)
+    suspend fun insertPost(post: Post)
     fun getAllPosts(): Flow<List<Post>>
-    suspend fun deletePost(post: Post)
-    fun searchPostsByTitle(searchText: String): Flow<List<Post>>
     fun getPostById(id: String): Flow<Post>
-    fun deleteAllPosts()
+    suspend fun deletePostById(id: String)
+    suspend fun deleteAllPosts()
+    fun searchByTitle(title: String): Flow<List<Post>>
+    fun searchByTag(tag: String): Flow<List<Post>>
 }

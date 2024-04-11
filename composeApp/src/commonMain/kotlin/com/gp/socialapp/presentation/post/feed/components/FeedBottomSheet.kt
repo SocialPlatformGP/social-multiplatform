@@ -30,9 +30,6 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -69,8 +66,6 @@ fun FilesBottomSheet(
                         .background(Color.White, shape = RoundedCornerShape(8.dp))
 
                 ) {
-                    
-
                     when (it.type) {
                         in listOf(
                             MimeType.VIDEO.value,
@@ -88,9 +83,7 @@ fun FilesBottomSheet(
                                     Color.Blue.copy(alpha = 0.7f)
                                 )
                             )
-
                         }
-
                         in listOf(
                             MimeType.IMAGE.value,
                             MimeType.JPEG.value,
@@ -100,7 +93,6 @@ fun FilesBottomSheet(
                             MimeType.TIFF.value,
                             MimeType.WEBP.value,
                         ) -> {
-
                             Image(
                                 imageVector = Icons.Filled.Image,
                                 contentDescription = "image file",
@@ -111,7 +103,6 @@ fun FilesBottomSheet(
                                 )
                             )
                         }
-
                         in listOf(
                             MimeType.WORD.value,
                             MimeType.DOCX.value,
@@ -130,7 +121,6 @@ fun FilesBottomSheet(
                                 )
                             )
                         }
-
                         MimeType.PDF.value -> {
                             Image(
                                 imageVector = Icons.Filled.PictureAsPdf,
@@ -142,7 +132,6 @@ fun FilesBottomSheet(
                                 )
                             )
                         }
-
                         in listOf(
                             MimeType.ZIP.value,
                             MimeType.RAR.value,
@@ -158,7 +147,6 @@ fun FilesBottomSheet(
                                 )
                             )
                         }
-
                         in listOf(
                             MimeType.MP3.value,
                             MimeType.WAV.value,
@@ -174,7 +162,6 @@ fun FilesBottomSheet(
                                 )
                             )
                         }
-
                         else -> {
                             Image(
                                 imageVector = Icons.Filled.InsertDriveFile,
@@ -187,7 +174,6 @@ fun FilesBottomSheet(
                             )
                         }
                     }
-
                     Spacer(modifier = Modifier.size(8.dp))
                     Column(
                         modifier = Modifier
@@ -206,7 +192,6 @@ fun FilesBottomSheet(
                         )
                     }
                 }
-
             }
         }
     }

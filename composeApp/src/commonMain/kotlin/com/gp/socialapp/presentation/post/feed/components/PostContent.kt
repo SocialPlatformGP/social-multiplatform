@@ -1,5 +1,6 @@
 package com.gp.socialapp.presentation.post.feed.components
 
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
@@ -15,15 +16,19 @@ fun PostContent(
     moderationStatus: String,
     onPostEvent: (PostEvent) -> Unit
 ) {
-    Column(
-        Modifier
-            .fillMaxWidth()
-    ) {
-        PostTitle(title)
-        PostBody(body)
-        Attachments(
-            attachments = attachments,
-            onPostEvent = onPostEvent
-        )
+    BoxWithConstraints {
+        val maxWidth = maxWidth
+        Column(
+            Modifier
+                .fillMaxWidth()
+        ) {
+            PostTitle(title)
+            PostBody(body)
+            Attachments(
+                attachments = attachments,
+                onPostEvent = onPostEvent,
+                width = maxWidth
+            )
+        }
     }
 }

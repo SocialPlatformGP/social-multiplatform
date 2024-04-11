@@ -8,4 +8,5 @@ val appModuleK = DI {
     import(repositoryModuleK)
     import(screenModelModuleK)
     import(localSourceModuleK)
+    import(platformModule)
 }

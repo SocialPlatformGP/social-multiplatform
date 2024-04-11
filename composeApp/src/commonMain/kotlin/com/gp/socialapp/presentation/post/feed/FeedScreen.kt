@@ -26,6 +26,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetState
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults.SecondaryIndicator
@@ -57,8 +59,16 @@ import com.gp.socialapp.presentation.post.create.CreatePostScreen
 import com.gp.socialapp.presentation.post.feed.components.FeedPostItem
 import com.gp.socialapp.presentation.post.feed.components.FeedTopBar
 import com.gp.socialapp.presentation.post.feed.components.FilesBottomSheet
+import com.gp.socialapp.presentation.post.postDetails.PostDetailsScreen
+import com.gp.socialapp.presentation.post.search.SearchScreen
+import com.gp.socialapp.presentation.post.searchResult.SearchResultScreen
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
+import socialmultiplatform.composeapp.generated.resources.Res
+import socialmultiplatform.composeapp.generated.resources.general
+import socialmultiplatform.composeapp.generated.resources.spotlight
 
 object FeedScreen : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -72,20 +82,23 @@ object FeedScreen : Screen {
         var isFileBottomSheetOpen by remember { mutableStateOf(false) }
         val bottomSheetState = rememberModalBottomSheetState()
         val tabItems = listOf(
-            TabItem("General", Icons.Filled.AllInclusive),
-            TabItem("Spotlight", Icons.Filled.NotificationImportant),
+            TabItem(stringResource(resource = Res.string.general), Icons.Filled.AllInclusive),
+            TabItem(
+                stringResource(resource = Res.string.spotlight),
+                Icons.Filled.NotificationImportant
+            ),
         )
         FeedContent(
             state = state,
-            currentUserID = "",
+            currentUserID = "25",
             onPostEvent = { action ->
                 when (action) {
                     is PostEvent.OnAddPost -> {
-                        navigator.push(CreatePostScreen)
+                        navigator.push(CreatePostScreen(state.openedTabItem))
                     }
 
                     is PostEvent.OnPostClicked -> {
-                        //todo navigate to post details
+                        navigator.push(PostDetailsScreen(action.post))
                     }
 
                     is PostEvent.OnPostEdited -> {
@@ -93,7 +106,7 @@ object FeedScreen : Screen {
                     }
 
                     is PostEvent.OnTagClicked -> {
-                        //todo navigate to search by tag
+                        navigator.push(SearchResultScreen(searchTag = action.tag, isTag = true))
                     }
 
                     is PostEvent.OnAudioClicked -> {
@@ -131,17 +144,25 @@ object FeedScreen : Screen {
                         }
                     }
 
+                    is PostEvent.OnPostReported -> {
+                        screenModel.reportPost(action.post)
+                    }
+
+                    is PostEvent.OnPostShareClicked -> {
+                        TODO()
+                    }
+
                     else -> {}
                 }
             },
             onNavigationAction = { action ->
                 when (action) {
                     is NavigationAction.NavigateToSearch -> {
-                        //todo navigate to search
+                        navigator.push(SearchScreen)
                     }
 
                     is NavigationAction.NavigateToPostDetails -> {
-                        //todo navigate to post details
+                        navigator.push(PostDetailsScreen(action.post))
                     }
 
                     else -> {}
@@ -158,12 +179,14 @@ object FeedScreen : Screen {
                 isFileBottomSheetOpen = true
             },
             bottomSheetState = bottomSheetState,
+            onResetError = screenModel::resetError,
+            onChangeOpenedTab = screenModel::changeOpenedTab
         )
     }
 
     @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
     @Composable
-    fun FeedContent(
+    private fun FeedContent(
         modifier: Modifier = Modifier,
         onPostEvent: (PostEvent) -> Unit,
         onNavigationAction: (NavigationAction) -> Unit,
@@ -173,13 +196,19 @@ object FeedScreen : Screen {
         currentAttachments: List<PostFile>,
         isFileBottomSheetOpen: Boolean,
         tabItems: List<TabItem>,
+        onChangeOpenedTab: (Int) -> Unit = { },
         onDismissBottomSheet: () -> Unit = { },
+        onResetError: () -> Unit,
         onShowBottomSheet: () -> Unit = { },
         bottomSheetState: SheetState,
     ) {
         var selectedTabIndex by remember { mutableIntStateOf(0) }
         val pagerState = rememberPagerState { tabItems.size }
+        val snackbarHostState = remember { SnackbarHostState() }
         Scaffold(
+            snackbarHost = {
+                SnackbarHost(hostState = snackbarHostState)
+            },
             floatingActionButton = {
                 FloatingActionButton(
                     onClick = { onPostEvent(PostEvent.OnAddPost) }
@@ -194,6 +223,15 @@ object FeedScreen : Screen {
                 FeedTopBar(onNavigationAction)
             }
         ) { paddingValues ->
+            if (state.error !is FeedError.NoError) {
+                scope.launch {
+                    snackbarHostState.showSnackbar(
+                        message = (state.error as FeedError.NetworkError).message,
+                    )
+                    delay(1500)
+                    onResetError()
+                }
+            }
             Column(
                 modifier = Modifier
                     .padding(paddingValues)
@@ -227,6 +265,7 @@ object FeedScreen : Screen {
                             selected = (index == selectedTabIndex),
                             onClick = {
                                 selectedTabIndex = index
+                                onChangeOpenedTab(index)
                                 scope.launch {
                                     pagerState.animateScrollToPage(index)
                                 }
@@ -249,7 +288,7 @@ object FeedScreen : Screen {
                     when (index) {
                         0 -> {
                             FeedPosts(
-                                posts = state.posts,
+                                posts = state.posts.filter { it.type == FeedTab.GENERAL.title },
                                 onPostEvent = onPostEvent,
                                 currentUserID = currentUserID
                             )
@@ -257,7 +296,7 @@ object FeedScreen : Screen {
 
                         1 -> {
                             FeedPosts(
-                                posts = state.posts.filter { it.type == "vip" },
+                                posts = state.posts.filter { it.type == FeedTab.SPOTLIGHT.title },
                                 onPostEvent = onPostEvent,
                                 currentUserID = currentUserID
                             )

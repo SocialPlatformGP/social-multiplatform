@@ -175,7 +175,8 @@ private fun EditPostContent(
                         }
                     }
                 },
-                onAddVideoClicked = {/*TODO: Add video picker*/ }
+                onAddVideoClicked = {/*TODO: Add video picker*/ },
+                pickedFileType = state.attachments.firstOrNull()?.type ?: ""
             )
         }
         if (openBottomSheet) {
@@ -201,9 +202,6 @@ private fun EditPostContent(
                 selectedTags = {
                     selectedTags += it
                 },
-                confirmNewTags = {
-                    confirmNewTags(it)
-                }
 
             )
         }
@@ -215,9 +213,6 @@ private fun EditPostContent(
                 confirmNewTags = {
                     confirmNewTags(it)
                 },
-                selectedTags = {
-                    selectedTags += it
-                }
             )
 
         }

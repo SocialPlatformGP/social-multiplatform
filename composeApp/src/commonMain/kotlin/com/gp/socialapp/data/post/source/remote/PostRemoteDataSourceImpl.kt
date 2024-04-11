@@ -1,7 +1,13 @@
 package com.gp.socialapp.data.post.source.remote
 
 import com.gp.socialapp.data.post.source.remote.model.Post
+import com.gp.socialapp.data.post.source.remote.model.PostRequest
+import com.gp.socialapp.data.post.source.remote.model.PostRequest.DeleteRequest
+import com.gp.socialapp.data.post.source.remote.model.PostRequest.DownvoteRequest
+import com.gp.socialapp.data.post.source.remote.model.PostRequest.FetchRequest
+import com.gp.socialapp.data.post.source.remote.model.PostRequest.UpvoteRequest
 import com.gp.socialapp.data.post.source.remote.model.Tag
+import com.gp.socialapp.util.AppConstants.BASE_URL
 import com.gp.socialapp.util.Result
 import io.github.aakira.napier.Napier
 import io.ktor.client.HttpClient
@@ -21,8 +27,6 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.json.Json
-
-private const val BASE_URL = "http://192.168.1.4:8080/"
 
 class PostRemoteDataSourceImpl : PostRemoteDataSource {
     val httpClient = HttpClient {
@@ -44,18 +48,21 @@ class PostRemoteDataSourceImpl : PostRemoteDataSource {
         }
     }
 
-    override suspend fun createPost(post: Post): Flow<Result<String>> {
+    override suspend fun createPost(request: PostRequest.CreateRequest): Flow<Result<String>> {
+        println("createPost: $request *********************125")
         return flow {
             emit(Result.Loading)
             try {
                 val response = httpClient.post {
                     endPoint("createPost")
                     setBody(
-                        post
+                        request
                     )
                 }
+//                println("response: ${response.status}")
                 val message = response.bodyAsText()
                 if (response.status == HttpStatusCode.OK) {
+//                    println("message: $message")
                     emit(Result.SuccessWithData(message))
                 } else {
                     emit(Result.Error(message))
@@ -108,54 +115,185 @@ class PostRemoteDataSourceImpl : PostRemoteDataSource {
     }
 
 
-    override fun fetchPosts(): Flow<List<Post>> {
-        return flow {
-            try {
-                val response = httpClient.get {
-                    endPoint("getAllPosts")
-                }
-                println("response: ${response.status}")
-                if (response.status == HttpStatusCode.OK) {
-                    val posts = response.body<List<Post>>()
-                    println("posts: $posts")
-                    emit(posts)
-                } else {
-                    emit(emptyList())
-                }
-            } catch (e: Exception) {
-                Napier.e("getAllPosts: ${e.message}")
-                emit(emptyList())
+    override fun fetchPosts(request: FetchRequest): Flow<Result<List<Post>>> = flow {
+        println("fetchPosts: $request *********************125")
+        emit(Result.Loading)
+        try {
+            val response = httpClient.post {
+                endPoint("getNewPosts")
+                setBody(
+                    request
+                )
             }
+            println("response: ${response.status}")
+            if (response.status == HttpStatusCode.OK) {
+                val posts = response.body<List<Post>>()
+                println("posts: $posts")
+                emit(Result.SuccessWithData(posts))
+            } else {
+                emit(Result.Error("An error occurred"))
+            }
+        } catch (e: Exception) {
+            Napier.e("getAllPosts: ${e.message}")
+            println("getAllPosts: ${e.message}")
+            emit(Result.Error(e.message ?: "An unknown error occurred"))
         }
     }
 
-    override suspend fun updatePost(post: Post): Flow<Result<String>> {
-        return flow { }
+    override fun fetchAllPosts(): Flow<Result<List<Post>>> = flow {
+        emit(Result.Loading)
+        try {
+            val response = httpClient.get {
+                endPoint("getAllPosts")
+
+            }
+            println("response: ${response.status}")
+            if (response.status == HttpStatusCode.OK) {
+                val posts = response.body<List<Post>>()
+                println("posts: $posts")
+                emit(Result.SuccessWithData(posts))
+            } else {
+                emit(Result.Error("An error occurred"))
+            }
+        } catch (e: Exception) {
+            Napier.e("getAllPosts: ${e.message}")
+            println("getAllPosts: ${e.message}")
+            emit(Result.Error(e.message ?: "An unknown error occurred"))
+        }
     }
 
-    override suspend fun deletePost(post: Post) {
-        TODO("Not yet implemented")
+    override fun searchByTitle(title: String): Flow<Result<List<Post>>> = flow {
+        emit(Result.Loading)
+        try {
+            val response = httpClient.get {
+                endPoint("searchByTitle")
+                setBody(title)
+            }
+            println("response: ${response.status}")
+            if (response.status == HttpStatusCode.OK) {
+                val posts = response.body<List<Post>>()
+                println("posts: $posts")
+                emit(Result.SuccessWithData(posts))
+            } else {
+                emit(Result.Error("An error occurred"))
+            }
+        } catch (e: Exception) {
+            emit(Result.Error(e.message ?: "An unknown error occurred"))
+        }
     }
 
-    override suspend fun upVotePost(post: Post) {
-        TODO("Not yet implemented")
+    override fun searchByTag(tag: String): Flow<Result<List<Post>>> = flow {
+        emit(Result.Loading)
+        try {
+            val response = httpClient.get {
+                endPoint("searchByTag")
+                setBody(tag)
+            }
+            println("response: ${response.status}")
+            if (response.status == HttpStatusCode.OK) {
+                val posts = response.body<List<Post>>()
+                println("posts: $posts")
+                emit(Result.SuccessWithData(posts))
+            } else {
+                emit(Result.Error("An error occurred"))
+            }
+        } catch (e: Exception) {
+            emit(Result.Error(e.message ?: "An unknown error occurred"))
+        }
     }
 
-    override suspend fun downVotePost(post: Post) {
-        TODO("Not yet implemented")
+    override suspend fun updatePost(request: PostRequest.UpdateRequest): Result<Nothing> {
+        try {
+            val response = httpClient.post {
+                endPoint("updatePost")
+                setBody(
+                    request
+                )
+            }
+            val message = response.bodyAsText()
+            if (response.status == HttpStatusCode.OK) {
+                return Result.Success
+            } else {
+                return Result.Error(message)
+            }
+        } catch (e: Exception) {
+            return Result.Error(e.message ?: "An unknown error occurred")
+        }
     }
 
-    override fun fetchPostById(id: String): Flow<Post> {
-        TODO("Not yet implemented")
+    override suspend fun deletePost(request: DeleteRequest): Result<Nothing> {
+        try {
+            val response = httpClient.post {
+                endPoint("deletePost")
+                setBody(
+                    request
+                )
+            }
+            val message = response.bodyAsText()
+            return if (response.status == HttpStatusCode.OK) {
+                Result.Success
+            } else {
+                Result.Error(message)
+            }
+        } catch (e: Exception) {
+            return Result.Error(e.message ?: "An unknown error occurred")
+        }
     }
 
-    override suspend fun incrementReplyCounter(postId: String) {
-        TODO("Not yet implemented")
+    override suspend fun upvotePost(request: UpvoteRequest): Result<Nothing> {
+        try {
+            val response = httpClient.post {
+                endPoint("upvotePost")
+                setBody(
+                    request
+                )
+            }
+            val message = response.bodyAsText()
+            return if (response.status == HttpStatusCode.OK) {
+                Result.Success
+            } else {
+                Result.Error(message)
+            }
+        } catch (e: Exception) {
+            return Result.Error(e.message ?: "An unknown error occurred")
+        }
     }
 
-    override suspend fun decrementReplyCounter(postId: String) {
-        TODO("Not yet implemented")
+    override suspend fun downvotePost(request: DownvoteRequest): Result<Nothing> {
+        try {
+            val response = httpClient.post {
+                endPoint("downvotePost")
+                setBody(
+                    request
+                )
+            }
+            val message = response.bodyAsText()
+            return if (response.status == HttpStatusCode.OK) {
+                Result.Success
+            } else {
+                Result.Error(message)
+            }
+        } catch (e: Exception) {
+            return Result.Error(e.message ?: "An unknown error occurred")
+        }
     }
 
-
+    override suspend fun reportPost(request: PostRequest.ReportRequest): Result<Nothing> {
+        try {
+            val response = httpClient.post {
+                endPoint("reportPost")
+                setBody(
+                    request
+                )
+            }
+            val message = response.bodyAsText()
+            return if (response.status == HttpStatusCode.OK) {
+                Result.Success
+            } else {
+                Result.Error(message)
+            }
+        } catch (e: Exception) {
+            return Result.Error(e.message ?: "An unknown error occurred")
+        }
+    }
 }
