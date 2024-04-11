@@ -8,7 +8,6 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
-import com.gp.socialapp.presentation.material.MaterialScreen
 
 object MaterialTab : Tab {
     override val options: TabOptions
@@ -28,6 +27,6 @@ object MaterialTab : Tab {
 
     @Composable
     override fun Content() {
-        Navigator(screen = MaterialScreen())
+        //Navigator(screen = MaterialScreen())
     }
 }

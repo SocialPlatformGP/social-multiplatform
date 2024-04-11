@@ -12,7 +12,6 @@ import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.gp.socialapp.presentation.material.MaterialScreen
 
 object ChatHomeScreen : Screen {
     @Composable
@@ -27,7 +26,7 @@ object ChatHomeScreen : Screen {
                 text = "Chat Screen",
                 style = MaterialTheme.typography.displaySmall,
                 modifier = Modifier.clickable {
-                    navigator.push(MaterialScreen("Mohammed"))
+                    //navigator.push(MaterialScreen("Mohammed"))
                 }
             )
         }
