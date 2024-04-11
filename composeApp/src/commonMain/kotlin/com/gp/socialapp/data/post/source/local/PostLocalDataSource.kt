@@ -10,4 +10,5 @@ interface PostLocalDataSource {
     suspend fun deletePostById(id: String)
     suspend fun deleteAllPosts()
     fun searchByTitle(title: String): Flow<List<Post>>
+    fun searchByTag(tag: String): Flow<List<Post>>
 }

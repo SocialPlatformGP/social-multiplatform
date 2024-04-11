@@ -38,19 +38,19 @@ data class PostEntity(
                     authorPfp = authorPfp,
                     id = id,
                     authorID = authorID,
-                    createdAt = createdAt.toLong(),
+                    createdAt = createdAt,
                     title = title,
                     body = body,
                     votes = votes,
-                    downvoted = downvoted.split(","),
-                    upvoted = upvoted.split(","),
+                    downvoted = downvoted.split(",").filter { it.isNotBlank() },
+                    upvoted = upvoted.split(",").filter { it.isNotBlank() },
                     moderationStatus = moderationStatus,
                     editedStatus = editedStatus == 1,
-                    tags = if (tags.isBlank()) emptyList() else tags.split(",").map { it.toTag() },
+                    tags = tags.split(",").filter{ it.isNotBlank() }.map { it.toTag() },
                     type = type,
-                    attachments = if (attachments.isBlank()) emptyList() else attachments.split(",")
+                    attachments = attachments.split(",").filter { it.isNotBlank() }
                         .map { it.toPostFile() },
-                    lastModified = lastModified.toLong()
+                    lastModified = lastModified
                 )
             }
         }

@@ -73,3 +73,5 @@ INSERT OR REPLACE INTO `posts` (
 );
 searchByTitle:
 SELECT * FROM `posts` WHERE title LIKE '%' || :title || '%' ORDER BY created_at DESC;
+searchByTag:
+SELECT * FROM `posts` WHERE tags LIKE '%' || :tag || '%' ORDER BY created_at DESC;

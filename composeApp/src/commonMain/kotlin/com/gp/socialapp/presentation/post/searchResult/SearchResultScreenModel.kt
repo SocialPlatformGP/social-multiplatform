@@ -3,6 +3,7 @@ package com.gp.socialapp.presentation.post.searchResult
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.gp.socialapp.data.post.repository.PostRepository
+import com.gp.socialapp.data.post.source.remote.model.Tag
 import com.gp.socialapp.util.Result
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,18 +16,33 @@ class SearchResultScreenModel(
 ): ScreenModel {
     private val _uiState = MutableStateFlow(SearchResultUiState())
     val uiState = _uiState.asStateFlow()
-    fun initScreenModel(searchTerm: String, isTag: Boolean) {
+    fun initScreenModel(searchTerm: String, searchTag: Tag, isTag: Boolean) {
         screenModelScope.launch {
-            postRepo.searchByTitle(searchTerm).collectLatest {
-                when(it) {
-                    is Result.SuccessWithData -> {
-                        val posts = it.data
-                        _uiState.update { it.copy(posts = posts) }
+            if(isTag) {
+                postRepo.searchByTag(searchTag).collect {
+                    when(it) {
+                        is Result.SuccessWithData -> {
+                            val posts = it.data
+                            _uiState.update { it.copy(posts = posts) }
+                        }
+                        is Result.Error -> {
+                            // Handle error
+                        }
+                        else -> Unit
                     }
-                    is Result.Error -> {
-                        // Handle error
+                }
+            } else {
+                postRepo.searchByTitle(searchTerm).collectLatest {
+                    when(it) {
+                        is Result.SuccessWithData -> {
+                            val posts = it.data
+                            _uiState.update { it.copy(posts = posts) }
+                        }
+                        is Result.Error -> {
+                            // Handle error
+                        }
+                        else -> Unit
                     }
-                    else -> Unit
                 }
             }
         }

@@ -48,7 +48,7 @@ class PostRepositoryImpl(
         return postRemoteSource.reportPost(request)
     }
 
-    override suspend fun searchByTitle(title: String): Flow<Result<List<Post>>> = flow {
+    override fun searchByTitle(title: String): Flow<Result<List<Post>>> = flow {
         emit(Result.Loading)
         val platform = getPlatform()
         try {
@@ -172,5 +172,9 @@ class PostRepositoryImpl(
         println("recentSearches before: ${recentSearches.isBlank()}, search: $search")
         recentSearches += "%69%$search"
         println("recentSearches after: $recentSearches")
+    }
+
+    override fun searchByTag(tag: Tag): Flow<Result<List<Post>>> {
+        TODO("Not yet implemented")
     }
 }

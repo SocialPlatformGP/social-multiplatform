@@ -23,12 +23,14 @@ import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gp.socialapp.data.post.source.remote.model.Post
+import com.gp.socialapp.data.post.source.remote.model.Tag
 import com.gp.socialapp.presentation.post.postDetails.PostDetailsScreen
 import com.gp.socialapp.presentation.post.searchResult.components.SearchResultHeader
 import com.gp.socialapp.presentation.post.searchResult.components.SearchResultList
 
 data class SearchResultScreen(
-    val searchTerm: String,
+    val searchTerm: String = "",
+    val searchTag: Tag = Tag(),
     val isTag: Boolean = false
 ): Screen{
     @Composable
@@ -38,7 +40,7 @@ data class SearchResultScreen(
         val state by screenModel.uiState.collectAsState()
         val isScreenModelInitialized by remember { mutableStateOf(false) }
         if(!isScreenModelInitialized){
-            screenModel.initScreenModel(searchTerm, isTag)
+            screenModel.initScreenModel(searchTerm,searchTag, isTag)
         }
         SearchResultContent(
             posts = state.posts,
@@ -73,6 +75,7 @@ data class SearchResultScreen(
                     }
                     SearchResultHeader(
                         searchTerm = searchTerm,
+                        searchTag = searchTag,
                         isTag = isTag
                     )
                 }

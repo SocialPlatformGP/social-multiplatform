@@ -49,7 +49,7 @@ object SearchScreen : Screen {
             recentSearches = state.recentSearches,
             onSearchItemClick = {
                 screenModel.addRecentSearchItem(it)
-                navigator.push(SearchResultScreen(it, false))
+                navigator.push(SearchResultScreen(searchTerm = it, isTag = false))
             },
             onDeleteRecentItem = screenModel::deleteRecentSearchItem,
             onSearchQueryChanged = screenModel::onSearchQueryChanged,

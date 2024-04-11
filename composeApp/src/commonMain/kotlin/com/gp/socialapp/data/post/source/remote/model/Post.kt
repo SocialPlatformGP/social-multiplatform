@@ -52,9 +52,9 @@ data class Post(
                 upvoted = upvoted.joinToString(separator = ","),
                 moderationStatus = moderationStatus,
                 editedStatus = if (editedStatus) 1 else 0,
-                tags = tags.map { it.toDbString() }.joinToString(separator = ","),
+                tags = tags.joinToString(separator = ",") { it.toDbString() },
                 type = type,
-                attachments = attachments.map { it.toDbString() }.joinToString(separator = ","),
+                attachments = attachments.joinToString(separator = ",") { it.toDbString() },
                 lastModified = lastModified
             )
         }

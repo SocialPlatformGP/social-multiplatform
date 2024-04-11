@@ -21,7 +21,10 @@ fun TagsFlowRow(
         modifier = Modifier.padding(start = 8.dp)
     ) {
         selectedTags.toList().forEach { tag ->
-            TagItem(onTagClicked, tag)
+            TagItem(
+                onTagClicked = onTagClicked,
+                tag = tag
+            )
         }
     }
 }

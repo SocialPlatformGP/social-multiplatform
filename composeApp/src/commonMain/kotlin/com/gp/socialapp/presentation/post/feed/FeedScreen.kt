@@ -61,6 +61,7 @@ import com.gp.socialapp.presentation.post.feed.components.FeedTopBar
 import com.gp.socialapp.presentation.post.feed.components.FilesBottomSheet
 import com.gp.socialapp.presentation.post.postDetails.PostDetailsScreen
 import com.gp.socialapp.presentation.post.search.SearchScreen
+import com.gp.socialapp.presentation.post.searchResult.SearchResultScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -105,7 +106,7 @@ object FeedScreen : Screen {
                     }
 
                     is PostEvent.OnTagClicked -> {
-                        //todo navigate to search by tag
+                        navigator.push(SearchResultScreen(searchTag = action.tag, isTag = true))
                     }
 
                     is PostEvent.OnAudioClicked -> {
