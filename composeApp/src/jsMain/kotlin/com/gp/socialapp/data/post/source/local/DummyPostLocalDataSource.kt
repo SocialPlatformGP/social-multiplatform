@@ -15,4 +15,5 @@ object DummyLocalSource : PostLocalDataSource {
     override suspend fun deletePostById(id: String) {}
 
     override suspend fun deleteAllPosts() {}
+    override fun searchByTitle(title: String): Flow<List<Post>> = flow{}
 }

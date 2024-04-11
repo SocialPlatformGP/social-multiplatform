@@ -15,7 +15,11 @@ interface PostRepository {
     suspend fun fetchPostById(id: String): Flow<Post>
     suspend fun createPost(post: Post): Flow<Result<String>>
     suspend fun reportPost(postId: String, reporterId: String): Result<Nothing>
-
+    fun searchByTitle(title: String): Flow<Result<List<Post>>>
     fun getAllTags(): Flow<List<Tag>>
     suspend fun insertTag(tag: Tag)
+    suspend fun getRecentSearches(): List<String>
+    suspend fun deleteRecentSearch(search: String)
+    suspend fun addRecentSearch(search: String)
+    fun searchByTag(tag: Tag): Flow<Result<List<Post>>>
 }

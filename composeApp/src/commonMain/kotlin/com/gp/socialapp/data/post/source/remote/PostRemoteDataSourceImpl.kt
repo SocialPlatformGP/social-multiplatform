@@ -162,6 +162,46 @@ class PostRemoteDataSourceImpl : PostRemoteDataSource {
         }
     }
 
+    override fun searchByTitle(title: String): Flow<Result<List<Post>>> = flow {
+        emit(Result.Loading)
+        try {
+            val response = httpClient.get {
+                endPoint("searchByTitle")
+                setBody(title)
+            }
+            println("response: ${response.status}")
+            if (response.status == HttpStatusCode.OK) {
+                val posts = response.body<List<Post>>()
+                println("posts: $posts")
+                emit(Result.SuccessWithData(posts))
+            } else {
+                emit(Result.Error("An error occurred"))
+            }
+        } catch (e: Exception) {
+            emit(Result.Error(e.message ?: "An unknown error occurred"))
+        }
+    }
+
+    override fun searchByTag(tag: String): Flow<Result<List<Post>>> = flow {
+        emit(Result.Loading)
+        try {
+            val response = httpClient.get {
+                endPoint("searchByTag")
+                setBody(tag)
+            }
+            println("response: ${response.status}")
+            if (response.status == HttpStatusCode.OK) {
+                val posts = response.body<List<Post>>()
+                println("posts: $posts")
+                emit(Result.SuccessWithData(posts))
+            } else {
+                emit(Result.Error("An error occurred"))
+            }
+        } catch (e: Exception) {
+            emit(Result.Error(e.message ?: "An unknown error occurred"))
+        }
+    }
+
     override suspend fun updatePost(request: PostRequest.UpdateRequest): Result<Nothing> {
         try {
             val response = httpClient.post {
