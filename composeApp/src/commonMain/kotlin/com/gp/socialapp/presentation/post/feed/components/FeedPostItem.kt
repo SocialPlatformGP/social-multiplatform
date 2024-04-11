@@ -76,7 +76,7 @@ fun FeedPostItem(
                 onCommentClicked = {
                     onPostEvent(PostEvent.OnCommentClicked(post.id))
                 },
-                filesCount = (if(post.attachments.first().type == FilePickerFileType.ImageContentType) 0 else post.attachments.size),
+                filesCount = (if(post.attachments.firstOrNull()?.type == FilePickerFileType.ImageContentType) 0 else post.attachments.size),
                 currentUserID = currentUserID,
                 onShowFilesClicked = { onPostEvent(PostEvent.OnViewFilesAttachmentClicked(post.attachments)) },
                 onShareClicked =  {onPostEvent(PostEvent.OnPostShareClicked(post))}

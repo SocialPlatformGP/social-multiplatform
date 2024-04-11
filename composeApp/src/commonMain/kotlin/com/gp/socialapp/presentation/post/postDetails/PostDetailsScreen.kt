@@ -42,6 +42,7 @@ import com.gp.socialapp.presentation.post.feed.ReplyEvent
 import com.gp.socialapp.presentation.post.feed.components.FeedPostItem
 import com.gp.socialapp.presentation.post.postDetails.components.AddReplySheet
 import com.gp.socialapp.presentation.post.postDetails.components.RepliesList
+import com.gp.socialapp.presentation.post.searchResult.SearchResultScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -84,7 +85,9 @@ data class PostDetailsScreen(val post: Post) : Screen {
                             }
                         }
                     }
-
+                    is PostEvent.OnTagClicked -> {
+                        navigator.push(SearchResultScreen(searchTag = postEvent.tag, isTag = true))
+                    }
                     else -> screenModel.handlePostEvent(postEvent)
                 }
             },
