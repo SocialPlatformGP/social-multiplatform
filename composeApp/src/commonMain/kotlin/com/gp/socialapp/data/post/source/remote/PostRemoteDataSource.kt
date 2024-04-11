@@ -23,4 +23,5 @@ interface PostRemoteDataSource {
     suspend fun insertTag(tag: Tag)
     fun fetchAllPosts(): Flow<Result<List<Post>>>
     fun searchByTitle(title: String): Flow<Result<List<Post>>>
+    fun searchByTag(tag: String): Flow<Result<List<Post>>>
 }

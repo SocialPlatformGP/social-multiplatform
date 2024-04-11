@@ -174,7 +174,25 @@ class PostRepositoryImpl(
         println("recentSearches after: $recentSearches")
     }
 
-    override fun searchByTag(tag: Tag): Flow<Result<List<Post>>> {
-        TODO("Not yet implemented")
+    override fun searchByTag(tag: Tag): Flow<Result<List<Post>>> = flow{
+        emit(Result.Loading)
+        val platform = getPlatform()
+        try {
+            if (tag.label.isEmpty()) {
+                emit(Result.SuccessWithData(emptyList()))
+                return@flow
+            } else if (platform == Platform.JS) {
+                postRemoteSource.searchByTag(tag.label).collect {
+                    emit(it)
+                }
+                return@flow
+            } else {
+                postLocalSource.searchByTag(tag.label).collect {
+                    emit(Result.SuccessWithData(it))
+                }
+            }
+        } catch (e: Exception) {
+            emit(Result.Error(e.message ?: "An error occurred"))
+        }
     }
 }
