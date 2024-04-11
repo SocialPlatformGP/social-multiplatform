@@ -1,0 +1,34 @@
+package com.gp.socialapp.presentation.post.searchResult
+
+import cafe.adriel.voyager.core.model.ScreenModel
+import cafe.adriel.voyager.core.model.screenModelScope
+import com.gp.socialapp.data.post.repository.PostRepository
+import com.gp.socialapp.util.Result
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+
+class SearchResultScreenModel(
+    private val postRepo: PostRepository
+): ScreenModel {
+    private val _uiState = MutableStateFlow(SearchResultUiState())
+    val uiState = _uiState.asStateFlow()
+    fun initScreenModel(searchTerm: String, isTag: Boolean) {
+        screenModelScope.launch {
+            postRepo.searchByTitle(searchTerm).collectLatest {
+                when(it) {
+                    is Result.SuccessWithData -> {
+                        val posts = it.data
+                        _uiState.update { it.copy(posts = posts) }
+                    }
+                    is Result.Error -> {
+                        // Handle error
+                    }
+                    else -> Unit
+                }
+            }
+        }
+    }
+}

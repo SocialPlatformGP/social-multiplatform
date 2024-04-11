@@ -1,9 +1,10 @@
-package com.gp.socialapp.presentation.post.search.components
+package com.gp.socialapp.presentation.post.searchResult.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -34,19 +35,29 @@ import com.seiko.imageloader.ui.AutoSizeBox
 fun ResultItemContent(
     modifier: Modifier = Modifier,
     title: String,
+    body: String,
     attachments: List<PostFile>,
     onImageClicked:(String) -> Unit = {}
 ) {
     Row (
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp)
     ){
-        Text(
-            text = title,
-            style = MaterialTheme.typography.headlineMedium,
-            maxLines = 3,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.padding(8.dp)
-        )
+        Column{
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(vertical = 8.dp)
+            )
+            Text(
+                text = body,
+                style = MaterialTheme.typography.bodyMedium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+            )
+        }
         Spacer(modifier = Modifier.weight(1f))
         if((attachments.firstOrNull()?.type) == FilePickerFileType.ImageContentType){
             val imageURL = BASE_URL+attachments.first().url

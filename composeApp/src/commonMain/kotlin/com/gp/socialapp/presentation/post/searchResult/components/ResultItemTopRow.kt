@@ -1,4 +1,4 @@
-package com.gp.socialapp.presentation.post.search.components
+package com.gp.socialapp.presentation.post.searchResult.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row

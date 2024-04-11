@@ -60,6 +60,7 @@ import com.gp.socialapp.presentation.post.feed.components.FeedPostItem
 import com.gp.socialapp.presentation.post.feed.components.FeedTopBar
 import com.gp.socialapp.presentation.post.feed.components.FilesBottomSheet
 import com.gp.socialapp.presentation.post.postDetails.PostDetailsScreen
+import com.gp.socialapp.presentation.post.search.SearchScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -156,7 +157,7 @@ object FeedScreen : Screen {
             onNavigationAction = { action ->
                 when (action) {
                     is NavigationAction.NavigateToSearch -> {
-                        //todo navigate to search
+                        navigator.push(SearchScreen)
                     }
 
                     is NavigationAction.NavigateToPostDetails -> {

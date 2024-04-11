@@ -1,4 +1,4 @@
-package com.gp.socialapp.presentation.post.search
+package com.gp.socialapp.presentation.post.searchResult
 
 import com.gp.socialapp.data.post.source.remote.model.Post
 

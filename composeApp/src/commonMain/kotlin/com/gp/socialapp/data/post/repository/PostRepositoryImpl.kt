@@ -1,6 +1,5 @@
 package com.gp.socialapp.data.post.repository
 
-import com.apollographql.apollo3.mpp.platform
 import com.gp.socialapp.data.auth.source.local.AuthKeyValueStorage
 import com.gp.socialapp.data.post.source.local.PostLocalDataSource
 import com.gp.socialapp.data.post.source.remote.PostRemoteDataSource
@@ -32,6 +31,11 @@ class PostRepositoryImpl(
         set(value) {
             settings[AppConstants.StorageKeys.POST_LAST_UPDATED.key] = value
         }
+    private var recentSearches: String
+        get() = settings.getString(AppConstants.StorageKeys.RECENT_SEARCHES.key, "")
+        set(value) {
+            settings[AppConstants.StorageKeys.RECENT_SEARCHES.key] = value
+        }
 
     override suspend fun createPost(post: Post): Flow<Result<String>> {
         val request = PostRequest.CreateRequest(post)
@@ -48,10 +52,10 @@ class PostRepositoryImpl(
         emit(Result.Loading)
         val platform = getPlatform()
         try {
-            if(title.isEmpty()) {
+            if (title.isEmpty()) {
                 emit(Result.SuccessWithData(emptyList()))
                 return@flow
-            } else if(platform == Platform.JS) {
+            } else if (platform == Platform.JS) {
                 postRemoteSource.searchByTitle(title).collect {
                     emit(it)
                 }
@@ -152,4 +156,21 @@ class PostRepositoryImpl(
     override fun getAllTags() = postRemoteSource.getAllTags()
 
     override suspend fun insertTag(tag: Tag) = postRemoteSource.insertTag(tag)
+    override suspend fun getRecentSearches(): List<String> {
+        return recentSearches.split("%69%").filter { it.isNotEmpty() }
+    }
+
+    override suspend fun deleteRecentSearch(search: String) {
+        if(recentSearches.contains("%69%$search".toRegex())){
+            recentSearches = recentSearches.replace("%69%$search", "")
+        } else if (recentSearches.contains("$search%69%".toRegex())){
+            recentSearches = recentSearches.replace("$search%69%", "")
+        }
+    }
+
+    override suspend fun addRecentSearch(search: String) {
+        println("recentSearches before: ${recentSearches.isBlank()}, search: $search")
+        recentSearches += "%69%$search"
+        println("recentSearches after: $recentSearches")
+    }
 }

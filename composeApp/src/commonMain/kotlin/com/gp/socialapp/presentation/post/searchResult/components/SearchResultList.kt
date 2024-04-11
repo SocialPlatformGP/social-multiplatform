@@ -1,7 +1,6 @@
-package com.gp.socialapp.presentation.post.search.components
+package com.gp.socialapp.presentation.post.searchResult.components
 
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier

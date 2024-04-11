@@ -18,4 +18,7 @@ interface PostRepository {
     suspend fun searchByTitle(title: String): Flow<Result<List<Post>>>
     fun getAllTags(): Flow<List<Tag>>
     suspend fun insertTag(tag: Tag)
+    suspend fun getRecentSearches(): List<String>
+    suspend fun deleteRecentSearch(search: String)
+    suspend fun addRecentSearch(search: String)
 }

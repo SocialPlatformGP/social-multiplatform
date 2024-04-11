@@ -8,6 +8,8 @@ import com.gp.socialapp.presentation.auth.userinfo.UserInformationScreenModel
 import com.gp.socialapp.presentation.post.create.CreatePostScreenModel
 import com.gp.socialapp.presentation.post.edit.EditPostScreenModel
 import com.gp.socialapp.presentation.post.feed.FeedScreenModel
+import com.gp.socialapp.presentation.post.search.SearchScreenModel
+import com.gp.socialapp.presentation.post.searchResult.SearchResultScreenModel
 import org.kodein.di.DI
 import org.kodein.di.bind
 import org.kodein.di.instance
@@ -23,4 +25,6 @@ val screenModelModuleK = DI.Module("screenModelModule") {
     bind<FeedScreenModel>() with singleton { FeedScreenModel(instance()) }
     bind<EditPostScreenModel>() with singleton { EditPostScreenModel(instance()) }
     bind<PostDetailsScreenModel>() with singleton { PostDetailsScreenModel(instance(), instance()) }
+    bind<SearchResultScreenModel>() with singleton { SearchResultScreenModel(instance()) }
+    bind<SearchScreenModel>() with singleton { SearchScreenModel(instance()) }
 }

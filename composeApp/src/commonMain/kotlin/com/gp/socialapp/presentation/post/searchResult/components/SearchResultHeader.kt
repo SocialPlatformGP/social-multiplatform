@@ -1,4 +1,4 @@
-package com.gp.socialapp.presentation.post.search.components
+package com.gp.socialapp.presentation.post.searchResult.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.MaterialTheme
@@ -15,7 +15,7 @@ fun SearchResultHeader(
     Text(
         text = "Search results for: ${if (isTag) "#$searchTerm" else searchTerm}",
         maxLines = 1,
-        style = MaterialTheme.typography.displayMedium,
+        style = MaterialTheme.typography.titleMedium,
         modifier = modifier.fillMaxWidth()
     )
 }
