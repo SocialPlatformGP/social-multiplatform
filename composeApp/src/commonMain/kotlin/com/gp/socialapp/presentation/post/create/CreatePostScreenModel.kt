@@ -26,7 +26,7 @@ class CreatePostScreenModel(
 
 
     init {
-//        getCurrentUser()
+        getCurrentUser()
         getChannelTags()
     }
 
@@ -113,7 +113,6 @@ class CreatePostScreenModel(
                         is Result.Error -> {
                             println("Error: cant get user data")
                         }
-
                         else -> Unit
                     }
                 }
