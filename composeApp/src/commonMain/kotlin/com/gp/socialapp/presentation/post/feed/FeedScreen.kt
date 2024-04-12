@@ -90,7 +90,7 @@ object FeedScreen : Screen {
         )
         FeedContent(
             state = state,
-            currentUserID = "25",
+            currentUserID = state.currentUserID,
             onPostEvent = { action ->
                 when (action) {
                     is PostEvent.OnAddPost -> {

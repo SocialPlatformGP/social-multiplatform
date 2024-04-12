@@ -113,7 +113,7 @@ data class PostDetailsScreen(val post: Post) : Screen {
                     else -> screenModel.handleReplyEvent(replyEvent)
                 }
             },
-            currentUserID = state.currentUser.id,
+            currentUserID = state.currentUserId,
             clickedReply = clickedReply,
             bottomSheetState = bottomSheetState,
             onDismissAddReplyBottomSheet = {

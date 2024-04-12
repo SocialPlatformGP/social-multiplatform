@@ -2,6 +2,7 @@ package com.gp.socialapp.presentatDefaultn.post.postDetails
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
+import com.gp.socialapp.data.auth.repository.AuthenticationRepository
 import com.gp.socialapp.data.post.repository.PostRepository
 import com.gp.socialapp.data.post.repository.ReplyRepository
 import com.gp.socialapp.data.post.source.remote.model.Post
@@ -11,6 +12,7 @@ import com.gp.socialapp.presentation.post.feed.PostEvent
 import com.gp.socialapp.presentation.post.feed.ReplyEvent
 import com.gp.socialapp.presentation.post.postDetails.PostDetailsActionResult
 import com.gp.socialapp.presentation.post.postDetails.PostDetailsUiState
+import com.gp.socialapp.util.DispatcherIO
 import com.gp.socialapp.util.Result
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,19 +22,21 @@ import kotlinx.coroutines.launch
 
 class PostDetailsScreenModel(
     private val postRepo: PostRepository,
-    private val replyRepo: ReplyRepository
+    private val replyRepo: ReplyRepository,
+    private val authRepo: AuthenticationRepository
 ) : ScreenModel {
     private val _uiState = MutableStateFlow(PostDetailsUiState())
     val uiState = _uiState.asStateFlow()
     fun initScreenModel(post: Post) {
-        screenModelScope.launch {
-            _uiState.update { it.copy(post = post) }
+        screenModelScope.launch (DispatcherIO){
+            val userId = authRepo.getCurrentLocalUserId()
+            _uiState.update { it.copy(post = post, currentUserId = userId) }
             getRepliesById(post.id)
         }
     }
 
     private fun getRepliesById(id: String) {
-        screenModelScope.launch(Dispatchers.Default) {
+        screenModelScope.launch(DispatcherIO) {
             replyRepo.getReplies(id).collect { result ->
                 when (result) {
                     is Result.SuccessWithData -> {
@@ -66,7 +70,7 @@ class PostDetailsScreenModel(
     }
 
     private fun insertReply(reply: Reply) {
-        screenModelScope.launch(Dispatchers.Default) {
+        screenModelScope.launch(DispatcherIO) {
             val result = replyRepo.insertReply(reply)
             when (result) {
                 is Result.Success -> {
@@ -89,8 +93,8 @@ class PostDetailsScreenModel(
     }
 
     private fun reportReply(reply: Reply) {
-        screenModelScope.launch(Dispatchers.Default) {
-            val result = replyRepo.reportReply(reply.id, _uiState.value.currentUser.id)
+        screenModelScope.launch(DispatcherIO) {
+            val result = replyRepo.reportReply(reply.id, _uiState.value.currentUserId)
             when (result) {
                 is Result.Success -> {
                     _uiState.update { it.copy(actionResult = PostDetailsActionResult.ReplyReported) }
@@ -112,14 +116,14 @@ class PostDetailsScreenModel(
     }
 
     private fun updatePost() {
-        screenModelScope.launch(Dispatchers.Default) {
+        screenModelScope.launch(DispatcherIO) {
 //            TODO
         }
     }
 
     private fun upvotePost(post: Post) {
-        screenModelScope.launch(Dispatchers.Default) {
-            val result = postRepo.upvotePost(post)
+        screenModelScope.launch(DispatcherIO) {
+            val result = postRepo.upvotePost(post, _uiState.value.currentUserId)
             when (result) {
                 is Result.Success -> {
                     updatePost()
@@ -141,8 +145,25 @@ class PostDetailsScreenModel(
     }
 
     private fun downvotePost(post: Post) {
-        screenModelScope.launch(Dispatchers.Default) {
-            val result = postRepo.downvotePost(post)
+        screenModelScope.launch(DispatcherIO) {
+            val result = postRepo.downvotePost(post, _uiState.value.currentUserId)
+            when (result) {
+                is Result.Success -> {
+                    updatePost()
+                }
+
+                is Result.Error -> {
+                    _uiState.update {
+                        it.copy(
+                            actionResult = PostDetailsActionResult.NetworkError(
+                                result.message
+                            )
+                        )
+                    }
+                }
+
+                else -> Unit
+            }
             when (result) {
                 is Result.Success -> {
                     updatePost()
@@ -164,7 +185,7 @@ class PostDetailsScreenModel(
     }
 
     private fun deletePost(post: Post) {
-        screenModelScope.launch(Dispatchers.Default) {
+        screenModelScope.launch(DispatcherIO) {
             val result = postRepo.deletePost(post)
             when (result) {
                 is Result.Success -> {
@@ -187,7 +208,7 @@ class PostDetailsScreenModel(
     }
 
     private fun updatePost(post: Post) {
-        screenModelScope.launch(Dispatchers.Default) {
+        screenModelScope.launch(DispatcherIO) {
             val result = postRepo.updatePost(post)
             when (result) {
                 is Result.Success -> {
@@ -211,7 +232,7 @@ class PostDetailsScreenModel(
     }
 
     private fun upvoteReply(reply: Reply) {
-        screenModelScope.launch(Dispatchers.Default) {
+        screenModelScope.launch(DispatcherIO) {
             println("\n\nReply to be upvoted: $reply\n\n")
             val result = replyRepo.upvoteReply(reply.id, "user25")
 //            val result = replyRepo.upvoteReply(reply.id, _uiState.value.currentUser.id)
@@ -238,8 +259,8 @@ class PostDetailsScreenModel(
     }
 
     private fun downvoteReply(reply: Reply) {
-        screenModelScope.launch(Dispatchers.Default) {
-            val result = replyRepo.downvoteReply(reply.id, _uiState.value.currentUser.id)
+        screenModelScope.launch(DispatcherIO) {
+            val result = replyRepo.downvoteReply(reply.id, _uiState.value.currentUserId)
             when (result) {
                 is Result.Success -> {
                     getRepliesById(reply.postId)
@@ -261,7 +282,7 @@ class PostDetailsScreenModel(
     }
 
     private fun deleteReply(reply: Reply) {
-        screenModelScope.launch(Dispatchers.Default) {
+        screenModelScope.launch(DispatcherIO) {
             val result = replyRepo.deleteReply(reply.id)
             when (result) {
                 is Result.Success -> {
@@ -286,7 +307,7 @@ class PostDetailsScreenModel(
     }
 
     private fun updateReply(reply: Reply) {
-        screenModelScope.launch(Dispatchers.Default) {
+        screenModelScope.launch(DispatcherIO) {
             val result = replyRepo.updateReply(reply)
             when (result) {
                 is Result.Success -> {
@@ -326,7 +347,7 @@ class PostDetailsScreenModel(
                     parentReplyId = "-1",
                     depth = 0,
                     content = event.text,
-                    authorID = _uiState.value.currentUser.id,
+                    authorID = _uiState.value.currentUserId,
                 )
                 println("reply in screen model: $reply")
                 insertReply(reply)
@@ -347,7 +368,7 @@ class PostDetailsScreenModel(
                     parentReplyId = event.reply.id,
                     depth = event.reply.depth + 1,
                     content = event.text,
-                    authorID = _uiState.value.currentUser.id,
+                    authorID = _uiState.value.currentUserId,
                 )
                 println("nested reply in screen model: $reply")
                 insertReply(reply)

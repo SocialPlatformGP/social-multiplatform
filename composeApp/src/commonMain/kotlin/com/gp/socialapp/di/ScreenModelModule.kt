@@ -23,7 +23,7 @@ val screenModelModuleK = DI.Module("screenModelModule") {
     bind<PasswordResetScreenModel>() with singleton { PasswordResetScreenModel(instance()) }
     bind<SignUpScreenModel>() with singleton { SignUpScreenModel(instance()) }
     bind<UserInformationScreenModel>() with singleton { UserInformationScreenModel(instance()) }
-    bind<FeedScreenModel>() with singleton { FeedScreenModel(instance()) }
+    bind<FeedScreenModel>() with singleton { FeedScreenModel(instance(), instance()) }
     bind<EditPostScreenModel>() with singleton { EditPostScreenModel(instance()) }
     bind<PostDetailsScreenModel>() with singleton { PostDetailsScreenModel(instance(), instance()) }
     bind<SearchResultScreenModel>() with singleton { SearchResultScreenModel(instance()) }
