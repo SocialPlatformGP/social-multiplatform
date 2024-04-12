@@ -1,5 +1,4 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 allprojects {
     repositories {
@@ -18,6 +17,8 @@ plugins {
     alias(libs.plugins.apollo)
     alias(libs.plugins.undercouch.download)
     alias(libs.plugins.ktlint)
+    id("io.realm.kotlin") version "1.11.0"
+
 }
 //ktlint {
 //    android = true
@@ -91,6 +92,7 @@ kotlin {
             implementation(libs.calf.file.picker)
             implementation(libs.kodein.di.framework.compose)
             implementation(libs.sqlDelight.coroutines)
+
         }
 
         commonTest.dependencies {
@@ -106,6 +108,8 @@ kotlin {
             implementation(libs.ktor.client.websockets)
             implementation(libs.sqlDelight.driver.android)
             implementation(compose.preview)
+            implementation(libs.realm.base)
+            implementation(libs.realm.sync)
         }
 
         jvmMain.dependencies {
@@ -114,6 +118,8 @@ kotlin {
             implementation(libs.kotlinx.coroutines.swing)
             implementation(libs.ktor.client.okhttp)
             implementation(libs.sqlDelight.driver.sqlite)
+            implementation(libs.realm.base)
+            implementation(libs.realm.sync)
         }
 
         jsMain.dependencies {
@@ -156,9 +162,7 @@ android {
         kotlinCompilerExtensionVersion = "1.5.4"
     }
 }
-dependencies {
-    implementation(libs.androidx.media3.exoplayer)
-}
+
 
 compose.desktop {
     application {

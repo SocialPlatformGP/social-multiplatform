@@ -67,6 +67,19 @@ import com.gp.material.presentation.FabItem
 import com.gp.material.presentation.MultiFloatingActionButton
 import org.jetbrains.compose.resources.painterResource
 import socialmultiplatform.composeapp.generated.resources.Res
+import socialmultiplatform.composeapp.generated.resources.add_file
+import socialmultiplatform.composeapp.generated.resources.excel
+import socialmultiplatform.composeapp.generated.resources.file
+import socialmultiplatform.composeapp.generated.resources.folder
+import socialmultiplatform.composeapp.generated.resources.image
+import socialmultiplatform.composeapp.generated.resources.img_3
+import socialmultiplatform.composeapp.generated.resources.pdf
+import socialmultiplatform.composeapp.generated.resources.powerpoint
+import socialmultiplatform.composeapp.generated.resources.sound
+import socialmultiplatform.composeapp.generated.resources.text
+import socialmultiplatform.composeapp.generated.resources.upload
+import socialmultiplatform.composeapp.generated.resources.word
+import socialmultiplatform.composeapp.generated.resources.zip
 
 object MaterialScreen : Screen {
     @Composable
