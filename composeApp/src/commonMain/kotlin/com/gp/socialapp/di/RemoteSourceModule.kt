@@ -8,6 +8,12 @@ import com.gp.socialapp.data.auth.source.remote.AuthenticationRemoteDataSource
 import com.gp.socialapp.data.auth.source.remote.AuthenticationRemoteDataSourceImpl
 import com.gp.socialapp.data.auth.source.remote.UserRemoteDataSource
 import com.gp.socialapp.data.auth.source.remote.model.User
+import com.gp.socialapp.data.chat.source.remote.MessageRemoteDataSource
+import com.gp.socialapp.data.chat.source.remote.MessageRemoteDataSourceImpl
+import com.gp.socialapp.data.chat.source.remote.RecentRoomRemoteDataSource
+import com.gp.socialapp.data.chat.source.remote.RecentRoomRemoteDataSourceImpl
+import com.gp.socialapp.data.chat.source.remote.RoomRemoteDataSource
+import com.gp.socialapp.data.chat.source.remote.RoomRemoteDataSourceImpl
 import com.gp.socialapp.data.post.source.remote.PostRemoteDataSource
 import com.gp.socialapp.data.post.source.remote.PostRemoteDataSourceImpl
 import com.gp.socialapp.data.post.source.remote.ReplyRemoteDataSource
@@ -24,6 +30,9 @@ val remoteDataSourceModuleK = DI.Module("remoteDataSourceModule") {
     bind<PostRemoteDataSource>() with singleton { PostRemoteDataSourceImpl() }
     bind<ReplyRemoteDataSource>() with singleton { ReplyRemoteDataSourceImpl() }
     bind<AuthenticationRemoteDataSource>() with singleton { AuthenticationRemoteDataSourceImpl() }
+    bind<MessageRemoteDataSource>() with singleton { MessageRemoteDataSourceImpl() }
+    bind<RoomRemoteDataSource>() with singleton { RoomRemoteDataSourceImpl() }
+    bind<RecentRoomRemoteDataSource>() with singleton { RecentRoomRemoteDataSourceImpl() }
     bind<UserRemoteDataSource>() with singleton {
         object : UserRemoteDataSource {
             override fun createUser(user: User, pfpURI: Uri): Flow<Result<Nothing>> {
@@ -55,40 +64,4 @@ val remoteDataSourceModuleK = DI.Module("remoteDataSourceModule") {
             }
         }
     }
-
 }
-    single<MaterialRemoteDataSource> {
-        object : MaterialRemoteDataSource {
-            override fun uploadFile(fileLocation: String, file: Uri): Flow<Result<Nothing>> {
-                TODO("Not yet implemented")
-            }
-
-            override fun uploadFolder(fileLocation: String, name: String): Flow<Result<Nothing>> {
-                TODO("Not yet implemented")
-            }
-
-            override fun deleteFile(fileLocation: String): Flow<Result<Nothing>> {
-                TODO("Not yet implemented")
-            }
-
-            override fun deleteFolder(folderPath: String): Flow<Result<Nothing>> {
-                TODO("Not yet implemented")
-            }
-
-            override fun getFileTypeFromName(fileName: String): FileType {
-                TODO("Not yet implemented")
-            }
-
-            override fun uploadMaterialItemToDatabase(materialItem: MaterialItem) {
-                TODO("Not yet implemented")
-            }
-
-            override fun getListOfFiles(path: String): Flow<Result<List<MaterialItem>>> {
-                TODO("Not yet implemented")
-            }
-
-        }}
-    single<AuthenticationRemoteDataSource> {AuthenticationRemoteDataSourceImpl()}
-
-}
-

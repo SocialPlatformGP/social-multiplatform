@@ -1,5 +1,9 @@
 package com.gp.socialapp.di
 
+import com.gp.socialapp.data.chat.source.local.RecentRoomLocalDataSource
+import com.gp.socialapp.data.chat.source.local.RecentRoomLocalDataSourceImpl
+import com.gp.socialapp.data.chat.source.local.RoomLocalDataSource
+import com.gp.socialapp.data.chat.source.local.RoomLocalDataSourceImpl
 import com.gp.socialapp.data.db.provideDbDriver
 import com.gp.socialapp.data.post.source.local.PostLocalDataSource
 import com.gp.socialapp.data.post.source.local.PostLocalDataSourceImpl
@@ -17,4 +21,6 @@ actual val platformModule = DI.Module("platformModule") {
         AppDatabase(provideDbDriver(AppDatabase.Schema))
     }
     bind<PostLocalDataSource>() with singleton { PostLocalDataSourceImpl(instance()) }
+    bind<RoomLocalDataSource>() with singleton { RoomLocalDataSourceImpl() }
+    bind<RecentRoomLocalDataSource>() with singleton { RecentRoomLocalDataSourceImpl() }
 }
