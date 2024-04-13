@@ -37,7 +37,7 @@ val repositoryModuleK = DI.Module("repositoryModule") {
     bind<ReplyRepository>() with singleton { ReplyRepositoryImpl(instance(), instance()) }
     bind<MessageRepository>() with singleton { MessageRepositoryImpl() }
     bind<RecentRoomRepository>() with singleton { RecentRoomRepositoryImpl() }
-    bind<RoomRepository>() with singleton { RoomRepositoryImpl() }
+    bind<RoomRepository>() with singleton { RoomRepositoryImpl(instance()) }
 }
 
 

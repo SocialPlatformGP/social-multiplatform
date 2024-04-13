@@ -36,11 +36,14 @@ object CreateGroupScreen: Screen {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = navigator.rememberNavigatorScreenModel<CreateGroupScreenModel>()
         val state by screenModel.uiState.collectAsState()
+        if(state.isCreated){
+            //TODO: Navigate to the created group
+        }
         CreateGroupScreenContent(
-            onAction =  {/*TODO*/},
+            onAction =  {action -> screenModel.handleUiAction(action)},
             groupName = state.groupName,
             avatarByteArray = state.groupAvatar,
-            isError = false,
+            isError = state.isError,
             selectedUsers = state.selectedUsers,
             allUsers = state.allUsers,
         )
@@ -54,7 +57,7 @@ object CreateGroupScreen: Screen {
         avatarByteArray: ByteArray,
         isError: Boolean,
         selectedUsers: List<User>,
-        allUsers: List<User>,
+        allUsers: List<SelectableUser>,
     ) {
         Scaffold (
             modifier = modifier
@@ -78,7 +81,7 @@ object CreateGroupScreen: Screen {
                         GroupAvatarSection(
                             avatarByteArray = avatarByteArray,
                             isModifiable = true,
-                            onChoosePhotoClicked = { /*TODO*/ },
+                            onImagePicked = {array -> onAction(CreateGroupAction.OnImagePicked(array))},
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         GroupNameSection(
@@ -91,14 +94,20 @@ object CreateGroupScreen: Screen {
                             selectedUsers = selectedUsers,
                             onUnselectUser = { userId -> onAction(CreateGroupAction.OnUnselectUser(userId)) },
                             users = allUsers,
-                            onUserClick = { /*TODO*/ }
+                            onUserClick = { selectableUser -> onAction(
+                                if (selectableUser.isSelected) {
+                                    CreateGroupAction.OnUnselectUser(selectableUser.user.id)
+                                } else {
+                                    CreateGroupAction.OnSelectUser(selectableUser.user.id)
+                                }
+                            )}
                         )
                         Button(
                             onClick = {
-//                                onChangeError(name.isBlank())
-//                                if (!isError) {
-//                                    onCreateGroup()
-//                                }
+                                onAction(CreateGroupAction.OnSetError(groupName.isBlank()))
+                                if (!isError) {
+                                    onAction(CreateGroupAction.OnCreateGroup)
+                                }
                             },
                             shape = RoundedCornerShape(32.dp),
                             modifier = Modifier
@@ -115,7 +124,6 @@ object CreateGroupScreen: Screen {
                                 text = "Create Group",
                                 style = MaterialTheme.typography.titleMedium,
                                 fontSize = 18.sp,
-//                color = MaterialTheme.colorScheme.onPrimary
                             )
                         }
                     }
