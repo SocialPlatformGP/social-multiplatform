@@ -1,5 +1,6 @@
 package com.gp.socialapp.data.chat.source.remote
 
+import com.gp.socialapp.data.chat.source.remote.model.reponse.RoomResponse
 import com.gp.socialapp.data.chat.source.remote.model.request.RoomRequest
 import com.gp.socialapp.data.post.util.endPoint
 import com.gp.socialapp.util.Result
@@ -18,13 +19,13 @@ class RoomRemoteDataSourceImpl(
         emit(Result.Loading)
         try {
             val response = httpClient.post{
-                endPoint("CreateGroupRoom")
+                endPoint("createGroupRoom")
                 setBody(
                     request
                 )
             }
             if(response.status == HttpStatusCode.OK){
-                val roomId = response.body<String>()
+                val roomId = response.body<RoomResponse.CreateGroupRoom>().roomId
                 emit(Result.SuccessWithData(roomId))
             } else {
                 emit(Result.Error("An error occurred: ${response.status.description}"))
