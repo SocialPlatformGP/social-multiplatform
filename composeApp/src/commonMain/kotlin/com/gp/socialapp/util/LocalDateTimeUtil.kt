@@ -1,9 +1,12 @@
 package com.gp.socialapp.util
 
 import kotlinx.datetime.Clock
+import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.daysUntil
+import kotlinx.datetime.minus
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 
@@ -13,4 +16,14 @@ object LocalDateTimeUtil {
     fun LocalDateTime.toDDMMYYYY() = "${this.dayOfMonth} / ${this.monthNumber} / ${this.year}"
     fun LocalDateTime.toMillis() = this.toInstant(TimeZone.UTC).toEpochMilliseconds()
     fun Long.toLocalDateTime() = Instant.fromEpochMilliseconds(this).toLocalDateTime(TimeZone.UTC)
+    fun Long.getDateHeader(): String {
+        val localDateTime = Instant.fromEpochSeconds(this).toLocalDateTime(TimeZone.UTC)
+        val today = LocalDateTime.now().date
+        return when {
+            localDateTime.date == today -> "Today"
+            localDateTime.date == today.minus(1, DateTimeUnit.DAY) -> "Yesterday"
+            localDateTime.date.daysUntil(today) < 7 -> localDateTime.date.dayOfWeek.name
+            else -> localDateTime.toDDMMYYYY()
+        }
+    }
 }
