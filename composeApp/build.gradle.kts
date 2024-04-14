@@ -17,7 +17,7 @@ plugins {
     alias(libs.plugins.apollo)
     alias(libs.plugins.undercouch.download)
     alias(libs.plugins.ktlint)
-    id("io.realm.kotlin") version "1.11.0"
+    id("io.realm.kotlin") version "1.13.0"
 
 }
 //ktlint {
@@ -179,10 +179,10 @@ compose.experimental {
     web.application {}
 }
 
-buildConfig {
-    // BuildConfig configuration here.
-    // https://github.com/gmazzo/gradle-buildconfig-plugin#usage-in-kts
-}
+//buildConfig {
+//    // BuildConfig configuration here.
+//    // https://github.com/gmazzo/gradle-buildconfig-plugin#usage-in-kts
+//}
 
 sqldelight {
     databases {
@@ -193,10 +193,10 @@ sqldelight {
         }
     }
 }
-apollo {
-    service("api") {
-        // GraphQL configuration here.
-        // https://www.apollographql.com/docs/kotlin/advanced/plugin-configuration/
-        packageName.set("com.gp.socialapp.graphql")
-    }
-}
+//apollo {
+//    service("api") {
+//        // GraphQL configuration here.
+//        // https://www.apollographql.com/docs/kotlin/advanced/plugin-configuration/
+//        packageName.set("com.gp.socialapp.graphql")
+//    }
+//}

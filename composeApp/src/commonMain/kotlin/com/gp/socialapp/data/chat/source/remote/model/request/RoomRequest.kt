@@ -3,6 +3,7 @@ package com.gp.socialapp.data.chat.source.remote.model.request
 import com.gp.socialapp.data.chat.model.Room
 
 sealed class RoomRequest {
+    @kotlinx.serialization.Serializable
     data class CreateGroupRoom(
         val groupName: String,
         val groupAvatar: ByteArray,

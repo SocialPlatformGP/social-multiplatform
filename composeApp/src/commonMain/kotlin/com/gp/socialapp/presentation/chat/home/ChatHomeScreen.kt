@@ -16,12 +16,18 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,6 +56,7 @@ object ChatHomeScreen : Screen {
         ) { event ->
             when (event) {
                 is ChatHomeUiEvent.OnRecentChatClick -> {
+                    println("Recent Chat Clicked")
                     navigator.push(
                         ChatRoomScreen(
                             event.recentRoomResponse.roomId, event.recentRoomResponse.isPrivate
@@ -58,14 +65,17 @@ object ChatHomeScreen : Screen {
                 }
 
                 ChatHomeUiEvent.OnCreateGroupClick -> {
+                    println("Create Group Clicked")
                     navigator.push(CreateGroupScreen)
                 }
 
                 ChatHomeUiEvent.OnCreatePrivateChatClick -> {
+                    println("Create Private Chat Clicked")
                     navigator.push(CreatePrivateChatScreen)
                 }
 
                 ChatHomeUiEvent.OnBackClick -> {
+
                     navigator.pop()
                 }
 
@@ -81,7 +91,58 @@ object ChatHomeScreen : Screen {
 fun ChatHomeScreenContent(
     state: ChatHomeUiState, event: (ChatHomeUiEvent) -> Unit
 ) {
-    Scaffold { paddingValues ->
+    Scaffold(floatingActionButton = {
+        var fabState = remember { mutableStateOf(false) }
+        Column(
+            horizontalAlignment = Alignment.End,
+            verticalArrangement = androidx.compose.foundation.layout.Arrangement.Bottom
+        ) {
+            if (!fabState.value) FloatingActionButton(
+                onClick = {
+                    fabState.value = !fabState.value
+                },
+            ) {
+
+                Icon(
+                    imageVector = Icons.Default.Add, contentDescription = "Add"
+                )
+            }
+            else {
+                FloatingActionButton(
+                    onClick = {
+                        fabState.value = !fabState.value
+                        event(ChatHomeUiEvent.OnCreateGroupClick)
+                    }, modifier = Modifier.padding(8.dp)
+                ) {
+                    Text(
+                        text = "Create Group"
+                    )
+                }
+                FloatingActionButton(
+                    onClick = {
+                        fabState.value = !fabState.value
+                        event(ChatHomeUiEvent.OnCreatePrivateChatClick)
+                    }, modifier = Modifier.padding(8.dp)
+                ) {
+                    Text(
+                        text = "Create Private Chat"
+                    )
+                }
+                FloatingActionButton(
+                    onClick = {
+                        fabState.value = !fabState.value
+                    },
+                ) {
+
+                    Icon(
+                        imageVector = Icons.Default.Cancel, contentDescription = "Close"
+                    )
+                }
+            }
+        }
+    }
+
+    ) { paddingValues ->
         Column(
             modifier = Modifier.padding(paddingValues).fillMaxSize()
         ) {
@@ -107,9 +168,7 @@ fun ChatHomeScreenContent(
 
 @Composable
 fun RecentRoomItem(
-    modifier: Modifier = Modifier,
-    recentRoom: RecentRoomResponse,
-    event: (ChatHomeUiEvent) -> Unit
+    modifier: Modifier = Modifier, recentRoom: RecentRoomResponse, event: (ChatHomeUiEvent) -> Unit
 
 ) {
     Row(
@@ -118,7 +177,7 @@ fun RecentRoomItem(
         }, verticalAlignment = Alignment.CenterVertically
     ) {
         AutoSizeImage(
-            "https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg",
+            url = recentRoom.pic_url,
             contentDescription = "room image",
             contentScale = androidx.compose.ui.layout.ContentScale.Crop,
             modifier = Modifier.size(64.dp).padding(4.dp).clip(CircleShape)

@@ -5,9 +5,9 @@ import com.gp.socialapp.data.chat.source.remote.model.request.RoomRequest
 import com.gp.socialapp.util.Result
 import kotlinx.coroutines.flow.Flow
 
-class RoomRepositoryImpl (
+class RoomRepositoryImpl(
     private val remoteDataSource: RoomRemoteDataSource
-): RoomRepository{
+) : RoomRepository {
     override suspend fun createGroupRoom(
         groupName: String,
         groupAvatar: ByteArray,
@@ -17,4 +17,9 @@ class RoomRepositoryImpl (
         val request = RoomRequest.CreateGroupRoom(groupName, groupAvatar, userIds, creatorId)
         return remoteDataSource.createGroupRoom(request)
     }
+
+    override suspend fun checkIfRoomExists(
+        user1: String,
+        user2: String
+    ) = remoteDataSource.checkIfRoomExists(user1, user2)
 }

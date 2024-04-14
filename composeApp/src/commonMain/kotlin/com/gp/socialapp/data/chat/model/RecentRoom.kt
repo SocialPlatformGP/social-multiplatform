@@ -18,9 +18,6 @@ data class RecentRoomResponse(
     val lastMessage: String,
     val isPrivate: Boolean,
     val senderName: String,
-    val receiverName: String,
-    val senderPicUrl: String,
-    val receiverPicUrl: String,
     val pic_url: String, //if the room is a group chat, this will be the group chat image
     val title: String, //if the room is a group chat, this will be the group chat name
     val lastMessageTime: Long,
