@@ -15,4 +15,6 @@ data class Message(
     val id: String = "",
     val senderName: String = "",
     val senderPfpURL: String = "",
+    val hasAttachment: Boolean = false,
+    val attachment: MessageAttachment = MessageAttachment()
 )

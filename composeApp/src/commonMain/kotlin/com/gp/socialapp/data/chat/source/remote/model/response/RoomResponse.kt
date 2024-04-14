@@ -1,4 +1,4 @@
-package com.gp.socialapp.data.chat.source.remote.model.reponse
+package com.gp.socialapp.data.chat.source.remote.model.response
 
 import com.gp.socialapp.data.chat.model.Room
 import kotlinx.serialization.Serializable
