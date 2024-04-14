@@ -6,7 +6,7 @@ import com.gp.socialapp.presentation.auth.passwordreset.PasswordResetScreenModel
 import com.gp.socialapp.presentation.auth.signup.SignUpScreenModel
 import com.gp.socialapp.presentation.auth.userinfo.UserInformationScreenModel
 import com.gp.socialapp.presentation.chat.creategroup.CreateGroupScreenModel
-
+import com.gp.socialapp.presentation.chat.home.ChatHomeScreenModel
 import com.gp.socialapp.presentation.post.create.CreatePostScreenModel
 import com.gp.socialapp.presentation.post.edit.EditPostScreenModel
 import com.gp.socialapp.presentation.post.feed.FeedScreenModel
@@ -26,9 +26,22 @@ val screenModelModuleK = DI.Module("screenModelModule") {
     bind<UserInformationScreenModel>() with singleton { UserInformationScreenModel(instance()) }
     bind<FeedScreenModel>() with singleton { FeedScreenModel(instance(), instance()) }
     bind<EditPostScreenModel>() with singleton { EditPostScreenModel(instance()) }
-    bind<PostDetailsScreenModel>() with singleton { PostDetailsScreenModel(instance(), instance(), instance()) }
+    bind<PostDetailsScreenModel>() with singleton {
+        PostDetailsScreenModel(
+            instance(),
+            instance(),
+            instance()
+        )
+    }
     bind<SearchResultScreenModel>() with singleton { SearchResultScreenModel(instance()) }
     bind<SearchScreenModel>() with singleton { SearchScreenModel(instance()) }
-    bind<CreateGroupScreenModel>() with singleton { CreateGroupScreenModel(instance(), instance(), instance()) }
+    bind<CreateGroupScreenModel>() with singleton {
+        CreateGroupScreenModel(
+            instance(),
+            instance(),
+            instance()
+        )
+    }
+    bind<ChatHomeScreenModel>() with singleton { ChatHomeScreenModel() }
 }
 

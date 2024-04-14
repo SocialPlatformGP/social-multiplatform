@@ -103,29 +103,30 @@ class PostLocalDataSourceImpl(
     }
 
     override fun searchByTitle(title: String): Flow<List<Post>> {
-        return postQueries.searchByTitle(title).asFlow().mapToList(Dispatchers.Default).map { list ->
-            list.map {
-                PostEntity(
-                    replyCount = it.reply_count.toInt(),
-                    authorName = it.author_name,
-                    authorPfp = it.author_pfp,
-                    id = it.id,
-                    authorID = it.author_id,
-                    createdAt = it.created_at,
-                    title = it.title,
-                    body = it.body,
-                    votes = it.votes.toInt(),
-                    downvoted = it.downvotes,
-                    upvoted = it.upvotes,
-                    moderationStatus = it.moderation_status,
-                    editedStatus = it.edited_status.toInt(),
-                    tags = it.tags,
-                    type = it.type,
-                    attachments = it.attachments,
-                    lastModified = it.last_modified
-                ).toPost()
+        return postQueries.searchByTitle(title).asFlow().mapToList(Dispatchers.Default)
+            .map { list ->
+                list.map {
+                    PostEntity(
+                        replyCount = it.reply_count.toInt(),
+                        authorName = it.author_name,
+                        authorPfp = it.author_pfp,
+                        id = it.id,
+                        authorID = it.author_id,
+                        createdAt = it.created_at,
+                        title = it.title,
+                        body = it.body,
+                        votes = it.votes.toInt(),
+                        downvoted = it.downvotes,
+                        upvoted = it.upvotes,
+                        moderationStatus = it.moderation_status,
+                        editedStatus = it.edited_status.toInt(),
+                        tags = it.tags,
+                        type = it.type,
+                        attachments = it.attachments,
+                        lastModified = it.last_modified
+                    ).toPost()
+                }
             }
-        }
     }
 
     override fun searchByTag(tag: String): Flow<List<Post>> {
