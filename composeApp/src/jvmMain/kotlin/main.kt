@@ -6,7 +6,7 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.gp.socialapp.data.post.source.remote.model.Post
-import com.gp.socialapp.data.post.source.remote.model.PostFile
+import com.gp.socialapp.data.post.source.remote.model.PostAttachment
 import com.gp.socialapp.presentation.app.App
 import com.gp.socialapp.theme.AppTheme
 import com.mohamedrejeb.calf.picker.FilePickerFileType
@@ -44,7 +44,7 @@ val post = Post(
     votes = 42,
     replyCount = 3,
     attachments = listOf(
-        PostFile(
+        PostAttachment(
             type = FilePickerFileType.ImageContentType,
         )
     )

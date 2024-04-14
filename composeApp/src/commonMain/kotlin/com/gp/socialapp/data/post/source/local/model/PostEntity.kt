@@ -1,14 +1,12 @@
 package com.gp.socialapp.data.post.source.local.model
 
 import com.gp.socialapp.data.post.source.remote.model.Post
-import com.gp.socialapp.data.post.source.remote.model.PostFile.Companion.toPostFile
+import com.gp.socialapp.data.post.source.remote.model.PostAttachment.Companion.toPostFile
 import com.gp.socialapp.data.post.source.remote.model.Tag.Companion.toTag
 import com.gp.socialapp.util.LocalDateTimeUtil.now
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
-import kotlinx.datetime.toLocalDateTime
 
 data class PostEntity(
     val replyCount: Int = 0,

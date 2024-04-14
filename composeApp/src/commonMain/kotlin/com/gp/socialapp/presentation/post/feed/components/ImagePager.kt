@@ -35,7 +35,7 @@ import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.gp.socialapp.data.post.source.remote.model.PostFile
+import com.gp.socialapp.data.post.source.remote.model.PostAttachment
 import com.gp.socialapp.util.AppConstants.BASE_URL
 import com.seiko.imageloader.model.ImageAction
 import com.seiko.imageloader.rememberImageSuccessPainter
@@ -45,9 +45,9 @@ import com.seiko.imageloader.ui.AutoSizeBox
 @Composable
 fun ImagePager(
     pageCount: Int,
-    images: List<PostFile> = emptyList(),
+    images: List<PostAttachment> = emptyList(),
     width: Dp,
-    onImageClicked: (PostFile) -> Unit
+    onImageClicked: (PostAttachment) -> Unit
 ) {
     Box(
         modifier = Modifier.size(height = 300.dp, width = width)

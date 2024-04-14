@@ -34,8 +34,6 @@ fun MessageImageAttachment(
     ) {
         AutoSizeBox(
             url = imageURL,
-            modifier = Modifier
-                .clickable { onImageClicked() },
         ) { action ->
             when (action) {
                 is ImageAction.Success -> {
@@ -49,7 +47,6 @@ fun MessageImageAttachment(
                         modifier = modifier
                             .fillMaxWidth()
                             .heightIn(max = maxHeight)
-//                            .clickable { onImageClicked() },
                     )
                 }
 

@@ -5,14 +5,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.gp.socialapp.data.post.source.remote.model.PostFile
+import com.gp.socialapp.data.post.source.remote.model.PostAttachment
 import com.gp.socialapp.presentation.post.feed.PostEvent
 
 @Composable
 fun PostContent(
     title: String,
     body: String,
-    attachments: List<PostFile>,
+    attachments: List<PostAttachment>,
     moderationStatus: String,
     onPostEvent: (PostEvent) -> Unit
 ) {

@@ -29,16 +29,19 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.gp.socialapp.data.chat.model.Message
+import com.gp.socialapp.data.chat.model.MessageAttachment
+import com.gp.socialapp.util.LocalDateTimeUtil.toHHMMTimestamp
+import com.mohamedrejeb.calf.picker.FilePickerFileType
 
 @Composable
 fun MessageItem(
     modifier: Modifier = Modifier,
     message: Message,
-    onFileClicked: (String, String, String) -> Unit,
+    onFileClicked: (MessageAttachment) -> Unit,
     onImageClicked: (String) -> Unit,
     onUserClicked: (String) -> Unit,
-    dropDownItems: List<String>,
-    onDropDownItemClicked: (String, String, String) -> Unit,
+    dropDownItems: List<DropDownItem>,
+    onDropDownItemClicked: (DropDownItem, String, String) -> Unit,
     isPrivateChat: Boolean,
     isSameSender: Boolean,
     isCurrentUser: Boolean,
@@ -46,12 +49,7 @@ fun MessageItem(
     maxScreenHeightDP: Dp,
 ) {
     val topPadding = if (isSameSender) 2.dp else 12.dp
-//    val extendedFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss z")
-//    val shortFormat = DateTimeFormatter.ofPattern("HH:mm")
-//    val dateTime = LocalDateTime.parse(message.timestamp, extendedFormat)
-//    val timestamp = shortFormat.format(dateTime)
-    val dateTime = ""//TODO
-    val timestamp = "" //TODO
+    val timestamp = message.createdAt.toHHMMTimestamp()
     val horizontalArrangement = if (isCurrentUser) Arrangement.End else Arrangement.Start
     val backgroundColor = if (isCurrentUser) MaterialTheme.colorScheme.primary
     else MaterialTheme.colorScheme.surfaceVariant
@@ -92,59 +90,57 @@ fun MessageItem(
                 itemHeight = with(density) { it.height.toDp() }
             }) {
                 if (!isCurrentUser && !isSameSender && !isPrivateChat) {
-                    MessageUserName(
-                        name = message.senderName,
+                    MessageUserName(name = message.senderName,
                         onUserClick = { onUserClicked(message.senderId) })
                 }
-//                if (message.fileType.contains("image") && message.message.isBlank()) {
-//                    val imageURL = message.fileURI.toString()
-//                    ImageMessageWithTimestamp(
-//                        imageURL = imageURL,
-//                        onImageClicked = { onImageClicked(imageURL) },
-//                        maxHeight = maxScreenHeightDP * 0.4f,
-//                        timestamp = timestamp
-//                    )
-//                } else {
-//                    if (message.fileURI.toString().isNotBlank()) {
-//                        MessageAttachment(
-//                            fileURI = message.fileURI,
-//                            fileType = message.fileType,
-//                            fileName = message.fileNames,
-//                            onFileClicked = {
-//                                onFileClicked(
-//                                    message.fileURI.toString(),
-//                                    message.fileType,
-//                                    message.fileNames
-//                                )
-//                            },
-//                            onImageClicked = { onImageClicked(message.fileURI.toString()) },
-//                            maxHeight = maxScreenHeightDP * 0.4f
-//                        )
-//                    }
-                MessageTextWithTimestamp(
-                    content = message.content, timestamp = timestamp
-                )
-            }
-            DropdownMenu(
-                expanded = isDropDownMenuVisible, onDismissRequest = {
-                    isDropDownMenuVisible = false
-                }, offset = pressOffset.copy(
-                    y = pressOffset.y - itemHeight
-                )
-            ) {
-                dropDownItems.forEach { item ->
-                    DropdownMenuItem(text = {
-                        Text(text = item)
-                    }, onClick = {
-                        isDropDownMenuVisible = false
-                        onDropDownItemClicked(item, message.id, message.content)
-                    })
+                if (message.content.isBlank() && message.attachment.type == FilePickerFileType.ImageContentType) {
+                    val imageURL = message.attachment.url
+                    ImageMessageWithTimestamp(
+                        imageURL = imageURL,
+                        onImageClicked = { onImageClicked(imageURL) },
+                        maxHeight = maxScreenHeightDP * 0.4f,
+                        timestamp = timestamp
+                    )
+                } else {
+                    if (message.hasAttachment) {
+                        MessageAttachment(
+                            fileUrl = message.attachment.url,
+                            fileType = message.attachment.type,
+                            fileName = message.attachment.name,
+                            onFileClicked = {
+                                onFileClicked(
+                                    message.attachment
+                                )
+                            },
+                            onImageClicked = { onImageClicked(message.attachment.url) },
+                            maxHeight = maxScreenHeightDP * 0.4f
+                        )
+                    }
+                    MessageTextWithTimestamp(
+                        content = message.content, timestamp = timestamp
+                    )
                 }
+                DropdownMenu(
+                    expanded = isDropDownMenuVisible, onDismissRequest = {
+                        isDropDownMenuVisible = false
+                    }, offset = pressOffset.copy(
+                        y = pressOffset.y - itemHeight
+                    )
+                ) {
+                    dropDownItems.forEach { item ->
+                        DropdownMenuItem(text = {
+                            Text(text = item.value)
+                        }, onClick = {
+                            isDropDownMenuVisible = false
+                            onDropDownItemClicked(item, message.id, message.content)
+                        })
+                    }
 
+                }
             }
         }
-    }
-    if (isCurrentUser) {
-        Spacer(modifier = Modifier.width(8.dp))
+        if (isCurrentUser) {
+            Spacer(modifier = Modifier.width(8.dp))
+        }
     }
 }

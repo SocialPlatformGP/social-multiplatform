@@ -13,10 +13,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.gp.socialapp.presentation.chat.chatroom.components.imagevectors.FileTypeIcons
+import com.gp.socialapp.presentation.chat.chatroom.components.imagevectors.filetypeicons.Audio
+import com.gp.socialapp.presentation.chat.chatroom.components.imagevectors.filetypeicons.Excel
+import com.gp.socialapp.presentation.chat.chatroom.components.imagevectors.filetypeicons.File
+import com.gp.socialapp.presentation.chat.chatroom.components.imagevectors.filetypeicons.Pdf
+import com.gp.socialapp.presentation.chat.chatroom.components.imagevectors.filetypeicons.Ppt
+import com.gp.socialapp.presentation.chat.chatroom.components.imagevectors.filetypeicons.Text
+import com.gp.socialapp.presentation.chat.chatroom.components.imagevectors.filetypeicons.Video
+import com.gp.socialapp.presentation.chat.chatroom.components.imagevectors.filetypeicons.Word
+import com.mohamedrejeb.calf.picker.FilePickerFileType
 
 @Composable
 fun MessageFileAttachment(
@@ -31,9 +41,10 @@ fun MessageFileAttachment(
         shape = RoundedCornerShape(20.dp, 20.dp, 20.dp, 20.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically,
-            modifier = modifier.clickable { onFileClicked() }.padding(8.dp)) {
+            modifier = modifier.clickable { onFileClicked() }.padding(8.dp)
+        ) {
             Icon(
-                painter = getFilePainterResource(fileType),
+                imageVector = getFileImageVector(fileType),
                 contentDescription = null,
                 tint = Color.Unspecified,
                 modifier = Modifier.size(32.dp)
@@ -50,18 +61,15 @@ fun MessageFileAttachment(
 }
 
 @Composable
-fun getFilePainterResource(fileType: String): Painter {
-    TODO("Not yet implemented")
-//    painterResource(
-//        id = when {
-//            fileType.contains("application/pdf") -> R.drawable.ic_pdf
-//            fileType.contains("audio") -> R.drawable.ic_audio
-//            fileType.contains("video") -> R.drawable.ic_video
-//            fileType.contains("text") -> R.drawable.ic_text
-//            fileType.contains("wordprocessingml") || fileType.contains("msword") -> R.drawable.ic_word
-//            fileType.contains("powerpoint") || fileType.contains("presentation") -> R.drawable.ic_ppt
-//            fileType.contains("excel") || fileType.contains("spreadsheet") -> R.drawable.ic_excel
-//            else -> R.drawable.ic_file
-//        }
-//    )
+fun getFileImageVector(fileType: String): ImageVector {
+    return when (fileType) {
+        FilePickerFileType.PdfContentType -> FileTypeIcons.Pdf
+        FilePickerFileType.AudioContentType -> FileTypeIcons.Audio
+        FilePickerFileType.VideoContentType -> FileTypeIcons.Video
+        FilePickerFileType.TextContentType -> FileTypeIcons.Text
+        FilePickerFileType.WordDocumentContentType -> FileTypeIcons.Word
+        FilePickerFileType.PowerPointPresentationContentType -> FileTypeIcons.Ppt
+        FilePickerFileType.ExcelSpreadsheetContentType -> FileTypeIcons.Excel
+        else -> FileTypeIcons.File
+    }
 }

@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.gp.socialapp.data.post.source.remote.model.Post
-import com.gp.socialapp.data.post.source.remote.model.PostFile
+import com.gp.socialapp.data.post.source.remote.model.PostAttachment
 import com.gp.socialapp.presentation.app.App
 import com.gp.socialapp.presentation.post.searchResult.components.SearchResultItem
 import com.gp.socialapp.theme.AppTheme
@@ -69,7 +69,7 @@ val post = Post(
     votes = 42,
     replyCount = 3,
     attachments = listOf(
-        PostFile(
+        PostAttachment(
             type = FilePickerFileType.ImageContentType,
         )
     )

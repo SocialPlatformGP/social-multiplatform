@@ -15,6 +15,10 @@ object LocalDateTimeUtil {
     fun LocalDateTime.toYYYYMMDD() = "${this.year} / ${this.monthNumber} / ${this.dayOfMonth}"
     fun LocalDateTime.toDDMMYYYY() = "${this.dayOfMonth} / ${this.monthNumber} / ${this.year}"
     fun LocalDateTime.toMillis() = this.toInstant(TimeZone.UTC).toEpochMilliseconds()
+    fun Long.toHHMMTimestamp(): String {
+        val localDateTime = Instant.fromEpochMilliseconds(this).toLocalDateTime(TimeZone.UTC)
+        return "${localDateTime.hour}:${localDateTime.minute}"
+    }
     fun Long.toLocalDateTime() = Instant.fromEpochMilliseconds(this).toLocalDateTime(TimeZone.UTC)
     fun Long.getDateHeader(): String {
         val localDateTime = Instant.fromEpochSeconds(this).toLocalDateTime(TimeZone.UTC)

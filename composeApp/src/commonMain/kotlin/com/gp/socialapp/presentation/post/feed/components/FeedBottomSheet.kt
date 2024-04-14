@@ -36,14 +36,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.unit.dp
 import com.gp.socialapp.data.post.source.remote.model.MimeType
-import com.gp.socialapp.data.post.source.remote.model.PostFile
+import com.gp.socialapp.data.post.source.remote.model.PostAttachment
 import com.gp.socialapp.presentation.post.feed.PostEvent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilesBottomSheet(
     modifier: Modifier = Modifier,
-    attachments: List<PostFile>,
+    attachments: List<PostAttachment>,
     onDismiss: () -> Unit,
     state: SheetState,
     onPostEvent: (PostEvent) -> Unit = { },

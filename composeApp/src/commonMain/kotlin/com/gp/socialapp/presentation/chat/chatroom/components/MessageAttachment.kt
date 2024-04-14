@@ -7,12 +7,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.eygraber.uri.Uri
+import com.mohamedrejeb.calf.picker.FilePickerFileType
 
 @Composable
 fun MessageAttachment(
     modifier: Modifier = Modifier,
-    fileURI: Uri,
+    fileUrl: String,
     fileType: String,
     fileName: String,
     maxHeight: Dp,
@@ -22,10 +22,10 @@ fun MessageAttachment(
     Surface(
         shape = RoundedCornerShape(20.dp), color = Color.Transparent
     ) {
-        when {
-            fileType.contains("image") -> {
+        when (fileType) {
+            FilePickerFileType.ImageContentType -> {
                 MessageImageAttachment(
-                    imageURL = fileURI.toString(),
+                    imageURL = fileUrl,
                     onImageClicked = { onImageClicked() },
                     maxHeight = maxHeight,
                     modifier = modifier,

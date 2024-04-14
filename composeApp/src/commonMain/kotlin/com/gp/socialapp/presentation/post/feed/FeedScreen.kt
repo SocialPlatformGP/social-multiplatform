@@ -54,7 +54,7 @@ import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gp.socialapp.data.post.source.remote.model.Post
-import com.gp.socialapp.data.post.source.remote.model.PostFile
+import com.gp.socialapp.data.post.source.remote.model.PostAttachment
 import com.gp.socialapp.presentation.post.create.CreatePostScreen
 import com.gp.socialapp.presentation.post.feed.components.FeedPostItem
 import com.gp.socialapp.presentation.post.feed.components.FeedTopBar
@@ -76,7 +76,7 @@ object FeedScreen : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = navigator.rememberNavigatorScreenModel<FeedScreenModel>()
-        var currentAttachments by remember { mutableStateOf(emptyList<PostFile>()) }
+        var currentAttachments by remember { mutableStateOf(emptyList<PostAttachment>()) }
         val scope = rememberCoroutineScope()
         val state by screenModel.state.collectAsState()
         var isFileBottomSheetOpen by remember { mutableStateOf(false) }
@@ -193,7 +193,7 @@ object FeedScreen : Screen {
         currentUserID: String,
         state: FeedUiState,
         scope: CoroutineScope = rememberCoroutineScope(),
-        currentAttachments: List<PostFile>,
+        currentAttachments: List<PostAttachment>,
         isFileBottomSheetOpen: Boolean,
         tabItems: List<TabItem>,
         onChangeOpenedTab: (Int) -> Unit = { },

@@ -22,7 +22,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.gp.socialapp.data.post.source.remote.model.PostFile
+import com.gp.socialapp.data.post.source.remote.model.PostAttachment
 import com.gp.socialapp.data.post.source.remote.model.Tag
 import com.gp.socialapp.presentation.post.create.component.BottomOptionRow
 import com.gp.socialapp.presentation.post.create.component.CreatePostTopBar
@@ -84,7 +84,7 @@ data class CreatePostScreen(val openedFeedTab: FeedTab) : Screen {
         onAddTags: (Set<Tag>) -> Unit,
         onRemoveTags: (Set<Tag>) -> Unit,
         confirmNewTags: (Set<Tag>) -> Unit,
-        onAddImage: (PostFile) -> Unit
+        onAddImage: (PostAttachment) -> Unit
     ) {
         var openBottomSheet by rememberSaveable { mutableStateOf(false) }
         val skipPartiallyExpanded by remember { mutableStateOf(false) }
@@ -106,7 +106,7 @@ data class CreatePostScreen(val openedFeedTab: FeedTab) : Screen {
                     files.firstOrNull()?.let { file ->
                         val image = file.readByteArray(context)
                         onAddImage(
-                            PostFile(
+                            PostAttachment(
                                 file = image,
                                 name = file.getName(context) ?: "",
                                 type = FilePickerFileType.ImageContentType,
