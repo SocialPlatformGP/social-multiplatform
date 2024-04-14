@@ -1,7 +1,7 @@
 package com.gp.socialapp.data.chat.source.remote
 
-import com.gp.socialapp.data.chat.source.remote.model.reponse.RoomResponse
 import com.gp.socialapp.data.chat.source.remote.model.request.RoomRequest
+import com.gp.socialapp.data.chat.source.remote.model.response.RoomResponse
 import com.gp.socialapp.data.chat.utils.EndPoint
 import com.gp.socialapp.data.post.util.endPoint
 import com.gp.socialapp.util.Result
@@ -9,9 +9,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
-import io.ktor.client.request.url
 import io.ktor.http.HttpStatusCode
-import io.ktor.http.contentType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
@@ -23,7 +21,7 @@ class RoomRemoteDataSourceImpl(
             emit(Result.Loading)
             try {
                 val response = httpClient.post {
-                    endPoint("createGroupRoom")
+                    endPoint(EndPoint.CreateGroupRoom.url)
                     setBody(
                         request
                     )
@@ -46,8 +44,7 @@ class RoomRemoteDataSourceImpl(
         emit(Result.Loading)
         try {
             val response = httpClient.post {
-                url(EndPoint.CheckIfRoomExists.url)
-                contentType(io.ktor.http.ContentType.Application.Json)
+                endPoint(EndPoint.CheckIfRoomExists.url)
                 setBody(
                     RoomRequest.RoomExistRequest(user1, user2)
                 )
