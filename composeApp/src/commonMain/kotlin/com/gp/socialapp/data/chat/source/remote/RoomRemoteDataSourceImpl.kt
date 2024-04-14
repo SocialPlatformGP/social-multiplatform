@@ -1,6 +1,6 @@
 package com.gp.socialapp.data.chat.source.remote
 
-import com.gp.socialapp.data.chat.source.remote.model.reponse.RoomResponse
+import com.gp.socialapp.data.chat.source.remote.model.response.RoomResponse
 import com.gp.socialapp.data.chat.source.remote.model.request.RoomRequest
 import com.gp.socialapp.data.chat.utils.EndPoint
 import com.gp.socialapp.data.post.util.endPoint
