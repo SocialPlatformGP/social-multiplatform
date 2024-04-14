@@ -16,6 +16,8 @@ import com.gp.socialapp.data.post.source.remote.ReplyRemoteDataSource
 import com.gp.socialapp.data.post.source.remote.ReplyRemoteDataSourceImpl
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.websocket.WebSockets
+import io.ktor.serialization.kotlinx.KotlinxWebsocketSerializationConverter
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import org.kodein.di.DI
@@ -41,6 +43,9 @@ val remoteDataSourceModuleK = DI.Module("remoteDataSourceModule") {
                     isLenient = true
                     encodeDefaults = true
                 })
+            }
+            install(WebSockets) {
+                contentConverter = KotlinxWebsocketSerializationConverter(Json)
             }
         }
     }
