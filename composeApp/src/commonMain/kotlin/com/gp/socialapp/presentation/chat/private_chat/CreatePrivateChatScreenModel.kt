@@ -63,4 +63,12 @@ class CreatePrivateChatScreenModel(
             }
         }
     }
+
+    fun clear() {
+        state.update {
+            it.copy(
+                room = null
+            )
+        }
+    }
 }

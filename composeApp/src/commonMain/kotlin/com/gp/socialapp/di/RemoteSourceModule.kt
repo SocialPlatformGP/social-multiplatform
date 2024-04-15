@@ -10,6 +10,8 @@ import com.gp.socialapp.data.chat.source.remote.RecentRoomRemoteDataSource
 import com.gp.socialapp.data.chat.source.remote.RecentRoomRemoteDataSourceImpl
 import com.gp.socialapp.data.chat.source.remote.RoomRemoteDataSource
 import com.gp.socialapp.data.chat.source.remote.RoomRemoteDataSourceImpl
+import com.gp.socialapp.data.chat.source.remote.SocketService
+import com.gp.socialapp.data.chat.source.remote.SocketServiceImpl
 import com.gp.socialapp.data.post.source.remote.PostRemoteDataSource
 import com.gp.socialapp.data.post.source.remote.PostRemoteDataSourceImpl
 import com.gp.socialapp.data.post.source.remote.ReplyRemoteDataSource
@@ -34,6 +36,7 @@ val remoteDataSourceModuleK = DI.Module("remoteDataSourceModule") {
     bind<RoomRemoteDataSource>() with singleton { RoomRemoteDataSourceImpl(instance()) }
     bind<RecentRoomRemoteDataSource>() with singleton { RecentRoomRemoteDataSourceImpl(instance()) }
     bind<UserRemoteDataSource>() with singleton { UserRemoteDataSourceImpl(instance()) }
+    bind<SocketService>() with singleton { SocketServiceImpl(instance()) }
     bind<HttpClient>() with singleton {
         HttpClient {
             install(ContentNegotiation) {

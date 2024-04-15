@@ -5,5 +5,7 @@ import com.gp.socialapp.util.Result
 import kotlinx.coroutines.flow.Flow
 
 interface RecentRoomRemoteDataSource {
-    suspend fun getAllRecentRooms(userId: String): Flow<Result<List<RecentRoomResponse>>>
+    fun getAllRecentRooms(userId: String): Flow<Result<List<RecentRoomResponse>>>
+
+
 }

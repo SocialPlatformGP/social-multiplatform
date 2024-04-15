@@ -11,4 +11,7 @@ import org.kodein.di.singleton
 val localSourceModuleK = DI.Module("localSourceModule") {
     bind<Settings>() with singleton { Settings() }
     bind<AuthKeyValueStorage>() with singleton { AuthKeyValueStorageImpl(instance()) }
+
+
 }
+

@@ -15,7 +15,8 @@ import kotlinx.coroutines.flow.flow
 class RecentRoomRemoteDataSourceImpl(
     private val client: HttpClient
 ) : RecentRoomRemoteDataSource {
-    override suspend fun getAllRecentRooms(userId: String) = flow {
+    override fun getAllRecentRooms(userId: String) = flow {
+        println("rrrrrrrrrrrrrrrruserId: $userId")
         emit(Result.Loading)
         try {
             val response = client.post {

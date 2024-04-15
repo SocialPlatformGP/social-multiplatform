@@ -45,6 +45,8 @@ object CreatePrivateChatScreen : Screen {
                     roomTitle = it.name
                 )
             )
+            screenModel.clear()
+
         }
 
         CreatePrivateChatContent(state) { user ->
