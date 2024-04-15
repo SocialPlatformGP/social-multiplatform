@@ -30,7 +30,7 @@ val remoteDataSourceModuleK = DI.Module("remoteDataSourceModule") {
     bind<PostRemoteDataSource>() with singleton { PostRemoteDataSourceImpl() }
     bind<ReplyRemoteDataSource>() with singleton { ReplyRemoteDataSourceImpl() }
     bind<AuthenticationRemoteDataSource>() with singleton { AuthenticationRemoteDataSourceImpl() }
-    bind<MessageRemoteDataSource>() with singleton { MessageRemoteDataSourceImpl() }
+    bind<MessageRemoteDataSource>() with singleton { MessageRemoteDataSourceImpl(instance()) }
     bind<RoomRemoteDataSource>() with singleton { RoomRemoteDataSourceImpl(instance()) }
     bind<RecentRoomRemoteDataSource>() with singleton { RecentRoomRemoteDataSourceImpl(instance()) }
     bind<UserRemoteDataSource>() with singleton { UserRemoteDataSourceImpl(instance()) }

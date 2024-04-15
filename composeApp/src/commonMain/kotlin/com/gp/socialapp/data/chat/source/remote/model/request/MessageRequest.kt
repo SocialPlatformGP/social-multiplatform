@@ -19,4 +19,16 @@ sealed class MessageRequest {
         val hasAttachment: Boolean = false,
         val attachment: MessageAttachment = MessageAttachment()
     ) : MessageRequest()
+
+    @Serializable
+    data class UpdateMessage(
+        val messageId: String,
+        val roomId: String,
+        val updatedContent: String
+    )
+    @Serializable
+    data class DeleteMessage(
+        val messageId: String,
+        val roomId: String
+    )
 }
