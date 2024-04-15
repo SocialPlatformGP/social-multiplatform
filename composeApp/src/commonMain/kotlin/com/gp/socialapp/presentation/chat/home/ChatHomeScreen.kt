@@ -56,12 +56,18 @@ object ChatHomeScreen : Screen {
         ) { event ->
             when (event) {
                 is ChatHomeUiEvent.OnRecentChatClick -> {
-                    println("Recent Chat Clicked")
-                    navigator.push(
-                        ChatRoomScreen(
-                            event.recentRoomResponse.roomId, event.recentRoomResponse.isPrivate
+                    event.recentRoomResponse.apply {
+                        navigator.push(
+                            ChatRoomScreen(
+                                roomId,
+                                pic_url,
+                                title,
+                                isPrivate
+                            )
                         )
-                    )
+                    }
+                    println("Recent Chat Clicked")
+
                 }
 
                 ChatHomeUiEvent.OnCreateGroupClick -> {

@@ -4,7 +4,6 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.gp.socialapp.data.auth.repository.AuthenticationRepository
 import com.gp.socialapp.data.chat.repository.RecentRoomRepository
-import com.gp.socialapp.util.Result
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
@@ -19,27 +18,18 @@ class ChatHomeScreenModel(
         getRecentRooms()
     }
 
-
     fun getRecentRooms() {
         val currentUserId = authenticationRepository.getCurrentLocalUserId()
         println("\n Current User Id: $currentUserId \n")
         screenModelScope.launch {
             recentRoomRepository.getAllRecentRooms(currentUserId)
-                .collect {
-                    when (it) {
-                        is Result.SuccessWithData -> {
-                            state.value = ChatHomeUiState(recentRooms = it.data)
-                        }
-
-                        is Result.Error -> {
-                            println("\n Error: ${it.message} \n")
-                        }
-
-                        else -> Unit
+                .collect { result ->
+                    result.onSuccessWithData { data ->
+                        state.value = ChatHomeUiState(recentRooms = data)
+                    }.onFailure {
+                        println("Error: $it")
                     }
                 }
         }
     }
-
-
 }

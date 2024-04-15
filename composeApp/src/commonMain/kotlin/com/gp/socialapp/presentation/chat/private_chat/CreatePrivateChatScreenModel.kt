@@ -6,7 +6,6 @@ import com.gp.socialapp.data.auth.repository.AuthenticationRepository
 import com.gp.socialapp.data.auth.repository.UserRepository
 import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.data.chat.repository.RoomRepository
-import com.gp.socialapp.util.Result
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -34,21 +33,16 @@ class CreatePrivateChatScreenModel(
         }
     }
 
-    fun getUsers() {
+    private fun getUsers() {
         screenModelScope.launch {
             userRepository.fetchUsers().collect { result ->
-                when (result) {
-                    is Result.SuccessWithData -> {
-                        state.update {
-                            it.copy(users = result.data)
-                        }
-                    }
 
-                    is Result.Error -> {
-                        println("Error: ${result.message}")
+                result.onSuccessWithData { data ->
+                    state.update {
+                        it.copy(users = data)
                     }
-
-                    else -> Unit
+                }.onFailure {
+                    println("Error: $it")
                 }
             }
         }
@@ -56,22 +50,15 @@ class CreatePrivateChatScreenModel(
 
     fun onUserSelected(user: User) {
         screenModelScope.launch {
-            roomRepository.checkIfRoomExists(state.value.currentUser, user.id).collect {
-                when (it) {
-                    is Result.SuccessWithData -> {
-                        println("*********Room Exists: ${it.data}")
-                        state.update { oldState ->
-                            oldState.copy(
-                                room = it.data
-                            )
-                        }
+            roomRepository.checkIfRoomExists(state.value.currentUser, user.id).collect { result ->
+                result.onSuccessWithData { data ->
+                    state.update { oldState ->
+                        oldState.copy(
+                            room = data
+                        )
                     }
-
-                    is Result.Error -> {
-                        println("*********Error: ${it.message}")
-                    }
-
-                    else -> Unit
+                }.onFailure {
+                    println("Error: $it")
                 }
             }
         }

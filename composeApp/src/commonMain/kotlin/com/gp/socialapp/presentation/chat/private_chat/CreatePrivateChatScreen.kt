@@ -40,7 +40,9 @@ object CreatePrivateChatScreen : Screen {
             navigator.push(
                 ChatRoomScreen(
                     roomId = it.id,
-                    isPrivate = true
+                    isPrivate = true,
+                    roomAvatarUrl = it.picUrl,
+                    roomTitle = it.name
                 )
             )
         }

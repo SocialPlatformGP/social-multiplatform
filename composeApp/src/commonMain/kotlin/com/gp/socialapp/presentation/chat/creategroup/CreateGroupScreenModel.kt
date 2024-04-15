@@ -4,10 +4,10 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.gp.socialapp.data.auth.repository.AuthenticationRepository
 import com.gp.socialapp.data.auth.repository.UserRepository
+import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.data.chat.repository.RoomRepository
 import com.gp.socialapp.presentation.chat.creategroup.SelectableUser.Companion.toSelectableUser
 import com.gp.socialapp.util.DispatcherIO
-import com.gp.socialapp.util.Result
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -33,27 +33,23 @@ class CreateGroupScreenModel(
     private fun getAllUsers() {
         screenModelScope.launch(DispatcherIO) {
             userRepo.fetchUsers().collect { result ->
-                when (result) {
-                    is Result.SuccessWithData -> {
-                        _uiState.update {
-                            it.copy(
-                                allUsers = result.data
-                                    .map { user ->
-                                        user.toSelectableUser()
-                                    }.filter {
-                                        it.user.id != currentUserId
-                                    }
-                            )
-                        }
-                    }
-                    is Result.Error -> {
-                        _uiState.update {
-                            it.copy(isError = true)
-                        }
-                    }
-                    else -> Unit
+                result.onSuccessWithData { data ->
+                    updateUsersListState(data)
+                }.onFailure {
+                    updateError(true)
+                    println("Error: $it")
                 }
             }
+        }
+    }
+
+    private fun updateUsersListState(users: List<User>) {
+        _uiState.update { state ->
+            state.copy(allUsers = users.map { user ->
+                user.toSelectableUser()
+            }.filter {
+                it.user.id != currentUserId
+            })
         }
     }
 
@@ -107,25 +103,20 @@ class CreateGroupScreenModel(
 
     private fun createGroup() {
         screenModelScope.launch(DispatcherIO) {
-            with(uiState.value){
+            with(uiState.value) {
                 roomRepo.createGroupRoom(
                     groupName = groupName,
                     groupAvatar = groupAvatar,
                     userIds = selectedUsers.map { it.id },
                     creatorId = currentUserId
-                ).collect{ result ->
-                    when (result) {
-                        is Result.SuccessWithData -> {
-                            _uiState.update {
-                                it.copy(isCreated = true, groupId = result.data)
-                            }
+                ).collect { result ->
+                    result.onSuccessWithData { data ->
+                        _uiState.update {
+                            it.copy(isCreated = true, groupId = data)
                         }
-                        is Result.Error -> {
-                            _uiState.update {
-                                it.copy(isError = true)
-                            }
-                        }
-                        else -> Unit
+                    }.onFailure {
+                        updateError(true)
+                        println("Error: $it")
                     }
                 }
             }
