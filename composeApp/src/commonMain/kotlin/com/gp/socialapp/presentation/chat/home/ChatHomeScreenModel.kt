@@ -35,11 +35,10 @@ class ChatHomeScreenModel(
         screenModelScope.launch(DispatcherIO) {
             recentRoomRepository.connectToSocket(
                 "6616abe8ac5070037ba8b0d3"
-            ).collect { result ->
-                result.onSuccess {
-                    getMessages()
-                }
+            ).onSuccess {
+                getMessages()
             }
+
         }
     }
 

@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface RecentRoomRepository {
     fun getAllRecentRooms(userId: String): Flow<Result<List<RecentRoomResponse>>>
-    fun connectToSocket(userId: String): Flow<Result<Nothing>>
+    suspend fun connectToSocket(userId: String): Result<Nothing>
     fun getMessages(userId: String): Flow<SocketMessage>
 
 }
