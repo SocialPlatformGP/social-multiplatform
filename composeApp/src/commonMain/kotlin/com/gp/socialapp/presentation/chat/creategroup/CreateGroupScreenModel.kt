@@ -25,21 +25,28 @@ class CreateGroupScreenModel(
 
     init {
         screenModelScope.launch(DispatcherIO) {
-            currentUserId = authRepo.getCurrentLocalUserId()
+//            currentUserId = authRepo.getCurrentLocalUserId()
+            currentUserId = "test-user-id"
             getAllUsers()
         }
     }
 
     private fun getAllUsers() {
         screenModelScope.launch(DispatcherIO) {
-            userRepo.fetchUsers().collect { result ->
-                result.onSuccessWithData { data ->
-                    updateUsersListState(data)
-                }.onFailure {
-                    updateError(true)
-                    println("Error: $it")
-                }
-            }
+//            userRepo.fetchUsers().collect { result ->
+//                result.onSuccessWithData { data ->
+//                    updateUsersListState(data)
+//                }.onFailure {
+//                    updateError(true)
+//                    println("Error: $it")
+//                }
+//            }
+            val users = listOf(
+                User("test-user-id", "test-user-name", "test-user-email", "test-user-avatar"),
+                User("test-user-id-2", "test-user-name-2", "test-user-email-2", "test-user-avatar-2"),
+                User("test-user-id-3", "test-user-name-3", "test-user-email-3", "test-user-avatar-3"),
+            )
+            updateUsersListState(users)
         }
     }
 
@@ -71,7 +78,7 @@ class CreateGroupScreenModel(
             val updatedMembers = _uiState.value.selectedUsers.toMutableList()
             updatedMembers.add(user)
             val updatedUsers = _uiState.value.allUsers.map {
-                if (it.user.email == user.email) {
+                if (it.user.id == userId) {
                     it.copy(isSelected = true)
                 } else {
                     it
@@ -80,6 +87,8 @@ class CreateGroupScreenModel(
             _uiState.update {
                 it.copy(allUsers = updatedUsers, selectedUsers = updatedMembers)
             }
+            println("Selected Users: ${_uiState.value.selectedUsers}")
+            println("All Users: ${_uiState.value.allUsers}")
         }
     }
 
@@ -90,7 +99,7 @@ class CreateGroupScreenModel(
             updatedMembers.remove(user)
             val updatedUsers = _uiState.value.allUsers.map {
                 if (it.user.id == user.id) {
-                    it.copy(isSelected = true)
+                    it.copy(isSelected = false)
                 } else {
                     it
                 }
@@ -98,6 +107,8 @@ class CreateGroupScreenModel(
             _uiState.update {
                 it.copy(allUsers = updatedUsers, selectedUsers = updatedMembers)
             }
+            println("Selected Users: ${_uiState.value.selectedUsers}")
+            println("All Users: ${_uiState.value.allUsers}")
         }
     }
 
@@ -115,7 +126,6 @@ class CreateGroupScreenModel(
                             it.copy(isCreated = true, groupId = data)
                         }
                     }.onFailure {
-                        updateError(true)
                         println("Error: $it")
                     }
                 }
