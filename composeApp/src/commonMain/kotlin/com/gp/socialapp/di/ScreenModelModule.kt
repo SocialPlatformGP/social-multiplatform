@@ -5,6 +5,7 @@ import com.gp.socialapp.presentation.auth.login.LoginScreenModel
 import com.gp.socialapp.presentation.auth.passwordreset.PasswordResetScreenModel
 import com.gp.socialapp.presentation.auth.signup.SignUpScreenModel
 import com.gp.socialapp.presentation.auth.userinfo.UserInformationScreenModel
+import com.gp.socialapp.presentation.chat.chatroom.ChatRoomScreenModel
 import com.gp.socialapp.presentation.chat.creategroup.CreateGroupScreenModel
 import com.gp.socialapp.presentation.chat.home.ChatHomeScreenModel
 import com.gp.socialapp.presentation.chat.private_chat.CreatePrivateChatScreenModel
@@ -46,6 +47,13 @@ val screenModelModuleK = DI.Module("screenModelModule") {
     bind<ChatHomeScreenModel>() with singleton { ChatHomeScreenModel(instance(), instance()) }
     bind<CreatePrivateChatScreenModel>() with singleton {
         CreatePrivateChatScreenModel(
+            instance(),
+            instance(),
+            instance()
+        )
+    }
+    bind<ChatRoomScreenModel>() with singleton {
+        ChatRoomScreenModel(
             instance(),
             instance(),
             instance()

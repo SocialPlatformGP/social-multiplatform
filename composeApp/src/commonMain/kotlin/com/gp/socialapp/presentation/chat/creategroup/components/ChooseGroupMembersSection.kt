@@ -44,7 +44,7 @@ fun ChooseGroupMembersSection(
                     isSelected = user.isSelected,
                     isSelectable = true,
                     onUserClick = {
-                        onUserClick(user.copy(isSelected = !user.isSelected))
+                        onUserClick(user)
                     })
             }
         }

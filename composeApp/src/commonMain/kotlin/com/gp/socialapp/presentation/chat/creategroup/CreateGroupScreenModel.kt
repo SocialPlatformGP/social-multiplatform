@@ -36,7 +36,7 @@ class CreateGroupScreenModel(
                 result.onSuccessWithData { data ->
                     updateUsersListState(data)
                 }.onFailure {
-                    updateError(true)
+//                    updateError(true)
                     println("Error: $it")
                 }
             }
@@ -71,7 +71,7 @@ class CreateGroupScreenModel(
             val updatedMembers = _uiState.value.selectedUsers.toMutableList()
             updatedMembers.add(user)
             val updatedUsers = _uiState.value.allUsers.map {
-                if (it.user.email == user.email) {
+                if (it.user.id == userId) {
                     it.copy(isSelected = true)
                 } else {
                     it
@@ -80,6 +80,8 @@ class CreateGroupScreenModel(
             _uiState.update {
                 it.copy(allUsers = updatedUsers, selectedUsers = updatedMembers)
             }
+            println("Selected Users: ${_uiState.value.selectedUsers}")
+            println("All Users: ${_uiState.value.allUsers}")
         }
     }
 
@@ -90,7 +92,7 @@ class CreateGroupScreenModel(
             updatedMembers.remove(user)
             val updatedUsers = _uiState.value.allUsers.map {
                 if (it.user.id == user.id) {
-                    it.copy(isSelected = true)
+                    it.copy(isSelected = false)
                 } else {
                     it
                 }
@@ -98,6 +100,8 @@ class CreateGroupScreenModel(
             _uiState.update {
                 it.copy(allUsers = updatedUsers, selectedUsers = updatedMembers)
             }
+            println("Selected Users: ${_uiState.value.selectedUsers}")
+            println("All Users: ${_uiState.value.allUsers}")
         }
     }
 
@@ -115,7 +119,6 @@ class CreateGroupScreenModel(
                             it.copy(isCreated = true, groupId = data)
                         }
                     }.onFailure {
-                        updateError(true)
                         println("Error: $it")
                     }
                 }

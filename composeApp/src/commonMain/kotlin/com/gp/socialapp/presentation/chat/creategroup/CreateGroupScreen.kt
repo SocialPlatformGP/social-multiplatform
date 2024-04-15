@@ -30,17 +30,17 @@ import com.gp.socialapp.presentation.chat.creategroup.components.ChooseGroupMemb
 import com.gp.socialapp.presentation.chat.creategroup.components.GroupAvatarSection
 import com.gp.socialapp.presentation.chat.creategroup.components.GroupNameSection
 
-object CreateGroupScreen: Screen {
+object CreateGroupScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = navigator.rememberNavigatorScreenModel<CreateGroupScreenModel>()
         val state by screenModel.uiState.collectAsState()
-        if(state.isCreated){
-            //TODO: Navigate to the created group
+        if (state.isCreated) {
+            println("Group Created: ${state.groupId}")
         }
         CreateGroupScreenContent(
-            onAction =  {action -> screenModel.handleUiAction(action)},
+            onAction = { action -> screenModel.handleUiAction(action) },
             groupName = state.groupName,
             avatarByteArray = state.groupAvatar,
             isError = state.isError,
@@ -59,61 +59,63 @@ object CreateGroupScreen: Screen {
         selectedUsers: List<User>,
         allUsers: List<SelectableUser>,
     ) {
-        Scaffold (
+        Scaffold(
             modifier = modifier
-        ){
-            Surface (
+        ) {
+            Surface(
                 color = MaterialTheme.colorScheme.inverseOnSurface,
                 modifier = Modifier.fillMaxSize().padding(it)
             ) {
-                Column (
+                Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.SpaceBetween,
-                    modifier = modifier
-                        .fillMaxSize()
-                        .padding(8.dp)
+                    modifier = modifier.fillMaxSize().padding(8.dp)
                 ) {
-                    Column (
+                    Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = modifier
-                            .fillMaxWidth()
+                        modifier = modifier.fillMaxWidth()
                     ) {
                         GroupAvatarSection(
                             avatarByteArray = avatarByteArray,
                             isModifiable = true,
-                            onImagePicked = {array -> onAction(CreateGroupAction.OnImagePicked(array))},
+                            onImagePicked = { array ->
+                                onAction(
+                                    CreateGroupAction.OnImagePicked(array)
+                                )
+                            },
                         )
                         Spacer(modifier = Modifier.height(4.dp))
-                        GroupNameSection(
-                            name =groupName,
+                        GroupNameSection(name = groupName,
                             onUpdateName = { name -> onAction(CreateGroupAction.OnUpdateName(name)) },
                             isError = isError,
-                            onChangeError = { value -> onAction(CreateGroupAction.OnSetError(value)) }
-                        )
+                            onChangeError = { value -> onAction(CreateGroupAction.OnSetError(value)) })
                         ChooseGroupMembersSection(
                             selectedUsers = selectedUsers,
-                            onUnselectUser = { userId -> onAction(CreateGroupAction.OnUnselectUser(userId)) },
+                            onUnselectUser = { userId ->
+                                onAction(
+                                    CreateGroupAction.OnUnselectUser(userId)
+                                )
+                            },
                             users = allUsers,
-                            onUserClick = { selectableUser -> onAction(
-                                if (selectableUser.isSelected) {
-                                    CreateGroupAction.OnUnselectUser(selectableUser.user.id)
-                                } else {
-                                    CreateGroupAction.OnSelectUser(selectableUser.user.id)
-                                }
-                            )}
-                        )
+                            onUserClick = { selectableUser ->
+                                println("User Clicked: ${selectableUser.user.email}")
+                                onAction(
+                                    if (selectableUser.isSelected) {
+                                        CreateGroupAction.OnUnselectUser(selectableUser.user.id)
+                                    } else {
+                                        CreateGroupAction.OnSelectUser(selectableUser.user.id)
+                                    }
+                                )
+                            })
                         Button(
                             onClick = {
                                 onAction(CreateGroupAction.OnSetError(groupName.isBlank()))
-                                if (!isError) {
+                                if (groupName.isNotBlank()) {
                                     onAction(CreateGroupAction.OnCreateGroup)
                                 }
                             },
                             shape = RoundedCornerShape(32.dp),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp)
-                                .height(54.dp),
+                            modifier = Modifier.fillMaxWidth().padding(8.dp).height(54.dp),
 
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
