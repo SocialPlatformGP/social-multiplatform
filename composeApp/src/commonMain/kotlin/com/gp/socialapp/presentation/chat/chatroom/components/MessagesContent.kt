@@ -31,7 +31,7 @@ fun MessagesContent(
         reverseLayout = true,
         state = scrollState,
     ) {
-        items(reversedMessages.size, key = { index -> reversedMessages[index].id }) { index ->
+        items(reversedMessages.size) { index ->
             val previousMessage = reversedMessages.getOrNull(index + 1)
             val message = reversedMessages[index]
             val isSameSender = previousMessage?.senderId.equals(message.senderId)

@@ -3,6 +3,7 @@ package com.gp.socialapp.presentation.chat.chatroom
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.gp.socialapp.data.auth.repository.AuthenticationRepository
+import com.gp.socialapp.data.chat.model.Message
 import com.gp.socialapp.data.chat.model.MessageAttachment
 import com.gp.socialapp.data.chat.repository.MessageRepository
 import com.gp.socialapp.data.chat.repository.RoomRepository
@@ -24,11 +25,14 @@ class ChatRoomScreenModel(
     private var isPrivate by Delegates.notNull<Boolean>()
     private lateinit var roomId: String
     fun initScreen(roomId: String, isPrivate: Boolean) {
-        screenModelScope.launch(DispatcherIO) {
             this@ChatRoomScreenModel.isPrivate = isPrivate
             this@ChatRoomScreenModel.roomId = roomId
-            val userId = authRepo.getCurrentLocalUserId()
-            _uiState.update { it.copy(currentUserId = userId) }
+            getCurrentUserId()
+            getMessages()
+    }
+
+    private fun getMessages() {
+        screenModelScope.launch(DispatcherIO) {
             messageRepo.fetchChatMessages(roomId).collect { result ->
                 when (result) {
                     is Result.SuccessWithData -> {
@@ -46,6 +50,14 @@ class ChatRoomScreenModel(
                     else -> Unit
                 }
             }
+        }
+    }
+
+    private fun getCurrentUserId() {
+        screenModelScope.launch (DispatcherIO) {
+//            val userId = authRepo.getCurrentLocalUserId()
+//            _uiState.update { it.copy(currentUserId = userId) }
+            _uiState.update { it.copy(currentUserId = "1") }
         }
     }
 
