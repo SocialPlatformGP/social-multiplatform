@@ -28,7 +28,7 @@ fun RowScope.MessageUserAvatar(
             placeHolderImageVector = Icons.Filled.AccountCircle,
             modifier = Modifier.align(Alignment.Top).padding(horizontal = 8.dp)
         )
-    } else if (!isCurrentUser && imageURL.isNotBlank() && !isPrivateChat) {
+    } else if (!isCurrentUser && isSameSender && !isPrivateChat) {
         Spacer(modifier = Modifier.width(48.dp))
     } else if (isPrivateChat && !isCurrentUser) {
         Spacer(modifier = Modifier.width(8.dp))
