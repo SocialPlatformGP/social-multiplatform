@@ -25,28 +25,21 @@ class CreateGroupScreenModel(
 
     init {
         screenModelScope.launch(DispatcherIO) {
-//            currentUserId = authRepo.getCurrentLocalUserId()
-            currentUserId = "test-user-id"
+            currentUserId = authRepo.getCurrentLocalUserId()
             getAllUsers()
         }
     }
 
     private fun getAllUsers() {
         screenModelScope.launch(DispatcherIO) {
-//            userRepo.fetchUsers().collect { result ->
-//                result.onSuccessWithData { data ->
-//                    updateUsersListState(data)
-//                }.onFailure {
+            userRepo.fetchUsers().collect { result ->
+                result.onSuccessWithData { data ->
+                    updateUsersListState(data)
+                }.onFailure {
 //                    updateError(true)
-//                    println("Error: $it")
-//                }
-//            }
-            val users = listOf(
-                User("test-user-id", "test-user-name", "test-user-email", "test-user-avatar"),
-                User("test-user-id-2", "test-user-name-2", "test-user-email-2", "test-user-avatar-2"),
-                User("test-user-id-3", "test-user-name-3", "test-user-email-3", "test-user-avatar-3"),
-            )
-            updateUsersListState(users)
+                    println("Error: $it")
+                }
+            }
         }
     }
 
