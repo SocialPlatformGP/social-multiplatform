@@ -7,7 +7,8 @@ data class CreateGroupUiState(
     val isCreated: Boolean = false,
     val isError: Boolean = false,
     val groupId: String = "",
-    val groupAvatar: ByteArray = byteArrayOf(),
+    val groupAvatarByteArray: ByteArray = byteArrayOf(),
+    val groupAvatarUrl: String = "",
     val allUsers: List<SelectableUser> = emptyList(),
     val selectedUsers: List<User> = emptyList(),
 )

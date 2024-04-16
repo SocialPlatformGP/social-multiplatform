@@ -58,7 +58,7 @@ class CreateGroupScreenModel(
     }
 
     private fun updateAvatar(byteArray: ByteArray) {
-        _uiState.value = _uiState.value.copy(groupAvatar = byteArray)
+        _uiState.value = _uiState.value.copy(groupAvatarByteArray = byteArray)
     }
 
     private fun updateError(value: Boolean) {
@@ -80,8 +80,6 @@ class CreateGroupScreenModel(
             _uiState.update {
                 it.copy(allUsers = updatedUsers, selectedUsers = updatedMembers)
             }
-            println("Selected Users: ${_uiState.value.selectedUsers}")
-            println("All Users: ${_uiState.value.allUsers}")
         }
     }
 
@@ -110,13 +108,13 @@ class CreateGroupScreenModel(
             with(uiState.value) {
                 roomRepo.createGroupRoom(
                     groupName = groupName,
-                    groupAvatar = groupAvatar,
+                    groupAvatar = groupAvatarByteArray,
                     userIds = selectedUsers.map { it.id },
                     creatorId = currentUserId
                 ).collect { result ->
-                    result.onSuccessWithData { data ->
+                    result.onSuccessWithData { room ->
                         _uiState.update {
-                            it.copy(isCreated = true, groupId = data)
+                            it.copy(isCreated = true, groupId = room.id, groupAvatarUrl = room.picUrl)
                         }
                     }.onFailure {
                         println("Error: $it")
@@ -135,5 +133,9 @@ class CreateGroupScreenModel(
             is CreateGroupAction.OnImagePicked -> updateAvatar(action.array)
             is CreateGroupAction.OnSelectUser -> addMember(action.userId)
         }
+    }
+
+    fun resetState() {
+        _uiState.value = CreateGroupUiState()
     }
 }

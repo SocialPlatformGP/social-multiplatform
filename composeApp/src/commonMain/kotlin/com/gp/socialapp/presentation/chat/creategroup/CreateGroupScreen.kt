@@ -26,6 +26,7 @@ import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gp.socialapp.data.auth.source.remote.model.User
+import com.gp.socialapp.presentation.chat.chatroom.ChatRoomScreen
 import com.gp.socialapp.presentation.chat.creategroup.components.ChooseGroupMembersSection
 import com.gp.socialapp.presentation.chat.creategroup.components.GroupAvatarSection
 import com.gp.socialapp.presentation.chat.creategroup.components.GroupNameSection
@@ -37,12 +38,20 @@ object CreateGroupScreen : Screen {
         val screenModel = navigator.rememberNavigatorScreenModel<CreateGroupScreenModel>()
         val state by screenModel.uiState.collectAsState()
         if (state.isCreated) {
-            println("Group Created: ${state.groupId}")
+            navigator.replace(
+                ChatRoomScreen(
+                    roomId = state.groupId,
+                    roomTitle = state.groupName,
+                    roomAvatarUrl = state.groupAvatarUrl,
+                    isPrivate = false
+                )
+            )
+            screenModel.resetState()
         }
         CreateGroupScreenContent(
             onAction = { action -> screenModel.handleUiAction(action) },
             groupName = state.groupName,
-            avatarByteArray = state.groupAvatar,
+            avatarByteArray = state.groupAvatarByteArray,
             isError = state.isError,
             selectedUsers = state.selectedUsers,
             allUsers = state.allUsers,
