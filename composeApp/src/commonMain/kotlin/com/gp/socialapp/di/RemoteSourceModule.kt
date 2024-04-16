@@ -26,13 +26,19 @@ import org.kodein.di.DI
 import org.kodein.di.bind
 import org.kodein.di.instance
 import org.kodein.di.singleton
+import kotlin.time.Duration.Companion.seconds
 
 
 val remoteDataSourceModuleK = DI.Module("remoteDataSourceModule") {
     bind<PostRemoteDataSource>() with singleton { PostRemoteDataSourceImpl() }
     bind<ReplyRemoteDataSource>() with singleton { ReplyRemoteDataSourceImpl() }
     bind<AuthenticationRemoteDataSource>() with singleton { AuthenticationRemoteDataSourceImpl() }
-    bind<MessageRemoteDataSource>() with singleton { MessageRemoteDataSourceImpl(instance()) }
+    bind<MessageRemoteDataSource>() with singleton {
+        MessageRemoteDataSourceImpl(
+            instance(),
+            instance()
+        )
+    }
     bind<RoomRemoteDataSource>() with singleton { RoomRemoteDataSourceImpl(instance()) }
     bind<RecentRoomRemoteDataSource>() with singleton { RecentRoomRemoteDataSourceImpl(instance()) }
     bind<UserRemoteDataSource>() with singleton { UserRemoteDataSourceImpl(instance()) }
@@ -48,8 +54,10 @@ val remoteDataSourceModuleK = DI.Module("remoteDataSourceModule") {
                 })
             }
             install(WebSockets) {
+                pingInterval = 30.seconds.inWholeMilliseconds
                 contentConverter = KotlinxWebsocketSerializationConverter(Json)
             }
         }
     }
 }
+

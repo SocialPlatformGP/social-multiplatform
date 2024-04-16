@@ -13,41 +13,33 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 class MessageRemoteDataSourceImpl(
-    private val httpClient: HttpClient
-): MessageRemoteDataSource {
-    override fun fetchChatMessages(request: MessageRequest.FetchMessages): Flow<Result<List<Message>>> = flow {
-        emit(Result.Loading)
-        try{
-            val response = httpClient.post {
-                endPoint("fetchChatMessages")
-                setBody(request)
-            }
-            if (response.status == HttpStatusCode.OK) {
-                val messages = response.body<List<Message>>()
-                emit(Result.SuccessWithData(messages))
-            } else {
-                emit(Result.Error("An error occurred: ${response.status.description}"))
-            }
-        } catch (e: Exception) {
-            emit(Result.Error("An error occurred: ${e.message}"))
-        }
-    }
+    private val httpClient: HttpClient,
+    private val socketService: SocketService
+) : MessageRemoteDataSource {
+    override suspend fun connectToSocket(userId: String, roomId: String) =
+        socketService.connectToSocket(userId, roomId)
 
-    override suspend fun sendMessage(request: MessageRequest.SendMessage): Result<Nothing> {
-        return try {
-            val response = httpClient.post {
-                endPoint("sendMessage")
-                setBody(request)
+    override fun fetchChatMessages(request: MessageRequest.FetchMessages): Flow<Result<List<Message>>> =
+        flow {
+            emit(Result.Loading)
+            try {
+                val response = httpClient.post {
+                    endPoint("fetchChatMessages")
+                    setBody(request)
+                }
+                if (response.status == HttpStatusCode.OK) {
+                    val messages = response.body<List<Message>>()
+                    emit(Result.SuccessWithData(messages))
+                } else {
+                    emit(Result.Error("An error occurred: ${response.status.description}"))
+                }
+            } catch (e: Exception) {
+                emit(Result.Error("An error occurred: ${e.message}"))
             }
-            if (response.status == HttpStatusCode.OK) {
-                Result.Success
-            } else {
-                Result.Error("An error occurred: ${response.status.description}")
-            }
-        } catch (e: Exception) {
-            Result.Error("An error occurred: ${e.message}")
         }
-    }
+
+    override suspend fun sendMessage(request: MessageRequest.SendMessage) =
+        socketService.sendMessage(request)
 
     override suspend fun updateMessage(request: MessageRequest.UpdateMessage): Result<Nothing> {
         return try {
@@ -64,6 +56,9 @@ class MessageRemoteDataSourceImpl(
             Result.Error("An error occurred: ${e.message}")
         }
     }
+
+    override fun observeMessages(): Flow<Result<Message>> =
+        socketService.observeMessages()
 
     override suspend fun deleteMessage(request: MessageRequest.DeleteMessage): Result<Nothing> {
         return try {

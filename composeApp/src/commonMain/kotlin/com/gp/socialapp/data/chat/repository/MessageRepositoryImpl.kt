@@ -11,11 +11,17 @@ import kotlinx.coroutines.flow.Flow
 class MessageRepositoryImpl(
     private val messageRemoteDataSource: MessageRemoteDataSource,
     private val messageLocalDataSource: MessageLocalDataSource
-) : MessageRepository{
+) : MessageRepository {
+    override suspend fun connectToSocket(userId: String, roomId: String): Result<Nothing> =
+        messageRemoteDataSource.connectToSocket(userId, roomId)
+
     override fun fetchChatMessages(chatId: String): Flow<Result<List<Message>>> {
         val request = MessageRequest.FetchMessages(chatId)
         return messageRemoteDataSource.fetchChatMessages(request)
     }
+
+    override fun observeMessages(): Flow<Result<Message>> =
+        messageRemoteDataSource.observeMessages()
 
     override suspend fun sendMessage(
         messageContent: String,

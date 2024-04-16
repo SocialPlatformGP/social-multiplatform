@@ -6,9 +6,24 @@ import com.gp.socialapp.util.Result
 import kotlinx.coroutines.flow.Flow
 
 interface MessageRepository {
+    suspend fun connectToSocket(userId: String, roomId: String): Result<Nothing>
+
     fun fetchChatMessages(chatId: String): Flow<Result<List<Message>>>
-    suspend fun sendMessage(messageContent: String, roomId: String, senderId: String, attachment: MessageAttachment): Result<Nothing>
-    suspend fun updateMessage(messageId: String, roomId: String, updatedContent: String): Result<Nothing>
+
+    fun observeMessages(): Flow<Result<Message>>
+    suspend fun sendMessage(
+        messageContent: String,
+        roomId: String,
+        senderId: String,
+        attachment: MessageAttachment
+    ): Result<Nothing>
+
+    suspend fun updateMessage(
+        messageId: String,
+        roomId: String,
+        updatedContent: String
+    ): Result<Nothing>
+
     suspend fun deleteMessage(messageId: String, chatId: String): Result<Nothing>
 //    fun fetchGroupChatMessages(groupId: String): Flow<List<Message>>
 //    fun createGroupChat(name: String, avatarLink: String, members: List<String>, currentUserEmail: String): Flow<Result<String>>
