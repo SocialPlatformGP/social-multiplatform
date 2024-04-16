@@ -27,4 +27,27 @@ sealed class RoomRequest {
         val receiverId: String,
     ) : RoomRequest()
 
+    data class GetRoomDetails (
+        val roomId: String
+    ) : RoomRequest()
+
+    data class UpdateRoomAvatar (
+        val roomId: String,
+        val byteArray: ByteArray
+    ) : RoomRequest()
+
+    data class UpdateRoomName(
+        val roomId: String,
+        val name: String
+    ) : RoomRequest()
+
+    data class AddMembers(
+        val roomId: String,
+        val userIds: List<String>)
+
+    data class RemoveMember (
+        val roomId: String,
+        val userId: String
+    )
+
 }

@@ -1,5 +1,6 @@
 package com.gp.socialapp.data.chat.source.remote
 
+import com.gp.socialapp.data.chat.model.Room
 import com.gp.socialapp.data.chat.source.remote.model.request.RoomRequest
 import com.gp.socialapp.data.chat.source.remote.model.response.RoomResponse
 import com.gp.socialapp.data.chat.utils.EndPoint
@@ -18,7 +19,7 @@ class RoomRemoteDataSourceImpl(
 ) : RoomRemoteDataSource {
 
 
-    override suspend fun createGroupRoom(request: RoomRequest.CreateGroupRoom): Flow<Result<String>> =
+    override suspend fun createGroupRoom(request: RoomRequest.CreateGroupRoom): Flow<Result<Room>> =
         flow {
             emit(Result.Loading)
             try {
@@ -29,8 +30,12 @@ class RoomRemoteDataSourceImpl(
                     )
                 }
                 if (response.status == HttpStatusCode.OK) {
-                    val roomId = response.body<RoomResponse.CreateGroupRoom>().roomId
-                    emit(Result.SuccessWithData(roomId))
+                    val body = response.body<RoomResponse.CreateGroupRoom>()
+                    val room = Room(
+                        id = body.roomId,
+                        picUrl = body.roomAvatarUrl
+                    )
+                    emit(Result.SuccessWithData(room))
                 } else {
                     emit(Result.Error("An error occurred: ${response.status.description}"))
                 }
@@ -61,6 +66,88 @@ class RoomRemoteDataSourceImpl(
             }
         } catch (e: Exception) {
             emit(Result.Error("An error occurred: ${e.message}"))
+        }
+    }
+
+    override suspend fun getRoomDetails(request: RoomRequest.GetRoomDetails): Result<Room> {
+        return try {
+            val response = httpClient.post {
+                endPoint("getRoomDetails")
+                setBody(request)
+            }
+            if(response.status == HttpStatusCode.OK) {
+                val room = response.body<RoomResponse.GetRoomDetails>().room
+                Result.SuccessWithData(room)
+            } else {
+                Result.Error("An error occurred: ${response.status.description}")
+            }
+        } catch (e: Exception) {
+            Result.Error("An error occurred: ${e.message}")
+        }
+    }
+
+    override suspend fun updateRoomAvatar(request: RoomRequest.UpdateRoomAvatar): Result<String> {
+        return try {
+            val response = httpClient.post {
+                endPoint("updateRoomAvatar")
+                setBody(request)
+            }
+            if(response.status == HttpStatusCode.OK) {
+                val roomId = response.body<RoomResponse.UpdateRoomAvatar>().avatarUrl
+                Result.SuccessWithData(roomId)
+            } else {
+                Result.Error("An error occurred: ${response.status.description}")
+            }
+        } catch (e: Exception) {
+            Result.Error("An error occurred: ${e.message}")
+        }
+    }
+
+    override suspend fun updateRoomName(request: RoomRequest.UpdateRoomName): Result<Nothing> {
+        return try {
+            val response = httpClient.post {
+                endPoint("updateRoomName")
+                setBody(request)
+            }
+            if(response.status == HttpStatusCode.OK) {
+                Result.Success
+            } else {
+                Result.Error("An error occurred: ${response.status.description}")
+            }
+        } catch (e: Exception) {
+            Result.Error("An error occurred: ${e.message}")
+        }
+    }
+
+    override suspend fun addMembers(request: RoomRequest.AddMembers): Result<Nothing> {
+        return try {
+            val response = httpClient.post {
+                endPoint("addMembers")
+                setBody(request)
+            }
+            if(response.status == HttpStatusCode.OK) {
+                Result.Success
+            } else {
+                Result.Error("An error occurred: ${response.status.description}")
+            }
+        } catch (e: Exception) {
+            Result.Error("An error occurred: ${e.message}")
+        }
+    }
+
+    override suspend fun removeMember(request: RoomRequest.RemoveMember): Result<Nothing> {
+        return try {
+            val response = httpClient.post {
+                endPoint("removeMember")
+                setBody(request)
+            }
+            if(response.status == HttpStatusCode.OK) {
+                Result.Success
+            } else {
+                Result.Error("An error occurred: ${response.status.description}")
+            }
+        } catch (e: Exception) {
+            Result.Error("An error occurred: ${e.message}")
         }
     }
 }

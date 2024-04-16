@@ -2,12 +2,14 @@ package com.gp.socialapp.data.auth.source.remote
 
 import com.eygraber.uri.Uri
 import com.gp.socialapp.data.auth.source.remote.model.User
+import com.gp.socialapp.data.auth.source.remote.model.requests.GetUsersByIdsRequest
 import com.gp.socialapp.data.post.util.endPoint
 import com.gp.socialapp.util.Result
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.post
+import io.ktor.client.request.setBody
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -52,7 +54,21 @@ class UserRemoteDataSourceImpl(
         TODO("Not yet implemented")
     }
 
-    override fun getUsersByEmails(emails: List<String>): Flow<Result<List<User>>> {
-        TODO("Not yet implemented")
+    override fun getUsersByIds(request: GetUsersByIdsRequest): Flow<Result<List<User>>> = flow {
+        emit(Result.Loading)
+        try {
+            val response = httpClient.post {
+                endPoint("getUsersByIds")
+                setBody(request)
+            }
+            if(response.status == HttpStatusCode.OK) {
+                val users = response.body<List<User>>()
+                emit(Result.SuccessWithData(users))
+            } else {
+                emit(Result.Error("An unknown error occurred ${response.status.description}"))
+            }
+        } catch (e: Exception) {
+            emit(Result.Error(e.message?: "An unknown error occurred"))
+        }
     }
 }

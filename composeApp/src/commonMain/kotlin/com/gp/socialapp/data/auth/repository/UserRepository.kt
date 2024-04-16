@@ -13,5 +13,5 @@ interface UserRepository {
     suspend fun fetchUser(email: String): Result<User>
     fun fetchUsers(): Flow<Result<List<User>>>
     fun getCurrentUserEmail(): String
-    fun getUsersByEmails(emails: List<String>): Flow<Result<List<User>>>
+    fun getUsersByIds(Ids: List<String>): Flow<Result<List<User>>>
 }
