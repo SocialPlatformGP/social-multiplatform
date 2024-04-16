@@ -20,7 +20,6 @@ class ChatHomeScreenModel(
     init {
         getCurrentUser()
         getRecentRooms()
-        connectToSocket()
     }
 
     private fun getCurrentUser() {
@@ -31,16 +30,6 @@ class ChatHomeScreenModel(
         }
     }
 
-    private fun connectToSocket() {
-        screenModelScope.launch(DispatcherIO) {
-            recentRoomRepository.connectToSocket(
-                "6616abe8ac5070037ba8b0d3"
-            ).onSuccess {
-                getMessages()
-            }
-
-        }
-    }
 
     fun getRecentRooms() {
         screenModelScope.launch {
@@ -51,15 +40,6 @@ class ChatHomeScreenModel(
                     }.onFailure {
                         println("Error: $it")
                     }
-                }
-        }
-    }
-
-    fun getMessages() {
-        screenModelScope.launch(DispatcherIO) {
-            recentRoomRepository.getMessages("6616abe8ac5070037ba8b0d3")
-                .collect { result ->
-                    println("result: $result")
                 }
         }
     }

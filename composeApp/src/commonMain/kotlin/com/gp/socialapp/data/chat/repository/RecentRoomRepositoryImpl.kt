@@ -10,9 +10,5 @@ class RecentRoomRepositoryImpl(
     override fun getAllRecentRooms(userId: String) =
         remoteDataSource.getAllRecentRooms(userId)
 
-    override suspend fun connectToSocket(userId: String) =
-        socketService.connectToSocket(userId)
-
-    override fun getMessages(userId: String) = socketService.getMessages(userId)
 
 }

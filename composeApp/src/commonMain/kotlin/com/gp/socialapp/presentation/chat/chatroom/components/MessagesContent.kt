@@ -24,16 +24,15 @@ fun MessagesContent(
     maxScreenWidthDP: Dp,
     maxScreenHeightDP: Dp,
 ) {
-    val reversedMessages = messages.asReversed()
     LazyColumn(
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(bottom = 2.dp),
         reverseLayout = true,
         state = scrollState,
     ) {
-        items(reversedMessages.size) { index ->
-            val previousMessage = reversedMessages.getOrNull(index + 1)
-            val message = reversedMessages[index]
+        items(messages.size) { index ->
+            val previousMessage = messages.getOrNull(index + 1)
+            val message = messages[index]
             val isSameSender = previousMessage?.senderId.equals(message.senderId)
             val isCurrentUser = message.senderId == currentUserId
             MessageItem(
