@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 interface MessageRepository {
     suspend fun connectToSocket(userId: String, roomId: String): Result<Nothing>
 
-    fun fetchChatMessages(chatId: String): Flow<Result<List<Message>>>
+    suspend fun fetchChatMessages(chatId: String): Flow<Result<List<Message>>>
 
     suspend fun closeSocket()
 

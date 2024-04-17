@@ -5,7 +5,9 @@ import com.gp.socialapp.data.chat.model.MessageAttachment
 import com.gp.socialapp.data.chat.source.local.MessageLocalDataSource
 import com.gp.socialapp.data.chat.source.remote.MessageRemoteDataSource
 import com.gp.socialapp.data.chat.source.remote.model.request.MessageRequest
+import com.gp.socialapp.util.Platform
 import com.gp.socialapp.util.Result
+import com.gp.socialapp.util.getPlatform
 import kotlinx.coroutines.flow.Flow
 
 class MessageRepositoryImpl(
@@ -15,9 +17,25 @@ class MessageRepositoryImpl(
     override suspend fun connectToSocket(userId: String, roomId: String): Result<Nothing> =
         messageRemoteDataSource.connectToSocket(userId, roomId)
 
-    override fun fetchChatMessages(chatId: String): Flow<Result<List<Message>>> {
+    override suspend fun fetchChatMessages(chatId: String): Flow<Result<List<Message>>> {
+        val platform = getPlatform()
         val request = MessageRequest.FetchMessages(chatId)
-        return messageRemoteDataSource.fetchChatMessages(request)
+        return if (platform == Platform.JS) messageRemoteDataSource.fetchChatMessages(request)
+        else messageLocalDataSource.getMessagesFlow(chatId).also {
+            messageRemoteDataSource.fetchChatMessages(request).collect { result ->
+                when (result) {
+                    is Result.SuccessWithData -> {
+                        messageLocalDataSource.insertMessages(*result.data.toTypedArray())
+                    }
+
+                    is Result.Error -> {
+                        //TODO Handle error
+                    }
+
+                    else -> Unit
+                }
+            }
+        }
     }
 
     override suspend fun closeSocket() {
@@ -28,10 +46,7 @@ class MessageRepositoryImpl(
         messageRemoteDataSource.observeMessages()
 
     override suspend fun sendMessage(
-        messageContent: String,
-        roomId: String,
-        senderId: String,
-        attachment: MessageAttachment
+        messageContent: String, roomId: String, senderId: String, attachment: MessageAttachment
     ): Result<Nothing> {
         val request = MessageRequest.SendMessage(
             content = messageContent,
@@ -44,23 +59,34 @@ class MessageRepositoryImpl(
     }
 
     override suspend fun updateMessage(
-        messageId: String,
-        roomId: String,
-        updatedContent: String
+        messageId: String, roomId: String, updatedContent: String
     ): Result<Nothing> {
         val request = MessageRequest.UpdateMessage(
-            messageId = messageId,
-            roomId = roomId,
-            updatedContent = updatedContent
+            messageId = messageId, roomId = roomId, updatedContent = updatedContent
         )
-        return messageRemoteDataSource.updateMessage(request)
+        val result = messageRemoteDataSource.updateMessage(request)
+        if(getPlatform() == Platform.JS) return result
+        return if (result is Result.Success) {
+            messageLocalDataSource.updateMessage(
+                Message(
+                    id = messageId, content = updatedContent, roomId = roomId
+                )
+            )
+        } else {
+            Result.Error("An error occurred")
+        }
     }
 
     override suspend fun deleteMessage(messageId: String, chatId: String): Result<Nothing> {
         val request = MessageRequest.DeleteMessage(
-            messageId = messageId,
-            roomId = chatId
+            messageId = messageId, roomId = chatId
         )
-        return messageRemoteDataSource.deleteMessage(request)
+        val result = messageRemoteDataSource.deleteMessage(request)
+        if(getPlatform() == Platform.JS) return result
+        return if (result is Result.Success) {
+            messageLocalDataSource.deleteMessage(messageId)
+        } else {
+            Result.Error("An error occurred")
+        }
     }
 }

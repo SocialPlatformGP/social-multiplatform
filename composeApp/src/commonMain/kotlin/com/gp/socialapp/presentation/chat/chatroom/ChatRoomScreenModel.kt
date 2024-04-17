@@ -68,6 +68,7 @@ class ChatRoomScreenModel(
 
     private fun sendMessage(content: String) {
         screenModelScope.launch(DispatcherIO) {
+            if(content.isEmpty()) return@launch
             messageRepo.sendMessage(
                 messageContent = content,
                 roomId = roomId,
