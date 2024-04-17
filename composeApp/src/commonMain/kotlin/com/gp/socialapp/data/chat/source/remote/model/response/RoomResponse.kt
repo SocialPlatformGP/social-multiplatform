@@ -15,11 +15,13 @@ sealed class RoomResponse {
         val room: Room?
     ) : RoomResponse()
 
-    data class GetRoomDetails (
+    @Serializable
+    data class GetRoomDetails(
         val room: Room
     ) : RoomResponse()
 
-    data class UpdateRoomAvatar (
+    @Serializable
+    data class UpdateRoomAvatar(
         val avatarUrl: String
     ) : RoomResponse()
 }

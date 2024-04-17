@@ -19,9 +19,10 @@ object LocalDateTimeUtil {
         val localDateTime = Instant.fromEpochMilliseconds(this).toLocalDateTime(TimeZone.UTC)
         return "${localDateTime.hour}:${localDateTime.minute}"
     }
+
     fun Long.toLocalDateTime() = Instant.fromEpochMilliseconds(this).toLocalDateTime(TimeZone.UTC)
     fun Long.getDateHeader(): String {
-        val localDateTime = Instant.fromEpochSeconds(this).toLocalDateTime(TimeZone.UTC)
+        val localDateTime = Instant.fromEpochMilliseconds(this).toLocalDateTime(TimeZone.UTC)
         val today = LocalDateTime.now().date
         return when {
             localDateTime.date == today -> "Today"
@@ -29,5 +30,14 @@ object LocalDateTimeUtil {
             localDateTime.date.daysUntil(today) < 7 -> localDateTime.date.dayOfWeek.name
             else -> localDateTime.toDDMMYYYY()
         }
+    }
+
+    fun convertEpochToTime(epoch: Long): String {
+        val localDateTime = Instant.fromEpochMilliseconds(epoch).toLocalDateTime(TimeZone.UTC)
+        val hour = (localDateTime.hour + 2)
+        val minute = localDateTime.minute
+        val amOrPm = if (hour < 12) "AM" else "PM"
+        val hourIn12HrFormat = if (hour > 12) hour - 12 else hour
+        return "$hourIn12HrFormat:$minute: $amOrPm"
     }
 }

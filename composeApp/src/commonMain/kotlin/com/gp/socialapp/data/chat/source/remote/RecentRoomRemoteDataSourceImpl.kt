@@ -16,7 +16,7 @@ class RecentRoomRemoteDataSourceImpl(
     private val client: HttpClient
 ) : RecentRoomRemoteDataSource {
     override fun getAllRecentRooms(userId: String) = flow {
-        println("rrrrrrrrrrrrrrrruserId: $userId")
+        println("Id: $userId")
         emit(Result.Loading)
         try {
             val response = client.post {

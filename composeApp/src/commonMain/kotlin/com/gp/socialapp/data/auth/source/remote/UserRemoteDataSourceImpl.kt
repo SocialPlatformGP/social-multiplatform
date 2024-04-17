@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.flow
 
 class UserRemoteDataSourceImpl(
     private val httpClient: HttpClient
-): UserRemoteDataSource {
+) : UserRemoteDataSource {
     override fun createUser(user: User, pfpURI: Uri): Flow<Result<Nothing>> {
         TODO("Not yet implemented")
     }
@@ -33,20 +33,20 @@ class UserRemoteDataSourceImpl(
         TODO("Not yet implemented")
     }
 
-    override fun fetchUsers(): Flow<Result<List<User>>>  = flow {
+    override fun fetchUsers(): Flow<Result<List<User>>> = flow {
         emit(Result.Loading)
-        try{
+        try {
             val response = httpClient.get {
                 endPoint("getAllUsers")
             }
-            if(response.status == HttpStatusCode.OK) {
+            if (response.status == HttpStatusCode.OK) {
                 val users = response.body<List<User>>()
                 emit(Result.SuccessWithData(users))
             } else {
                 emit(Result.Error("An unknown error occurred ${response.status}"))
             }
         } catch (e: Exception) {
-            emit(Result.Error(e.message?: "An unknown error occurred"))
+            emit(Result.Error(e.message ?: "An unknown error occurred"))
         }
     }
 
@@ -55,20 +55,22 @@ class UserRemoteDataSourceImpl(
     }
 
     override fun getUsersByIds(request: GetUsersByIdsRequest): Flow<Result<List<User>>> = flow {
+        println("Request: $request")
         emit(Result.Loading)
         try {
             val response = httpClient.post {
                 endPoint("getUsersByIds")
                 setBody(request)
             }
-            if(response.status == HttpStatusCode.OK) {
+            if (response.status == HttpStatusCode.OK) {
                 val users = response.body<List<User>>()
+                println("Users: $users")
                 emit(Result.SuccessWithData(users))
             } else {
                 emit(Result.Error("An unknown error occurred ${response.status.description}"))
             }
         } catch (e: Exception) {
-            emit(Result.Error(e.message?: "An unknown error occurred"))
+            emit(Result.Error(e.message ?: "An unknown error occurred"))
         }
     }
 }

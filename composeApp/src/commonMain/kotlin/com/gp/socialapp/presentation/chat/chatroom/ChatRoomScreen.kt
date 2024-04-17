@@ -32,6 +32,7 @@ import com.gp.socialapp.presentation.chat.chatroom.components.EditMessageDialog
 import com.gp.socialapp.presentation.chat.chatroom.components.ImagePreviewDialog
 import com.gp.socialapp.presentation.chat.chatroom.components.MessageInput
 import com.gp.socialapp.presentation.chat.chatroom.components.MessagesContent
+import com.gp.socialapp.presentation.chat.groupdetails.GroupDetailsScreen
 import com.mohamedrejeb.calf.core.LocalPlatformContext
 import com.mohamedrejeb.calf.io.getName
 import com.mohamedrejeb.calf.io.readByteArray
@@ -57,24 +58,35 @@ data class ChatRoomScreen(
             screenModel.initScreen(roomId, isPrivate)
             isInitialized = true
         }
-        ChatRoomContent(
-            messages = state.messages,
+        ChatRoomContent(messages = state.messages,
             currentUserId = state.currentUserId,
             onAction = { action ->
-                when(action) {
-                    is ChatRoomAction.OnBackPressed -> navigator.pop()
-                    is ChatRoomAction.OnChatHeaderClicked -> {
-                        TODO("Navigate to group details or user profile")
+                when (action) {
+                    is ChatRoomAction.OnBackPressed -> {
+                        screenModel.onClear()
+                        navigator.pop()
                     }
+
+                    is ChatRoomAction.OnChatHeaderClicked -> {
+                        if (!action.isPrivate) navigator.push(
+                            GroupDetailsScreen(
+                                roomId = action.roomId,
+                                roomTitle = roomTitle,
+                                roomAvatarUrl = roomAvatarUrl,
+                            )
+                        )
+                        // TODO else navigate to user profile
+                    }
+
                     is ChatRoomAction.OnUserClicked -> {
                         TODO("Navigate to user profile")
                     }
+
                     else -> {
                         screenModel.handleUiAction(action)
                     }
                 }
-            }
-        )
+            })
     }
 
     @Composable
@@ -126,8 +138,7 @@ data class ChatRoomScreen(
                     onChatHeaderClicked = {
                         onAction(
                             ChatRoomAction.OnChatHeaderClicked(
-                                roomId,
-                                isPrivate
+                                roomId, isPrivate
                             )
                         )
                     },
@@ -172,6 +183,7 @@ data class ChatRoomScreen(
                                 }
 
                                 is ChatRoomAction.OnAttachClicked -> {
+                                    println("Attach clicked")
                                     pickedFileType = action.type
                                     filePicker.launch()
                                 }
@@ -186,7 +198,17 @@ data class ChatRoomScreen(
                         maxScreenHeightDP = boxWithConstraintsScope.maxHeight,
                     )
                     MessageInput(
-                        onAction = onAction,
+                        onAction = { action ->
+                            when (action) {
+                                is ChatRoomAction.OnAttachClicked -> {
+                                    println("Attach clicked")
+                                    pickedFileType = action.type
+                                    filePicker.launch()
+                                }
+
+                                else -> onAction(action)
+                            }
+                        },
                     )
                     if (isEditMessageDialogOpen) {
                         EditMessageDialog(initialMessage = editedMessageBody,

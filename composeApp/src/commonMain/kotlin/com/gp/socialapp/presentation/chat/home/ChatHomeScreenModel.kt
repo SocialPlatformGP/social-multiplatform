@@ -19,21 +19,24 @@ class ChatHomeScreenModel(
 
     init {
         getCurrentUser()
-        getRecentRooms()
     }
 
     private fun getCurrentUser() {
         screenModelScope.launch(DispatcherIO) {
+//            authenticationRepository.setLocalUserId("6616abe8ac5070037ba8b0d3")
+            val userId = authenticationRepository.getCurrentLocalUserId()
+            println("UserId: $userId")
             state.update {
-                it.copy(currentUserId = authenticationRepository.getCurrentLocalUserId())
+                it.copy(currentUserId = userId)
             }
+            getRecentRooms()
         }
     }
 
 
     fun getRecentRooms() {
-        screenModelScope.launch {
-            recentRoomRepository.getAllRecentRooms("6616abe8ac5070037ba8b0d3")
+        screenModelScope.launch(DispatcherIO) {
+            recentRoomRepository.getAllRecentRooms(uiState.value.currentUserId)
                 .collect { result ->
                     result.onSuccessWithData { data ->
                         state.value = ChatHomeUiState(recentRooms = data)

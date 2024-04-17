@@ -47,6 +47,7 @@ fun MessageImageAttachment(
                         modifier = modifier
                             .fillMaxWidth()
                             .heightIn(max = maxHeight)
+                            .clickable { onImageClicked() }
                     )
                 }
 

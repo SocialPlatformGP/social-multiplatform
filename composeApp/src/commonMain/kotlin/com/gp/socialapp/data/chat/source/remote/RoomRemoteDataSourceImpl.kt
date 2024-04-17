@@ -22,6 +22,7 @@ class RoomRemoteDataSourceImpl(
     override suspend fun createGroupRoom(request: RoomRequest.CreateGroupRoom): Flow<Result<Room>> =
         flow {
             emit(Result.Loading)
+            println("Request: $request")
             try {
                 val response = httpClient.post {
                     endPoint(EndPoint.CreateGroupRoom.url)

@@ -36,10 +36,9 @@ class CreatePrivateChatScreenModel(
     private fun getUsers() {
         screenModelScope.launch {
             userRepository.fetchUsers().collect { result ->
-
                 result.onSuccessWithData { data ->
                     state.update {
-                        it.copy(users = data)
+                        it.copy(users = data.filter { it.id != state.value.currentUser })
                     }
                 }.onFailure {
                     println("Error: $it")

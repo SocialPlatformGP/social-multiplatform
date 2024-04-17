@@ -16,7 +16,7 @@ data class User(
     val phoneNumber: String = "",
     val birthdate: Long = 0L,
     val bio: String = "",
-    val createdAt: LocalDateTime? = null,
+    val createdAt: String = "",
     val isAdmin: Boolean = false,
 ) {
     fun toUserRequest() = UserRequest(

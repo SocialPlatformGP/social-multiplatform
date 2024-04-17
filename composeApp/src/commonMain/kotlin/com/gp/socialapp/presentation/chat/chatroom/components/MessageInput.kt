@@ -64,8 +64,8 @@ fun MessageInput(
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(
-                    bottom = 4.dp
-                ),
+                bottom = 4.dp
+            ),
         ) {
             TextField(
                 value = message,
@@ -88,7 +88,10 @@ fun MessageInput(
                     disabledIndicatorColor = Color.Transparent
                 )
             )
-            IconButton(onClick = { onAction(ChatRoomAction.OnSendMessage(message)) }) {
+            IconButton(onClick = {
+                onAction(ChatRoomAction.OnSendMessage(message))
+                message = ""
+            }) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.Send,
                     contentDescription = null,
@@ -102,10 +105,14 @@ fun MessageInput(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                IconButton(onClick = { onAction(ChatRoomAction.OnAttachClicked(FilePickerFileType.All)) }) {
+                IconButton(
+                    onClick = {
+                        println("Attach clicked in message input")
+                        onAction(ChatRoomAction.OnAttachClicked(FilePickerFileType.All))
+                    }) {
                     Icon(
                         imageVector = Icons.Default.AttachFile,
-                        contentDescription = null,
+                        contentDescription = "Attach file",
                         tint = MaterialTheme.colorScheme.onSurface
                     )
                 }

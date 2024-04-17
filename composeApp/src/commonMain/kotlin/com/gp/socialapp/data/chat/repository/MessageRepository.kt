@@ -10,6 +10,8 @@ interface MessageRepository {
 
     fun fetchChatMessages(chatId: String): Flow<Result<List<Message>>>
 
+    suspend fun closeSocket()
+
     fun observeMessages(): Flow<Result<Message>>
     suspend fun sendMessage(
         messageContent: String,

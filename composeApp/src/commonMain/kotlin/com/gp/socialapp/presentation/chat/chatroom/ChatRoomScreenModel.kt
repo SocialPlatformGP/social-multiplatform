@@ -126,6 +126,13 @@ class ChatRoomScreenModel(
         }
     }
 
+    fun onClear() {
+        screenModelScope.launch(DispatcherIO) {
+            messageRepo.closeSocket()
+            _uiState.update { ChatRoomUiState() }
+        }
+    }
+
     fun handleUiAction(action: ChatRoomAction) {
         when (action) {
             is ChatRoomAction.OnSendMessage -> {

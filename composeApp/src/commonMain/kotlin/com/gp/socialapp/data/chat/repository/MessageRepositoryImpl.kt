@@ -20,6 +20,10 @@ class MessageRepositoryImpl(
         return messageRemoteDataSource.fetchChatMessages(request)
     }
 
+    override suspend fun closeSocket() {
+        messageRemoteDataSource.closeSocket()
+    }
+
     override fun observeMessages(): Flow<Result<Message>> =
         messageRemoteDataSource.observeMessages()
 
@@ -33,7 +37,7 @@ class MessageRepositoryImpl(
             content = messageContent,
             roomId = roomId,
             senderId = senderId,
-            hasAttachment = attachment.type.isBlank(),
+            hasAttachment = attachment.type.isNotBlank(),
             attachment = attachment
         )
         return messageRemoteDataSource.sendMessage(request)

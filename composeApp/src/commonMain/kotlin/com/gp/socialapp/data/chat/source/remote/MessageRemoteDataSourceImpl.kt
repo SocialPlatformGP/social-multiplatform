@@ -29,6 +29,7 @@ class MessageRemoteDataSourceImpl(
                 }
                 if (response.status == HttpStatusCode.OK) {
                     val messages = response.body<List<Message>>()
+                    println("Messages: $messages")
                     emit(Result.SuccessWithData(messages))
                 } else {
                     emit(Result.Error("An error occurred: ${response.status.description}"))
@@ -74,6 +75,10 @@ class MessageRemoteDataSourceImpl(
         } catch (e: Exception) {
             Result.Error("An error occurred: ${e.message}")
         }
+    }
+
+    override suspend fun closeSocket() {
+        socketService.closeSocket()
     }
 
 }
