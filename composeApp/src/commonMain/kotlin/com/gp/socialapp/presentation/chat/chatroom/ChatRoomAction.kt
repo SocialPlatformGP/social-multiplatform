@@ -12,6 +12,7 @@ sealed interface ChatRoomAction {
         val messageId: String,
         val messageContent: String
     ) : ChatRoomAction
+    data object OnRemoveAttachment : ChatRoomAction
 
     data class OnSendMessage(val message: String) : ChatRoomAction
     data class OnAttachClicked(val type: FilePickerFileType) : ChatRoomAction

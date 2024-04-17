@@ -6,6 +6,7 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,6 +18,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material.icons.filled.AddPhotoAlternate
 import androidx.compose.material.icons.filled.AttachFile
+import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -35,12 +37,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.gp.socialapp.data.chat.model.MessageAttachment
 import com.gp.socialapp.presentation.chat.chatroom.ChatRoomAction
 import com.mohamedrejeb.calf.picker.FilePickerFileType
 
 @Composable
 fun MessageInput(
     onAction: (ChatRoomAction) -> Unit,
+    attachment: MessageAttachment,
     modifier: Modifier = Modifier,
 ) {
     var isExpanded by remember { mutableStateOf(false) }
@@ -61,6 +65,25 @@ fun MessageInput(
     Column(
         modifier = modifier.padding(horizontal = 8.dp, vertical = 2.dp).fillMaxWidth()
     ) {
+        if(attachment.type.isNotEmpty()){
+            Box (
+                modifier = Modifier.padding(8.dp).fillMaxWidth()
+            ){
+                MessageFileAttachment(
+                    fileType = attachment.type,
+                    fileName = attachment.name,
+                    onFileClicked = { /**/ },
+                    modifier = Modifier.padding(2.dp).fillMaxWidth().align(Alignment.CenterStart)
+                )
+                IconButton(onClick = { onAction(ChatRoomAction.OnRemoveAttachment) }, modifier =Modifier.align(Alignment.CenterEnd)) {
+                    Icon(
+                        imageVector = Icons.Default.Cancel,
+                        contentDescription = "Remove attachment",
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+            }
+        }
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(

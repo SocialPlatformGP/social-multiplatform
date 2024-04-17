@@ -26,6 +26,7 @@ import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gp.socialapp.data.chat.model.Message
+import com.gp.socialapp.data.chat.model.MessageAttachment
 import com.gp.socialapp.presentation.chat.chatroom.components.ChatRoomTopBar
 import com.gp.socialapp.presentation.chat.chatroom.components.DropDownItem
 import com.gp.socialapp.presentation.chat.chatroom.components.EditMessageDialog
@@ -60,6 +61,7 @@ data class ChatRoomScreen(
         }
         ChatRoomContent(messages = state.messages,
             currentUserId = state.currentUserId,
+            attachment = state.currentAttachment,
             onAction = { action ->
                 when (action) {
                     is ChatRoomAction.OnBackPressed -> {
@@ -94,6 +96,7 @@ data class ChatRoomScreen(
         modifier: Modifier = Modifier,
         messages: List<Message>,
         currentUserId: String,
+        attachment: MessageAttachment,
         onAction: (ChatRoomAction) -> Unit,
         scope: CoroutineScope = rememberCoroutineScope(),
     ) {
@@ -209,6 +212,7 @@ data class ChatRoomScreen(
                                 else -> onAction(action)
                             }
                         },
+                        attachment = attachment
                     )
                     if (isEditMessageDialogOpen) {
                         EditMessageDialog(initialMessage = editedMessageBody,

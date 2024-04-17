@@ -155,6 +155,10 @@ class ChatRoomScreenModel(
                 deleteMessage(action.messageId)
             }
 
+            is ChatRoomAction.OnRemoveAttachment -> {
+                _uiState.update { it.copy(currentAttachment = MessageAttachment()) }
+            }
+
             else -> Unit
         }
     }
