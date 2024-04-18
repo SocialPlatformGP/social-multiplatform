@@ -25,7 +25,7 @@ class MessageLocalDataSourceImpl(
                     roomId
                 ).sort(
                     property = "createdAt",
-                    sortOrder = Sort.ASCENDING
+                    sortOrder = Sort.DESCENDING
                 ).find().asFlow()
                 messagesFlow.collect { results ->
                     when (results) {
