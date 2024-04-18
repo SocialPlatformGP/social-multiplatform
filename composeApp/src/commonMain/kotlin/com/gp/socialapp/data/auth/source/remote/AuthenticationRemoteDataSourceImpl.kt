@@ -8,6 +8,7 @@ import com.gp.socialapp.data.auth.source.remote.model.requests.SignInRequest
 import com.gp.socialapp.data.auth.source.remote.model.responses.AuthResponse
 import com.gp.socialapp.data.auth.source.remote.model.responses.IsEmailAvailableResponse
 import com.gp.socialapp.data.auth.source.remote.model.responses.UserResponse
+import com.gp.socialapp.util.AppConstants.BASE_URL
 import com.gp.socialapp.util.Result
 import io.github.aakira.napier.Napier
 import io.ktor.client.HttpClient
@@ -27,7 +28,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.json.Json
 
-private const val BASE_URL = "http://192.168.1.4:8080/"
 
 class AuthenticationRemoteDataSourceImpl : AuthenticationRemoteDataSource {
     val httpClient = HttpClient {

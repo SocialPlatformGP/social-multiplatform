@@ -13,6 +13,7 @@ data class FeedUiState(
     val error: FeedError = FeedError.NoError,
     val openedTabItem: FeedTab = FeedTab.GENERAL,
     val currentUserID: String = "",
+    val isLoggedOut: Boolean = false
 )
 
 

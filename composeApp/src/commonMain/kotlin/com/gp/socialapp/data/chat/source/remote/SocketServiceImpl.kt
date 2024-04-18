@@ -2,6 +2,7 @@ package com.gp.socialapp.data.chat.source.remote
 
 import com.gp.socialapp.data.chat.model.Message
 import com.gp.socialapp.data.chat.source.remote.model.request.MessageRequest
+import com.gp.socialapp.util.AppConstants.SOCKET_URL
 import com.gp.socialapp.util.Result
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
@@ -30,7 +31,7 @@ class SocketServiceImpl(
             println("userId: $userId")
             socket = client.webSocketSession {
                 url {
-                    takeFrom("ws://192.168.1.4:8080/")
+                    takeFrom(SOCKET_URL)
                     path("/chatSocket")
                     parameter("userid", userId)
                     parameter("roomid", roomId)
@@ -45,7 +46,7 @@ class SocketServiceImpl(
                 Result.Error("An error occurred")
             }
         } catch (e: Exception) {
-            Result.Error(e.message ?: "An error occurred")
+            Result.Error("An error occurred: ${e.message}")
         }
     }
 

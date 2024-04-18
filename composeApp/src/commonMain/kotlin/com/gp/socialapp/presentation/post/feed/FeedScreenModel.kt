@@ -171,4 +171,16 @@ class FeedScreenModel(
             it.copy(openedTabItem = FeedTab.entries[tab])
         }
     }
+    fun logout() {
+        screenModelScope.launch {
+            authRepo.clearStorage()
+            _state.update { it.copy(isLoggedOut = true) }
+        }
+    }
+
+    fun resetState() {
+        screenModelScope.launch {
+            _state.update { FeedUiState() }
+        }
+    }
 }

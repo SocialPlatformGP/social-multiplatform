@@ -55,6 +55,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gp.socialapp.data.post.source.remote.model.Post
 import com.gp.socialapp.data.post.source.remote.model.PostAttachment
+import com.gp.socialapp.presentation.auth.login.LoginScreen
 import com.gp.socialapp.presentation.post.create.CreatePostScreen
 import com.gp.socialapp.presentation.post.feed.components.FeedPostItem
 import com.gp.socialapp.presentation.post.feed.components.FeedTopBar
@@ -81,6 +82,10 @@ object FeedScreen : Screen {
         val state by screenModel.state.collectAsState()
         var isFileBottomSheetOpen by remember { mutableStateOf(false) }
         val bottomSheetState = rememberModalBottomSheetState()
+        if(state.isLoggedOut){
+            navigator.push(LoginScreen)
+            screenModel.resetState()
+        }
         val tabItems = listOf(
             TabItem(stringResource(resource = Res.string.general), Icons.Filled.AllInclusive),
             TabItem(
@@ -149,7 +154,7 @@ object FeedScreen : Screen {
                     }
 
                     is PostEvent.OnPostShareClicked -> {
-                        TODO()
+                        screenModel.logout()
                     }
 
                     else -> {}

@@ -14,8 +14,7 @@ class MessageEntity (): RealmObject {
     var createdAt: Long = LocalDateTime.now().toInstant(TimeZone.UTC).epochSeconds
     var roomId: String = ""
     var senderId: String = ""
-    @PrimaryKey
-    var id: String = ""
+    @PrimaryKey var id: String = ""
     var senderName: String = ""
     var senderPfpURL: String = ""
     var hasAttachment: Boolean = false

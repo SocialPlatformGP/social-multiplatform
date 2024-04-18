@@ -25,7 +25,7 @@ class MessageLocalDataSourceImpl(
                     roomId
                 ).sort(
                     property = "createdAt",
-                    sortOrder = Sort.ASCENDING
+                    sortOrder = Sort.DESCENDING
                 ).find().asFlow()
                 messagesFlow.collect { results ->
                     when (results) {
@@ -47,6 +47,7 @@ class MessageLocalDataSourceImpl(
 
     override suspend fun insertMessages(vararg messages: Message): Result<Nothing> {
         return try {
+            println("\n\n\nMessages to insert ${messages.joinToString(",,,,,,")}\n\n\n")
             realm.write {
                 messages.forEach { message ->
                     val messageEntity = message.toEntity()
