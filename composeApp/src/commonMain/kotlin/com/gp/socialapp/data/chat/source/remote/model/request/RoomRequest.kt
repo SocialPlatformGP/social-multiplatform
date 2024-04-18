@@ -1,6 +1,7 @@
 package com.gp.socialapp.data.chat.source.remote.model.request
 
 import com.gp.socialapp.data.chat.model.Room
+import kotlinx.serialization.Serializable
 
 sealed class RoomRequest {
     @kotlinx.serialization.Serializable
@@ -49,7 +50,7 @@ sealed class RoomRequest {
         val roomId: String,
         val userIds: List<String>
     )
-
+    @Serializable
     data class RemoveMember(
         val roomId: String,
         val userId: String

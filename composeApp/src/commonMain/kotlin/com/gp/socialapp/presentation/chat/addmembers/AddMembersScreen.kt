@@ -83,10 +83,13 @@ data class AddMembersScreen(
                         onRemoveMember(it)
                     },
                     onUserClick = { selectableUser ->
+                        println("selectableUser: ${selectableUser}")
                         if (selectableUser.isSelected) {
-                            onAddMember(selectableUser.user.id)
-                        } else {
+                            println("Removing member")
                             onRemoveMember(selectableUser.user.id)
+                        } else {
+                            println("Adding member")
+                            onAddMember(selectableUser.user.id)
                         }
                     })
                 Spacer(modifier = Modifier.size(8.dp))

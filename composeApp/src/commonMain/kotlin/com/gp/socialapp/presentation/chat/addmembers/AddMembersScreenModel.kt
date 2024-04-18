@@ -48,7 +48,7 @@ class AddMembersScreenModel(
                                 allUsers = allUsers.map { user -> user.toSelectableUser() }
                             )
                         }
-
+                        println("All Users: ${_uiState.value.allUsers}")
                     }
                     else -> Unit
                 }
@@ -63,6 +63,7 @@ class AddMembersScreenModel(
     }
 
     fun removeMember(memberId: String) {
+        println("Member ID: $memberId")
         val user = _uiState.value.selectedUsers.first { it.id == memberId }
         screenModelScope.launch(Dispatchers.Default) {
             val updatedMembers = _uiState.value.selectedUsers.toMutableList()
@@ -83,6 +84,7 @@ class AddMembersScreenModel(
     }
 
     fun addMember(memberId: String) {
+        println("Member ID: $memberId")
         val user = _uiState.value.allUsers.first { it.user.id == memberId }.user
         screenModelScope.launch(Dispatchers.Default) {
             val updatedMembers = _uiState.value.selectedUsers.toMutableList()

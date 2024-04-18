@@ -137,17 +137,21 @@ class RoomRemoteDataSourceImpl(
     }
 
     override suspend fun removeMember(request: RoomRequest.RemoveMember): Result<Nothing> {
+        println("reached client")
         return try {
             val response = httpClient.post {
                 endPoint("removeMember")
                 setBody(request)
             }
             if(response.status == HttpStatusCode.OK) {
+                println("Response is OK for remove member")
                 Result.Success
             } else {
+                println("Response is not OK for remove member: ${response.status.description}")
                 Result.Error("An error occurred: ${response.status.description}")
             }
         } catch (e: Exception) {
+            println("Exception occurred: ${e.message}")
             Result.Error("An error occurred: ${e.message}")
         }
     }

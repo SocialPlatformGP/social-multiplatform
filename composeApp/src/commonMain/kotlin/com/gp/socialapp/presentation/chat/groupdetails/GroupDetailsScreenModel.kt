@@ -117,4 +117,8 @@ class GroupDetailsScreenModel (
             }
         }
     }
+
+    fun resetState() {
+        _uiState.value = GroupDetailsUiState()
+    }
 }

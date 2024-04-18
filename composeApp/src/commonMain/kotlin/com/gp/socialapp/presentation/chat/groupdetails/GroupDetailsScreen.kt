@@ -60,6 +60,7 @@ data class GroupDetailsScreen(
                 when(action){
                     is GroupDetailsAction.OnAddMembersClicked -> {
                         navigator.push(AddMembersScreen(roomId = roomId, groupMembersIds = state.members.map { it.id }))
+//                        screenModel.resetState()
                     }
                     is GroupDetailsAction.OnMessageUser -> {
                         //todo navigate to chat
