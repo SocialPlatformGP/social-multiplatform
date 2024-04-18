@@ -37,7 +37,7 @@ class ChatRoomScreenModel(
         screenModelScope.launch(DispatcherIO) {
             messageRepo.fetchChatMessages(roomId).collect { result ->
                 result.onSuccessWithData { messages ->
-                    _uiState.update { it.copy(messages = messages + it.messages) }
+                    _uiState.update { it.copy(messages = messages) }
                 }.onFailure {
                     println("Error: $it")
                 }
