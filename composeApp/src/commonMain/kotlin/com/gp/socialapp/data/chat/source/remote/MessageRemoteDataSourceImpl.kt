@@ -17,7 +17,7 @@ class MessageRemoteDataSourceImpl(
     private val socketService: SocketService
 ) : MessageRemoteDataSource {
     override suspend fun connectToSocket(userId: String, roomId: String) =
-        socketService.connectToSocket(userId, roomId)
+        socketService.connectToSocket(userId)
 
     override fun fetchChatMessages(request: MessageRequest.FetchMessages): Flow<Result<List<Message>>> =
         flow {

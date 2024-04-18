@@ -26,7 +26,7 @@ class SocketServiceImpl(
     private val client: HttpClient
 ) : SocketService {
     var socket: DefaultClientWebSocketSession? = null
-    override suspend fun connectToSocket(userId: String, roomId: String): Result<Nothing> {
+    override suspend fun connectToSocket(userId: String): Result<Nothing> {
         return try {
             println("userId: $userId")
             socket = client.webSocketSession {
@@ -34,9 +34,7 @@ class SocketServiceImpl(
                     takeFrom(SOCKET_URL)
                     path("/chatSocket")
                     parameter("userid", userId)
-                    parameter("roomid", roomId)
                 }
-//                url("ws://192.168.1.4:8080/chatSocket?user-id=$userId")
             }
             if (socket?.isActive == true) {
                 println("socket connected")
@@ -80,7 +78,8 @@ class SocketServiceImpl(
         }
     }
 
-    override suspend fun closeSocket() {
+    override suspend fun closeSocket(): Result<Nothing> {
         socket?.close()
+        return Result.Success
     }
 }

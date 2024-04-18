@@ -3,15 +3,14 @@ package com.gp.socialapp.data.chat.source.local
 import com.gp.socialapp.data.chat.model.Message
 import com.gp.socialapp.data.chat.source.local.model.MessageEntity
 import com.gp.socialapp.data.chat.source.local.model.MessageEntity.Companion.toEntity
+import com.gp.socialapp.util.Result
 import io.realm.kotlin.Realm
+import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.notifications.InitialResults
 import io.realm.kotlin.notifications.UpdatedResults
 import io.realm.kotlin.query.Sort
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import  com.gp.socialapp.util.Result
-import io.realm.kotlin.UpdatePolicy
 
 class MessageLocalDataSourceImpl(
     private val realm: Realm
@@ -25,7 +24,7 @@ class MessageLocalDataSourceImpl(
                     roomId
                 ).sort(
                     property = "createdAt",
-                    sortOrder = Sort.ASCENDING
+                    sortOrder = Sort.DESCENDING
                 ).find().asFlow()
                 messagesFlow.collect { results ->
                     when (results) {
@@ -40,7 +39,7 @@ class MessageLocalDataSourceImpl(
                         }
                     }
                 }
-            } catch(e: Exception) {
+            } catch (e: Exception) {
                 emit(Result.Error(e.message ?: "An error occurred"))
             }
         }
@@ -79,8 +78,9 @@ class MessageLocalDataSourceImpl(
     override suspend fun updateMessage(message: Message): Result<Nothing> {
         return try {
             realm.write {
-                val messageToUpdate = query(clazz = MessageEntity::class, "id == $0", message.id).find().first()
-                if(message.content.isNotBlank())messageToUpdate.content = message.content
+                val messageToUpdate =
+                    query(clazz = MessageEntity::class, "id == $0", message.id).find().first()
+                if (message.content.isNotBlank()) messageToUpdate.content = message.content
             }
             Result.Success
         } catch (e: Exception) {
