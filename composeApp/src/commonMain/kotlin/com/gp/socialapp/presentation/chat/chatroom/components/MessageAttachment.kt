@@ -7,7 +7,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.mohamedrejeb.calf.picker.FilePickerFileType
 
 @Composable
 fun MessageAttachment(
@@ -23,7 +22,7 @@ fun MessageAttachment(
         shape = RoundedCornerShape(20.dp), color = Color.Transparent
     ) {
         when (fileType) {
-            FilePickerFileType.ImageContentType -> {
+            "png" -> {
                 MessageImageAttachment(
                     imageURL = fileUrl,
                     onImageClicked = { onImageClicked() },

@@ -29,7 +29,6 @@ class ChatRoomScreenModel(
         this@ChatRoomScreenModel.isPrivate = isPrivate
         this@ChatRoomScreenModel.roomId = roomId
         getCurrentUserId()
-        connectToSocket()
         getMessages()
     }
 
@@ -38,6 +37,7 @@ class ChatRoomScreenModel(
             messageRepo.fetchChatMessages(roomId).collect { result ->
                 result.onSuccessWithData { messages ->
                     _uiState.update { it.copy(messages = messages) }
+                    observeMessages()
                 }.onFailure {
                     println("Error: $it")
                 }
@@ -49,6 +49,7 @@ class ChatRoomScreenModel(
         screenModelScope.launch(DispatcherIO) {
             messageRepo.observeMessages().onEach { message ->
                 if (message is Result.SuccessWithData) {
+                    if (message.data.roomId != roomId) return@onEach
                     val newList = _uiState.value.messages.toMutableList()
                     newList.add(0, message.data)
                     _uiState.update {
@@ -68,7 +69,7 @@ class ChatRoomScreenModel(
 
     private fun sendMessage(content: String) {
         screenModelScope.launch(DispatcherIO) {
-            if(content.isEmpty() && _uiState.value.currentAttachment.type.isBlank()) return@launch
+            if (content.isEmpty() && _uiState.value.currentAttachment.type.isBlank()) return@launch
             messageRepo.sendMessage(
                 messageContent = content,
                 roomId = roomId,
@@ -83,19 +84,6 @@ class ChatRoomScreenModel(
         }
     }
 
-    private fun connectToSocket() {
-        screenModelScope.launch(DispatcherIO) {
-            messageRepo.connectToSocket(
-                uiState.value.currentUserId,
-                roomId
-            ).onSuccess {
-                println("Socket connected")
-                observeMessages()
-            }.onFailure {
-                println("Socket connection failed")
-            }
-        }
-    }
 
     private fun updateMessage(messageId: String, content: String) {
         screenModelScope.launch(DispatcherIO) {
@@ -127,12 +115,6 @@ class ChatRoomScreenModel(
         }
     }
 
-    fun onClear() {
-        screenModelScope.launch(DispatcherIO) {
-            messageRepo.closeSocket()
-            _uiState.update { ChatRoomUiState() }
-        }
-    }
 
     fun handleUiAction(action: ChatRoomAction) {
         when (action) {

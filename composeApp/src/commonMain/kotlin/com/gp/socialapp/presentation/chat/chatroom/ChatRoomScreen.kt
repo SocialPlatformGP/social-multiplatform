@@ -66,7 +66,6 @@ data class ChatRoomScreen(
                 when (action) {
                     is ChatRoomAction.OnBackPressed -> {
                         navigator.pop()
-                        screenModel.onClear()
                     }
 
                     is ChatRoomAction.OnChatHeaderClicked -> {

@@ -30,9 +30,21 @@ class ChatHomeScreenModel(
                 it.copy(currentUserId = userId)
             }
             getRecentRooms()
+            connectToSocket()
         }
     }
 
+    private fun connectToSocket() {
+        screenModelScope.launch(DispatcherIO) {
+            recentRoomRepository.connectToSocket(
+                uiState.value.currentUserId,
+            ).onSuccess {
+                println("Socket connected")
+            }.onFailure {
+                println("Socket connection failed")
+            }
+        }
+    }
 
     fun getRecentRooms() {
         screenModelScope.launch(DispatcherIO) {
@@ -44,6 +56,16 @@ class ChatHomeScreenModel(
                         println("Error: $it")
                     }
                 }
+        }
+    }
+
+    fun onClear() {
+        screenModelScope.launch(DispatcherIO) {
+            recentRoomRepository.closeSocket().onSuccess {
+                println("Socket closed")
+            }.onFailure {
+                println("Socket close failed")
+            }
         }
     }
 }

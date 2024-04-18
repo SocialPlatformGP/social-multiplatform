@@ -6,9 +6,9 @@ import com.gp.socialapp.util.Result
 import kotlinx.coroutines.flow.Flow
 
 interface SocketService {
-    suspend fun connectToSocket(userId: String, roomId: String): Result<Nothing>
+    suspend fun connectToSocket(userId: String): Result<Nothing>
     fun observeMessages(): Flow<Result<Message>>
     suspend fun sendMessage(message: MessageRequest.SendMessage): Result<Nothing>
 
-    suspend fun closeSocket()
+    suspend fun closeSocket(): Result<Nothing>
 }
