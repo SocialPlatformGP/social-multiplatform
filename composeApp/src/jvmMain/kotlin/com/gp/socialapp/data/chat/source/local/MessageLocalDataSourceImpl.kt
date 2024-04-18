@@ -7,7 +7,6 @@ import io.realm.kotlin.Realm
 import io.realm.kotlin.notifications.InitialResults
 import io.realm.kotlin.notifications.UpdatedResults
 import io.realm.kotlin.query.Sort
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import  com.gp.socialapp.util.Result
@@ -69,7 +68,6 @@ class MessageLocalDataSourceImpl(
                 val messageToDelete: MessageEntity =
                     query(clazz = MessageEntity::class, "id == $0", messageId).find().first()
                 delete(messageToDelete)
-
             }
             Result.Success
         } catch (e: Exception) {
@@ -85,6 +83,22 @@ class MessageLocalDataSourceImpl(
             }
             Result.Success
         } catch (e: Exception) {
+            Result.Error(e.message ?: "An error occurred")
+        }
+    }
+
+    override suspend fun getLastLocalMessage(chatId: String): Result<Message> {
+        return try {
+            val messageEntity = realm.query(
+                clazz = MessageEntity::class,
+                query = "roomId == $0",
+                chatId
+            ).sort(
+                property = "createdAt",
+                sortOrder = Sort.DESCENDING
+            ).find().first()
+            Result.SuccessWithData(messageEntity.toMessage())
+        } catch(e: Exception) {
             Result.Error(e.message ?: "An error occurred")
         }
     }

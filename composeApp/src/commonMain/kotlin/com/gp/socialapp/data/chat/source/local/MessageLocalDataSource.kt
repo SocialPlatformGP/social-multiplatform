@@ -10,4 +10,5 @@ interface MessageLocalDataSource {
     suspend fun insertMessages(vararg messages: Message): Result<Nothing>
     suspend fun deleteMessage(messageId: String): Result<Nothing>
     suspend fun updateMessage(message: Message): Result<Nothing>
+    suspend fun getLastLocalMessage(chatId: String): Result<Message>
 }

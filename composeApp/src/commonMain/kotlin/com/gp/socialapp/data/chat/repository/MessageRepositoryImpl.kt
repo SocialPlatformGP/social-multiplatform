@@ -19,9 +19,13 @@ class MessageRepositoryImpl(
 
     override suspend fun fetchChatMessages(chatId: String): Flow<Result<List<Message>>> {
         val platform = getPlatform()
-        val request = MessageRequest.FetchMessages(chatId)
-        return if (platform == Platform.JS) messageRemoteDataSource.fetchChatMessages(request)
+        val jsRequest = MessageRequest.FetchMessages(chatId)
+        return if (platform == Platform.JS) messageRemoteDataSource.fetchChatMessages(jsRequest)
         else messageLocalDataSource.getMessagesFlow(chatId).also {
+            val lastMessage = messageLocalDataSource.getLastLocalMessage(chatId)
+            val request = MessageRequest.FetchMessages(
+                chatId, timestamp = (lastMessage as? Result.SuccessWithData<Message>)?.data?.createdAt?:0L
+            )
             messageRemoteDataSource.fetchChatMessages(request).collect { result ->
                 when (result) {
                     is Result.SuccessWithData -> {

@@ -87,4 +87,20 @@ class MessageLocalDataSourceImpl(
             Result.Error(e.message ?: "An error occurred")
         }
     }
+
+    override suspend fun getLastLocalMessage(chatId: String): Result<Message> {
+        return try {
+            val messageEntity = realm.query(
+                clazz = MessageEntity::class,
+                query = "roomId == $0",
+                chatId
+            ).sort(
+                property = "createdAt",
+                sortOrder = Sort.DESCENDING
+            ).find().first()
+            Result.SuccessWithData(messageEntity.toMessage())
+        } catch(e: Exception) {
+            Result.Error(e.message ?: "An error occurred")
+        }
+    }
 }

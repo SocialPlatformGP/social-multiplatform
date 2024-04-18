@@ -13,4 +13,5 @@ object DummyMessageLocalSource: MessageLocalDataSource {
     override suspend fun deleteMessage(messageId: String): Result<Nothing> = Result.Idle
 
     override suspend fun updateMessage(message: Message): Result<Nothing> = Result.Idle
+    override suspend fun getLastLocalMessage(chatId: String): Result<Message> = Result.Idle
 }
