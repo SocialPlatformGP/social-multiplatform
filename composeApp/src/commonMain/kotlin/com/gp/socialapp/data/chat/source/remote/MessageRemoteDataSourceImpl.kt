@@ -2,6 +2,7 @@ package com.gp.socialapp.data.chat.source.remote
 
 import com.gp.socialapp.data.chat.model.Message
 import com.gp.socialapp.data.chat.source.remote.model.request.MessageRequest
+import com.gp.socialapp.data.chat.source.remote.model.response.NewDataResponse
 import com.gp.socialapp.data.post.util.endPoint
 import com.gp.socialapp.util.Result
 import io.ktor.client.HttpClient
@@ -29,7 +30,7 @@ class MessageRemoteDataSourceImpl(
                 }
                 if (response.status == HttpStatusCode.OK) {
                     val messages = response.body<List<Message>>()
-                    println("Messages: $messages")
+//                    println("Messages: $messages")
                     emit(Result.SuccessWithData(messages))
                 } else {
                     emit(Result.Error("An error occurred: ${response.status.description}"))
@@ -58,8 +59,10 @@ class MessageRemoteDataSourceImpl(
         }
     }
 
-    override fun observeMessages(): Flow<Result<Message>> =
-        socketService.observeMessages()
+    override suspend fun observeMessages(): Flow<Result<NewDataResponse>> {
+        println("im in message remote data source")
+        return socketService.observeNewDataMessage()
+    }
 
     override suspend fun deleteMessage(request: MessageRequest.DeleteMessage): Result<Nothing> {
         return try {

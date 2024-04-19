@@ -5,6 +5,7 @@ import com.gp.socialapp.data.chat.model.MessageAttachment
 import com.gp.socialapp.data.chat.source.local.MessageLocalDataSource
 import com.gp.socialapp.data.chat.source.remote.MessageRemoteDataSource
 import com.gp.socialapp.data.chat.source.remote.model.request.MessageRequest
+import com.gp.socialapp.data.chat.source.remote.model.response.NewDataResponse
 import com.gp.socialapp.util.Platform
 import com.gp.socialapp.util.Result
 import com.gp.socialapp.util.getPlatform
@@ -46,8 +47,10 @@ class MessageRepositoryImpl(
         messageRemoteDataSource.closeSocket()
     }
 
-    override fun observeMessages(): Flow<Result<Message>> =
-        messageRemoteDataSource.observeMessages()
+    override suspend fun observeMessages(): Flow<Result<NewDataResponse>> {
+        println("im in message repo")
+        return messageRemoteDataSource.observeMessages()
+    }
 
     override suspend fun sendMessage(
         messageContent: String, roomId: String, senderId: String, attachment: MessageAttachment
@@ -69,7 +72,7 @@ class MessageRepositoryImpl(
             messageId = messageId, roomId = roomId, updatedContent = updatedContent
         )
         val result = messageRemoteDataSource.updateMessage(request)
-        if(getPlatform() == Platform.JS) return result
+        if (getPlatform() == Platform.JS) return result
         return if (result is Result.Success) {
             messageLocalDataSource.updateMessage(
                 Message(
@@ -86,7 +89,7 @@ class MessageRepositoryImpl(
             messageId = messageId, roomId = chatId
         )
         val result = messageRemoteDataSource.deleteMessage(request)
-        if(getPlatform() == Platform.JS) return result
+        if (getPlatform() == Platform.JS) return result
         return if (result is Result.Success) {
             messageLocalDataSource.deleteMessage(messageId)
         } else {

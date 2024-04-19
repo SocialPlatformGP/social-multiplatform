@@ -2,6 +2,7 @@ package com.gp.socialapp.data.chat.repository
 
 import com.gp.socialapp.data.chat.model.Message
 import com.gp.socialapp.data.chat.model.MessageAttachment
+import com.gp.socialapp.data.chat.source.remote.model.response.NewDataResponse
 import com.gp.socialapp.util.Result
 import kotlinx.coroutines.flow.Flow
 
@@ -12,7 +13,7 @@ interface MessageRepository {
 
     suspend fun closeSocket()
 
-    fun observeMessages(): Flow<Result<Message>>
+    suspend fun observeMessages(): Flow<Result<NewDataResponse>>
     suspend fun sendMessage(
         messageContent: String,
         roomId: String,
