@@ -1,4 +1,4 @@
-package com.gp.socialapp.presentation.chat.private_chat
+package com.gp.socialapp.presentation.chat.createprivate
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope

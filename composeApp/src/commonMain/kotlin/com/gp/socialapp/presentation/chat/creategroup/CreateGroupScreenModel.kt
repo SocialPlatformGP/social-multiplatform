@@ -23,7 +23,12 @@ class CreateGroupScreenModel(
     private val _uiState = MutableStateFlow(CreateGroupUiState())
     val uiState = _uiState.asStateFlow()
 
-    init {
+    fun init() {
+        resetState()
+        getUsers()
+    }
+
+    private fun getUsers() {
         screenModelScope.launch(DispatcherIO) {
             currentUserId = authRepo.getCurrentLocalUserId()
             getAllUsers()
@@ -140,7 +145,7 @@ class CreateGroupScreenModel(
         }
     }
 
-    fun resetState() {
+    private fun resetState() {
         _uiState.value = CreateGroupUiState()
     }
 }
