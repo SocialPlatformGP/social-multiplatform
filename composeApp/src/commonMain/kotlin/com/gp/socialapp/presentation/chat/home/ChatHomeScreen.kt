@@ -20,7 +20,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
-import cafe.adriel.voyager.core.lifecycle.LifecycleEffect
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -38,17 +37,6 @@ object ChatHomeScreen : Screen {
 
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = navigator.rememberNavigatorScreenModel<ChatHomeScreenModel>()
-
-        LifecycleEffect(onStarted = {
-            screenModel.life.value = true
-            println("ChatHomeScreen started")
-        },
-            onDisposed = {
-                println("ChatHomeScreen disposed")
-                screenModel.life.value = false
-                screenModel.onDispose()
-            }
-        )
         val state by screenModel.uiState.collectAsState()
         ChatHomeScreenContent(
             state

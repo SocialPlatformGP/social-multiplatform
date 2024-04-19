@@ -17,14 +17,12 @@ import io.ktor.websocket.readText
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -88,24 +86,6 @@ class SocketServiceImpl(
     override suspend fun observeNewData(): Flow<Result<NewDataResponse>> {
         return sharedFlow
     }
-//    override suspend fun observeNewData(): Flow<Result<NewDataResponse>> {
-//        return try {
-//            socket?.incoming?.receiveAsFlow()?.filter {
-//                it is Frame.Text
-//            }?.map {
-//                val json = (it as? Frame.Text)?.readText() ?: ""
-//                val response = Json.decodeFromString<NewDataResponse>(json)
-//                println("im in socket: ${response.messages?.content}")
-//                Result.SuccessWithData(
-//                    response
-//                )
-//            } ?: flow { }
-//        } catch (e: Exception) {
-//            e.printStackTrace()
-//            flow { }
-//        }
-//    }
-
 
     override suspend fun sendMessage(message: MessageRequest.SendMessage): Result<Nothing> {
         println("message: $message")
@@ -122,41 +102,10 @@ class SocketServiceImpl(
 
     override suspend fun closeSocket(): Result<Nothing> {
         socket?.close()
-//        recentSocket?.close()
         return Result.Success
     }
 
     override suspend fun observeNewDataMessage(): Flow<Result<NewDataResponse>> {
         return sharedFlow
     }
-
-//    override fun observeRecentRooms(): Flow<Result<List<RecentRoomResponse>>> {
-//        return flow {
-//            recentSocket?.incoming?.receiveAsFlow()?.filter {
-//                println("new recent as frame : $it")
-//                it is Frame.Text
-//            }?.map {
-//                println("new recent as frame2 : $it")
-//                val json = (it as? Frame.Text)?.readText() ?: ""
-//                val recentRooms = Json.decodeFromString<List<RecentRoomResponse>>(json)
-//                println("recentRooms: $recentRooms")
-//                Result.SuccessWithData(recentRooms)
-//            }?.collect {
-//                emit(it)
-//            }
-//        }
-//    }
-}
-
-public fun <T> Flow<T>.mutableStateIn(
-    scope: CoroutineScope,
-    initialValue: T
-): MutableStateFlow<T> {
-    val flow = MutableStateFlow(initialValue)
-
-    scope.launch {
-        this@mutableStateIn.collect(flow)
-    }
-
-    return flow
 }

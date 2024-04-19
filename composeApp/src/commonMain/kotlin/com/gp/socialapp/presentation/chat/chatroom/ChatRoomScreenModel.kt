@@ -8,7 +8,6 @@ import com.gp.socialapp.data.chat.repository.MessageRepository
 import com.gp.socialapp.data.chat.repository.RoomRepository
 import com.gp.socialapp.util.DispatcherIO
 import com.gp.socialapp.util.Result
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -46,25 +45,9 @@ class ChatRoomScreenModel(
         }
     }
 
-//    private suspend fun observeMessages() {
-//        messageRepo.observeMessages().onEach { result ->
-//            result.onSuccessWithData { newData ->
-//                if (newData.messages == null || newData.messages.roomId != roomId)
-//                else {
-//                    val newList = _uiState.value.messages.toMutableList()
-//                    newList.add(0, newData.messages)
-//                    _uiState.update {
-//                        it.copy(messages = newList)
-//                    }
-//                }
-//            }
-//        }.launchIn(screenModelScope)
-//
-//    }
-
     private fun observeMessages() {
         if (job == null) {
-            job = CoroutineScope(DispatcherIO).launch {
+            job = screenModelScope.launch(DispatcherIO) {
                 messageRepo.observeMessages().collect { result ->
                     result.onSuccessWithData { newData ->
                         println("im in room vm :")

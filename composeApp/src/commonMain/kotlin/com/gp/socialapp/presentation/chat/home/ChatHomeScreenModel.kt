@@ -5,7 +5,6 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import com.gp.socialapp.data.auth.repository.AuthenticationRepository
 import com.gp.socialapp.data.chat.repository.RecentRoomRepository
 import com.gp.socialapp.util.DispatcherIO
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,9 +17,7 @@ class ChatHomeScreenModel(
 ) : ScreenModel {
     private val state = MutableStateFlow(ChatHomeUiState())
     val uiState = state.asStateFlow()
-    val scope = CoroutineScope(DispatcherIO)
     var job: Job? = null
-    var life = MutableStateFlow(true)
 
 
     init {
@@ -65,20 +62,16 @@ class ChatHomeScreenModel(
     fun observeMessages() {
         if (job == null) {
             job = screenModelScope.launch {
-                life.collect {
-                    if (it) {
-                        recentRoomRepository.observeNewData().collect { result ->
-                            println("im in home vm ")
-                            result.onSuccessWithData { newData ->
-                                state.update {
-                                    it.copy(recentRooms = newData.recentRooms)
-                                }
-                            }
+                recentRoomRepository.observeNewData().collect { result ->
+                    println("im in home vm ")
+                    result.onSuccessWithData { newData ->
+                        state.update {
+                            it.copy(recentRooms = newData.recentRooms)
                         }
                     }
-
                 }
             }
+
         }
     }
 
