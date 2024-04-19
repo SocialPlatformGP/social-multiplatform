@@ -5,6 +5,8 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import com.gp.socialapp.data.auth.repository.AuthenticationRepository
 import com.gp.socialapp.data.chat.repository.RecentRoomRepository
 import com.gp.socialapp.util.DispatcherIO
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -16,14 +18,18 @@ class ChatHomeScreenModel(
 ) : ScreenModel {
     private val state = MutableStateFlow(ChatHomeUiState())
     val uiState = state.asStateFlow()
+    val scope = CoroutineScope(DispatcherIO)
+    var job: Job? = null
+    var life = MutableStateFlow(true)
+
 
     init {
         getCurrentUser()
     }
 
-    private fun getCurrentUser() {
+
+    fun getCurrentUser() {
         screenModelScope.launch(DispatcherIO) {
-//            authenticationRepository.setLocalUserId("6616abe8ac5070037ba8b0d3")
             val userId = authenticationRepository.getCurrentLocalUserId()
             println("UserId: $userId")
             state.update {
@@ -46,7 +52,38 @@ class ChatHomeScreenModel(
         }
     }
 
-    fun getRecentRooms() {
+    //    suspend fun observeMessages() {
+//        recentRoomRepository.observeNewData().onEach { result ->
+//            result.onSuccessWithData { newData ->
+//                state.update {
+//                    it.copy(recentRooms = newData.recentRooms)
+//                }
+//            }
+//        }.launchIn(screenModelScope)
+//
+//    }
+    fun observeMessages() {
+        if (job == null) {
+            job = screenModelScope.launch {
+                life.collect {
+                    if (it) {
+                        recentRoomRepository.observeNewData().collect { result ->
+                            println("im in home vm ")
+                            result.onSuccessWithData { newData ->
+                                state.update {
+                                    it.copy(recentRooms = newData.recentRooms)
+                                }
+                            }
+                        }
+                    }
+
+                }
+            }
+        }
+    }
+
+
+    suspend fun getRecentRooms() {
         screenModelScope.launch(DispatcherIO) {
             recentRoomRepository.getAllRecentRooms(uiState.value.currentUserId)
                 .collect { result ->
@@ -56,6 +93,7 @@ class ChatHomeScreenModel(
                         println("Error: $it")
                     }
                 }
+            observeMessages()
         }
     }
 
@@ -68,4 +106,11 @@ class ChatHomeScreenModel(
             }
         }
     }
+
+    override fun onDispose() {
+        super.onDispose()
+        println("Disposed")
+    }
+
+
 }

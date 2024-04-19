@@ -20,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
+import cafe.adriel.voyager.core.lifecycle.LifecycleEffect
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -34,8 +35,20 @@ import com.gp.socialapp.presentation.chat.private_chat.CreatePrivateChatScreen
 object ChatHomeScreen : Screen {
     @Composable
     override fun Content() {
+
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = navigator.rememberNavigatorScreenModel<ChatHomeScreenModel>()
+
+        LifecycleEffect(onStarted = {
+            screenModel.life.value = true
+            println("ChatHomeScreen started")
+        },
+            onDisposed = {
+                println("ChatHomeScreen disposed")
+                screenModel.life.value = false
+                screenModel.onDispose()
+            }
+        )
         val state by screenModel.uiState.collectAsState()
         ChatHomeScreenContent(
             state
@@ -43,12 +56,10 @@ object ChatHomeScreen : Screen {
             when (event) {
                 is ChatHomeUiEvent.OnRecentChatClick -> {
                     event.recentRoomResponse.apply {
+                        navigator.pop()
                         navigator.push(
                             ChatRoomScreen(
-                                roomId,
-                                pic_url,
-                                title,
-                                isPrivate
+                                roomId, pic_url, title, isPrivate
                             )
                         )
                     }
@@ -64,6 +75,7 @@ object ChatHomeScreen : Screen {
                 }
 
                 ChatHomeUiEvent.OnBackClick -> {
+                    screenModel.onClear()
                     navigator.pop()
                 }
 
@@ -84,11 +96,9 @@ fun ChatHomeScreenContent(
             horizontalAlignment = Alignment.End,
             verticalArrangement = androidx.compose.foundation.layout.Arrangement.Bottom
         ) {
-            if (!fabState.value)
-                SingleFab(
-                    fabState,
-                    Icons.Default.Add
-                )
+            if (!fabState.value) SingleFab(
+                fabState, Icons.Default.Add
+            )
             else {
                 FabWithOptionButtons(fabState, event)
             }

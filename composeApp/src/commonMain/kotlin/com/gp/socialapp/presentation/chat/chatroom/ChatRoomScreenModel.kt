@@ -8,10 +8,10 @@ import com.gp.socialapp.data.chat.repository.MessageRepository
 import com.gp.socialapp.data.chat.repository.RoomRepository
 import com.gp.socialapp.util.DispatcherIO
 import com.gp.socialapp.util.Result
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.properties.Delegates
@@ -25,6 +25,7 @@ class ChatRoomScreenModel(
     val uiState = _uiState.asStateFlow()
     private var isPrivate by Delegates.notNull<Boolean>()
     private lateinit var roomId: String
+    private var job: Job? = null
     fun initScreen(roomId: String, isPrivate: Boolean) {
         this@ChatRoomScreenModel.isPrivate = isPrivate
         this@ChatRoomScreenModel.roomId = roomId
@@ -37,26 +38,47 @@ class ChatRoomScreenModel(
             messageRepo.fetchChatMessages(roomId).collect { result ->
                 result.onSuccessWithData { messages ->
                     _uiState.update { it.copy(messages = messages) }
-                    observeMessages()
                 }.onFailure {
                     println("Error: $it")
                 }
+                observeMessages()
             }
         }
     }
 
+//    private suspend fun observeMessages() {
+//        messageRepo.observeMessages().onEach { result ->
+//            result.onSuccessWithData { newData ->
+//                if (newData.messages == null || newData.messages.roomId != roomId)
+//                else {
+//                    val newList = _uiState.value.messages.toMutableList()
+//                    newList.add(0, newData.messages)
+//                    _uiState.update {
+//                        it.copy(messages = newList)
+//                    }
+//                }
+//            }
+//        }.launchIn(screenModelScope)
+//
+//    }
+
     private fun observeMessages() {
-        screenModelScope.launch(DispatcherIO) {
-            messageRepo.observeMessages().onEach { message ->
-                if (message is Result.SuccessWithData) {
-                    if (message.data.roomId != roomId) return@onEach
-                    val newList = _uiState.value.messages.toMutableList()
-                    newList.add(0, message.data)
-                    _uiState.update {
-                        it.copy(messages = newList)
+        if (job == null) {
+            job = CoroutineScope(DispatcherIO).launch {
+                messageRepo.observeMessages().collect { result ->
+                    result.onSuccessWithData { newData ->
+                        println("im in room vm :")
+                        if (newData.messages == null || newData.messages.roomId != roomId)
+                        else {
+                            val newList = _uiState.value.messages.toMutableList()
+                            newList.add(0, newData.messages)
+                            _uiState.update {
+                                it.copy(messages = newList)
+                            }
+                        }
                     }
                 }
-            }.launchIn(screenModelScope)
+            }
         }
     }
 
