@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
 
 sealed class MessageRequest {
     @Serializable
-    data class FetchMessages(val roomId: String) : MessageRequest()
+    data class FetchMessages(val roomId: String, val timestamp: Long = 0) : MessageRequest()
 
     @Serializable
     data class SendMessage(

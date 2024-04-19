@@ -46,7 +46,9 @@ data class AddMembersScreen(
         val state by screenModel.uiState.collectAsState()
         if(state.isDone) {
             screenModel.resetState()
-            navigator.pop()
+            navigator.pop().apply {
+                isInitialized = false
+            }
         }
         AddMembersContent(
             selectedUsers = state.selectedUsers,

@@ -21,8 +21,8 @@ fun MessageAttachment(
     Surface(
         shape = RoundedCornerShape(20.dp), color = Color.Transparent
     ) {
-        when (fileType) {
-            "png" -> {
+        when {
+             fileType.contains("image".toRegex()) -> {
                 MessageImageAttachment(
                     imageURL = fileUrl,
                     onImageClicked = { onImageClicked() },

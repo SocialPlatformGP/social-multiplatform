@@ -49,6 +49,7 @@ data class GroupDetailsScreen(
         val screenModel = navigator.rememberNavigatorScreenModel<GroupDetailsScreenModel>()
         var isInitialized by remember { mutableStateOf(false) }
         if(!isInitialized){
+            println("GroupDetailsScreen: init()")
             screenModel.init(roomId, roomTitle, roomAvatarUrl)
             isInitialized = true
         }
@@ -59,9 +60,10 @@ data class GroupDetailsScreen(
             onAction = { action ->
                 when(action){
                     is GroupDetailsAction.OnAddMembersClicked -> {
-                        navigator.push(AddMembersScreen(roomId = roomId, groupMembersIds = state.members.map { it.id }))
-                        screenModel.resetState()
-                        isInitialized = false
+                        navigator.push(AddMembersScreen(roomId = roomId, groupMembersIds = state.members.map { it.id })).also {
+                            screenModel.resetState()
+                            isInitialized = false
+                        }
                     }
                     is GroupDetailsAction.OnMessageUser -> {
                         //todo navigate to chat

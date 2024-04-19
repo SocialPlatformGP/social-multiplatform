@@ -41,19 +41,21 @@ class GroupDetailsScreenModel (
     private fun initGroupDetails() {
         screenModelScope.launch (DispatcherIO) {
             roomRepo.getRoomDetails(roomId).onSuccessWithData { room ->
+                println("room: $room")
                 val userIds = room.members.keys
                 launch {
                     userRepo.getUsersByIds(userIds.toList()).collect { result ->
-                        result.onSuccessWithData {
-                            val users = it.filter { user -> user.id != _uiState.value.currentUserId }
+                        result.onSuccessWithData { users ->
                             _uiState.update { state ->
                                 state.copy(
                                     members = users,
                                     admins = room.members.filter { it.value }.keys.toList(),
                                 )
                             }
+                            println("state: ${_uiState.value}")
                         }.onFailure {
                             //todo handle error
+                            println("error: $it")
                         }
                     }
                 }
@@ -64,6 +66,7 @@ class GroupDetailsScreenModel (
                 }
             }.onFailure {
                 //todo handle error
+                println("error: $it")
             }
         }
     }
