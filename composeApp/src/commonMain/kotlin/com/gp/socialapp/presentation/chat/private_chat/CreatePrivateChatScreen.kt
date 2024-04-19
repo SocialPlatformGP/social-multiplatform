@@ -20,6 +20,7 @@ import com.gp.socialapp.presentation.chat.chatroom.ChatRoomScreen
 import com.gp.socialapp.presentation.chat.private_chat.components.CreatePrivateChatItem
 
 object CreatePrivateChatScreen : Screen {
+    //Todo : ADD SEARCH FUNCTIONALITY
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow

@@ -3,6 +3,7 @@ package com.gp.socialapp.presentation.chat.creategroup.components
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.HorizontalDivider
@@ -23,6 +24,7 @@ fun ChooseGroupMembersSection(
 ) {
     Column(
         modifier = modifier,
+//        verticalArrangement = Arrangement.Top
     ) {
         FlowRow {
             selectedUsers.forEach { user ->
@@ -34,11 +36,61 @@ fun ChooseGroupMembersSection(
         }
         HorizontalDivider(
             modifier = modifier.padding(top = 16.dp),
-            thickness = 1.dp
+            thickness = 2.dp
         )
-        LazyColumn {
+        LazyColumn(
+            modifier = Modifier.padding(top = 20.dp).fillMaxHeight()
+        ) {
             items(users.size) { index ->
                 val user = users[index]
+                GroupMemberItem(
+                    selectableUser = user,
+                    isSelected = user.isSelected,
+                    isSelectable = true,
+                    onUserClick = {
+                        onUserClick(user)
+                    })
+
+                GroupMemberItem(
+                    selectableUser = user,
+                    isSelected = user.isSelected,
+                    isSelectable = true,
+                    onUserClick = {
+                        onUserClick(user)
+                    })
+
+                GroupMemberItem(
+                    selectableUser = user,
+                    isSelected = user.isSelected,
+                    isSelectable = true,
+                    onUserClick = {
+                        onUserClick(user)
+                    })
+
+                GroupMemberItem(
+                    selectableUser = user,
+                    isSelected = user.isSelected,
+                    isSelectable = true,
+                    onUserClick = {
+                        onUserClick(user)
+                    })
+
+                GroupMemberItem(
+                    selectableUser = user,
+                    isSelected = user.isSelected,
+                    isSelectable = true,
+                    onUserClick = {
+                        onUserClick(user)
+                    })
+
+                GroupMemberItem(
+                    selectableUser = user,
+                    isSelected = user.isSelected,
+                    isSelectable = true,
+                    onUserClick = {
+                        onUserClick(user)
+                    })
+
                 GroupMemberItem(
                     selectableUser = user,
                     isSelected = user.isSelected,

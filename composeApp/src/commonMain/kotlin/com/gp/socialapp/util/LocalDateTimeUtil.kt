@@ -38,6 +38,6 @@ object LocalDateTimeUtil {
         val minute = localDateTime.minute
         val amOrPm = if (hour < 12) "AM" else "PM"
         val hourIn12HrFormat = if (hour > 12) hour - 12 else hour
-        return "$hourIn12HrFormat:$minute: $amOrPm"
+        return "$hourIn12HrFormat:$minute $amOrPm"
     }
 }

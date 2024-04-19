@@ -66,7 +66,7 @@ class ChatHomeScreenModel(
                     println("im in home vm ")
                     result.onSuccessWithData { newData ->
                         state.update {
-                            it.copy(recentRooms = newData.recentRooms)
+                            it.copy(recentRooms = newData.recentRooms.sortedByDescending { it.lastMessageTime })
                         }
                     }
                 }
@@ -81,7 +81,8 @@ class ChatHomeScreenModel(
             recentRoomRepository.getAllRecentRooms(uiState.value.currentUserId)
                 .collect { result ->
                     result.onSuccessWithData { data ->
-                        state.value = ChatHomeUiState(recentRooms = data)
+                        state.value =
+                            ChatHomeUiState(recentRooms = data.sortedByDescending { it.lastMessageTime })
                     }.onFailure {
                         println("Error: $it")
                     }

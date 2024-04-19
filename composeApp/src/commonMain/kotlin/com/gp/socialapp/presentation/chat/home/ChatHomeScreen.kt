@@ -20,6 +20,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
+import cafe.adriel.voyager.core.lifecycle.LifecycleEffect
+import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -30,6 +32,7 @@ import com.gp.socialapp.presentation.chat.home.components.FabWithOptionButtons
 import com.gp.socialapp.presentation.chat.home.components.RecentRoomItem
 import com.gp.socialapp.presentation.chat.home.components.SingleFab
 import com.gp.socialapp.presentation.chat.private_chat.CreatePrivateChatScreen
+import kotlinx.coroutines.launch
 
 object ChatHomeScreen : Screen {
     @Composable
@@ -37,6 +40,10 @@ object ChatHomeScreen : Screen {
 
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = navigator.rememberNavigatorScreenModel<ChatHomeScreenModel>()
+        LifecycleEffect(
+            onStarted = { screenModel.screenModelScope.launch { screenModel.getCurrentUser() } },
+            onDisposed = {}
+        )
         val state by screenModel.uiState.collectAsState()
         ChatHomeScreenContent(
             state
@@ -100,6 +107,7 @@ fun ChatHomeScreenContent(
             LazyColumn(
                 modifier = Modifier.fillMaxSize()
             ) {
+                println("recent rooms: ${state.recentRooms}")
                 items(state.recentRooms) { recentRoom ->
                     val animatable = remember { Animatable(0.5f) }
                     LaunchedEffect(key1 = true) {

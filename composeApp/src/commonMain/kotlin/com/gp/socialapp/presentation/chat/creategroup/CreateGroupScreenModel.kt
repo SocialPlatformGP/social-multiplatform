@@ -114,7 +114,11 @@ class CreateGroupScreenModel(
                 ).collect { result ->
                     result.onSuccessWithData { room ->
                         _uiState.update {
-                            it.copy(isCreated = true, groupId = room.id, groupAvatarUrl = room.picUrl)
+                            it.copy(
+                                isCreated = true,
+                                groupId = room.id,
+                                groupAvatarUrl = room.picUrl
+                            )
                         }
                     }.onFailure {
                         println("Error: $it")
@@ -132,6 +136,7 @@ class CreateGroupScreenModel(
             is CreateGroupAction.OnCreateGroup -> createGroup()
             is CreateGroupAction.OnImagePicked -> updateAvatar(action.array)
             is CreateGroupAction.OnSelectUser -> addMember(action.userId)
+            else -> Unit
         }
     }
 

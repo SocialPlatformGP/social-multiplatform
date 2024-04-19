@@ -8,12 +8,18 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -49,7 +55,16 @@ object CreateGroupScreen : Screen {
             screenModel.resetState()
         }
         CreateGroupScreenContent(
-            onAction = { action -> screenModel.handleUiAction(action) },
+            onAction = {
+                when (it) {
+                    is CreateGroupAction.OnBackClicked -> {
+                        navigator.pop()
+                        screenModel.resetState()
+                    }
+
+                    else -> screenModel.handleUiAction(it)
+                }
+            },
             groupName = state.groupName,
             avatarByteArray = state.groupAvatarByteArray,
             isError = state.isError,
@@ -58,6 +73,7 @@ object CreateGroupScreen : Screen {
         )
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     private fun CreateGroupScreenContent(
         modifier: Modifier = Modifier,
@@ -69,6 +85,24 @@ object CreateGroupScreen : Screen {
         allUsers: List<SelectableUser>,
     ) {
         Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = {},
+                    navigationIcon = {
+                        IconButton(
+                            onClick = {
+                                onAction(CreateGroupAction.OnBackClicked)
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.ArrowBackIosNew,
+                                contentDescription = "Back"
+                            )
+                        }
+                    },
+                    actions = {},
+                )
+            },
             modifier = modifier
         ) {
             Surface(
@@ -99,6 +133,7 @@ object CreateGroupScreen : Screen {
                             isError = isError,
                             onChangeError = { value -> onAction(CreateGroupAction.OnSetError(value)) })
                         ChooseGroupMembersSection(
+                            modifier = Modifier.weight(1f),
                             selectedUsers = selectedUsers,
                             onUnselectUser = { userId ->
                                 onAction(
