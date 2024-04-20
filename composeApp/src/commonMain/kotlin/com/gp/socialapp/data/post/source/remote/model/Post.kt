@@ -1,7 +1,7 @@
 package com.gp.socialapp.data.post.source.remote.model
 
 import com.gp.socialapp.data.post.source.local.model.PostEntity
-import com.gp.socialapp.data.post.source.remote.model.PostFile.Companion.toDbString
+import com.gp.socialapp.data.post.source.remote.model.PostAttachment.Companion.toDbString
 import com.gp.socialapp.data.post.source.remote.model.Tag.Companion.toDbString
 import com.gp.socialapp.data.post.util.PostPopularityUtils
 import com.gp.socialapp.util.LocalDateTimeUtil.now
@@ -26,7 +26,7 @@ data class Post(
     val editedStatus: Boolean = false,
     val tags: List<Tag> = emptyList(),
     val type: String = "general",
-    val attachments: List<PostFile> = emptyList(),
+    val attachments: List<PostAttachment> = emptyList(),
     val lastModified: Long = LocalDateTime.now().toInstant(TimeZone.UTC).epochSeconds
 ) {
     companion object {

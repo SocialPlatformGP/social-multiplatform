@@ -7,7 +7,7 @@ import com.gp.socialapp.data.post.source.remote.model.Reply
 
 data class PostDetailsUiState(
     val post: Post = Post(),
-    val currentUser: User = User(),
+    val currentUserId: String = "",
     val isLoading: Boolean = false,
     val currentReplies: List<NestedReply> = emptyList(),
     val currentReply: Reply = Reply(),

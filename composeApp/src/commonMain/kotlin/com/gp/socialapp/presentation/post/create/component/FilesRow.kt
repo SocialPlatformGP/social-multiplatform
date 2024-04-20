@@ -11,13 +11,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.gp.socialapp.data.post.source.remote.model.PostFile
+import com.gp.socialapp.data.post.source.remote.model.PostAttachment
 import com.mohamedrejeb.calf.picker.toImageBitmap
 
 @Composable
 fun FilesRow(
-    files: List<PostFile>,
-    onFileClick: (PostFile) -> Unit,
+    files: List<PostAttachment>,
+    onFileClick: (PostAttachment) -> Unit,
 ) {
     LazyRow(
         modifier = Modifier.fillMaxWidth(),

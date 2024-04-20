@@ -211,7 +211,9 @@ data class UserInformationScreen(
                         )
                     }
                 }
-                Row {
+                Row (
+                    verticalAlignment = Alignment.CenterVertically
+                ){
                     OutlinedTextField(
                         value = state.firstName,
                         onValueChange = onFirstNameChange,

@@ -13,3 +13,8 @@ xcuserdata/
 Pods/
 *.jks
 *yarn.lock
+/composeApp/default.backup.realm
+/composeApp/default.realm
+/composeApp/default.realm.backup-log
+/composeApp/default.realm.lock
+/composeApp/edulink.db

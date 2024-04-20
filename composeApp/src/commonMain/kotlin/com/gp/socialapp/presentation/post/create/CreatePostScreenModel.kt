@@ -6,7 +6,7 @@ import com.gp.socialapp.data.auth.repository.AuthenticationRepository
 import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.data.post.repository.PostRepository
 import com.gp.socialapp.data.post.source.remote.model.Post
-import com.gp.socialapp.data.post.source.remote.model.PostFile
+import com.gp.socialapp.data.post.source.remote.model.PostAttachment
 import com.gp.socialapp.data.post.source.remote.model.Tag
 import com.gp.socialapp.util.Result
 import kotlinx.coroutines.Dispatchers
@@ -26,7 +26,7 @@ class CreatePostScreenModel(
 
 
     init {
-//        getCurrentUser()
+        getCurrentUser()
         getChannelTags()
     }
 
@@ -113,7 +113,6 @@ class CreatePostScreenModel(
                         is Result.Error -> {
                             println("Error: cant get user data")
                         }
-
                         else -> Unit
                     }
                 }
@@ -121,13 +120,13 @@ class CreatePostScreenModel(
         }
     }
 
-    fun onAddFile(postFile: PostFile) {
+    fun onAddFile(postAttachment: PostAttachment) {
         screenModelScope.launch {
-            _uiState.update { it.copy(files = it.files + postFile) }
+            _uiState.update { it.copy(files = it.files + postAttachment) }
         }
     }
 
-    fun onRemoveFile(file: PostFile) {
+    fun onRemoveFile(file: PostAttachment) {
         screenModelScope.launch(Dispatchers.Default) {
             val newFiles = uiState.value.files.filter { !it.file.contentEquals(file.file) }
             _uiState.value = uiState.value.copy(files = newFiles)

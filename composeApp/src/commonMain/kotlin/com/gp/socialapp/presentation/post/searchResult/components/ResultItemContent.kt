@@ -24,7 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.gp.socialapp.data.post.source.remote.model.PostFile
+import com.gp.socialapp.data.post.source.remote.model.PostAttachment
 import com.gp.socialapp.util.AppConstants.BASE_URL
 import com.mohamedrejeb.calf.picker.FilePickerFileType
 import com.seiko.imageloader.model.ImageAction
@@ -36,7 +36,7 @@ fun ResultItemContent(
     modifier: Modifier = Modifier,
     title: String,
     body: String,
-    attachments: List<PostFile>,
+    attachments: List<PostAttachment>,
     onImageClicked:(String) -> Unit = {}
 ) {
     Row (

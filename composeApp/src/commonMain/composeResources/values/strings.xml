@@ -51,4 +51,6 @@
     <string name="post_report_completed">Post has been reported successfully</string>
     <string name="post_update_completed">Post has been updated successfully</string>
     <string name="unknown_action_result">xD?</string>
+    <string name="confirm_member_removal">Are you sure you want to remove this user from the group?</string>
+    <string name="add_selected_members">Add selected members</string>
 </resources>

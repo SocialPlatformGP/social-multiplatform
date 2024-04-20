@@ -1,7 +1,7 @@
 package com.gp.socialapp.presentation.post.feed
 
 import com.gp.socialapp.data.post.source.remote.model.Post
-import com.gp.socialapp.data.post.source.remote.model.PostFile
+import com.gp.socialapp.data.post.source.remote.model.PostAttachment
 import com.gp.socialapp.data.post.source.remote.model.Reply
 import com.gp.socialapp.data.post.source.remote.model.Tag
 
@@ -15,10 +15,10 @@ sealed class PostEvent() {
     data class OnPostShareClicked(val post: Post) : PostEvent()
     object OnAddPost : PostEvent()
     data class OnTagClicked(val tag: Tag) : PostEvent()
-    data class OnAudioClicked(val file: PostFile) : PostEvent()
-    data class OnImageClicked(val file: PostFile) : PostEvent()
-    data class OnVideoClicked(val file: PostFile) : PostEvent()
-    data class OnDocumentClicked(val file: PostFile) : PostEvent()
+    data class OnAudioClicked(val file: PostAttachment) : PostEvent()
+    data class OnImageClicked(val file: PostAttachment) : PostEvent()
+    data class OnVideoClicked(val file: PostAttachment) : PostEvent()
+    data class OnDocumentClicked(val file: PostAttachment) : PostEvent()
     data class OnCommentClicked(val postId: String) : PostEvent()
     data class OnCommentAdded(
         val text: String,
@@ -26,7 +26,7 @@ sealed class PostEvent() {
     ) : PostEvent()
 
     object Initial : PostEvent()
-    data class OnViewFilesAttachmentClicked(val files: List<PostFile>) : PostEvent()
+    data class OnViewFilesAttachmentClicked(val files: List<PostAttachment>) : PostEvent()
 
 }
 

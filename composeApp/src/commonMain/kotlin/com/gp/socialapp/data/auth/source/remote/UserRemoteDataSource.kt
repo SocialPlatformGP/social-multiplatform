@@ -2,6 +2,7 @@ package com.gp.socialapp.data.auth.source.remote
 
 import com.eygraber.uri.Uri
 import com.gp.socialapp.data.auth.source.remote.model.User
+import com.gp.socialapp.data.auth.source.remote.model.requests.GetUsersByIdsRequest
 import com.gp.socialapp.util.Result
 import kotlinx.coroutines.flow.Flow
 
@@ -12,5 +13,5 @@ interface UserRemoteDataSource {
     suspend fun fetchUser(email: String): Result<User>
     fun fetchUsers(): Flow<Result<List<User>>>
     fun getCurrentUserEmail(): String
-    fun getUsersByEmails(emails: List<String>): Flow<Result<List<User>>>
+    fun getUsersByIds(request: GetUsersByIdsRequest): Flow<Result<List<User>>>
 }

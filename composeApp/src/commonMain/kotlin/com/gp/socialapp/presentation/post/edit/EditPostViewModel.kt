@@ -4,7 +4,7 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.gp.socialapp.data.post.repository.PostRepository
 import com.gp.socialapp.data.post.source.remote.model.Post
-import com.gp.socialapp.data.post.source.remote.model.PostFile
+import com.gp.socialapp.data.post.source.remote.model.PostAttachment
 import com.gp.socialapp.data.post.source.remote.model.Tag
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -65,13 +65,13 @@ class EditPostScreenModel(
         _post.update { it.copy(tags = it.tags - tag) }
     }
 
-    fun addFile(files: List<PostFile>) {
+    fun addFile(files: List<PostAttachment>) {
         val files2 = post.value.attachments + files
 
         _post.update { it.copy(attachments = files2.distinct()) }
     }
 
-    fun removeFile(file: PostFile) {
+    fun removeFile(file: PostAttachment) {
         _post.update { it.copy(attachments = it.attachments - file) }
     }
 

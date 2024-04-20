@@ -11,7 +11,9 @@ data class FeedUiState(
     val allTags: Set<Tag> = emptySet(),
     val selectedTags: Set<Tag> = emptySet(),
     val error: FeedError = FeedError.NoError,
-    val openedTabItem: FeedTab = FeedTab.GENERAL
+    val openedTabItem: FeedTab = FeedTab.GENERAL,
+    val currentUserID: String = "",
+    val isLoggedOut: Boolean = false
 )
 
 

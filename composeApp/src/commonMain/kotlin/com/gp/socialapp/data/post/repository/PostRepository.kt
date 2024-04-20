@@ -10,8 +10,8 @@ interface PostRepository {
     fun getPosts(): Flow<Result<List<Post>>>
     suspend fun updatePost(post: Post): Result<Nothing>
     suspend fun deletePost(post: Post): Result<Nothing>
-    suspend fun upvotePost(post: Post): Result<Nothing>
-    suspend fun downvotePost(post: Post): Result<Nothing>
+    suspend fun upvotePost(post: Post, userId: String): Result<Nothing>
+    suspend fun downvotePost(post: Post, userId: String): Result<Nothing>
     suspend fun fetchPostById(id: String): Flow<Post>
     suspend fun createPost(post: Post): Flow<Result<String>>
     suspend fun reportPost(postId: String, reporterId: String): Result<Nothing>

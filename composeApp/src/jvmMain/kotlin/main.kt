@@ -1,16 +1,13 @@
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.gp.socialapp.data.post.source.remote.model.Post
-import com.gp.socialapp.data.post.source.remote.model.PostFile
+import com.gp.socialapp.data.post.source.remote.model.PostAttachment
 import com.gp.socialapp.presentation.app.App
-import com.gp.socialapp.presentation.post.searchResult.components.SearchResultItem
 import com.gp.socialapp.theme.AppTheme
 import com.mohamedrejeb.calf.picker.FilePickerFileType
 import java.awt.Dimension
@@ -30,15 +27,13 @@ fun main() = application {
 @Composable
 fun PreviewApp() {
     AppTheme {
-        Column{
-            SearchResultItem(
-                item = post,
-                onPostClicked = {},
-                modifier = Modifier.padding(16.dp))
+        Column {
+
         }
 
     }
 }
+
 val post = Post(
     id = "sfgs",
     authorName = "John Doe",
@@ -49,8 +44,8 @@ val post = Post(
     votes = 42,
     replyCount = 3,
     attachments = listOf(
-        PostFile(
+        PostAttachment(
             type = FilePickerFileType.ImageContentType,
         )
     )
-    )
+)

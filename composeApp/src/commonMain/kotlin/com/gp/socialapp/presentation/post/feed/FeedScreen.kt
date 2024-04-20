@@ -54,7 +54,8 @@ import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gp.socialapp.data.post.source.remote.model.Post
-import com.gp.socialapp.data.post.source.remote.model.PostFile
+import com.gp.socialapp.data.post.source.remote.model.PostAttachment
+import com.gp.socialapp.presentation.auth.login.LoginScreen
 import com.gp.socialapp.presentation.post.create.CreatePostScreen
 import com.gp.socialapp.presentation.post.feed.components.FeedPostItem
 import com.gp.socialapp.presentation.post.feed.components.FeedTopBar
@@ -76,11 +77,15 @@ object FeedScreen : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = navigator.rememberNavigatorScreenModel<FeedScreenModel>()
-        var currentAttachments by remember { mutableStateOf(emptyList<PostFile>()) }
+        var currentAttachments by remember { mutableStateOf(emptyList<PostAttachment>()) }
         val scope = rememberCoroutineScope()
         val state by screenModel.state.collectAsState()
         var isFileBottomSheetOpen by remember { mutableStateOf(false) }
         val bottomSheetState = rememberModalBottomSheetState()
+        if(state.isLoggedOut){
+            navigator.push(LoginScreen)
+            screenModel.resetState()
+        }
         val tabItems = listOf(
             TabItem(stringResource(resource = Res.string.general), Icons.Filled.AllInclusive),
             TabItem(
@@ -90,7 +95,7 @@ object FeedScreen : Screen {
         )
         FeedContent(
             state = state,
-            currentUserID = "25",
+            currentUserID = state.currentUserID,
             onPostEvent = { action ->
                 when (action) {
                     is PostEvent.OnAddPost -> {
@@ -149,7 +154,7 @@ object FeedScreen : Screen {
                     }
 
                     is PostEvent.OnPostShareClicked -> {
-                        TODO()
+                        screenModel.logout()
                     }
 
                     else -> {}
@@ -193,7 +198,7 @@ object FeedScreen : Screen {
         currentUserID: String,
         state: FeedUiState,
         scope: CoroutineScope = rememberCoroutineScope(),
-        currentAttachments: List<PostFile>,
+        currentAttachments: List<PostAttachment>,
         isFileBottomSheetOpen: Boolean,
         tabItems: List<TabItem>,
         onChangeOpenedTab: (Int) -> Unit = { },

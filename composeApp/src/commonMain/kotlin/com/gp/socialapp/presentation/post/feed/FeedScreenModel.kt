@@ -2,9 +2,11 @@ package com.gp.socialapp.presentation.post.feed
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
+import com.gp.socialapp.data.auth.repository.AuthenticationRepository
 import com.gp.socialapp.data.post.repository.PostRepository
 import com.gp.socialapp.data.post.source.remote.model.Post
 import com.gp.socialapp.data.post.util.PostPopularityUtils
+import com.gp.socialapp.util.DispatcherIO
 import com.gp.socialapp.util.Result
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,18 +16,22 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class FeedScreenModel(
-    val repository: PostRepository,
+    private val postRepo: PostRepository,
+    private val authRepo: AuthenticationRepository
 ) : ScreenModel {
     private val _state = MutableStateFlow(FeedUiState())
     val state = _state.asStateFlow()
-    private val currentUserId: String = "25"
-    //TODO: Implement currentUserId
     init {
-        getAllPosts()
+        screenModelScope.launch (DispatcherIO){
+            val userId = authRepo.getCurrentLocalUserId()
+            _state.update { it.copy(currentUserID = userId) }
+            getAllPosts()
+        }
+
     }
     private fun getAllPosts() {
-        screenModelScope.launch(Dispatchers.Default) {
-            repository.getPosts().collectLatest { result ->
+        screenModelScope.launch(DispatcherIO) {
+            postRepo.getPosts().collectLatest { result ->
                 when (result) {
                     is Result.SuccessWithData -> {
                         result.data.forEach { post ->
@@ -81,8 +87,8 @@ class FeedScreenModel(
     }
 
     fun upVote(post: Post) {
-        screenModelScope.launch(Dispatchers.Default) {
-            val result = repository.upvotePost(post)
+        screenModelScope.launch(DispatcherIO) {
+            val result = postRepo.upvotePost(post, state.value.currentUserID)
             when (result) {
                 is Result.Error -> {
                     _state.update { it.copy(error = FeedError.NetworkError(result.message)) }
@@ -98,8 +104,8 @@ class FeedScreenModel(
     }
 
     fun downVote(post: Post) {
-        screenModelScope.launch(Dispatchers.Default) {
-            val result = repository.downvotePost(post)
+        screenModelScope.launch(DispatcherIO) {
+            val result = postRepo.downvotePost(post, state.value.currentUserID)
             when (result) {
                 is Result.Error -> {
                     _state.update { it.copy(error = FeedError.NetworkError(result.message)) }
@@ -115,8 +121,8 @@ class FeedScreenModel(
     }
 
     fun reportPost(post: Post) {
-        screenModelScope.launch(Dispatchers.Default) {
-            val result = repository.reportPost(post.id, currentUserId)
+        screenModelScope.launch(DispatcherIO) {
+            val result = postRepo.reportPost(post.id, state.value.currentUserID)
             if (result is Result.Error) {
                 _state.update { it.copy(error = FeedError.NetworkError(result.message)) }
             }
@@ -124,8 +130,8 @@ class FeedScreenModel(
     }
 
     fun deletePost(post: Post) {
-        screenModelScope.launch() {
-            val result = repository.deletePost(post)
+        screenModelScope.launch(DispatcherIO) {
+            val result = postRepo.deletePost(post)
             when (result) {
                 is Result.Error -> {
                     _state.update { it.copy(error = FeedError.NetworkError(result.message)) }
@@ -163,6 +169,18 @@ class FeedScreenModel(
     fun changeOpenedTab(tab: Int){
         _state.update {
             it.copy(openedTabItem = FeedTab.entries[tab])
+        }
+    }
+    fun logout() {
+        screenModelScope.launch {
+            authRepo.clearStorage()
+            _state.update { it.copy(isLoggedOut = true) }
+        }
+    }
+
+    fun resetState() {
+        screenModelScope.launch {
+            _state.update { FeedUiState() }
         }
     }
 }

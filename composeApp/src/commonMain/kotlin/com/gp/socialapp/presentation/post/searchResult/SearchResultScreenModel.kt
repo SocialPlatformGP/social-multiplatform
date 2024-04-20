@@ -4,6 +4,7 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.gp.socialapp.data.post.repository.PostRepository
 import com.gp.socialapp.data.post.source.remote.model.Tag
+import com.gp.socialapp.util.DispatcherIO
 import com.gp.socialapp.util.Result
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,7 +18,7 @@ class SearchResultScreenModel(
     private val _uiState = MutableStateFlow(SearchResultUiState())
     val uiState = _uiState.asStateFlow()
     fun initScreenModel(searchTerm: String, searchTag: Tag, isTag: Boolean) {
-        screenModelScope.launch {
+        screenModelScope.launch(DispatcherIO) {
             if(isTag) {
                 postRepo.searchByTag(searchTag).collect {
                     when(it) {

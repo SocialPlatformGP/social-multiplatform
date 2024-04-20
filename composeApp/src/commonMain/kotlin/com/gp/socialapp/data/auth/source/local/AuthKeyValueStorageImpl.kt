@@ -13,7 +13,8 @@ class AuthKeyValueStorageImpl(
             settings[AppConstants.StorageKeys.USER_TOKEN.key] = value
         }
     override var userId: String?
-        get() = settings.getStringOrNull(AppConstants.StorageKeys.USER_ID.key)
+//        get() = settings.getStringOrNull(AppConstants.StorageKeys.USER_ID.key)
+        get() = settings.getString(AppConstants.StorageKeys.USER_ID.key, "662106064d63fe2e5e09375d")
         set(value) {
             settings[AppConstants.StorageKeys.USER_ID.key] = value
         }

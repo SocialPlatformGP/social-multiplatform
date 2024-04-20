@@ -133,18 +133,18 @@ class PostRepositoryImpl(
         return postRemoteSource.deletePost(request)
     }
 
-    override suspend fun upvotePost(post: Post): Result<Nothing> {
+    override suspend fun upvotePost(post: Post, userId: String): Result<Nothing> {
         val request = PostRequest.UpvoteRequest(
             post.id,
-            authStorage.userId ?: "25"
+            userId
         )
         return postRemoteSource.upvotePost(request)
     }
 
-    override suspend fun downvotePost(post: Post): Result<Nothing> {
+    override suspend fun downvotePost(post: Post, userId: String): Result<Nothing> {
         val request = PostRequest.DownvoteRequest(
             post.id,
-            authStorage.userId ?: "25"
+            userId
         )
         return postRemoteSource.downvotePost(request)
     }
