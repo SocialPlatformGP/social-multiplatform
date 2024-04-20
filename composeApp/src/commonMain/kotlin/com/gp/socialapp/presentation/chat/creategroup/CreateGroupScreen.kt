@@ -27,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import cafe.adriel.voyager.core.lifecycle.LifecycleEffect
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -43,6 +44,11 @@ object CreateGroupScreen : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = navigator.rememberNavigatorScreenModel<CreateGroupScreenModel>()
         val state by screenModel.uiState.collectAsState()
+        LifecycleEffect(
+            onStarted = {
+                screenModel.init()
+            }
+        )
         if (state.isCreated) {
             navigator.replace(
                 ChatRoomScreen(
@@ -52,14 +58,12 @@ object CreateGroupScreen : Screen {
                     isPrivate = false
                 )
             )
-            screenModel.resetState()
         }
         CreateGroupScreenContent(
             onAction = {
                 when (it) {
                     is CreateGroupAction.OnBackClicked -> {
                         navigator.pop()
-                        screenModel.resetState()
                     }
 
                     else -> screenModel.handleUiAction(it)

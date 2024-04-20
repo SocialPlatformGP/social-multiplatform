@@ -31,7 +31,7 @@ import com.gp.socialapp.presentation.chat.creategroup.CreateGroupScreen
 import com.gp.socialapp.presentation.chat.home.components.FabWithOptionButtons
 import com.gp.socialapp.presentation.chat.home.components.RecentRoomItem
 import com.gp.socialapp.presentation.chat.home.components.SingleFab
-import com.gp.socialapp.presentation.chat.private_chat.CreatePrivateChatScreen
+import com.gp.socialapp.presentation.chat.createprivate.CreatePrivateChatScreen
 import kotlinx.coroutines.launch
 
 object ChatHomeScreen : Screen {

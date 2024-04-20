@@ -1,4 +1,4 @@
-package com.gp.socialapp.presentation.chat.private_chat.components
+package com.gp.socialapp.presentation.chat.createprivate.components
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.padding

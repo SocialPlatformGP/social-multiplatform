@@ -28,8 +28,13 @@ class ChatRoomScreenModel(
     fun initScreen(roomId: String, isPrivate: Boolean) {
         this@ChatRoomScreenModel.isPrivate = isPrivate
         this@ChatRoomScreenModel.roomId = roomId
+        resetState()
         getCurrentUserId()
         getMessages()
+    }
+
+    private fun resetState() {
+        _uiState.update { ChatRoomUiState() }
     }
 
     private fun getMessages() {

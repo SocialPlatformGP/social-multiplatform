@@ -1,4 +1,4 @@
-package com.gp.socialapp.presentation.chat.private_chat
+package com.gp.socialapp.presentation.chat.createprivate
 
 import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.data.chat.model.Room

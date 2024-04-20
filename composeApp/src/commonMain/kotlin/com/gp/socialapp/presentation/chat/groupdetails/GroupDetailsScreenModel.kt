@@ -20,6 +20,7 @@ class GroupDetailsScreenModel (
     val uiState = _uiState.asStateFlow()
     private lateinit var roomId: String
     fun init(roomId: String, roomTitle: String, roomAvatarUrl: String) {
+        resetState()
         _uiState.value = GroupDetailsUiState(
             groupName = roomTitle,
             groupAvatarUrl = roomAvatarUrl
@@ -121,7 +122,7 @@ class GroupDetailsScreenModel (
         }
     }
 
-    fun resetState() {
+    private fun resetState() {
         _uiState.value = GroupDetailsUiState()
     }
 }

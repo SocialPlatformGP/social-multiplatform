@@ -1,4 +1,4 @@
-package com.gp.socialapp.presentation.chat.private_chat
+package com.gp.socialapp.presentation.chat.createprivate
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,7 +17,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.presentation.chat.chatroom.ChatRoomScreen
-import com.gp.socialapp.presentation.chat.private_chat.components.CreatePrivateChatItem
+import com.gp.socialapp.presentation.chat.createprivate.components.CreatePrivateChatItem
 
 object CreatePrivateChatScreen : Screen {
     //Todo : ADD SEARCH FUNCTIONALITY

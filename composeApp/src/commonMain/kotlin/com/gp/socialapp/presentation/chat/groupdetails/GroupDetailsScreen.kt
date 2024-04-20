@@ -24,6 +24,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.core.lifecycle.LifecycleEffect
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -48,12 +49,11 @@ data class GroupDetailsScreen(
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = navigator.rememberNavigatorScreenModel<GroupDetailsScreenModel>()
-        var isInitialized by remember { mutableStateOf(false) }
-        if (!isInitialized) {
-            println("GroupDetailsScreen: init()")
-            screenModel.init(roomId, roomTitle, roomAvatarUrl)
-            isInitialized = true
-        }
+        LifecycleEffect(
+            onStarted = {
+                screenModel.init(roomId, roomTitle, roomAvatarUrl)
+            }
+        )
         val state by screenModel.uiState.collectAsState()
         GroupDetailsContent(
             avatarURL = state.groupAvatarUrl,
@@ -65,10 +65,7 @@ data class GroupDetailsScreen(
                             AddMembersScreen(
                                 roomId = roomId,
                                 groupMembersIds = state.members.map { it.id })
-                        ).also {
-                            screenModel.resetState()
-                            isInitialized = false
-                        }
+                        )
                     }
 
                     is GroupDetailsAction.OnMessageUser -> {
@@ -81,7 +78,6 @@ data class GroupDetailsScreen(
 
                     is GroupDetailsAction.OnBackClicked -> {
                         navigator.pop()
-                        screenModel.resetState()
                     }
 
                     else -> {

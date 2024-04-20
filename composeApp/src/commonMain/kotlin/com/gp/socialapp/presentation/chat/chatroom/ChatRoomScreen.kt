@@ -21,6 +21,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import cafe.adriel.voyager.core.lifecycle.LifecycleEffect
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -54,12 +55,13 @@ data class ChatRoomScreen(
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = navigator.rememberNavigatorScreenModel<ChatRoomScreenModel>()
         val state by screenModel.uiState.collectAsState()
-        var isInitialized by remember { mutableStateOf(false) }
-        if (!isInitialized) {
-            screenModel.initScreen(roomId, isPrivate)
-            isInitialized = true
-        }
-        ChatRoomContent(messages = state.messages,
+        LifecycleEffect(
+            onStarted = {
+                screenModel.initScreen(roomId, isPrivate)
+            }
+        )
+        ChatRoomContent(
+            messages = state.messages,
             currentUserId = state.currentUserId,
             attachment = state.currentAttachment,
             onAction = { action ->

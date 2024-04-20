@@ -27,6 +27,7 @@ class AddMembersScreenModel(
     fun init(roomId: String, groupMembersIds: List<String>) {
         this.roomId = roomId
         this.groupMembersIds = groupMembersIds
+        resetState()
         getUserID()
         initAddMembers()
     }
@@ -113,7 +114,7 @@ class AddMembersScreenModel(
         }
     }
 
-    fun resetState() {
+    private fun resetState() {
         _uiState.update { AddMembersUiState() }
     }
 }
