@@ -18,6 +18,10 @@ import com.gp.socialapp.data.post.source.remote.PostRemoteDataSource
 import com.gp.socialapp.data.post.source.remote.PostRemoteDataSourceImpl
 import com.gp.socialapp.data.post.source.remote.ReplyRemoteDataSource
 import com.gp.socialapp.data.post.source.remote.ReplyRemoteDataSourceImpl
+import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.createSupabaseClient
+import io.github.jan.supabase.gotrue.Auth
+import io.github.jan.supabase.gotrue.FlowType
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.websocket.WebSockets
@@ -32,15 +36,25 @@ import kotlin.time.Duration.Companion.seconds
 
 
 val remoteDataSourceModuleK = DI.Module("remoteDataSourceModule") {
-    bind<PostRemoteDataSource>() with singleton { PostRemoteDataSourceImpl() }
+    bind<PostRemoteDataSource>() with singleton { PostRemoteDataSourceImpl(instance()) }
     bind<MaterialRemoteDataSource>() with singleton {
         MaterialRemoteDataSourceImpl(
             instance(),
             instance()
         )
     }
-    bind<ReplyRemoteDataSource>() with singleton { ReplyRemoteDataSourceImpl() }
-    bind<AuthenticationRemoteDataSource>() with singleton { AuthenticationRemoteDataSourceImpl() }
+    bind<SupabaseClient>() with singleton {
+        createSupabaseClient(
+            supabaseUrl = "https://vszvbwfzewqeoxxpetgj.supabase.co",
+            supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZzenZid2Z6ZXdxZW94eHBldGdqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTM2MjM0MjUsImV4cCI6MjAyOTE5OTQyNX0.dO4SiJ9MCN0gZaY15kjqRdYL0NRFTZWID_xiYWhAnk8"
+        ) {
+            install(Auth){
+                flowType = FlowType.PKCE
+            }
+        }
+    }
+    bind<ReplyRemoteDataSource>() with singleton { ReplyRemoteDataSourceImpl(instance()) }
+    bind<AuthenticationRemoteDataSource>() with singleton { AuthenticationRemoteDataSourceImpl(instance(), instance()) }
     bind<MessageRemoteDataSource>() with singleton {
         MessageRemoteDataSourceImpl(
             instance(),

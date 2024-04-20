@@ -65,6 +65,7 @@ import socialmultiplatform.composeapp.generated.resources.or_login_with
 import socialmultiplatform.composeapp.generated.resources.password
 import socialmultiplatform.composeapp.generated.resources.show_password
 import socialmultiplatform.composeapp.generated.resources.sign_in_with_google
+import socialmultiplatform.composeapp.generated.resources.sign_in_with_microsoft
 import socialmultiplatform.composeapp.generated.resources.sign_up
 
 object LoginScreen : Screen {
@@ -73,9 +74,9 @@ object LoginScreen : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = navigator.rememberNavigatorScreenModel<LoginScreenModel>()
         val state by screenModel.uiState.collectAsState()
-        if (state.token != null) {
-            navigator.replaceAll(MainContainer(state.token!!))
-        } else {
+//        if (state.token != null) {
+//            navigator.replaceAll(MainContainer(state.token!!))
+//        } else {
             LoginContent(
                 onSignInWithGoogle = { /*todo*/ },
                 state = state,
@@ -83,14 +84,16 @@ object LoginScreen : Screen {
                 navigateToForgotPassword = { navigator.push(PasswordResetScreen) },
                 onEmailChange = { screenModel.updateEmail(it) },
                 onPasswordChange = { screenModel.updatePassword(it) },
-                onSignIn = { screenModel.onSignIn() }
+                onSignIn = { screenModel.onSignIn() },
+                onSignInWithMicrosoft = { screenModel.signInWithMicrosoft() },
             )
-        }
+//        }
     }
 
     @Composable
     private fun LoginContent(
         onSignInWithGoogle: () -> Unit,
+        onSignInWithMicrosoft: () -> Unit,
         onSignIn: () -> Unit,
         state: LoginUiState,
         navigateToSignUp: () -> Unit,
@@ -232,6 +235,25 @@ object LoginScreen : Screen {
 //            )
                     Text(
                         text = stringResource(resource = Res.string.sign_in_with_google),
+                        fontSize = 18.sp,
+                    )
+                }
+                OutlinedButton(
+                    onClick = { onSignInWithMicrosoft() },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 4.dp)
+                        .height(50.dp),
+                    shape = RoundedCornerShape(8.dp),
+                ) {
+//            Icon(
+//                painter = painterResource(resource = Res.drawable.google),
+//                contentDescription = null,
+//                tint = androidx.compose.ui.graphics.Color.Unspecified,
+//                modifier = Modifier.size(24.dp)
+//            )
+                    Text(
+                        text = stringResource(resource = Res.string.sign_in_with_microsoft),
                         fontSize = 18.sp,
                     )
                 }

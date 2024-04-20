@@ -8,6 +8,7 @@ import com.gp.socialapp.presentation.auth.util.AuthError.NoError
 import com.gp.socialapp.presentation.auth.util.AuthError.PasswordError
 import com.gp.socialapp.presentation.auth.util.AuthError.ServerError
 import com.gp.socialapp.presentation.auth.util.Validator
+import com.gp.socialapp.util.DispatcherIO
 import com.gp.socialapp.util.Result
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -94,5 +95,11 @@ class LoginScreenModel(
 
     fun onLogOut() {
         authRepo.clearStorage()
+    }
+
+    fun signInWithMicrosoft() {
+        screenModelScope.launch(DispatcherIO) {
+            authRepo.signInWithMicrosoft()
+        }
     }
 }

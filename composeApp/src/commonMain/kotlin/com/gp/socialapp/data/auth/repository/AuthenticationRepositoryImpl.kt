@@ -43,4 +43,8 @@ class AuthenticationRepositoryImpl(
     override fun clearStorage() {
         localKeyValueStorage.cleanStorage()
     }
+
+    override suspend fun signInWithMicrosoft() {
+        remoteDataSource.signInWithMicrosoft()
+    }
 }

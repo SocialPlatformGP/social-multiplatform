@@ -19,4 +19,5 @@ interface AuthenticationRepository {
     fun setLocalUserId(id: String)
     fun setLocalUserToken(token: String)
     fun clearStorage()
+    suspend fun signInWithMicrosoft()
 }

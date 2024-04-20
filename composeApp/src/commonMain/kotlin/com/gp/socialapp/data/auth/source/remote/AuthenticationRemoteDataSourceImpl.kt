@@ -8,9 +8,14 @@ import com.gp.socialapp.data.auth.source.remote.model.requests.SignInRequest
 import com.gp.socialapp.data.auth.source.remote.model.responses.AuthResponse
 import com.gp.socialapp.data.auth.source.remote.model.responses.IsEmailAvailableResponse
 import com.gp.socialapp.data.auth.source.remote.model.responses.UserResponse
+import com.gp.socialapp.data.post.util.endPoint
 import com.gp.socialapp.util.AppConstants.BASE_URL
 import com.gp.socialapp.util.Result
 import io.github.aakira.napier.Napier
+import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.createSupabaseClient
+import io.github.jan.supabase.gotrue.auth
+import io.github.jan.supabase.gotrue.providers.Azure
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -29,25 +34,10 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.json.Json
 
 
-class AuthenticationRemoteDataSourceImpl : AuthenticationRemoteDataSource {
-    val httpClient = HttpClient {
-        install(ContentNegotiation) {
-            json(Json {
-                ignoreUnknownKeys = true
-                useAlternativeNames = false
-                isLenient = true
-                encodeDefaults = true
-            })
-        }
-    }
-
-    private fun HttpRequestBuilder.endPoint(path: String) {
-        url {
-            takeFrom(BASE_URL)
-            path(path)
-            contentType(ContentType.Application.Json)
-        }
-    }
+class AuthenticationRemoteDataSourceImpl(
+    private val httpClient: HttpClient,
+    private val supabaseClient: SupabaseClient
+) : AuthenticationRemoteDataSource {
 
     override fun isEmailAvailable(email: String): Flow<Result<Boolean>> {
         val request = IsEmailAvailableRequest(email)
@@ -175,6 +165,9 @@ class AuthenticationRemoteDataSourceImpl : AuthenticationRemoteDataSource {
                 emit(Result.Error(e.message ?: "Null"))
             }
         }
+    }
+    override suspend fun signInWithMicrosoft(){
+        supabaseClient.auth.signInWith(Azure)
     }
 
     override fun sendPasswordResetEmail(email: String): Flow<Result<Nothing>> {
