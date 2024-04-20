@@ -1,4 +1,4 @@
-package com.gp.material.source.local
+package com.gp.socialapp.data.material.source.local
 
 class LocalDataSourceImpl {
 }
