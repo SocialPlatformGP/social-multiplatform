@@ -8,6 +8,8 @@ import com.gp.socialapp.data.chat.source.local.RoomLocalDataSource
 import com.gp.socialapp.data.chat.source.local.RoomLocalDataSourceImpl
 import com.gp.socialapp.data.chat.source.local.model.MessageEntity
 import com.gp.socialapp.data.db.provideDbDriver
+import com.gp.socialapp.data.material.source.remote.FileManager
+import com.gp.socialapp.data.material.source.remote.FileManagerImpl
 import com.gp.socialapp.data.post.source.local.PostLocalDataSource
 import com.gp.socialapp.data.post.source.local.PostLocalDataSourceImpl
 import com.gp.socialapp.db.AppDatabase
@@ -38,4 +40,5 @@ actual val platformModule = DI.Module("platformModule") {
     bind<Realm>() with singleton {
         Realm.open(instance())
     }
+    bind<FileManager>() with singleton { FileManagerImpl() }
 }

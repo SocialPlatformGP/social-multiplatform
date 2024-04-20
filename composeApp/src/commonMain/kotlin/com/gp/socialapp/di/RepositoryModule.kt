@@ -10,6 +10,8 @@ import com.gp.socialapp.data.chat.repository.RecentRoomRepository
 import com.gp.socialapp.data.chat.repository.RecentRoomRepositoryImpl
 import com.gp.socialapp.data.chat.repository.RoomRepository
 import com.gp.socialapp.data.chat.repository.RoomRepositoryImpl
+import com.gp.socialapp.data.material.repository.MaterialRepository
+import com.gp.socialapp.data.material.repository.MaterialRepositoryImpl
 import com.gp.socialapp.data.post.repository.PostRepository
 import com.gp.socialapp.data.post.repository.PostRepositoryImpl
 import com.gp.socialapp.data.post.repository.ReplyRepository
@@ -22,6 +24,7 @@ import org.kodein.di.singleton
 
 val repositoryModuleK = DI.Module("repositoryModule") {
     bind<UserRepository>() with singleton { UserRepositoryImpl(instance()) }
+    bind<MaterialRepository>() with singleton { MaterialRepositoryImpl(instance()) }
     bind<AuthenticationRepository>() with singleton {
         AuthenticationRepositoryImpl(
             instance(),

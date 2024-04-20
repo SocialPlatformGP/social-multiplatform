@@ -1,18 +1,32 @@
-package com.gp.material.source.remote
+package com.gp.socialapp.data.material.source.remote
 
-import com.eygraber.uri.Uri
-import com.gp.material.model.FileType
-import com.gp.material.model.MaterialItem
+import com.gp.socialapp.data.material.model.responses.MaterialResponse
 import com.gp.socialapp.util.Result
 import kotlinx.coroutines.flow.Flow
 
 interface MaterialRemoteDataSource {
-    fun uploadFile(fileLocation:String, file: Uri): Flow<Result<Nothing>>
-    fun uploadFolder(fileLocation: String,name:String): Flow<Result<Nothing>>
-    fun deleteFile(fileLocation: String): Flow<Result<Nothing>>
-    fun deleteFolder(folderPath:String): Flow<Result<Nothing>>
-    fun getFileTypeFromName(fileName: String): FileType
-    fun uploadMaterialItemToDatabase(materialItem: MaterialItem)
-    fun getListOfFiles(path: String): Flow<Result<List<MaterialItem>>>
+    suspend fun getMaterialAtPath(
+        path: String
+    ): Flow<Result<MaterialResponse.GetMaterialResponses>>
+
+    suspend fun createFolder(
+        name: String,
+        path: String,
+    ): Flow<Result<MaterialResponse.GetMaterialResponses>>
+
+    suspend fun createFile(
+        name: String,
+        type: String,
+        path: String,
+        content: ByteArray
+    ): Flow<Result<MaterialResponse.GetMaterialResponses>>
+
+    suspend fun deleteFile(
+        fileId: String,
+        path: String
+    ): Flow<Result<MaterialResponse.GetMaterialResponses>>
+
+    suspend fun deleteFolder(folderId: String): Flow<Result<MaterialResponse.GetMaterialResponses>>
+    suspend fun downloadFile(url: String)
 
 }

@@ -12,6 +12,8 @@ import com.gp.socialapp.data.chat.source.remote.RoomRemoteDataSource
 import com.gp.socialapp.data.chat.source.remote.RoomRemoteDataSourceImpl
 import com.gp.socialapp.data.chat.source.remote.SocketService
 import com.gp.socialapp.data.chat.source.remote.SocketServiceImpl
+import com.gp.socialapp.data.material.source.remote.MaterialRemoteDataSource
+import com.gp.socialapp.data.material.source.remote.MaterialRemoteDataSourceImpl
 import com.gp.socialapp.data.post.source.remote.PostRemoteDataSource
 import com.gp.socialapp.data.post.source.remote.PostRemoteDataSourceImpl
 import com.gp.socialapp.data.post.source.remote.ReplyRemoteDataSource
@@ -31,6 +33,12 @@ import kotlin.time.Duration.Companion.seconds
 
 val remoteDataSourceModuleK = DI.Module("remoteDataSourceModule") {
     bind<PostRemoteDataSource>() with singleton { PostRemoteDataSourceImpl() }
+    bind<MaterialRemoteDataSource>() with singleton {
+        MaterialRemoteDataSourceImpl(
+            instance(),
+            instance()
+        )
+    }
     bind<ReplyRemoteDataSource>() with singleton { ReplyRemoteDataSourceImpl() }
     bind<AuthenticationRemoteDataSource>() with singleton { AuthenticationRemoteDataSourceImpl() }
     bind<MessageRemoteDataSource>() with singleton {

@@ -3,184 +3,174 @@ package com.gp.socialapp.presentation.material
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import com.eygraber.uri.Uri
-import com.gp.material.model.MaterialItem
-import com.gp.material.repository.MaterialRepository
-import com.gp.socialapp.util.Result
-import dev.icerock.moko.mvvm.viewmodel.ViewModel
+import com.gp.socialapp.data.material.model.MaterialFolder
+import com.gp.socialapp.data.material.repository.MaterialRepository
+import com.gp.socialapp.util.DispatcherIO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class MaterialScreenModel(private val materialRepo: MaterialRepository) : ScreenModel {
-    private val _actionResult = MutableStateFlow<Result<String>>(Result.Idle)
-    val actionResult = _actionResult.asStateFlow()
+class MaterialScreenModel(
+    private val materialRepo: MaterialRepository
+) : ScreenModel {
+    private val uiState = MutableStateFlow(MaterialUiState())
+    val state = uiState.asStateFlow()
 
-    private val _currentPath = MutableStateFlow("materials")
-    val currentPath = _currentPath.asStateFlow()
 
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading = _isLoading.asStateFlow()
-
-    private val _items = MutableStateFlow<List<MaterialItem>>(emptyList())
-    val items = _items.asStateFlow()
-
-    init {
+    fun getMaterial() {
         screenModelScope.launch {
-            _currentPath.collect {
-                fetchDataFromFirebaseStorage()
+            materialRepo.getMaterialAtPath(state.value.currentFolder.path).collect { result ->
+                result.onSuccessWithData { data ->
+                    uiState.update {
+                        println("***********Data: $data***************")
+                        it.copy(
+                            currentFiles = data.files,
+                            currentFolders = data.folders
+                        )
+                    }
+                }
+                result.onFailure {
+                    println("***********Error: $it***************")
+                }
             }
         }
     }
 
-    private fun fetchDataFromFirebaseStorage() {
+    fun uploadFolder(
+        folderName: String
+    ) {
         screenModelScope.launch {
-            materialRepo.getListOfFiles(_currentPath.value).collect {
-                when (it) {
-                    is Result.SuccessWithData -> {
-                        _items.value = it.data
-                        _isLoading.value = false
-                        _actionResult.value = Result.Idle
+            materialRepo.createFolder(
+                name = folderName,
+                path = state.value.currentFolder.path,
+            ).collect { result ->
+                result.onSuccessWithData { data ->
+                    uiState.update {
+                        it.copy(
+                            currentFolders = data.folders,
+                            currentFiles = data.files
+                        )
                     }
-                    is Result.Error -> {
-                        _isLoading.value = false
-                        _actionResult.value = Result.Error("Failed to fetch data from remote host")
-                    }
-                    is Result.Loading -> {
-                        _isLoading.value = true
-                    }
+                }
 
-                    else -> {
+            }
+        }
+    }
 
+    fun uploadFile(
+        fileName: String,
+        fileType: String,
+        fileContent: ByteArray
+    ) {
+        screenModelScope.launch {
+            materialRepo.createFile(
+                name = fileName,
+                type = fileType,
+                path = state.value.currentFolder.path,
+                content = fileContent
+            ).collect { result ->
+                result.onSuccessWithData { data ->
+                    uiState.update {
+                        it.copy(
+                            currentFolders = data.folders,
+                            currentFiles = data.files
+                        )
+                    }
+                }
+
+            }
+        }
+    }
+
+    fun openFolder(folder: MaterialFolder) {
+        val newFolder = Folder(
+            path = folder.id,
+            name = folder.name
+        )
+        uiState.update {
+            it.copy(
+                listOfPreviousFolder = state.value.listOfPreviousFolder.plus(state.value.currentFolder),
+                currentFolder = newFolder,
+
+                )
+        }.apply {
+            getMaterial()
+        }
+        println("currentFolder " + state.value.currentFolder.name + " " + state.value.currentFolder.path + " " + state.value.currentFolders.size + " " + state.value.currentFiles.size)
+        println("openFolder " + state.value.listOfPreviousFolder.map { it.name })
+
+    }
+
+    fun closeFolder() {
+        uiState.update {
+            it.copy(
+                currentFolder = state.value.listOfPreviousFolder.last(),
+            )
+        }.also {
+            uiState.update {
+                it.copy(
+                    listOfPreviousFolder = state.value.listOfPreviousFolder.dropLast(1)
+                )
+            }.also {
+                getMaterial()
+            }
+        }
+        println("currentFolder " + state.value.currentFolder.name + " " + state.value.currentFolder.path + " " + state.value.currentFolders.size + " " + state.value.currentFiles.size)
+        println("closeFolder " + state.value.listOfPreviousFolder.map { it.name })
+    }
+
+    fun deleteFile(fileId: String) {
+        screenModelScope.launch {
+            materialRepo.deleteFile(fileId, state.value.currentFolder.path).collect { result ->
+                result.onSuccessWithData { data ->
+                    uiState.update {
+                        it.copy(
+                            currentFolders = data.folders,
+                            currentFiles = data.files
+                        )
+                    }
+                }
+            }
+
+        }
+    }
+
+    fun deleteFolder(folderId: String) {
+        screenModelScope.launch {
+            materialRepo.deleteFolder(folderId).collect { result ->
+                result.onSuccessWithData { data ->
+                    uiState.update {
+                        it.copy(
+                            currentFolders = data.folders,
+                            currentFiles = data.files
+                        )
                     }
                 }
             }
         }
     }
 
-    fun openFolder(path: String) {
-        _currentPath.value = path
-    }
-
-    fun getCurrentPath(): String {
-        return _currentPath.value
-    }
-
-    fun uploadFile(fileUri: Uri) {
-        screenModelScope.launch {
-            materialRepo.uploadFile(_currentPath.value, fileUri).collect {
-                when (it) {
-                    is Result.Success -> {
-                        _isLoading.value = false
-                        _actionResult.value =
-                            Result.SuccessWithData("File has been uploaded successfully")
-                        fetchDataFromFirebaseStorage()
-                    }
-                    is Result.Error -> {
-                        _isLoading.value = false
-                        _actionResult.value = Result.Error("Failed to upload file")
-                    }
-                    is Result.Loading -> {
-                        _isLoading.value = true
-                    }
-
-                    else -> {}
-                }
-            }
+    fun downloadFile(url: String) {
+        screenModelScope.launch(DispatcherIO) {
+            materialRepo.downloadFile(url)
         }
     }
 
-    fun uploadFolder(name: String) {
-        screenModelScope.launch {
-            materialRepo.uploadFolder(_currentPath.value, name).collect {
-                when (it) {
-                    is Result.Success -> {
-                        _isLoading.value = false
-                        _actionResult.value =
-                            Result.SuccessWithData("Folder has been created successfully")
-                        fetchDataFromFirebaseStorage()
-                    }
-                    is Result.Error -> {
-                        _isLoading.value = false
-                        _actionResult.value = Result.Error("Failed to create folder")
-                    }
-                    is Result.Loading -> {
-                        _isLoading.value = true
-                    }
+    fun handleUiEvent(event: MaterialAction) {
+        when (event) {
+            is MaterialAction.OnUploadFileClicked -> uploadFile(
+                event.name,
+                event.type,
+                event.content
+            )
 
-                    else -> {}
-                }
-            }
-        }
-    }
+            is MaterialAction.OnCreateFolderClicked -> uploadFolder(event.name)
+            is MaterialAction.OnFolderClicked -> openFolder(event.folder)
+            is MaterialAction.OnDeleteFileClicked -> deleteFile(event.fileId)
+            is MaterialAction.OnDownloadFileClicked -> downloadFile(event.url)
 
-    fun deleteFolder(currentPath: String) {
-        screenModelScope.launch {
-            materialRepo.deleteFolder(currentPath).collect {
-                when (it) {
-                    is Result.Success -> {
-                        _isLoading.value = false
-                        _actionResult.value =
-                            Result.SuccessWithData("Folder has been deleted successfully")
-                        fetchDataFromFirebaseStorage()
-                    }
-                    is Result.Error -> {
-                        _isLoading.value = false
-                        _actionResult.value = Result.Error("Failed to delete folder")
-                    }
-                    is Result.Loading -> {
-                        _isLoading.value = true
-                    }
-
-                    else -> {}
-                }
-            }
-        }
-    }
-
-    fun deleteFile(fileLocation: String) {
-        screenModelScope.launch {
-            materialRepo.deleteFile(fileLocation).collect {
-                when (it) {
-                    is Result.Success -> {
-                        _isLoading.value = false
-                        _actionResult.value =
-                            Result.SuccessWithData("File has been deleted successfully")
-                        fetchDataFromFirebaseStorage()
-                    }
-                    is Result.Error -> {
-                        _isLoading.value = false
-                        _actionResult.value = Result.Error("Failed to delete file")
-                    }
-                    is Result.Loading -> {
-                        _isLoading.value = true
-                    }
-
-                    else -> {
-
-                    }
-                }
-            }
-        }
-    }
-
-    fun goBack(): Boolean {
-        val lastSlashIndex = _currentPath.value.lastIndexOf("/")
-        return if (lastSlashIndex != 0) {
-            _currentPath.value = _currentPath.value.substring(0, lastSlashIndex)
-            true
-        } else {
-            _currentPath.value = "materials"
-            false
-        }
-    }
-
-    fun getCurrentFolderName(path: String): String {
-        val lastSlashIndex = path.lastIndexOf("/")
-        return if (lastSlashIndex != 0 && lastSlashIndex != -1) {
-            path.substring(startIndex = lastSlashIndex + 1)
-        } else {
-            "Home"
+            else -> Unit
         }
     }
 }

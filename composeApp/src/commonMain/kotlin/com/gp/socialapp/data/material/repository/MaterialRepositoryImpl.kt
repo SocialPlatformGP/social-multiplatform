@@ -1,38 +1,46 @@
-package com.gp.material.repository
+package com.gp.socialapp.data.material.repository
 
 
-import com.eygraber.uri.Uri
-import com.gp.material.model.FileType
-import com.gp.material.model.MaterialItem
-import com.gp.material.source.remote.MaterialRemoteDataSource
-import kotlinx.coroutines.flow.Flow
+import com.gp.socialapp.data.material.model.responses.MaterialResponse
+import com.gp.socialapp.data.material.source.remote.MaterialRemoteDataSource
 import com.gp.socialapp.util.Result
+import kotlinx.coroutines.flow.Flow
 
-class MaterialRepositoryImpl (private val remoteDataSource: MaterialRemoteDataSource): MaterialRepository{
-    override fun getListOfFiles(path: String): Flow<Result<List<MaterialItem>>> {
-        return remoteDataSource.getListOfFiles(path)
+class MaterialRepositoryImpl(private val remoteDataSource: MaterialRemoteDataSource) :
+    MaterialRepository {
+    override suspend fun getMaterialAtPath(path: String): Flow<Result<MaterialResponse.GetMaterialResponses>> {
+        return remoteDataSource.getMaterialAtPath(path)
     }
 
-    override fun uploadFile(fileLocation: String, file: Uri): Flow<Result<Nothing>> {
-        return remoteDataSource.uploadFile(fileLocation, file)
+
+    override suspend fun createFolder(
+        name: String,
+        path: String,
+    ): Flow<Result<MaterialResponse.GetMaterialResponses>> {
+        return remoteDataSource.createFolder(name, path)
     }
 
-    override fun uploadFolder(fileLocation: String, name: String): Flow<Result<Nothing>> {
-        return remoteDataSource.uploadFolder(fileLocation, name)
+    override suspend fun createFile(
+        name: String,
+        type: String,
+        path: String,
+        content: ByteArray
+    ): Flow<Result<MaterialResponse.GetMaterialResponses>> {
+        return remoteDataSource.createFile(name, type, path, content)
     }
 
-    override fun deleteFile(fileLocation: String) : Flow<Result<Nothing>> {
-        return remoteDataSource.deleteFile(fileLocation)
+    override suspend fun deleteFile(
+        fileId: String,
+        path: String
+    ): Flow<Result<MaterialResponse.GetMaterialResponses>> {
+        return remoteDataSource.deleteFile(fileId, path)
     }
 
-    override fun deleteFolder(folderPath: String) : Flow<Result<Nothing>>{
-        return remoteDataSource.deleteFolder(folderPath)
+    override suspend fun deleteFolder(folderId: String): Flow<Result<MaterialResponse.GetMaterialResponses>> {
+        return remoteDataSource.deleteFolder(folderId)
     }
 
-    override fun getFileTypeFromName(fileName: String): FileType {
-        return remoteDataSource.getFileTypeFromName(fileName)
-    }
-    override fun uploadMaterialItemToDatabase(materialItem: MaterialItem) {
-        return remoteDataSource.uploadMaterialItemToDatabase(materialItem)
+    override suspend fun downloadFile(url: String) {
+        remoteDataSource.downloadFile(url)
     }
 }
