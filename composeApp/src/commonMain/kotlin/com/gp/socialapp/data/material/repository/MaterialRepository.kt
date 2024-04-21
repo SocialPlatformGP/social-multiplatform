@@ -30,6 +30,7 @@ interface MaterialRepository {
         folderId: String
     ): Flow<Result<MaterialResponse.GetMaterialResponses>>
 
-    suspend fun downloadFile(url: String)
+    suspend fun downloadFile(url: String, mimeType: String)
+    suspend fun openFile(fileId: String, url: String, mimeType: String)
 
 }

@@ -8,9 +8,10 @@ import com.gp.socialapp.presentation.auth.userinfo.UserInformationScreenModel
 import com.gp.socialapp.presentation.chat.addmembers.AddMembersScreenModel
 import com.gp.socialapp.presentation.chat.chatroom.ChatRoomScreenModel
 import com.gp.socialapp.presentation.chat.creategroup.CreateGroupScreenModel
+import com.gp.socialapp.presentation.chat.createprivate.CreatePrivateChatScreenModel
 import com.gp.socialapp.presentation.chat.groupdetails.GroupDetailsScreenModel
 import com.gp.socialapp.presentation.chat.home.ChatHomeScreenModel
-import com.gp.socialapp.presentation.chat.createprivate.CreatePrivateChatScreenModel
+import com.gp.socialapp.presentation.material.MaterialScreenModel
 import com.gp.socialapp.presentation.post.create.CreatePostScreenModel
 import com.gp.socialapp.presentation.post.edit.EditPostScreenModel
 import com.gp.socialapp.presentation.post.feed.FeedScreenModel

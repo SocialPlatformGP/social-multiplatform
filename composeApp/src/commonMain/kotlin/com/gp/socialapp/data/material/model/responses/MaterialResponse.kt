@@ -10,4 +10,10 @@ sealed class MaterialResponse {
         val files: List<MaterialFile> = emptyList(),
         val folders: List<MaterialFolder> = emptyList()
     ) : MaterialResponse()
+
+    @Serializable
+    data class DownloadFileResponse(
+        val data: ByteArray,
+        val fileName: String
+    ) : MaterialResponse()
 }

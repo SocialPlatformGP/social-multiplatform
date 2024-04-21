@@ -27,6 +27,6 @@ interface MaterialRemoteDataSource {
     ): Flow<Result<MaterialResponse.GetMaterialResponses>>
 
     suspend fun deleteFolder(folderId: String): Flow<Result<MaterialResponse.GetMaterialResponses>>
-    suspend fun downloadFile(url: String)
+    suspend fun downloadFile(url: String): Result<MaterialResponse.DownloadFileResponse>
 
 }
