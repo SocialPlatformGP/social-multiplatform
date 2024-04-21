@@ -8,8 +8,11 @@ import com.gp.socialapp.data.chat.source.local.RoomLocalDataSource
 import com.gp.socialapp.data.chat.source.local.RoomLocalDataSourceImpl
 import com.gp.socialapp.data.chat.source.local.model.MessageEntity
 import com.gp.socialapp.data.db.provideDbDriver
-import com.gp.socialapp.data.material.source.remote.FileManager
+import com.gp.socialapp.data.material.source.local.MaterialLocalDataSource
+import com.gp.socialapp.data.material.source.local.MaterialLocalDataSourceImpl
+import com.gp.socialapp.data.material.source.local.model.FileEntity
 import com.gp.socialapp.data.material.source.remote.FileManagerImpl
+import com.gp.socialapp.data.material.utils.FileManager
 import com.gp.socialapp.data.post.source.local.PostLocalDataSource
 import com.gp.socialapp.data.post.source.local.PostLocalDataSourceImpl
 import com.gp.socialapp.db.AppDatabase
@@ -32,9 +35,10 @@ actual val platformModule = DI.Module("platformModule") {
     bind<RoomLocalDataSource>() with singleton { RoomLocalDataSourceImpl() }
     bind<RecentRoomLocalDataSource>() with singleton { RecentRoomLocalDataSourceImpl() }
     bind<MessageLocalDataSource>() with singleton { MessageLocalDataSourceImpl(instance()) }
+    bind<MaterialLocalDataSource>() with singleton { MaterialLocalDataSourceImpl(instance()) }
     bind<Configuration>() with singleton {
         RealmConfiguration.create(
-            schema = setOf(MessageEntity::class)
+            schema = setOf(MessageEntity::class, FileEntity::class),
         )
     }
     bind<Realm>() with singleton {
