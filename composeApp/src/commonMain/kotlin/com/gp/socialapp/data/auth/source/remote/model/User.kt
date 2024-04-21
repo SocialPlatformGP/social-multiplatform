@@ -18,6 +18,7 @@ data class User(
     val bio: String = "",
     val createdAt: String = "",
     val isAdmin: Boolean = false,
+    val isDataComplete: Boolean = false,
 ) {
     fun toUserRequest() = UserRequest(
         firstName = firstName,
@@ -34,6 +35,7 @@ data class User(
 
 @Serializable
 data class UserRequest(
+    val id: String = "",
     val firstName: String = "",
     val lastName: String = "",
     val password: String = "",

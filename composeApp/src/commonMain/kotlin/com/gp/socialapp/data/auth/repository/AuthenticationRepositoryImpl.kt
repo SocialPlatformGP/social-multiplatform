@@ -3,6 +3,7 @@ package com.gp.socialapp.data.auth.repository
 import com.gp.socialapp.data.auth.source.local.AuthKeyValueStorage
 import com.gp.socialapp.data.auth.source.remote.AuthenticationRemoteDataSource
 import com.gp.socialapp.data.auth.source.remote.model.User
+import com.gp.socialapp.data.auth.source.remote.model.UserRequest
 import com.gp.socialapp.util.Result
 import io.github.jan.supabase.gotrue.providers.OAuthProvider
 import kotlinx.coroutines.flow.Flow
@@ -19,7 +20,7 @@ class AuthenticationRepositoryImpl(
         remoteDataSource.signInUser(email, password)
 
     override fun signUpUser(user: User) =
-        remoteDataSource.signUpUser(user.toUserRequest())
+        remoteDataSource.createRemoteUser(user.toUserRequest())
 
     override fun getSignedInUser(id: String) = remoteDataSource.getSignedInUser(id)
 
@@ -77,6 +78,47 @@ class AuthenticationRepositoryImpl(
                     val sessionSource = result.data.second
                     remoteDataSource.getSignedInUser(userInfo.id).collect {
                         emit(it)
+                    }
+                }
+                is Result.Error -> {
+                    emit(Result.Error(result.message))
+                }
+                is Result.Loading -> {
+                    emit(Result.Loading)
+                }
+                else -> Unit
+            }
+        }
+    }
+
+    override fun signUpWithEmail(email: String, password: String): Flow<Result<User>> = flow {
+        emit(Result.Loading)
+        remoteDataSource.signUpWithEmail(email, password).collect { result ->
+            when(result) {
+                is Result.SuccessWithData -> {
+                    val userInfo = result.data.first
+                    val sessionSource = result.data.second
+                    val request = UserRequest(
+                        email = email,
+                        id = userInfo.id,
+                    )
+                    remoteDataSource.createRemoteUser(request).collect {
+                        when(it) {
+                            is Result.SuccessWithData -> {
+                                if(it.data.errorMessage.isNotBlank()) {
+                                    emit(Result.SuccessWithData(it.data.user))
+                                } else {
+                                    emit(Result.Error(it.data.errorMessage))
+                                }
+                            }
+                            is Result.Error -> {
+                                emit(Result.Error(it.message))
+                            }
+                            is Result.Loading -> {
+                                emit(Result.Loading)
+                            }
+                            else -> Unit
+                        }
                     }
                 }
                 is Result.Error -> {

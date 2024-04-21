@@ -15,9 +15,10 @@ interface AuthenticationRemoteDataSource {
     val sessionStatusFlow: StateFlow<SessionStatus>
     fun isEmailAvailable(email: String): Flow<Result<Boolean>>
     fun signInUser(email: String, password: String): Flow<Result<AuthResponse>>
-    fun signUpUser(userRequest: UserRequest): Flow<Result<AuthResponse>>
+    fun createRemoteUser(userRequest: UserRequest): Flow<Result<AuthResponse>>
     fun getSignedInUser(id: String): Flow<Result<User>>
     fun sendPasswordResetEmail(email: String): Flow<Result<Nothing>>
     fun signInWithOAuth(provider: OAuthProvider): Flow<Result<Pair<UserInfo, SessionSource>>>
     fun signInWithEmail(email: String, password: String): Flow<Result<Pair<UserInfo, SessionSource>>>
+    fun signUpWithEmail(email: String, password: String): Flow<Result<Pair<UserInfo, SessionSource>>>
 }

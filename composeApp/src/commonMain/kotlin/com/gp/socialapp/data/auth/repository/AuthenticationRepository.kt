@@ -22,4 +22,5 @@ interface AuthenticationRepository {
     fun clearStorage()
     fun signInWithOAuth(provider: OAuthProvider): Flow<Result<User>>
     fun signInWithEmail(email: String, password: String): Flow<Result<User>>
+    fun signUpWithEmail(email: String, password: String): Flow<Result<User>>
 }

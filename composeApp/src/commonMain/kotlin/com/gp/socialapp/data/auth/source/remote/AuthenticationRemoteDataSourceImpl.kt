@@ -83,8 +83,6 @@ class AuthenticationRemoteDataSourceImpl(
                     )
                 }.let {
                     val response = it.body<AuthResponse>()
-                    println("signinResponse:$response")
-                    Napier.d("signin : ${it.status} ${response.errorMessage} ${response.token}")
                     when (it.status) {
                         HttpStatusCode.OK -> {
                             emit(Result.SuccessWithData(response))
@@ -102,7 +100,7 @@ class AuthenticationRemoteDataSourceImpl(
         }
     }
 
-    override fun signUpUser(userRequest: UserRequest): Flow<Result<AuthResponse>> {
+    override fun createRemoteUser(userRequest: UserRequest): Flow<Result<AuthResponse>> {
         println("signupRequest:$userRequest")
         return flow {
             emit(Result.Loading)
@@ -115,7 +113,6 @@ class AuthenticationRemoteDataSourceImpl(
                 }.let {
                     val response = it.body<AuthResponse>()
                     println("signupResponse:$response")
-                    Napier.d("signup : ${it.status} ${response.errorMessage} ${response.token}")
                     when (it.status) {
                         HttpStatusCode.OK -> {
                             emit(Result.SuccessWithData(response))
@@ -197,6 +194,35 @@ class AuthenticationRemoteDataSourceImpl(
         emit(Result.Loading)
         try {
             supabaseClient.auth.signInWith(Email) {
+                this.email = email
+                this.password = password
+            }
+            sessionStatusFlow.collect {
+                when (it) {
+                    is SessionStatus.Authenticated -> {
+                        val user = supabaseClient.auth.sessionManager.loadSession()?.user
+                        if (user != null) {
+                            emit(Result.SuccessWithData(Pair(user, it.source)))
+                        } else {
+                            emit(Result.Error("User is null"))
+                        }
+                    }
+
+                    else -> Unit
+                }
+            }
+        } catch (e: Exception) {
+            emit(Result.Error(e.message ?: "Null"))
+        }
+    }
+
+    override fun signUpWithEmail(
+        email: String,
+        password: String
+    ): Flow<Result<Pair<UserInfo, SessionSource>>> = flow {
+        emit(Result.Loading)
+        try {
+            supabaseClient.auth.signUpWith(Email) {
                 this.email = email
                 this.password = password
             }

@@ -47,6 +47,7 @@ import com.gp.socialapp.presentation.auth.util.AuthError
 import com.gp.socialapp.presentation.auth.util.AuthError.EmailError
 import com.gp.socialapp.presentation.auth.util.AuthError.PasswordError
 import com.gp.socialapp.presentation.auth.util.AuthError.RePasswordError
+import com.gp.socialapp.presentation.main.MainContainer
 import com.gp.socialapp.util.Result
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
@@ -66,8 +67,8 @@ object SignUpScreen : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = navigator.rememberNavigatorScreenModel<SignUpScreenModel>()
         val state by screenModel.uiState.collectAsState()
-        if (state.isSignedUp is Result.Success) {
-            navigator.push(UserInformationScreen(state.email, state.password))
+        if (state.signedUpUser != null) {
+            navigator.replaceAll(MainContainer(state.signedUpUser!!))
         }
         SignUpContent(
             state = state,

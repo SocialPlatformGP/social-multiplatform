@@ -60,18 +60,13 @@ class SignUpScreenModel(
         screenModelScope.launch {
             Napier.d("onSignUp: ${uiState.value}")
             with(uiState.value) {
-                authRepo.isEmailAvailable(email).collect {
+                authRepo.signUpWithEmail(email, password).collect {
                     when (it) {
                         is Result.SuccessWithData -> {
-                            if (it.data) {
-                                _uiState.value = _uiState.value.copy(
-                                    error = NoError,
-                                    isSignedUp = Result.Success
-                                )
-                            } else {
-                                _uiState.value =
-                                    _uiState.value.copy(error = EmailError(getString(Res.string.email_already_exists)))
-                            }
+                            _uiState.value = _uiState.value.copy(
+                                error = NoError,
+                                signedUpUser = it.data
+                            )
                         }
 
                         is Result.Error -> {
@@ -85,7 +80,6 @@ class SignUpScreenModel(
                             Napier.d("onSignUp: else")
                         }
                     }
-
                 }
             }
         }

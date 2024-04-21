@@ -109,7 +109,8 @@ data class UserInformationScreen(
         if (state.createdState is Result.SuccessWithData) {
             val authResponse = (state.createdState as Result.SuccessWithData).data
             println("Token: ${authResponse.token}")
-            navigator.replaceAll(MainContainer(authResponse.token))
+            TODO()
+//            navigator.replaceAll(MainContainer(authResponse.token))
         }
         Scaffold { paddingValues ->
             UserInformationContent(
