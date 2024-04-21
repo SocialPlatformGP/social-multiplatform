@@ -10,39 +10,14 @@ data class User(
     val id: String = "",
     val firstName: String = "",
     val lastName: String = "",
-    val password: String = "",
     val profilePictureURL: String = "",
     val email: String = "",
     val phoneNumber: String = "",
     val birthdate: Long = 0L,
     val bio: String = "",
-    val createdAt: String = "",
+    val createdAt: Long = 0L,
     val isAdmin: Boolean = false,
     val isDataComplete: Boolean = false,
-) {
-    fun toUserRequest() = UserRequest(
-        firstName = firstName,
-        lastName = lastName,
-        password = password,
-        profilePictureURL = profilePictureURL,
-        email = email,
-        phoneNumber = phoneNumber,
-        birthdate = birthdate ?: LocalDateTime.now().toMillis(),
-        bio = bio,
-        isAdmin = isAdmin
-    )
-}
-
-@Serializable
-data class UserRequest(
-    val id: String = "",
-    val firstName: String = "",
-    val lastName: String = "",
-    val password: String = "",
-    val profilePictureURL: String = "",
-    val email: String = "",
-    val phoneNumber: String = "",
-    val birthdate: Long = LocalDateTime.now().toMillis(),
-    val bio: String = "",
-    val isAdmin: Boolean = false,
 )
+
+

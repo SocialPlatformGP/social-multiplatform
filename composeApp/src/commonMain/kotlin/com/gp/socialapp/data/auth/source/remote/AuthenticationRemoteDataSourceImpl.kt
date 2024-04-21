@@ -1,168 +1,24 @@
 package com.gp.socialapp.data.auth.source.remote
 
 import com.gp.socialapp.data.auth.source.remote.model.User
-import com.gp.socialapp.data.auth.source.remote.model.UserRequest
-import com.gp.socialapp.data.auth.source.remote.model.requests.GetUserRequest
-import com.gp.socialapp.data.auth.source.remote.model.requests.IsEmailAvailableRequest
-import com.gp.socialapp.data.auth.source.remote.model.requests.SignInRequest
-import com.gp.socialapp.data.auth.source.remote.model.responses.AuthResponse
-import com.gp.socialapp.data.auth.source.remote.model.responses.IsEmailAvailableResponse
-import com.gp.socialapp.data.auth.source.remote.model.responses.UserResponse
-import com.gp.socialapp.data.post.util.endPoint
 import com.gp.socialapp.util.Result
-import io.github.aakira.napier.Napier
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.gotrue.SessionSource
 import io.github.jan.supabase.gotrue.SessionStatus
 import io.github.jan.supabase.gotrue.auth
-import io.github.jan.supabase.gotrue.providers.Azure
 import io.github.jan.supabase.gotrue.providers.OAuthProvider
 import io.github.jan.supabase.gotrue.providers.builtin.Email
-import io.github.jan.supabase.gotrue.user.UserInfo
-import io.ktor.client.HttpClient
-import io.ktor.client.call.body
-import io.ktor.client.request.get
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
-import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flow
 
 
 class AuthenticationRemoteDataSourceImpl(
-    private val httpClient: HttpClient,
     private val supabaseClient: SupabaseClient
 ) : AuthenticationRemoteDataSource {
-    override val sessionStatusFlow: StateFlow<SessionStatus>
-        get() = supabaseClient.auth.sessionStatus
 
-    override fun isEmailAvailable(email: String): Flow<Result<Boolean>> {
-        val request = IsEmailAvailableRequest(email)
-        println("isEmailAvailableRequest:$request")
-        return flow {
-            emit(Result.Loading)
-            try {
-                httpClient.post {
-                    endPoint("isEmailAvailable")
-                    setBody(
-                        request
-                    )
-                }.let {
-                    val response = it.body<IsEmailAvailableResponse>()
-                    println("isEmailAvailableResponse:$response")
-                    Napier.d("isEmailAvailableResponse : ${it.status} ${response.message} ${response.isAvailable}")
-                    when (it.status) {
-                        HttpStatusCode.OK -> {
-                            emit(Result.SuccessWithData(response.isAvailable))
-                        }
+    private val sessionStatusFlow = supabaseClient.auth.sessionStatus
 
-                        else -> {
-                            emit(Result.Error(it.status.description + " " + response.message))
-                        }
-                    }
-                }
 
-            } catch (e: Exception) {
-                Napier.e("isEmailAvailable: ${e.message}")
-                emit(Result.Error(e.message ?: "Null"))
-            }
-        }
-    }
-
-    override fun signInUser(email: String, password: String): Flow<Result<AuthResponse>> {
-        val request = SignInRequest(email, password)
-        println("signinRequest:$request")
-        return flow {
-            emit(Result.Loading)
-            try {
-                httpClient.post {
-                    endPoint("signin")
-                    setBody(
-                        request
-                    )
-                }.let {
-                    val response = it.body<AuthResponse>()
-                    when (it.status) {
-                        HttpStatusCode.OK -> {
-                            emit(Result.SuccessWithData(response))
-                        }
-
-                        else -> {
-                            emit(Result.Error(it.status.description + " " + response.errorMessage))
-                        }
-                    }
-                }
-            } catch (e: Exception) {
-                Napier.e("signin: ${e.message}")
-                emit(Result.Error(e.message ?: "Null"))
-            }
-        }
-    }
-
-    override fun createRemoteUser(userRequest: UserRequest): Flow<Result<AuthResponse>> {
-        println("signupRequest:$userRequest")
-        return flow {
-            emit(Result.Loading)
-            try {
-                httpClient.post {
-                    endPoint("signup")
-                    setBody(
-                        userRequest
-                    )
-                }.let {
-                    val response = it.body<AuthResponse>()
-                    println("signupResponse:$response")
-                    when (it.status) {
-                        HttpStatusCode.OK -> {
-                            emit(Result.SuccessWithData(response))
-                        }
-
-                        else -> {
-                            emit(Result.Error(it.status.description + " " + response.errorMessage))
-                        }
-                    }
-                }
-            } catch (e: Exception) {
-                Napier.e("signup: ${e.message}")
-                emit(Result.Error(e.message ?: "Null"))
-            }
-        }
-    }
-
-    override fun getSignedInUser(id: String): Flow<Result<User>> {
-        println("getSignedInUserRequest:$id")
-        val request = GetUserRequest(id)
-        return flow {
-            emit(Result.Loading)
-            try {
-                httpClient.get {
-                    endPoint("getSignedUser")
-                    setBody(
-                        request
-                    )
-                }.let {
-                    val response = it.body<UserResponse>().toUser()
-                    println("getSignedInUserResponse:$response")
-                    Napier.d("getSignedInUser : ${it.status} ${response}")
-                    when (it.status) {
-                        HttpStatusCode.OK -> {
-                            emit(Result.SuccessWithData(response))
-                        }
-
-                        else -> {
-                            emit(Result.Error(it.status.description + " " + "Error"))
-                        }
-                    }
-                }
-            } catch (e: Exception) {
-                Napier.e("getSignedInUser: ${e.message}")
-                emit(Result.Error(e.message ?: "Null"))
-            }
-        }
-    }
-
-    override fun signInWithOAuth(provider: OAuthProvider): Flow<Result<Pair<UserInfo, SessionSource>>> = flow {
+    override fun signInWithOAuth(provider: OAuthProvider): Flow<Result<User>> = flow {
         emit(Result.Loading)
         try {
             supabaseClient.auth.signInWith(provider) {
@@ -171,12 +27,8 @@ class AuthenticationRemoteDataSourceImpl(
             sessionStatusFlow.collect {
                 when (it) {
                     is SessionStatus.Authenticated -> {
-                        val user = supabaseClient.auth.sessionManager.loadSession()?.user
-                        if (user != null) {
-                            emit(Result.SuccessWithData(Pair(user, it.source)))
-                        } else {
-                            emit(Result.Error("User is null"))
-                        }
+                        val user = getSignedInUser()
+                        emit(user)
                     }
 
                     else -> Unit
@@ -190,7 +42,7 @@ class AuthenticationRemoteDataSourceImpl(
     override fun signInWithEmail(
         email: String,
         password: String
-    ): Flow<Result<Pair<UserInfo, SessionSource>>> = flow {
+    ): Flow<Result<User>> = flow {
         emit(Result.Loading)
         try {
             supabaseClient.auth.signInWith(Email) {
@@ -200,12 +52,8 @@ class AuthenticationRemoteDataSourceImpl(
             sessionStatusFlow.collect {
                 when (it) {
                     is SessionStatus.Authenticated -> {
-                        val user = supabaseClient.auth.sessionManager.loadSession()?.user
-                        if (user != null) {
-                            emit(Result.SuccessWithData(Pair(user, it.source)))
-                        } else {
-                            emit(Result.Error("User is null"))
-                        }
+                        val user = getSignedInUser()
+                        emit(user)
                     }
 
                     else -> Unit
@@ -219,7 +67,7 @@ class AuthenticationRemoteDataSourceImpl(
     override fun signUpWithEmail(
         email: String,
         password: String
-    ): Flow<Result<Pair<UserInfo, SessionSource>>> = flow {
+    ): Flow<Result<User>> = flow {
         emit(Result.Loading)
         try {
             supabaseClient.auth.signUpWith(Email) {
@@ -229,14 +77,9 @@ class AuthenticationRemoteDataSourceImpl(
             sessionStatusFlow.collect {
                 when (it) {
                     is SessionStatus.Authenticated -> {
-                        val user = supabaseClient.auth.sessionManager.loadSession()?.user
-                        if (user != null) {
-                            emit(Result.SuccessWithData(Pair(user, it.source)))
-                        } else {
-                            emit(Result.Error("User is null"))
-                        }
+                        val user = getSignedInUser()
+                        emit(user)
                     }
-
                     else -> Unit
                 }
             }
@@ -245,6 +88,54 @@ class AuthenticationRemoteDataSourceImpl(
         }
     }
 
+    override suspend fun getSignedInUser(): Result<User> {
+        val userInfo = supabaseClient.auth.sessionManager.loadSession()?.user
+        if (userInfo != null) {
+            val isUserDataComplete =
+                userInfo.appMetadata?.getOrElse("isUserDataComplete") { false } as Boolean
+            val user = if (isUserDataComplete) {
+                val id = userInfo.id
+                val firstName =
+                    userInfo.userMetadata?.getOrElse("first_name") { "" } as String
+                val lastName =
+                    userInfo.userMetadata?.getOrElse("last_name") { "" } as String
+                val email = userInfo.email ?: ""
+                val pfpUrl =
+                    userInfo.userMetadata?.getOrElse("profile_picture_url") { "" } as String
+                val phoneNumber = userInfo.phone ?: ""
+                val birthDate =
+                    userInfo.userMetadata?.getOrElse("birth_date") { 0L } as Long
+                val bio = userInfo.userMetadata?.getOrElse("bio") { "" } as String
+                val createdAt = userInfo.createdAt?.epochSeconds ?: 0L
+                val isAdmin =
+                    userInfo.appMetadata?.getOrElse("isAdmin") { false } as Boolean
+                User(
+                    id = id,
+                    firstName = firstName,
+                    lastName = lastName,
+                    profilePictureURL = pfpUrl,
+                    email = email,
+                    phoneNumber = phoneNumber,
+                    birthdate = birthDate,
+                    bio = bio,
+                    createdAt = createdAt,
+                    isAdmin = isAdmin,
+                    isDataComplete = isUserDataComplete
+                )
+            } else {
+                val id = userInfo.id
+                val email = userInfo.email ?: ""
+                User(
+                    id = id,
+                    email = email,
+                    isDataComplete = false
+                )
+            }
+            return Result.SuccessWithData(user)
+        } else {
+            return Result.Error("User is null")
+        }
+    }
 
     override fun sendPasswordResetEmail(email: String): Flow<Result<Nothing>> {
         TODO("Not yet implemented")

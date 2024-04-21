@@ -42,7 +42,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.gp.socialapp.presentation.auth.userinfo.UserInformationScreen
+import com.gp.socialapp.presentation.main.userinfo.UserInformationScreen
 import com.gp.socialapp.presentation.auth.util.AuthError
 import com.gp.socialapp.presentation.auth.util.AuthError.EmailError
 import com.gp.socialapp.presentation.auth.util.AuthError.PasswordError

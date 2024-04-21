@@ -4,7 +4,7 @@ import com.gp.socialapp.presentatDefaultn.post.postDetails.PostDetailsScreenMode
 import com.gp.socialapp.presentation.auth.login.LoginScreenModel
 import com.gp.socialapp.presentation.auth.passwordreset.PasswordResetScreenModel
 import com.gp.socialapp.presentation.auth.signup.SignUpScreenModel
-import com.gp.socialapp.presentation.auth.userinfo.UserInformationScreenModel
+import com.gp.socialapp.presentation.main.userinfo.UserInformationScreenModel
 import com.gp.socialapp.presentation.chat.addmembers.AddMembersScreenModel
 import com.gp.socialapp.presentation.chat.chatroom.ChatRoomScreenModel
 import com.gp.socialapp.presentation.chat.creategroup.CreateGroupScreenModel

@@ -31,26 +31,21 @@ class LoginScreenModel(
     init {
         val userId = authRepo.getCurrentLocalUserId()
         if (userId.isNotBlank()) {
-            _uiState.update { it.copy(userId = userId)}
-            getSignedInUser(userId)
+            _uiState.update { it.copy(userId = userId) }
+            getSignedInUser()
         }
     }
 
-    private fun getSignedInUser(userId: String) {
-        screenModelScope.launch (DispatcherIO){
-            authRepo.getSignedInUser(userId).collect {
-                when (it) {
-                    is Result.SuccessWithData -> {
-                        _uiState.value = _uiState.value.copy(signedInUser = it.data)
-                    }
-                    is Result.Error -> {
-                        Napier.e("getSignedInUser: ${it.message}")
-                    }
-                    is Result.Loading -> {
-                        Napier.d("getSignedInUser: Loading")
-                    }
-                    else -> Unit
+    private fun getSignedInUser() {
+        screenModelScope.launch(DispatcherIO) {
+            when (val result = authRepo.getSignedInUser()) {
+                is Result.SuccessWithData -> {
+                    _uiState.value = _uiState.value.copy(signedInUser = result.data)
                 }
+                is Result.Error -> {
+                    Napier.e("getSignedInUser: ${result.message}")
+                }
+                else -> Unit
             }
         }
     }
@@ -79,19 +74,28 @@ class LoginScreenModel(
         screenModelScope.launch {
             with(_uiState.value) {
                 authRepo.signInWithEmail(email, password).collect { result ->
-                    when(result){
+                    when (result) {
                         is Result.SuccessWithData -> {
                             authRepo.setLocalUserId(result.data.id)
-                            _uiState.update { it.copy(userId = result.data.id, signedInUser = result.data, error = NoError) }
+                            _uiState.update {
+                                it.copy(
+                                    userId = result.data.id,
+                                    signedInUser = result.data,
+                                    error = NoError
+                                )
+                            }
                         }
+
                         is Result.Error -> {
                             _uiState.update {
                                 it.copy(error = ServerError(result.message))
                             }
                         }
+
                         is Result.Loading -> {
                             Napier.d("signInWithOAuth: Loading")
                         }
+
                         else -> Unit
                     }
                 }
@@ -113,20 +117,29 @@ class LoginScreenModel(
 
     fun signInWithOAuth(provider: OAuthProvider) {
         screenModelScope.launch(DispatcherIO) {
-            authRepo.signInWithOAuth(provider).collect{ result ->
-                when(result){
+            authRepo.signInWithOAuth(provider).collect { result ->
+                when (result) {
                     is Result.SuccessWithData -> {
                         authRepo.setLocalUserId(result.data.id)
-                        _uiState.update { it.copy(userId = result.data.id, signedInUser = result.data, error = NoError) }
+                        _uiState.update {
+                            it.copy(
+                                userId = result.data.id,
+                                signedInUser = result.data,
+                                error = NoError
+                            )
+                        }
                     }
+
                     is Result.Error -> {
                         _uiState.update {
                             it.copy(error = ServerError(result.message))
                         }
                     }
+
                     is Result.Loading -> {
                         Napier.d("signInWithOAuth: Loading")
                     }
+
                     else -> Unit
                 }
             }

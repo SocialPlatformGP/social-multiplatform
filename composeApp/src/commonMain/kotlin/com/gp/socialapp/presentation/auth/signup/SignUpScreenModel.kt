@@ -63,6 +63,7 @@ class SignUpScreenModel(
                 authRepo.signUpWithEmail(email, password).collect {
                     when (it) {
                         is Result.SuccessWithData -> {
+                            authRepo.setLocalUserId(it.data.id)
                             _uiState.value = _uiState.value.copy(
                                 error = NoError,
                                 signedUpUser = it.data

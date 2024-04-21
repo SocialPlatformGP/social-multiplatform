@@ -1,8 +1,9 @@
-package com.gp.socialapp.presentation.auth.userinfo
+package com.gp.socialapp.presentation.main.userinfo
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.gp.socialapp.data.auth.repository.AuthenticationRepository
+import com.gp.socialapp.data.auth.repository.UserRepository
 import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.presentation.auth.util.AuthError
 import com.gp.socialapp.presentation.auth.util.Validator
@@ -21,11 +22,11 @@ import socialmultiplatform.composeapp.generated.resources.invalid_phone_number
 import socialmultiplatform.composeapp.generated.resources.user_must_be_at_least_18_years_old
 
 class UserInformationScreenModel(
-    private val authRepo: AuthenticationRepository,
+    private val userRepo: UserRepository
 ) : ScreenModel {
     private val _uiState = MutableStateFlow(UserInformationUiState())
     val uiState = _uiState.asStateFlow()
-    fun onCompleteAccount(email: String, password: String) {
+    fun onCompleteAccount(signedInUser: User) {
         with(_uiState.value) {
             if (!Validator.NameValidator.validateAll(firstName)) {
                 screenModelScope.launch {
@@ -67,33 +68,33 @@ class UserInformationScreenModel(
             }
         }
         screenModelScope.launch {
-            with(uiState.value) {
-                authRepo.signUpUser(
-                    User(
-                        firstName = firstName,
-                        lastName = lastName,
-                        email = email,
-                        password = password,
-                        phoneNumber = phoneNumber,
-                        birthdate = birthDate.toMillis(),
-                        bio = bio,
-                    )
-                ).collect { state ->
-                    when (state) {
-                        is Result.SuccessWithData -> {
-                            _uiState.value = uiState.value.copy(createdState = state)
-                            authRepo.setLocalUserToken(state.data.token)
-                        }
-
-                        is Result.Error -> {
-                            val error = AuthError.ServerError(state.message)
-                            _uiState.value = uiState.value.copy(error = error)
-                        }
-
-                        else -> Unit
-                    }
-                }
-            }
+//            with(uiState.value) {
+//                authRepo.signUpUser(
+//                    User(
+//                        firstName = firstName,
+//                        lastName = lastName,
+//                        email = signedInUser.email,
+//                        password = signedInUser.password,
+//                        phoneNumber = phoneNumber,
+//                        birthdate = birthDate.toMillis(),
+//                        bio = bio,
+//                    )
+//                ).collect { state ->
+//                    when (state) {
+//                        is Result.SuccessWithData -> {
+//                            _uiState.value = uiState.value.copy(createdState = state)
+////                            authRepo.setLocalUserToken(state.data.token)
+//                        }
+//
+//                        is Result.Error -> {
+//                            val error = AuthError.ServerError(state.message)
+//                            _uiState.value = uiState.value.copy(error = error)
+//                        }
+//
+//                        else -> Unit
+//                    }
+//                }
+//            }
         }
     }
 
