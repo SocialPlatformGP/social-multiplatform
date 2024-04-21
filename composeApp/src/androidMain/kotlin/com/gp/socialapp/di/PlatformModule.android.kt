@@ -45,10 +45,10 @@ actual val platformModule = DI.Module("platformModule") {
             supabaseUrl = "https://vszvbwfzewqeoxxpetgj.supabase.co",
             supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZzenZid2Z6ZXdxZW94eHBldGdqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTM2MjM0MjUsImV4cCI6MjAyOTE5OTQyNX0.dO4SiJ9MCN0gZaY15kjqRdYL0NRFTZWID_xiYWhAnk8"
         ) {
-            install(Auth){
+            install(Auth) {
                 flowType = FlowType.PKCE
-                host = "com.gp.socialapp"
-                scheme = "edulink"
+                host = "login"
+                scheme = "com.gp.edulink"
                 defaultExternalAuthAction = ExternalAuthAction.CustomTabs()
             }
         }
