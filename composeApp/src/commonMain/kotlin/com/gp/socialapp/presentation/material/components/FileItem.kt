@@ -1,8 +1,7 @@
 package com.gp.socialapp.presentation.material.components
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -16,6 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -51,21 +51,16 @@ import com.gp.socialapp.presentation.material.components.imageVectors.materialic
 import com.gp.socialapp.presentation.material.components.imageVectors.materialicon.Xsl
 import com.gp.socialapp.presentation.material.components.imageVectors.materialicon.Zip
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FileItem(
     file: MaterialFile, action: (MaterialAction) -> Unit
 ) {
     var isMenuExpanded by remember { mutableStateOf(false) }
-    Card(modifier = Modifier.fillMaxWidth().padding(4.dp).combinedClickable(
-        onClick = {
-            action(MaterialAction.OnFileClicked(file.id, file.url, file.name))
-        },
-        onLongClick = {
-            isMenuExpanded = true
-        }
-
-    )) {
+    Card(modifier = Modifier.fillMaxWidth().padding(4.dp).pointerInput(
+        Unit
+    ) {
+        detectTapGestures(onPress = {}, onLongPress = { isMenuExpanded = true })
+    }) {
         Column(
             modifier = Modifier.padding(4.dp)
         ) {
@@ -89,23 +84,8 @@ fun FileItem(
                 MoreOptionsMenu(isExpanded = true,
                     onCloseMenu = { isMenuExpanded = false },
                     onDelete = { action(MaterialAction.OnDeleteFileClicked(file.id)) },
-                    onOpenFile = {
-                        action(
-                            MaterialAction.OnFileClicked(
-                                file.id,
-                                file.url,
-                                file.name
-                            )
-                        )
-                    },
-                    onDownload = {
-                        action(
-                            MaterialAction.OnDownloadFileClicked(
-                                file.url,
-                                file.name
-                            )
-                        )
-                    }
+                    onOpenFile = { /*todo*/ },
+                    onDownload = { action(MaterialAction.OnDownloadFileClicked(file.url)) }
                 )
             }
         }
