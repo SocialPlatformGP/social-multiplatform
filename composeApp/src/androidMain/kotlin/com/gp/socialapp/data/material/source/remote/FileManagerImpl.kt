@@ -9,10 +9,12 @@ import androidx.annotation.RequiresApi
 import androidx.core.net.toUri
 import com.gp.socialapp.AndroidApp.Companion.INSTANCE
 import com.gp.socialapp.data.material.utils.FileManager
+import com.gp.socialapp.util.AppConstants.BASE_URL
 
-class FileManagerImpl : FileManager {
+class FileManagerImpl(
+) : FileManager {
     @RequiresApi(Build.VERSION_CODES.Q)
-    override suspend fun saveFile(data: ByteArray, fileName: String, mimeType: String): String {
+    override suspend fun saveFile(file: ByteArray, fileName: String, mimeType: String): String {
         val contentValue = ContentValues().apply {
             put(
                 MediaStore.MediaColumns.DISPLAY_NAME,
@@ -24,7 +26,7 @@ class FileManagerImpl : FileManager {
         val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValue)
         if (uri != null) {
             resolver.openOutputStream(uri).use {
-                it?.write(data)
+                it?.write(file)
             }
         }
         println("uri: ${uri?.path}")
@@ -39,9 +41,21 @@ class FileManagerImpl : FileManager {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
         INSTANCE.startActivity(intent)
-
-
     }
 
-
+    override suspend fun shareLink(url: String) {
+        val link = "$BASE_URL$url"
+        val sendIntent: Intent = Intent(
+            Intent.ACTION_SEND
+        ).apply {
+            putExtra(Intent.EXTRA_SUBJECT, "Link From EduLink MultiPlatform App")
+            putExtra(
+                Intent.EXTRA_TEXT,
+                " I've found a file in edulink app that might be interested you $link"
+            )
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            type = "text/plain"
+        }
+        INSTANCE.startActivity(sendIntent)
+    }
 }

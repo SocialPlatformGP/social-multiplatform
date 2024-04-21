@@ -6,7 +6,9 @@ import com.gp.socialapp.data.material.model.responses.MaterialResponse
 import com.gp.socialapp.data.material.source.local.MaterialLocalDataSource
 import com.gp.socialapp.data.material.source.remote.MaterialRemoteDataSource
 import com.gp.socialapp.data.material.utils.FileManager
+import com.gp.socialapp.util.Platform
 import com.gp.socialapp.util.Result
+import com.gp.socialapp.util.getPlatform
 import kotlinx.coroutines.flow.Flow
 
 class MaterialRepositoryImpl(
@@ -69,5 +71,11 @@ class MaterialRepositoryImpl(
             }
         }
 
+    }
+
+    override suspend fun shareLink(url: String) {
+        if (getPlatform() == Platform.ANDROID) {
+            fileManager.shareLink(url)
+        }
     }
 }

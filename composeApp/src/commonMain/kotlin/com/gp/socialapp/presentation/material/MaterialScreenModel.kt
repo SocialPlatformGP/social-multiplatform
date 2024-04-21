@@ -180,7 +180,15 @@ class MaterialScreenModel(
                 MimeType.getMimeTypeFromFileName(event.fileName)
             )
 
+            is MaterialAction.OnShareLinkClicked -> shareLink(event.url)
+
             else -> Unit
+        }
+    }
+
+    private fun shareLink(url: String) {
+        screenModelScope.launch {
+            materialRepo.shareLink(url)
         }
     }
 
