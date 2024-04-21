@@ -11,8 +11,6 @@ import com.gp.socialapp.presentation.auth.util.Validator
 import com.gp.socialapp.util.DispatcherIO
 import com.gp.socialapp.util.Result
 import io.github.aakira.napier.Napier
-import io.github.jan.supabase.gotrue.providers.Azure
-import io.github.jan.supabase.gotrue.providers.IDTokenProvider
 import io.github.jan.supabase.gotrue.providers.OAuthProvider
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -31,10 +29,29 @@ class LoginScreenModel(
     val uiState = _uiState.asStateFlow()
 
     init {
-        val token = authRepo.getLocalUserToken()
-        Napier.d("token: ${token ?: "null"}")
-        if (token != null) {
-            _uiState.value = _uiState.value.copy(userId = token)
+        val userId = authRepo.getCurrentLocalUserId()
+        if (userId.isNotBlank()) {
+            _uiState.update { it.copy(userId = userId)}
+            getSignedInUser(userId)
+        }
+    }
+
+    private fun getSignedInUser(userId: String) {
+        screenModelScope.launch (DispatcherIO){
+            authRepo.getSignedInUser(userId).collect {
+                when (it) {
+                    is Result.SuccessWithData -> {
+                        _uiState.value = _uiState.value.copy(signedInUser = it.data)
+                    }
+                    is Result.Error -> {
+                        Napier.e("getSignedInUser: ${it.message}")
+                    }
+                    is Result.Loading -> {
+                        Napier.d("getSignedInUser: Loading")
+                    }
+                    else -> Unit
+                }
+            }
         }
     }
 
@@ -61,25 +78,20 @@ class LoginScreenModel(
         }
         screenModelScope.launch {
             with(_uiState.value) {
-                val state = authRepo.signInUser(email, password)
-                state.collect {
-                    when (it) {
+                authRepo.signInWithEmail(email, password).collect { result ->
+                    when(result){
                         is Result.SuccessWithData -> {
-                            println("token: ${it.data}")
-                            _uiState.value = _uiState.value.copy(
-                                userId = it.data.token,
-                                error = NoError
-                            )
-                            authRepo.setLocalUserToken(it.data.token)
+                            authRepo.setLocalUserId(result.data.id)
+                            _uiState.update { it.copy(userId = result.data.id, signedInUser = result.data, error = NoError) }
                         }
-
                         is Result.Error -> {
-                            _uiState.value = _uiState.value.copy(
-                                userId = null,
-                                error = ServerError(it.message)
-                            )
+                            _uiState.update {
+                                it.copy(error = ServerError(result.message))
+                            }
                         }
-
+                        is Result.Loading -> {
+                            Napier.d("signInWithOAuth: Loading")
+                        }
                         else -> Unit
                     }
                 }
@@ -101,21 +113,19 @@ class LoginScreenModel(
 
     fun signInWithOAuth(provider: OAuthProvider) {
         screenModelScope.launch(DispatcherIO) {
-            authRepo.signInWithMicrosoft(provider).collect{ result ->
-                when(result) {
+            authRepo.signInWithOAuth(provider).collect{ result ->
+                when(result){
                     is Result.SuccessWithData -> {
-                        val userInfo = result.data.first
-                        val sessionSource = result.data.second
-                        println("userInfo: ${userInfo}, user id: ${userInfo.id}, session source: ${sessionSource::class.simpleName}")
+                        authRepo.setLocalUserId(result.data.id)
+                        _uiState.update { it.copy(userId = result.data.id, signedInUser = result.data, error = NoError) }
                     }
                     is Result.Error -> {
-                        _uiState.value = _uiState.value.copy(
-                            userId = null,
-                            error = ServerError(result.message)
-                        )
+                        _uiState.update {
+                            it.copy(error = ServerError(result.message))
+                        }
                     }
                     is Result.Loading -> {
-                        //todo show loading
+                        Napier.d("signInWithOAuth: Loading")
                     }
                     else -> Unit
                 }

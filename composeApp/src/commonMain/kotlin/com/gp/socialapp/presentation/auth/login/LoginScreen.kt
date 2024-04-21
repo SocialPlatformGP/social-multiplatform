@@ -43,6 +43,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import cafe.adriel.voyager.core.lifecycle.LifecycleEffect
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -52,6 +53,7 @@ import com.gp.socialapp.presentation.auth.signup.SignUpScreen
 import com.gp.socialapp.presentation.auth.util.AuthError.EmailError
 import com.gp.socialapp.presentation.auth.util.AuthError.PasswordError
 import com.gp.socialapp.presentation.auth.util.AuthError.ServerError
+import com.gp.socialapp.presentation.main.MainContainer
 import io.github.jan.supabase.gotrue.providers.Azure
 import io.github.jan.supabase.gotrue.providers.Google
 import kotlinx.coroutines.launch
@@ -75,11 +77,11 @@ object LoginScreen : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = navigator.rememberNavigatorScreenModel<LoginScreenModel>()
         val state by screenModel.uiState.collectAsState()
-//        if (state.token != null) {
-//            navigator.replaceAll(MainContainer(state.token!!))
-//        } else {
+        if (state.signedInUser != null) {
+            navigator.replaceAll(MainContainer(state.signedInUser!!))
+        } else {
             LoginContent(
-                onSignInWithGoogle = { screenModel.signInWithOAuth(Google) },
+            onSignInWithGoogle = { screenModel.signInWithOAuth(Google) },
                 state = state,
                 navigateToSignUp = { navigator.push(SignUpScreen) },
                 navigateToForgotPassword = { navigator.push(PasswordResetScreen) },
@@ -88,7 +90,7 @@ object LoginScreen : Screen {
                 onSignIn = { screenModel.onSignIn() },
                 onSignInWithMicrosoft = { screenModel.signInWithOAuth(Azure) },
             )
-//        }
+        }
     }
 
     @Composable

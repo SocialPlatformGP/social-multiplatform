@@ -17,6 +17,7 @@ import io.github.jan.supabase.gotrue.SessionStatus
 import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.gotrue.providers.Azure
 import io.github.jan.supabase.gotrue.providers.OAuthProvider
+import io.github.jan.supabase.gotrue.providers.builtin.Email
 import io.github.jan.supabase.gotrue.user.UserInfo
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -164,7 +165,7 @@ class AuthenticationRemoteDataSourceImpl(
         }
     }
 
-    override fun signInWithMicrosoft(provider: OAuthProvider): Flow<Result<Pair<UserInfo, SessionSource>>> = flow {
+    override fun signInWithOAuth(provider: OAuthProvider): Flow<Result<Pair<UserInfo, SessionSource>>> = flow {
         emit(Result.Loading)
         try {
             supabaseClient.auth.signInWith(provider) {
@@ -188,6 +189,36 @@ class AuthenticationRemoteDataSourceImpl(
             emit(Result.Error(e.message ?: "Null"))
         }
     }
+
+    override fun signInWithEmail(
+        email: String,
+        password: String
+    ): Flow<Result<Pair<UserInfo, SessionSource>>> = flow {
+        emit(Result.Loading)
+        try {
+            supabaseClient.auth.signInWith(Email) {
+                this.email = email
+                this.password = password
+            }
+            sessionStatusFlow.collect {
+                when (it) {
+                    is SessionStatus.Authenticated -> {
+                        val user = supabaseClient.auth.sessionManager.loadSession()?.user
+                        if (user != null) {
+                            emit(Result.SuccessWithData(Pair(user, it.source)))
+                        } else {
+                            emit(Result.Error("User is null"))
+                        }
+                    }
+
+                    else -> Unit
+                }
+            }
+        } catch (e: Exception) {
+            emit(Result.Error(e.message ?: "Null"))
+        }
+    }
+
 
     override fun sendPasswordResetEmail(email: String): Flow<Result<Nothing>> {
         TODO("Not yet implemented")

@@ -18,5 +18,6 @@ interface AuthenticationRemoteDataSource {
     fun signUpUser(userRequest: UserRequest): Flow<Result<AuthResponse>>
     fun getSignedInUser(id: String): Flow<Result<User>>
     fun sendPasswordResetEmail(email: String): Flow<Result<Nothing>>
-    fun signInWithMicrosoft(provider: OAuthProvider): Flow<Result<Pair<UserInfo, SessionSource>>>
+    fun signInWithOAuth(provider: OAuthProvider): Flow<Result<Pair<UserInfo, SessionSource>>>
+    fun signInWithEmail(email: String, password: String): Flow<Result<Pair<UserInfo, SessionSource>>>
 }

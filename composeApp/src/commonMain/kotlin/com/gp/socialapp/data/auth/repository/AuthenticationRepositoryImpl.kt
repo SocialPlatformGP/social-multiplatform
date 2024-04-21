@@ -4,10 +4,9 @@ import com.gp.socialapp.data.auth.source.local.AuthKeyValueStorage
 import com.gp.socialapp.data.auth.source.remote.AuthenticationRemoteDataSource
 import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.util.Result
-import io.github.jan.supabase.gotrue.SessionSource
 import io.github.jan.supabase.gotrue.providers.OAuthProvider
-import io.github.jan.supabase.gotrue.user.UserInfo
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
 class AuthenticationRepositoryImpl(
     private val remoteDataSource: AuthenticationRemoteDataSource,
@@ -47,7 +46,47 @@ class AuthenticationRepositoryImpl(
         localKeyValueStorage.cleanStorage()
     }
 
-    override fun signInWithMicrosoft(provider: OAuthProvider) : Flow<Result<Pair<UserInfo, SessionSource>>> {
-        return remoteDataSource.signInWithMicrosoft(provider)
+    override fun signInWithOAuth(provider: OAuthProvider) : Flow<Result<User>>  = flow{
+        emit(Result.Loading)
+        remoteDataSource.signInWithOAuth(provider).collect{ result ->
+            when(result) {
+                is Result.SuccessWithData -> {
+                    val userInfo = result.data.first
+                    val sessionSource = result.data.second
+                    remoteDataSource.getSignedInUser(userInfo.id).collect { result
+                        emit(it)
+                    }
+                }
+                is Result.Error -> {
+                    emit(Result.Error(result.message))
+                }
+                is Result.Loading -> {
+                    emit(Result.Loading)
+                }
+                else -> Unit
+            }
+        }
+    }
+
+    override fun signInWithEmail(email: String, password: String): Flow<Result<User>> = flow {
+        emit(Result.Loading)
+        remoteDataSource.signInWithEmail(email, password).collect { result ->
+            when(result) {
+                is Result.SuccessWithData -> {
+                    val userInfo = result.data.first
+                    val sessionSource = result.data.second
+                    remoteDataSource.getSignedInUser(userInfo.id).collect {
+                        emit(it)
+                    }
+                }
+                is Result.Error -> {
+                    emit(Result.Error(result.message))
+                }
+                is Result.Loading -> {
+                    emit(Result.Loading)
+                }
+                else -> Unit
+            }
+        }
     }
 }
