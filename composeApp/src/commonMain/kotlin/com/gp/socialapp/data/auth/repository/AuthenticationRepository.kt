@@ -3,6 +3,9 @@ package com.gp.socialapp.data.auth.repository
 import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.data.auth.source.remote.model.responses.AuthResponse
 import com.gp.socialapp.util.Result
+import io.github.jan.supabase.gotrue.SessionSource
+import io.github.jan.supabase.gotrue.providers.OAuthProvider
+import io.github.jan.supabase.gotrue.user.UserInfo
 import kotlinx.coroutines.flow.Flow
 
 interface AuthenticationRepository {
@@ -19,5 +22,5 @@ interface AuthenticationRepository {
     fun setLocalUserId(id: String)
     fun setLocalUserToken(token: String)
     fun clearStorage()
-    suspend fun signInWithMicrosoft()
+    fun signInWithMicrosoft(provider: OAuthProvider): Flow<Result<Pair<UserInfo, SessionSource>>>
 }

@@ -43,16 +43,6 @@ val remoteDataSourceModuleK = DI.Module("remoteDataSourceModule") {
             instance()
         )
     }
-    bind<SupabaseClient>() with singleton {
-        createSupabaseClient(
-            supabaseUrl = "https://vszvbwfzewqeoxxpetgj.supabase.co",
-            supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZzenZid2Z6ZXdxZW94eHBldGdqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTM2MjM0MjUsImV4cCI6MjAyOTE5OTQyNX0.dO4SiJ9MCN0gZaY15kjqRdYL0NRFTZWID_xiYWhAnk8"
-        ) {
-            install(Auth){
-                flowType = FlowType.PKCE
-            }
-        }
-    }
     bind<ReplyRemoteDataSource>() with singleton { ReplyRemoteDataSourceImpl(instance()) }
     bind<AuthenticationRemoteDataSource>() with singleton { AuthenticationRemoteDataSourceImpl(instance(), instance()) }
     bind<MessageRemoteDataSource>() with singleton {

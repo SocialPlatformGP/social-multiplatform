@@ -4,6 +4,9 @@ import com.gp.socialapp.data.auth.source.local.AuthKeyValueStorage
 import com.gp.socialapp.data.auth.source.remote.AuthenticationRemoteDataSource
 import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.util.Result
+import io.github.jan.supabase.gotrue.SessionSource
+import io.github.jan.supabase.gotrue.providers.OAuthProvider
+import io.github.jan.supabase.gotrue.user.UserInfo
 import kotlinx.coroutines.flow.Flow
 
 class AuthenticationRepositoryImpl(
@@ -44,7 +47,7 @@ class AuthenticationRepositoryImpl(
         localKeyValueStorage.cleanStorage()
     }
 
-    override suspend fun signInWithMicrosoft() {
-        remoteDataSource.signInWithMicrosoft()
+    override fun signInWithMicrosoft(provider: OAuthProvider) : Flow<Result<Pair<UserInfo, SessionSource>>> {
+        return remoteDataSource.signInWithMicrosoft(provider)
     }
 }

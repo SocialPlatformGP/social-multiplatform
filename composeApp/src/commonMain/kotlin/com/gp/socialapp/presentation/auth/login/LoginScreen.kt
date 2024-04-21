@@ -52,7 +52,8 @@ import com.gp.socialapp.presentation.auth.signup.SignUpScreen
 import com.gp.socialapp.presentation.auth.util.AuthError.EmailError
 import com.gp.socialapp.presentation.auth.util.AuthError.PasswordError
 import com.gp.socialapp.presentation.auth.util.AuthError.ServerError
-import com.gp.socialapp.presentation.main.MainContainer
+import io.github.jan.supabase.gotrue.providers.Azure
+import io.github.jan.supabase.gotrue.providers.Google
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import socialmultiplatform.composeapp.generated.resources.Res
@@ -78,14 +79,14 @@ object LoginScreen : Screen {
 //            navigator.replaceAll(MainContainer(state.token!!))
 //        } else {
             LoginContent(
-                onSignInWithGoogle = { /*todo*/ },
+                onSignInWithGoogle = { screenModel.signInWithOAuth(Google) },
                 state = state,
                 navigateToSignUp = { navigator.push(SignUpScreen) },
                 navigateToForgotPassword = { navigator.push(PasswordResetScreen) },
                 onEmailChange = { screenModel.updateEmail(it) },
                 onPasswordChange = { screenModel.updatePassword(it) },
                 onSignIn = { screenModel.onSignIn() },
-                onSignInWithMicrosoft = { screenModel.signInWithMicrosoft() },
+                onSignInWithMicrosoft = { screenModel.signInWithOAuth(Azure) },
             )
 //        }
     }

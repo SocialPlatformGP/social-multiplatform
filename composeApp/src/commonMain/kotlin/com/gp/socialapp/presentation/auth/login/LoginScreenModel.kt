@@ -11,6 +11,9 @@ import com.gp.socialapp.presentation.auth.util.Validator
 import com.gp.socialapp.util.DispatcherIO
 import com.gp.socialapp.util.Result
 import io.github.aakira.napier.Napier
+import io.github.jan.supabase.gotrue.providers.Azure
+import io.github.jan.supabase.gotrue.providers.IDTokenProvider
+import io.github.jan.supabase.gotrue.providers.OAuthProvider
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -31,7 +34,7 @@ class LoginScreenModel(
         val token = authRepo.getLocalUserToken()
         Napier.d("token: ${token ?: "null"}")
         if (token != null) {
-            _uiState.value = _uiState.value.copy(token = token)
+            _uiState.value = _uiState.value.copy(userId = token)
         }
     }
 
@@ -64,7 +67,7 @@ class LoginScreenModel(
                         is Result.SuccessWithData -> {
                             println("token: ${it.data}")
                             _uiState.value = _uiState.value.copy(
-                                token = it.data.token,
+                                userId = it.data.token,
                                 error = NoError
                             )
                             authRepo.setLocalUserToken(it.data.token)
@@ -72,7 +75,7 @@ class LoginScreenModel(
 
                         is Result.Error -> {
                             _uiState.value = _uiState.value.copy(
-                                token = null,
+                                userId = null,
                                 error = ServerError(it.message)
                             )
                         }
@@ -83,7 +86,6 @@ class LoginScreenModel(
             }
         }
     }
-//    fun authenticateWithGoogle(account: GoogleSignInAccount) = authRepo.authenticateWithGoogle(account)
 
     fun updateEmail(email: String) {
         _uiState.update { it.copy(email = email) }
@@ -97,9 +99,27 @@ class LoginScreenModel(
         authRepo.clearStorage()
     }
 
-    fun signInWithMicrosoft() {
+    fun signInWithOAuth(provider: OAuthProvider) {
         screenModelScope.launch(DispatcherIO) {
-            authRepo.signInWithMicrosoft()
+            authRepo.signInWithMicrosoft(provider).collect{ result ->
+                when(result) {
+                    is Result.SuccessWithData -> {
+                        val userInfo = result.data.first
+                        val sessionSource = result.data.second
+                        println("userInfo: ${userInfo}, user id: ${userInfo.id}, session source: ${sessionSource::class.simpleName}")
+                    }
+                    is Result.Error -> {
+                        _uiState.value = _uiState.value.copy(
+                            userId = null,
+                            error = ServerError(result.message)
+                        )
+                    }
+                    is Result.Loading -> {
+                        //todo show loading
+                    }
+                    else -> Unit
+                }
+            }
         }
     }
 }
