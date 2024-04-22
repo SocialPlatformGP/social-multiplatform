@@ -26,7 +26,7 @@ fun FileDetailsClickableItem(
     title: String,
     url: String,
     icon: ImageVector,
-    onShareLinkClicked: (String) -> Unit
+    onOpenLinkClicked: (String) -> Unit
 ) {
     val annotatedString = buildAnnotatedString {
         val link = BASE_URL + url
@@ -64,7 +64,7 @@ fun FileDetailsClickableItem(
                     annotatedString.getStringAnnotations(
                         tag = "URL", start = offset, end = offset
                     ).firstOrNull()?.let {
-                        onShareLinkClicked(url)
+                        onOpenLinkClicked(url)
                     }
                 }
 

@@ -58,4 +58,13 @@ class FileManagerImpl(
         }
         INSTANCE.startActivity(sendIntent)
     }
+
+    override suspend fun openLink(url: String) {
+        val link = "$BASE_URL$url"
+        val intent = Intent(Intent.ACTION_VIEW).apply {
+            data = link.toUri()
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        INSTANCE.startActivity(intent)
+    }
 }

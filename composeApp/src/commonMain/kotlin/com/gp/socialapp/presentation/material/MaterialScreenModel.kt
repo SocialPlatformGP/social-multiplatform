@@ -4,9 +4,11 @@ package com.gp.socialapp.presentation.material
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.gp.socialapp.data.material.model.MaterialFolder
+import com.gp.socialapp.data.material.model.responses.MaterialResponse
 import com.gp.socialapp.data.material.repository.MaterialRepository
-import com.gp.socialapp.presentation.material.components.MimeType
+import com.gp.socialapp.presentation.material.utils.MimeType
 import com.gp.socialapp.util.DispatcherIO
+import com.gp.socialapp.util.Results
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -17,28 +19,37 @@ class MaterialScreenModel(
 ) : ScreenModel {
     private val uiState = MutableStateFlow(MaterialUiState())
     val state = uiState.asStateFlow()
-
-
     fun getMaterial() {
         screenModelScope.launch {
             materialRepo.getMaterialAtPath(state.value.currentFolder.path).collect { result ->
-                result.onSuccessWithData { data ->
-                    uiState.update {
-                        println("***********Data: $data***************")
-                        it.copy(
-                            currentFiles = data.files,
-                            currentFolders = data.folders
-                        )
+                when (result) {
+                    is Results.Failure -> {
+                        stopLoading()
+                        println(result.error)
                     }
-                }
-                result.onFailure {
-                    println("***********Error: $it***************")
+
+                    Results.Loading -> {
+                        startLoading()
+                    }
+
+                    is Results.Success -> {
+                        stopLoading()
+                        updateData(result.data)
+                    }
                 }
             }
         }
     }
 
-    fun uploadFolder(
+    private fun updateData(data: MaterialResponse.GetMaterialResponses) {
+        uiState.update {
+            it.copy(
+                currentFiles = data.files, currentFolders = data.folders
+            )
+        }
+    }
+
+    private fun uploadFolder(
         folderName: String
     ) {
         screenModelScope.launch {
@@ -46,23 +57,27 @@ class MaterialScreenModel(
                 name = folderName,
                 path = state.value.currentFolder.path,
             ).collect { result ->
-                result.onSuccessWithData { data ->
-                    uiState.update {
-                        it.copy(
-                            currentFolders = data.folders,
-                            currentFiles = data.files
-                        )
+                when (result) {
+                    is Results.Failure -> {
+                        println(result.error)
+                        stopLoading()
+                    }
+
+                    Results.Loading -> {
+                        startLoading()
+                    }
+
+                    is Results.Success -> {
+                        stopLoading()
+                        updateData(result.data)
                     }
                 }
-
             }
         }
     }
 
-    fun uploadFile(
-        fileName: String,
-        fileType: String,
-        fileContent: ByteArray
+    private fun uploadFile(
+        fileName: String, fileType: String, fileContent: ByteArray
     ) {
         screenModelScope.launch {
             materialRepo.createFile(
@@ -71,23 +86,28 @@ class MaterialScreenModel(
                 path = state.value.currentFolder.path,
                 content = fileContent
             ).collect { result ->
-                result.onSuccessWithData { data ->
-                    uiState.update {
-                        it.copy(
-                            currentFolders = data.folders,
-                            currentFiles = data.files
-                        )
+                when (result) {
+                    is Results.Failure -> {
+                        stopLoading()
+                        println(result.error)
+                    }
+
+                    Results.Loading -> {
+                        startLoading()
+                    }
+
+                    is Results.Success -> {
+                        stopLoading()
+                        updateData(result.data)
                     }
                 }
-
             }
         }
     }
 
-    fun openFolder(folder: MaterialFolder) {
+    private fun openFolder(folder: MaterialFolder) {
         val newFolder = Folder(
-            path = folder.id,
-            name = folder.name
+            path = folder.id, name = folder.name
         )
         uiState.update {
             it.copy(
@@ -98,9 +118,6 @@ class MaterialScreenModel(
         }.apply {
             getMaterial()
         }
-        println("currentFolder " + state.value.currentFolder.name + " " + state.value.currentFolder.path + " " + state.value.currentFolders.size + " " + state.value.currentFiles.size)
-        println("openFolder " + state.value.listOfPreviousFolder.map { it.name })
-
     }
 
     fun closeFolder() {
@@ -117,42 +134,53 @@ class MaterialScreenModel(
                 getMaterial()
             }
         }
-        println("currentFolder " + state.value.currentFolder.name + " " + state.value.currentFolder.path + " " + state.value.currentFolders.size + " " + state.value.currentFiles.size)
-        println("closeFolder " + state.value.listOfPreviousFolder.map { it.name })
     }
 
-    fun deleteFile(fileId: String) {
+    private fun deleteFile(fileId: String) {
         screenModelScope.launch {
             materialRepo.deleteFile(fileId, state.value.currentFolder.path).collect { result ->
-                result.onSuccessWithData { data ->
-                    uiState.update {
-                        it.copy(
-                            currentFolders = data.folders,
-                            currentFiles = data.files
-                        )
+                when (result) {
+                    is Results.Failure -> {
+                        println(result.error)
+                        stopLoading()
+                    }
+
+                    Results.Loading -> {
+                        startLoading()
+                    }
+
+                    is Results.Success -> {
+                        stopLoading()
+                        updateData(result.data)
                     }
                 }
             }
-
         }
     }
 
-    fun deleteFolder(folderId: String) {
+    private fun deleteFolder(folderId: String) {
         screenModelScope.launch {
             materialRepo.deleteFolder(folderId).collect { result ->
-                result.onSuccessWithData { data ->
-                    uiState.update {
-                        it.copy(
-                            currentFolders = data.folders,
-                            currentFiles = data.files
-                        )
+                when (result) {
+                    is Results.Failure -> {
+                        stopLoading()
+                        println(result.error)
+                    }
+
+                    Results.Loading -> {
+                        startLoading()
+                    }
+
+                    is Results.Success -> {
+                        updateData(result.data)
+                        stopLoading()
                     }
                 }
             }
         }
     }
 
-    fun downloadFile(url: String, mimeType: MimeType) {
+    private fun downloadFile(url: String, mimeType: MimeType) {
         screenModelScope.launch(DispatcherIO) {
             materialRepo.downloadFile(url, mimeType.mimeType)
         }
@@ -161,28 +189,31 @@ class MaterialScreenModel(
     fun handleUiEvent(event: MaterialAction) {
         when (event) {
             is MaterialAction.OnUploadFileClicked -> uploadFile(
-                event.name,
-                event.type,
-                event.content
+                event.name, event.type, event.content
             )
 
             is MaterialAction.OnCreateFolderClicked -> uploadFolder(event.name)
             is MaterialAction.OnFolderClicked -> openFolder(event.folder)
             is MaterialAction.OnDeleteFileClicked -> deleteFile(event.fileId)
             is MaterialAction.OnDownloadFileClicked -> downloadFile(
-                event.url,
-                MimeType.getMimeTypeFromFileName(event.fileName)
+                event.url, MimeType.getMimeTypeFromFileName(event.fileName)
             )
 
             is MaterialAction.OnFileClicked -> openFile(
-                event.fileId,
-                event.url,
-                MimeType.getMimeTypeFromFileName(event.fileName)
+                event.fileId, event.url, MimeType.getMimeTypeFromFileName(event.fileName)
             )
 
             is MaterialAction.OnShareLinkClicked -> shareLink(event.url)
+            is MaterialAction.OnDeleteFolderClicked -> deleteFolder(event.folderId)
+            is MaterialAction.OpenLink -> openLink(event.link)
 
             else -> Unit
+        }
+    }
+
+    private fun openLink(url: String) {
+        screenModelScope.launch {
+            materialRepo.openLink(url)
         }
     }
 
@@ -192,9 +223,25 @@ class MaterialScreenModel(
         }
     }
 
-    fun openFile(fileId: String, url: String, mimeType: MimeType) {
+    private fun openFile(fileId: String, url: String, mimeType: MimeType) {
         screenModelScope.launch {
             materialRepo.openFile(fileId, url, mimeType.mimeType)
+        }
+    }
+
+    private fun startLoading() {
+        uiState.update {
+            it.copy(
+                isLoading = true
+            )
+        }
+    }
+
+    private fun stopLoading() {
+        uiState.update {
+            it.copy(
+                isLoading = false
+            )
         }
     }
 }

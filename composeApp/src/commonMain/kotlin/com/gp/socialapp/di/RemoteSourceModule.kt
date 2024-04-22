@@ -36,7 +36,6 @@ val remoteDataSourceModuleK = DI.Module("remoteDataSourceModule") {
     bind<MaterialRemoteDataSource>() with singleton {
         MaterialRemoteDataSourceImpl(
             instance(),
-            instance()
         )
     }
     bind<ReplyRemoteDataSource>() with singleton { ReplyRemoteDataSourceImpl() }

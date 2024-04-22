@@ -12,7 +12,8 @@ fun MoreOptionsMenu(
     onDelete: () -> Unit,
     onOpenFile: () -> Unit,
     onDownload: () -> Unit,
-    onDetails: () -> Unit
+    onDetails: () -> Unit,
+    onShareFileClicked: () -> Unit
 ) {
     if (isExpanded) {
         DropdownMenu(
@@ -23,6 +24,7 @@ fun MoreOptionsMenu(
                 text = { Text("Open") },
                 onClick = {
                     onOpenFile()
+                    onCloseMenu()
                 }
             )
             DropdownMenuItem(
@@ -34,7 +36,10 @@ fun MoreOptionsMenu(
             )
             DropdownMenuItem(
                 text = { Text("Share") },
-                onClick = { /* todo:Share */ }
+                onClick = {
+                    onShareFileClicked()
+                    onCloseMenu()
+                }
             )
             DropdownMenuItem(
                 text = { Text("Download") },
@@ -45,7 +50,10 @@ fun MoreOptionsMenu(
             )
             DropdownMenuItem(
                 text = { Text("Details") },
-                onClick = onDetails
+                onClick = {
+                    onDetails()
+                    onCloseMenu()
+                }
 
             )
 

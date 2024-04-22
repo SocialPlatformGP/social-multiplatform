@@ -1,10 +1,13 @@
 package com.gp.socialapp.data.material.source.remote
 
 import com.gp.socialapp.data.material.utils.FileManager
+import com.gp.socialapp.util.AppConstants.BASE_URL
 import com.gp.socialapp.util.DispatcherIO
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.awt.Desktop
 import java.io.File
+import java.net.URI
 
 class FileManagerImpl() : FileManager {
     val home = System.getProperty("user.home")
@@ -28,7 +31,14 @@ class FileManagerImpl() : FileManager {
     }
 
     override suspend fun shareLink(url: String) {
-        TODO("Not yet implemented")
+
+    }
+
+    override suspend fun openLink(url: String) {
+        val link = "$BASE_URL$url".replace(" ", "%20")
+        withContext(Dispatchers.IO) {
+            Desktop.getDesktop().browse(URI(link))
+        }
     }
 
 

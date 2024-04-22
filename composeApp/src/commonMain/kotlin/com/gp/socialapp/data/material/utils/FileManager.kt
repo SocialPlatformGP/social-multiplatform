@@ -4,4 +4,5 @@ interface FileManager {
     suspend fun saveFile(file: ByteArray, fileName: String, mimeType: String): String
     suspend fun openFile(filePath: String, mimeType: String)
     suspend fun shareLink(url: String)
+    suspend fun openLink(url: String)
 }
