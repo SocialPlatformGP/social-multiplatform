@@ -92,7 +92,8 @@ kotlin {
             implementation(libs.calf.file.picker)
             implementation(libs.kodein.di.framework.compose)
             implementation(libs.sqlDelight.coroutines)
-            implementation("io.github.jan-tennert.supabase:gotrue-kt:2.3.0")
+            implementation(libs.supabase.auth)
+            implementation(libs.supabase.storage)
         }
 
         commonTest.dependencies {

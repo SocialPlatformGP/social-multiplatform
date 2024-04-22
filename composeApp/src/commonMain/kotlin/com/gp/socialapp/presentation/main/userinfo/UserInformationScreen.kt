@@ -51,6 +51,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import cafe.adriel.voyager.core.lifecycle.LifecycleEffect
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -92,6 +93,11 @@ data class UserInformationScreen(
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = navigator.rememberNavigatorScreenModel<UserInformationScreenModel>()
         val state by screenModel.uiState.collectAsState()
+        LifecycleEffect(
+            onStarted = {
+                screenModel.onScreenStart(signedInUser)
+            }
+        )
         val scope = rememberCoroutineScope()
         val context = LocalPlatformContext.current
         val pickerLauncher = rememberFilePickerLauncher(
@@ -106,11 +112,8 @@ data class UserInformationScreen(
                 }
             }
         )
-        if (state.createdState is Result.SuccessWithData) {
-            val authResponse = (state.createdState as Result.SuccessWithData).data
-//            println("Token: ${authResponse.token}")
-//            TODO()
-////            navigator.replaceAll(MainContainer(authResponse.token))
+        if (state.createdState is Result.Success) {
+            navigator.replaceAll(MainContainer(state.signedInUser?: signedInUser))
         }
         Scaffold { paddingValues ->
             UserInformationContent(
@@ -122,7 +125,7 @@ data class UserInformationScreen(
                 onPhoneNumberChange = { screenModel.onPhoneNumberChange(it) },
                 onBioChange = { screenModel.onBioChange(it) },
                 onDateOfBirthChange = { screenModel.onBirthDateChange(it) },
-                onContinueClicked = { screenModel.onCompleteAccount(signedInUser) }
+                onContinueClicked = { screenModel.onCompleteAccount() }
             )
         }
     }
@@ -347,9 +350,6 @@ data class UserInformationScreen(
                     }
                     DatePickerDialog(
                         onDismissRequest = {
-                            // Dismiss the dialog when the user clicks outside the dialog or on the back
-                            // button. If you want to disable that functionality, simply use an empty
-                            // onDismissRequest.
                             isDateDialogOpen = false
                         },
                         confirmButton = {
