@@ -7,6 +7,7 @@ import com.gp.socialapp.data.material.model.MaterialFolder
 import com.gp.socialapp.data.material.model.responses.MaterialResponse
 import com.gp.socialapp.data.material.repository.MaterialRepository
 import com.gp.socialapp.presentation.material.utils.MimeType
+import com.gp.socialapp.util.DataError
 import com.gp.socialapp.util.DispatcherIO
 import com.gp.socialapp.util.Results
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,35 +20,15 @@ class MaterialScreenModel(
 ) : ScreenModel {
     private val uiState = MutableStateFlow(MaterialUiState())
     val state = uiState.asStateFlow()
+
     fun getMaterial() {
         screenModelScope.launch {
             materialRepo.getMaterialAtPath(state.value.currentFolder.path).collect { result ->
-                when (result) {
-                    is Results.Failure -> {
-                        stopLoading()
-                        println(result.error)
-                    }
-
-                    Results.Loading -> {
-                        startLoading()
-                    }
-
-                    is Results.Success -> {
-                        stopLoading()
-                        updateData(result.data)
-                    }
-                }
+                handleUiState(result)
             }
         }
     }
 
-    private fun updateData(data: MaterialResponse.GetMaterialResponses) {
-        uiState.update {
-            it.copy(
-                currentFiles = data.files, currentFolders = data.folders
-            )
-        }
-    }
 
     private fun uploadFolder(
         folderName: String
@@ -57,21 +38,7 @@ class MaterialScreenModel(
                 name = folderName,
                 path = state.value.currentFolder.path,
             ).collect { result ->
-                when (result) {
-                    is Results.Failure -> {
-                        println(result.error)
-                        stopLoading()
-                    }
-
-                    Results.Loading -> {
-                        startLoading()
-                    }
-
-                    is Results.Success -> {
-                        stopLoading()
-                        updateData(result.data)
-                    }
-                }
+                handleUiState(result)
             }
         }
     }
@@ -86,21 +53,7 @@ class MaterialScreenModel(
                 path = state.value.currentFolder.path,
                 content = fileContent
             ).collect { result ->
-                when (result) {
-                    is Results.Failure -> {
-                        stopLoading()
-                        println(result.error)
-                    }
-
-                    Results.Loading -> {
-                        startLoading()
-                    }
-
-                    is Results.Success -> {
-                        stopLoading()
-                        updateData(result.data)
-                    }
-                }
+                handleUiState(result)
             }
         }
     }
@@ -139,21 +92,7 @@ class MaterialScreenModel(
     private fun deleteFile(fileId: String) {
         screenModelScope.launch {
             materialRepo.deleteFile(fileId, state.value.currentFolder.path).collect { result ->
-                when (result) {
-                    is Results.Failure -> {
-                        println(result.error)
-                        stopLoading()
-                    }
-
-                    Results.Loading -> {
-                        startLoading()
-                    }
-
-                    is Results.Success -> {
-                        stopLoading()
-                        updateData(result.data)
-                    }
-                }
+                handleUiState(result)
             }
         }
     }
@@ -161,21 +100,7 @@ class MaterialScreenModel(
     private fun deleteFolder(folderId: String) {
         screenModelScope.launch {
             materialRepo.deleteFolder(folderId).collect { result ->
-                when (result) {
-                    is Results.Failure -> {
-                        stopLoading()
-                        println(result.error)
-                    }
-
-                    Results.Loading -> {
-                        startLoading()
-                    }
-
-                    is Results.Success -> {
-                        updateData(result.data)
-                        stopLoading()
-                    }
-                }
+                handleUiState(result)
             }
         }
     }
@@ -206,8 +131,27 @@ class MaterialScreenModel(
             is MaterialAction.OnShareLinkClicked -> shareLink(event.url)
             is MaterialAction.OnDeleteFolderClicked -> deleteFolder(event.folderId)
             is MaterialAction.OpenLink -> openLink(event.link)
-
             else -> Unit
+        }
+    }
+
+    private fun handleUiState(result: Results<MaterialResponse.GetMaterialResponses, DataError.Network>) {
+        when (result) {
+            is Results.Failure -> {
+                stopLoading()
+                showError(result.error)
+            }
+
+            Results.Loading -> {
+                resetError()
+                startLoading()
+            }
+
+            is Results.Success -> {
+                resetError()
+                stopLoading()
+                updateData(result.data)
+            }
         }
     }
 
@@ -241,6 +185,30 @@ class MaterialScreenModel(
         uiState.update {
             it.copy(
                 isLoading = false
+            )
+        }
+    }
+
+    private fun showError(error: DataError.Network) {
+        uiState.update {
+            it.copy(
+                error = error.name
+            )
+        }
+    }
+
+    private fun resetError() {
+        uiState.update {
+            it.copy(
+                error = null
+            )
+        }
+    }
+
+    private fun updateData(data: MaterialResponse.GetMaterialResponses) {
+        uiState.update {
+            it.copy(
+                currentFiles = data.files, currentFolders = data.folders
             )
         }
     }

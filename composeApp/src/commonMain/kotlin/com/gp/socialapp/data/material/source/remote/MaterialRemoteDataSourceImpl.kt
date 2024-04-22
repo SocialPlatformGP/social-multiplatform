@@ -10,8 +10,10 @@ import io.ktor.client.call.body
 import io.ktor.client.request.delete
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.flow
 
 class MaterialRemoteDataSourceImpl(
@@ -28,23 +30,14 @@ class MaterialRemoteDataSourceImpl(
                         request
                     )
                 }
-                val data = response.body<MaterialResponse.GetMaterialResponses>()
-                if (response.status == HttpStatusCode.OK) {
-                    emit(Results.Success(data))
-                } else {
-                    when (response.status) {
-                        HttpStatusCode.NotFound -> emit(Results.Failure(DataError.Network.NOT_FOUND))
-                        HttpStatusCode.BadRequest -> emit(Results.Failure(DataError.Network.BAD_REQUEST))
-                        HttpStatusCode.PayloadTooLarge -> emit(Results.Failure(DataError.Network.PAYLOAD_TOO_LARGE))
-                        else -> emit(Results.Failure(DataError.Network.CANT_GET_FILES_AT_PATH))
-                    }
-                }
+                handleServerResponse(response)
             } catch (e: Exception) {
                 emit(Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN))
                 e.printStackTrace()
             }
         }
     }
+
 
     override suspend fun createFolder(
         name: String,
@@ -60,17 +53,7 @@ class MaterialRemoteDataSourceImpl(
                         request
                     )
                 }
-                val data = response.body<MaterialResponse.GetMaterialResponses>()
-                if (response.status == HttpStatusCode.OK) {
-                    emit(Results.Success(data))
-                } else {
-                    when (response.status) {
-                        HttpStatusCode.NotFound -> emit(Results.Failure(DataError.Network.NOT_FOUND))
-                        HttpStatusCode.BadRequest -> emit(Results.Failure(DataError.Network.BAD_REQUEST))
-                        HttpStatusCode.PayloadTooLarge -> emit(Results.Failure(DataError.Network.PAYLOAD_TOO_LARGE))
-                        else -> emit(Results.Failure(DataError.Network.CANT_CREATE_FOLDER))
-                    }
-                }
+                handleServerResponse(response)
             } catch (e: Exception) {
                 emit(Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN))
                 e.printStackTrace()
@@ -99,17 +82,8 @@ class MaterialRemoteDataSourceImpl(
                         request
                     )
                 }
-                val data = response.body<MaterialResponse.GetMaterialResponses>()
-                if (response.status == HttpStatusCode.OK) {
-                    emit(Results.Success(data))
-                } else {
-                    when (response.status) {
-                        HttpStatusCode.NotFound -> emit(Results.Failure(DataError.Network.NOT_FOUND))
-                        HttpStatusCode.BadRequest -> emit(Results.Failure(DataError.Network.BAD_REQUEST))
-                        HttpStatusCode.PayloadTooLarge -> emit(Results.Failure(DataError.Network.PAYLOAD_TOO_LARGE))
-                        else -> emit(Results.Failure(DataError.Network.CANT_UPLOAD_FILE))
-                    }
-                }
+                handleServerResponse(response)
+
             } catch (e: Exception) {
                 emit(Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN))
                 e.printStackTrace()
@@ -128,16 +102,8 @@ class MaterialRemoteDataSourceImpl(
                     endPoint("deleteFile")
                     setBody(request)
                 }
-                val data = response.body<MaterialResponse.GetMaterialResponses>()
-                if (response.status == HttpStatusCode.OK) {
-                    emit(Results.Success(data))
-                } else {
-                    when (response.status) {
-                        HttpStatusCode.NotFound -> emit(Results.Failure(DataError.Network.NOT_FOUND))
-                        HttpStatusCode.BadRequest -> emit(Results.Failure(DataError.Network.BAD_REQUEST))
-                        else -> emit(Results.Failure(DataError.Network.FILE_NOT_DELETED))
-                    }
-                }
+                handleServerResponse(response)
+
             } catch (e: Exception) {
                 emit(Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN))
                 e.printStackTrace()
@@ -151,16 +117,8 @@ class MaterialRemoteDataSourceImpl(
                 val response = this@MaterialRemoteDataSourceImpl.client.delete(folderId) {
                     endPoint("deleteFile")
                 }
-                val data = response.body<MaterialResponse.GetMaterialResponses>()
-                if (response.status == HttpStatusCode.OK) {
-                    emit(Results.Success(data))
-                } else {
-                    when (response.status) {
-                        HttpStatusCode.NotFound -> emit(Results.Failure(DataError.Network.NOT_FOUND))
-                        HttpStatusCode.BadRequest -> emit(Results.Failure(DataError.Network.BAD_REQUEST))
-                        else -> emit(Results.Failure(DataError.Network.FOLDER_NOT_DELETED))
-                    }
-                }
+                handleServerResponse(response)
+
             } catch (e: Exception) {
                 emit(Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN))
                 e.printStackTrace()
@@ -188,6 +146,22 @@ class MaterialRemoteDataSourceImpl(
             }
         } catch (e: Exception) {
             Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN)
+        }
+    }
+}
+
+private suspend fun FlowCollector<Results<MaterialResponse.GetMaterialResponses, DataError.Network>>.handleServerResponse(
+    response: HttpResponse
+) {
+    val data = response.body<MaterialResponse.GetMaterialResponses>()
+    if (response.status == HttpStatusCode.OK) {
+        emit(Results.Success(data))
+    } else {
+        when (response.status) {
+            HttpStatusCode.NotFound -> emit(Results.Failure(DataError.Network.NOT_FOUND))
+            HttpStatusCode.BadRequest -> emit(Results.Failure(DataError.Network.BAD_REQUEST))
+            HttpStatusCode.PayloadTooLarge -> emit(Results.Failure(DataError.Network.PAYLOAD_TOO_LARGE))
+            else -> emit(Results.Failure(DataError.Network.CANT_GET_FILES_AT_PATH))
         }
     }
 }

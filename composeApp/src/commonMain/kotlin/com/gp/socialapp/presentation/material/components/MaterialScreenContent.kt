@@ -1,5 +1,6 @@
 package com.gp.socialapp.presentation.material.components
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -7,8 +8,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -20,21 +28,35 @@ import androidx.compose.ui.unit.dp
 import com.gp.socialapp.data.material.model.MaterialFile
 import com.gp.socialapp.presentation.material.MaterialAction
 import com.gp.socialapp.presentation.material.MaterialUiState
+import com.gp.socialapp.util.SnackbarVisualsWithError
 import com.mohamedrejeb.calf.core.LocalPlatformContext
 import com.mohamedrejeb.calf.picker.FilePickerFileType
 import com.mohamedrejeb.calf.picker.FilePickerSelectionMode
 import com.mohamedrejeb.calf.picker.rememberFilePickerLauncher
+import kotlinx.coroutines.launch
 
 @Composable
 fun MaterialScreenContent(
     state: MaterialUiState,
     action: (MaterialAction) -> Unit,
 ) {
+
     val context = LocalPlatformContext.current
     val scope = rememberCoroutineScope()
     var dialogState by remember { mutableStateOf(false) }
     var detialsDialogState by remember { mutableStateOf(false) }
     var fileDetails by remember { mutableStateOf(MaterialFile()) }
+    val snackbarHostState = remember { SnackbarHostState() }
+    if (state.error != null) {
+        scope.launch {
+            snackbarHostState.showSnackbar(
+                SnackbarVisualsWithError(
+                    message = state.error,
+                    isError = true
+                )
+            )
+        }
+    }
     val filePicker = rememberFilePickerLauncher(
         selectionMode = FilePickerSelectionMode.Single,
         type = FilePickerFileType.All
@@ -51,6 +73,32 @@ fun MaterialScreenContent(
                 dialogState = true
             }
         },
+        snackbarHost = {
+            SnackbarHost(snackbarHostState) { data ->
+                val isError = (data.visuals as? SnackbarVisualsWithError)?.isError ?: false
+                val buttonColor = if (isError) {
+                    ButtonDefaults.textButtonColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer,
+                        contentColor = MaterialTheme.colorScheme.error
+                    )
+                } else {
+                    ButtonDefaults.textButtonColors(
+                        contentColor = MaterialTheme.colorScheme.inversePrimary
+                    )
+                }
+                Snackbar(
+                    modifier = Modifier
+                        .border(2.dp, MaterialTheme.colorScheme.secondary)
+                        .padding(12.dp),
+                    action = {
+                        TextButton(
+                            onClick = { if (isError) data.dismiss() else data.performAction() },
+                            colors = buttonColor
+                        ) { Text(data.visuals.actionLabel ?: "") }
+                    }
+                ) { Text(data.visuals.message) }
+            }
+        }
     ) { paddingValues ->
         Column(
             modifier = Modifier.padding(paddingValues).fillMaxSize()

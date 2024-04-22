@@ -8,7 +8,7 @@ data class MaterialUiState(
     val isLoading: Boolean = false,
     val currentFiles: List<MaterialFile> = emptyList(),
     val currentFolders: List<MaterialFolder> = emptyList(),
-    val error: String = "",
+    val error: String? = null,
     val currentFolder: Folder = Folder("root", "root"),
     val listOfPreviousFolder: List<Folder> = listOf(),
 
