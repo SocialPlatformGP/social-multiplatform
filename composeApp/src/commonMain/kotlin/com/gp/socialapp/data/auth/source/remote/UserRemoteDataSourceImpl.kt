@@ -109,4 +109,20 @@ class UserRemoteDataSourceImpl(
             Result.Error(e.message ?: "An unknown error occurred")
         }
     }
+
+    override suspend fun createRemoteUser(user: User): Result<Nothing> {
+        return try {
+            val request = httpClient.post {
+                endPoint("createUser")
+                setBody(user)
+            }
+            if(request.status == HttpStatusCode.OK) {
+                Result.Success
+            } else {
+                Result.Error("An unknown error occurred ${request.status.description}")
+            }
+        } catch (e: Exception) {
+            Result.Error(e.message ?: "An unknown error occurred")
+        }
+    }
 }

@@ -31,4 +31,6 @@ class UserRepositoryImpl(
     override fun getUsersByIds(Ids: List<String>)
         = userRemoteSource.getUsersByIds(GetUsersByIdsRequest(Ids))
 
+    override suspend fun createRemoteUser(user: User): Result<Nothing> = userRemoteSource.createRemoteUser(user)
+
 }

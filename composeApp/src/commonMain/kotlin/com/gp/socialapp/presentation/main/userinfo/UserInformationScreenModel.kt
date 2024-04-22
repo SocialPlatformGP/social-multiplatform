@@ -97,9 +97,15 @@ class UserInformationScreenModel(
         screenModelScope.launch (DispatcherIO) {
             authRepo.getSignedInUser().let { result ->
                 if(result is Result.SuccessWithData) {
-                    _uiState.update { it.copy(signedInUser = result.data, createdState = Result.Success) }
+                    userRepo.createRemoteUser(result.data).let { result2 ->
+                        if(result2 is Result.Error) {
+                            _uiState.update { state -> state.copy(error = AuthError.ServerError(result2.message)) }
+                        } else {
+                            _uiState.update { state -> state.copy(signedInUser = result.data, createdState = Result.Success) }
+                        }
+                    }
                 } else if(result is Result.Error) {
-                    _uiState.update { it.copy(error = AuthError.ServerError(result.message)) }
+                    _uiState.update {state -> state.copy(error = AuthError.ServerError(result.message)) }
                 }
             }
         }

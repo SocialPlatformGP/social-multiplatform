@@ -14,4 +14,5 @@ interface UserRepository {
     fun fetchUsers(): Flow<Result<List<User>>>
     fun getCurrentUserEmail(): String
     fun getUsersByIds(Ids: List<String>): Flow<Result<List<User>>>
+    suspend fun createRemoteUser(user: User): Result<Nothing>
 }

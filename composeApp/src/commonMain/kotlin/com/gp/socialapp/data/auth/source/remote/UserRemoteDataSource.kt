@@ -16,4 +16,5 @@ interface UserRemoteDataSource {
     fun getCurrentUserEmail(): String
     fun getUsersByIds(request: GetUsersByIdsRequest): Flow<Result<List<User>>>
     suspend fun uploadUserPfp(pfpByteArray: ByteArray, userId: String): Result<String>
+    suspend fun createRemoteUser(user: User): Result<Nothing>
 }
