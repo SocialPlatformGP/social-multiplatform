@@ -2,6 +2,7 @@ package com.gp.socialapp.data.material.source.remote
 
 import com.gp.socialapp.data.material.model.requests.MaterialRequest
 import com.gp.socialapp.data.material.model.responses.MaterialResponse
+import com.gp.socialapp.data.material.utils.FileManager
 import com.gp.socialapp.util.Result
 import io.github.aakira.napier.Napier
 import io.ktor.client.HttpClient
@@ -157,9 +158,7 @@ class MaterialRemoteDataSourceImpl(
         }
     }
 
-    override suspend fun downloadFile(
-        url: String,
-    ) {
+    override suspend fun downloadFile(url: String): Result<MaterialResponse.DownloadFileResponse> {
         val response = this.client.post {
             endPoint("download")
             setBody(
@@ -169,16 +168,15 @@ class MaterialRemoteDataSourceImpl(
         println(response)
         if (response.status == HttpStatusCode.OK) {
             println(response)
-            fileManager.saveFile(response.body<ByteArray>())
+            val data = response.body<MaterialResponse.DownloadFileResponse>()
+            return Result.SuccessWithData(data)
             println("Downloaded file")
         } else {
             println("Failed to download file")
+            return Result.Error("Failed to download file")
         }
     }
 }
 
-interface FileManager {
-    suspend fun saveFile(file: ByteArray): String
-}
 
-expect class FileManagerImpl : FileManager
+

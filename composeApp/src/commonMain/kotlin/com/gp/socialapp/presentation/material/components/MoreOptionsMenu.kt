@@ -12,6 +12,7 @@ fun MoreOptionsMenu(
     onDelete: () -> Unit,
     onOpenFile: () -> Unit,
     onDownload: () -> Unit,
+    onDetails: () -> Unit
 ) {
     if (isExpanded) {
         DropdownMenu(
@@ -44,7 +45,8 @@ fun MoreOptionsMenu(
             )
             DropdownMenuItem(
                 text = { Text("Details") },
-                onClick = { /* todo:Details */ }
+                onClick = onDetails
+
             )
 
         }

@@ -5,6 +5,7 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.gp.socialapp.data.material.model.MaterialFolder
 import com.gp.socialapp.data.material.repository.MaterialRepository
+import com.gp.socialapp.presentation.material.components.MimeType
 import com.gp.socialapp.util.DispatcherIO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -151,9 +152,9 @@ class MaterialScreenModel(
         }
     }
 
-    fun downloadFile(url: String) {
+    fun downloadFile(url: String, mimeType: MimeType) {
         screenModelScope.launch(DispatcherIO) {
-            materialRepo.downloadFile(url)
+            materialRepo.downloadFile(url, mimeType.mimeType)
         }
     }
 
@@ -168,9 +169,32 @@ class MaterialScreenModel(
             is MaterialAction.OnCreateFolderClicked -> uploadFolder(event.name)
             is MaterialAction.OnFolderClicked -> openFolder(event.folder)
             is MaterialAction.OnDeleteFileClicked -> deleteFile(event.fileId)
-            is MaterialAction.OnDownloadFileClicked -> downloadFile(event.url)
+            is MaterialAction.OnDownloadFileClicked -> downloadFile(
+                event.url,
+                MimeType.getMimeTypeFromFileName(event.fileName)
+            )
+
+            is MaterialAction.OnFileClicked -> openFile(
+                event.fileId,
+                event.url,
+                MimeType.getMimeTypeFromFileName(event.fileName)
+            )
+
+            is MaterialAction.OnShareLinkClicked -> shareLink(event.url)
 
             else -> Unit
+        }
+    }
+
+    private fun shareLink(url: String) {
+        screenModelScope.launch {
+            materialRepo.shareLink(url)
+        }
+    }
+
+    fun openFile(fileId: String, url: String, mimeType: MimeType) {
+        screenModelScope.launch {
+            materialRepo.openFile(fileId, url, mimeType.mimeType)
         }
     }
 }

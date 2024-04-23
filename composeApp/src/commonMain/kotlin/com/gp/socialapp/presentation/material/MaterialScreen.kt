@@ -1,24 +1,35 @@
 package com.gp.socialapp.presentation.material
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.AttachFile
+import androidx.compose.material.icons.filled.Directions
 import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material.icons.filled.Link
+import androidx.compose.material.icons.filled.Title
+import androidx.compose.material.icons.filled.TypeSpecimen
+import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -30,6 +41,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.lifecycle.LifecycleEffect
 import cafe.adriel.voyager.core.model.screenModelScope
@@ -37,7 +49,10 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.gp.socialapp.data.material.model.MaterialFile
 import com.gp.socialapp.presentation.material.components.CreateFolderDialog
+import com.gp.socialapp.presentation.material.components.FileDetailsClickableItem
+import com.gp.socialapp.presentation.material.components.FileDetailsItem
 import com.gp.socialapp.presentation.material.components.FileItem
 import com.gp.socialapp.presentation.material.components.FolderItem
 import com.gp.socialapp.presentation.material.components.uploadFiles
@@ -90,6 +105,8 @@ fun MaterialScreenContent(
     val context = LocalPlatformContext.current
     val scope = rememberCoroutineScope()
     var dialogState by remember { mutableStateOf(false) }
+    var detialsDialogState by remember { mutableStateOf(false) }
+    var fileDetails by remember { mutableStateOf(MaterialFile()) }
     val filePicker = rememberFilePickerLauncher(
         selectionMode = FilePickerSelectionMode.Single,
         type = FilePickerFileType.All
@@ -172,7 +189,16 @@ fun MaterialScreenContent(
                 items(state.currentFiles) { file ->
                     FileItem(
                         file = file,
-                        action = action
+                        action = {
+                            when (it) {
+                                is MaterialAction.OnDetailsClicked -> {
+                                    detialsDialogState = true
+                                    fileDetails = file
+                                }
+
+                                else -> action(it)
+                            }
+                        }
                     )
                 }
             }
@@ -182,6 +208,87 @@ fun MaterialScreenContent(
         CreateFolderDialog(
             onDismissRequest = { dialogState = false },
             onConfirmation = { action(MaterialAction.OnCreateFolderClicked(it)) }
+        )
+    }
+    if (detialsDialogState) {
+        DetailsDialog(
+            onDismissRequest = { detialsDialogState = false },
+            file = fileDetails,
+            onShareLinkClicked = { action(MaterialAction.OnShareLinkClicked(it)) }
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DetailsDialog(
+    onDismissRequest: () -> Unit = {},
+    file: MaterialFile,
+    onShareLinkClicked: (String) -> Unit
+) {
+    BasicAlertDialog(
+        onDismissRequest = {
+            onDismissRequest()
+        },
+        modifier = Modifier.wrapContentSize(),
+    ) {
+        Card(
+            modifier = Modifier
+                .wrapContentSize()
+                .padding(16.dp),
+            shape = RoundedCornerShape(16.dp),
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp).fillMaxWidth(),
+                verticalArrangement = Arrangement.Center,
+            ) {
+                Text(
+                    text = "File Details",
+                    style = MaterialTheme.typography.headlineSmall,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
+                HorizontalDivider(
+                    modifier = Modifier.padding(8.dp),
+                    thickness = 1.dp,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                FileDetails(
+                    file,
+                    onShareLinkClicked = onShareLinkClicked
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun FileDetails(
+    file: MaterialFile,
+    onShareLinkClicked: (String) -> Unit
+) {
+    Column {
+        FileDetailsItem(
+            "File Name",
+            file.name,
+            Icons.Default.Title
+        )
+        FileDetailsItem(
+            "File Type",
+            file.type,
+            Icons.Default.TypeSpecimen
+        )
+        FileDetailsClickableItem(
+            "Url",
+            file.url,
+            Icons.Default.Link,
+            onShareLinkClicked = onShareLinkClicked
+        )
+
+        FileDetailsItem(
+            "Path",
+            file.path,
+            Icons.Default.Directions
         )
     }
 }

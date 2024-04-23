@@ -11,4 +11,5 @@ data class MaterialFile(
     val createdAt: LocalDateTime? = null,
     val id: String = "",
     val path: String = "",
+    val localPath: String = "",
 )

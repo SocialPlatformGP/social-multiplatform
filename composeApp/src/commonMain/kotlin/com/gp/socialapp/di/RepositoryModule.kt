@@ -24,7 +24,13 @@ import org.kodein.di.singleton
 
 val repositoryModuleK = DI.Module("repositoryModule") {
     bind<UserRepository>() with singleton { UserRepositoryImpl(instance()) }
-    bind<MaterialRepository>() with singleton { MaterialRepositoryImpl(instance()) }
+    bind<MaterialRepository>() with singleton {
+        MaterialRepositoryImpl(
+            instance(),
+            instance(),
+            instance()
+        )
+    }
     bind<AuthenticationRepository>() with singleton {
         AuthenticationRepositoryImpl(
             instance(),
