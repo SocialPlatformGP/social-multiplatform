@@ -44,7 +44,7 @@ val remoteDataSourceModuleK = DI.Module("remoteDataSourceModule") {
         )
     }
     bind<ReplyRemoteDataSource>() with singleton { ReplyRemoteDataSourceImpl(instance()) }
-    bind<AuthenticationRemoteDataSource>() with singleton { AuthenticationRemoteDataSourceImpl(instance(), instance()) }
+    bind<AuthenticationRemoteDataSource>() with singleton { AuthenticationRemoteDataSourceImpl(instance()) }
     bind<MessageRemoteDataSource>() with singleton {
         MessageRemoteDataSourceImpl(
             instance(),
@@ -53,7 +53,7 @@ val remoteDataSourceModuleK = DI.Module("remoteDataSourceModule") {
     }
     bind<RoomRemoteDataSource>() with singleton { RoomRemoteDataSourceImpl(instance()) }
     bind<RecentRoomRemoteDataSource>() with singleton { RecentRoomRemoteDataSourceImpl(instance()) }
-    bind<UserRemoteDataSource>() with singleton { UserRemoteDataSourceImpl(instance()) }
+    bind<UserRemoteDataSource>() with singleton { UserRemoteDataSourceImpl(instance(), instance()) }
     bind<SocketService>() with singleton { SocketServiceImpl(instance()) }
     bind<HttpClient>() with singleton {
         HttpClient {
