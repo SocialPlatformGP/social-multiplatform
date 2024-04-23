@@ -16,6 +16,10 @@ import com.gp.socialapp.data.material.utils.FileManager
 import com.gp.socialapp.data.post.source.local.PostLocalDataSource
 import com.gp.socialapp.data.post.source.local.PostLocalDataSourceImpl
 import com.gp.socialapp.db.AppDatabase
+import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.createSupabaseClient
+import io.github.jan.supabase.gotrue.Auth
+import io.github.jan.supabase.gotrue.FlowType
 import io.realm.kotlin.Configuration
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
@@ -45,4 +49,19 @@ actual val platformModule = DI.Module("platformModule") {
         Realm.open(instance())
     }
     bind<FileManager>() with singleton { FileManagerImpl() }
+    bind<SupabaseClient>() with singleton {
+        createSupabaseClient(
+            supabaseUrl = "https://vszvbwfzewqeoxxpetgj.supabase.co",
+            supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZzenZid2Z6ZXdxZW94eHBldGdqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTM2MjM0MjUsImV4cCI6MjAyOTE5OTQyNX0.dO4SiJ9MCN0gZaY15kjqRdYL0NRFTZWID_xiYWhAnk8"
+        ) {
+            install(Auth){
+                flowType = FlowType.PKCE
+                host = "com.gp.socialapp"
+                scheme = "edulink"
+                httpCallbackConfig {
+                    htmlTitle = "EduLink Redirect"
+                }
+            }
+        }
+    }
 }

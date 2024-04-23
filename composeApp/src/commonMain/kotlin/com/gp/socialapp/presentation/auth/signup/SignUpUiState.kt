@@ -8,6 +8,6 @@ data class SignUpUiState(
     var email: String = "",
     var password: String = "",
     var rePassword: String = "",
+    val signedUpUser: User? = null,
     var error: AuthError = AuthError.NoError,
-    var isSignedUp: Result<User> = Result.Idle,
 )

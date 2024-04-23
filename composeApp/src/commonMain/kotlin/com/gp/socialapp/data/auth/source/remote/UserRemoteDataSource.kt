@@ -7,6 +7,7 @@ import com.gp.socialapp.util.Result
 import kotlinx.coroutines.flow.Flow
 
 interface UserRemoteDataSource {
+    suspend fun updateUserInfo(user: User): Result<Nothing>
     fun createUser(user: User, pfpURI: Uri): Flow<Result<Nothing>>
     fun updateUser(user: User): Flow<Result<Nothing>>
     fun deleteUser(user: User): Flow<Result<Nothing>>
@@ -14,4 +15,6 @@ interface UserRemoteDataSource {
     fun fetchUsers(): Flow<Result<List<User>>>
     fun getCurrentUserEmail(): String
     fun getUsersByIds(request: GetUsersByIdsRequest): Flow<Result<List<User>>>
+    suspend fun uploadUserPfp(pfpByteArray: ByteArray, userId: String): Result<String>
+    suspend fun createRemoteUser(user: User): Result<Nothing>
 }

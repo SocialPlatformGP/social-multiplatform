@@ -7,6 +7,7 @@ import com.gp.socialapp.data.post.source.remote.model.PostRequest.DownvoteReques
 import com.gp.socialapp.data.post.source.remote.model.PostRequest.FetchRequest
 import com.gp.socialapp.data.post.source.remote.model.PostRequest.UpvoteRequest
 import com.gp.socialapp.data.post.source.remote.model.Tag
+import com.gp.socialapp.data.post.util.endPoint
 import com.gp.socialapp.util.AppConstants.BASE_URL
 import com.gp.socialapp.util.Result
 import io.github.aakira.napier.Napier
@@ -28,26 +29,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.json.Json
 
-class PostRemoteDataSourceImpl : PostRemoteDataSource {
-    val httpClient = HttpClient {
-        install(ContentNegotiation) {
-            json(Json {
-                ignoreUnknownKeys = true
-                useAlternativeNames = false
-                isLenient = true
-                encodeDefaults = true
-            })
-        }
-    }
-
-    private fun HttpRequestBuilder.endPoint(path: String) {
-        url {
-            takeFrom(BASE_URL)
-            path(path)
-            contentType(ContentType.Application.Json)
-        }
-    }
-
+class PostRemoteDataSourceImpl(
+    private val httpClient: HttpClient
+) : PostRemoteDataSource {
     override suspend fun createPost(request: PostRequest.CreateRequest): Flow<Result<String>> {
         println("createPost: $request *********************125")
         return flow {

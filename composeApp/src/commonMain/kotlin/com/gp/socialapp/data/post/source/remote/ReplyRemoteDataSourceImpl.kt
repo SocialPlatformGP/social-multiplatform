@@ -4,6 +4,7 @@ import com.gp.socialapp.data.post.source.remote.model.Post
 import com.gp.socialapp.data.post.source.remote.model.PostRequest
 import com.gp.socialapp.data.post.source.remote.model.Reply
 import com.gp.socialapp.data.post.source.remote.model.ReplyRequest
+import com.gp.socialapp.data.post.util.endPoint
 import com.gp.socialapp.util.AppConstants
 import com.gp.socialapp.util.Result
 import io.github.aakira.napier.Napier
@@ -25,25 +26,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.json.Json
 
-class ReplyRemoteDataSourceImpl: ReplyRemoteDataSource {
-    val httpClient = HttpClient {
-        install(ContentNegotiation) {
-            json(Json {
-                ignoreUnknownKeys = true
-                useAlternativeNames = false
-                isLenient = true
-                encodeDefaults = true
-            })
-        }
-    }
-
-    private fun HttpRequestBuilder.endPoint(path: String) {
-        url {
-            takeFrom(AppConstants.BASE_URL)
-            path(path)
-            contentType(ContentType.Application.Json)
-        }
-    }
+class ReplyRemoteDataSourceImpl (
+    private val httpClient: HttpClient
+): ReplyRemoteDataSource {
     override suspend fun createReply(request: ReplyRequest.CreateRequest): Result<Nothing> {
         println("createReply: $request *********************125")
         try {

@@ -42,11 +42,12 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.gp.socialapp.presentation.auth.userinfo.UserInformationScreen
+import com.gp.socialapp.presentation.main.userinfo.UserInformationScreen
 import com.gp.socialapp.presentation.auth.util.AuthError
 import com.gp.socialapp.presentation.auth.util.AuthError.EmailError
 import com.gp.socialapp.presentation.auth.util.AuthError.PasswordError
 import com.gp.socialapp.presentation.auth.util.AuthError.RePasswordError
+import com.gp.socialapp.presentation.main.MainContainer
 import com.gp.socialapp.util.Result
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
@@ -66,8 +67,8 @@ object SignUpScreen : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = navigator.rememberNavigatorScreenModel<SignUpScreenModel>()
         val state by screenModel.uiState.collectAsState()
-        if (state.isSignedUp is Result.Success) {
-            navigator.push(UserInformationScreen(state.email, state.password))
+        if (state.signedUpUser != null) {
+            navigator.replaceAll(MainContainer(state.signedUpUser!!))
         }
         SignUpContent(
             state = state,
