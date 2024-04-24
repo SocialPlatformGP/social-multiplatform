@@ -10,36 +10,45 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.CurrentTab
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabNavigator
+import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.navigation.tabs.ChatTab
 import com.gp.socialapp.navigation.tabs.MaterialTab
+import com.gp.socialapp.presentation.main.userinfo.UserInformationScreen
 import com.gp.socialapp.tabs.PostsTab
 
 
-data class MainContainer(val userToken: String) : Screen {
+data class MainContainer(val signedInUser: User) : Screen {
 
     @Composable
     override fun Content() {
-        TabNavigator(PostsTab) {
-            Scaffold(
-                content = {
-                    Column(
-                        modifier = Modifier.padding(it)
-                    ) {
-                        CurrentTab()
+        val navigtor = LocalNavigator.currentOrThrow
+        if(signedInUser.isDataComplete) {
+            TabNavigator(PostsTab) {
+                Scaffold(
+                    content = {
+                        Column(
+                            modifier = Modifier.padding(it)
+                        ) {
+                            CurrentTab()
+                        }
+                    },
+                    bottomBar = {
+                        NavigationBar {
+                            TabNavigationItem(tab = PostsTab)
+                            TabNavigationItem(tab = ChatTab)
+                            TabNavigationItem(tab = MaterialTab)
+                        }
                     }
-                },
-                bottomBar = {
-                    NavigationBar {
-                        TabNavigationItem(tab = PostsTab)
-                        TabNavigationItem(tab = ChatTab)
-                        TabNavigationItem(tab = MaterialTab)
-                    }
-                }
-            )
+                )
+            }
+        } else {
+            navigtor.replace(UserInformationScreen(signedInUser))
         }
     }
 

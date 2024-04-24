@@ -1,4 +1,4 @@
-package com.gp.socialapp.presentation.auth.userinfo
+package com.gp.socialapp.presentation.main.userinfo
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -51,10 +51,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import cafe.adriel.voyager.core.lifecycle.LifecycleEffect
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.presentation.auth.util.AuthError
 import com.gp.socialapp.presentation.main.MainContainer
 import com.gp.socialapp.util.LocalDateTimeUtil.now
@@ -84,14 +86,18 @@ import socialmultiplatform.composeapp.generated.resources.phone_number
 import socialmultiplatform.composeapp.generated.resources.select
 
 data class UserInformationScreen(
-    val email: String = "",
-    val password: String = "",
+    val signedInUser: User,
 ) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = navigator.rememberNavigatorScreenModel<UserInformationScreenModel>()
         val state by screenModel.uiState.collectAsState()
+        LifecycleEffect(
+            onStarted = {
+                screenModel.onScreenStart(signedInUser)
+            }
+        )
         val scope = rememberCoroutineScope()
         val context = LocalPlatformContext.current
         val pickerLauncher = rememberFilePickerLauncher(
@@ -106,10 +112,8 @@ data class UserInformationScreen(
                 }
             }
         )
-        if (state.createdState is Result.SuccessWithData) {
-            val authResponse = (state.createdState as Result.SuccessWithData).data
-            println("Token: ${authResponse.token}")
-            navigator.replaceAll(MainContainer(authResponse.token))
+        if (state.createdState is Result.Success) {
+            navigator.replaceAll(MainContainer(state.signedInUser?: signedInUser))
         }
         Scaffold { paddingValues ->
             UserInformationContent(
@@ -121,7 +125,7 @@ data class UserInformationScreen(
                 onPhoneNumberChange = { screenModel.onPhoneNumberChange(it) },
                 onBioChange = { screenModel.onBioChange(it) },
                 onDateOfBirthChange = { screenModel.onBirthDateChange(it) },
-                onContinueClicked = { screenModel.onCompleteAccount(email, password) }
+                onContinueClicked = { screenModel.onCompleteAccount() }
             )
         }
     }
@@ -346,9 +350,6 @@ data class UserInformationScreen(
                     }
                     DatePickerDialog(
                         onDismissRequest = {
-                            // Dismiss the dialog when the user clicks outside the dialog or on the back
-                            // button. If you want to disable that functionality, simply use an empty
-                            // onDismissRequest.
                             isDateDialogOpen = false
                         },
                         confirmButton = {

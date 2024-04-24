@@ -43,6 +43,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import cafe.adriel.voyager.core.lifecycle.LifecycleEffect
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -53,6 +54,8 @@ import com.gp.socialapp.presentation.auth.util.AuthError.EmailError
 import com.gp.socialapp.presentation.auth.util.AuthError.PasswordError
 import com.gp.socialapp.presentation.auth.util.AuthError.ServerError
 import com.gp.socialapp.presentation.main.MainContainer
+import io.github.jan.supabase.gotrue.providers.Azure
+import io.github.jan.supabase.gotrue.providers.Google
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import socialmultiplatform.composeapp.generated.resources.Res
@@ -65,6 +68,7 @@ import socialmultiplatform.composeapp.generated.resources.or_login_with
 import socialmultiplatform.composeapp.generated.resources.password
 import socialmultiplatform.composeapp.generated.resources.show_password
 import socialmultiplatform.composeapp.generated.resources.sign_in_with_google
+import socialmultiplatform.composeapp.generated.resources.sign_in_with_microsoft
 import socialmultiplatform.composeapp.generated.resources.sign_up
 
 object LoginScreen : Screen {
@@ -73,17 +77,18 @@ object LoginScreen : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = navigator.rememberNavigatorScreenModel<LoginScreenModel>()
         val state by screenModel.uiState.collectAsState()
-        if (state.token != null) {
-            navigator.replaceAll(MainContainer(state.token!!))
+        if (state.signedInUser != null) {
+            navigator.replaceAll(MainContainer(state.signedInUser!!))
         } else {
             LoginContent(
-                onSignInWithGoogle = { /*todo*/ },
+            onSignInWithGoogle = { screenModel.signInWithOAuth(Google) },
                 state = state,
                 navigateToSignUp = { navigator.push(SignUpScreen) },
                 navigateToForgotPassword = { navigator.push(PasswordResetScreen) },
                 onEmailChange = { screenModel.updateEmail(it) },
                 onPasswordChange = { screenModel.updatePassword(it) },
-                onSignIn = { screenModel.onSignIn() }
+                onSignIn = { screenModel.onSignIn() },
+                onSignInWithMicrosoft = { screenModel.signInWithOAuth(Azure) },
             )
         }
     }
@@ -91,6 +96,7 @@ object LoginScreen : Screen {
     @Composable
     private fun LoginContent(
         onSignInWithGoogle: () -> Unit,
+        onSignInWithMicrosoft: () -> Unit,
         onSignIn: () -> Unit,
         state: LoginUiState,
         navigateToSignUp: () -> Unit,
@@ -232,6 +238,25 @@ object LoginScreen : Screen {
 //            )
                     Text(
                         text = stringResource(resource = Res.string.sign_in_with_google),
+                        fontSize = 18.sp,
+                    )
+                }
+                OutlinedButton(
+                    onClick = { onSignInWithMicrosoft() },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 4.dp)
+                        .height(50.dp),
+                    shape = RoundedCornerShape(8.dp),
+                ) {
+//            Icon(
+//                painter = painterResource(resource = Res.drawable.google),
+//                contentDescription = null,
+//                tint = androidx.compose.ui.graphics.Color.Unspecified,
+//                modifier = Modifier.size(24.dp)
+//            )
+                    Text(
+                        text = stringResource(resource = Res.string.sign_in_with_microsoft),
                         fontSize = 18.sp,
                     )
                 }

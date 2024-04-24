@@ -108,7 +108,7 @@ class CreatePostScreenModel(
     private fun getCurrentUser() {
         screenModelScope.launch {
             authRepository.getCurrentLocalUserId().let { id ->
-                authRepository.getSignedInUser(id).collect {
+                authRepository.getSignedInUser().let {
                     when (it) {
                         is Result.SuccessWithData -> {
                             currentUser.value = it.data

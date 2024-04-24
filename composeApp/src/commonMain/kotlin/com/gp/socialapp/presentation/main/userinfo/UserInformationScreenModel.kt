@@ -1,11 +1,14 @@
-package com.gp.socialapp.presentation.auth.userinfo
+package com.gp.socialapp.presentation.main.userinfo
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.gp.socialapp.data.auth.repository.AuthenticationRepository
+import com.gp.socialapp.data.auth.repository.UserRepository
 import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.presentation.auth.util.AuthError
 import com.gp.socialapp.presentation.auth.util.Validator
+import com.gp.socialapp.util.DispatcherIO
+import com.gp.socialapp.util.LocalDateTimeUtil.now
 import com.gp.socialapp.util.LocalDateTimeUtil.toMillis
 import com.gp.socialapp.util.Result
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,11 +24,12 @@ import socialmultiplatform.composeapp.generated.resources.invalid_phone_number
 import socialmultiplatform.composeapp.generated.resources.user_must_be_at_least_18_years_old
 
 class UserInformationScreenModel(
-    private val authRepo: AuthenticationRepository,
+    private val userRepo: UserRepository,
+    private val authRepo: AuthenticationRepository
 ) : ScreenModel {
     private val _uiState = MutableStateFlow(UserInformationUiState())
     val uiState = _uiState.asStateFlow()
-    fun onCompleteAccount(email: String, password: String) {
+    fun onCompleteAccount() {
         with(_uiState.value) {
             if (!Validator.NameValidator.validateAll(firstName)) {
                 screenModelScope.launch {
@@ -68,30 +72,40 @@ class UserInformationScreenModel(
         }
         screenModelScope.launch {
             with(uiState.value) {
-                authRepo.signUpUser(
-                    User(
-                        firstName = firstName,
-                        lastName = lastName,
-                        email = email,
-                        password = password,
-                        phoneNumber = phoneNumber,
-                        birthdate = birthDate.toMillis(),
-                        bio = bio,
-                    )
-                ).collect { state ->
-                    when (state) {
-                        is Result.SuccessWithData -> {
-                            _uiState.value = uiState.value.copy(createdState = state)
-                            authRepo.setLocalUserToken(state.data.token)
-                        }
+                val user = User(
+                    id = signedInUser?.id?: "",
+                    email = signedInUser?.email?: "",
+                    firstName = firstName,
+                    lastName = lastName,
+                    phoneNumber = phoneNumber,
+                    birthdate = birthDate.toMillis(),
+                    bio = bio,
+                    createdAt = signedInUser?.createdAt?: 0L,
+                    isDataComplete = true
+                )
+                val result = userRepo.updateUserInfo(user, pfpImageByteArray)
+                if(result is Result.Success) {
+                    getSignedInUser()
+                } else if(result is Result.Error){
+                    _uiState.update { it.copy(error = AuthError.ServerError(result.message)) }
+                }
+            }
+        }
+    }
 
-                        is Result.Error -> {
-                            val error = AuthError.ServerError(state.message)
-                            _uiState.value = uiState.value.copy(error = error)
+    private fun getSignedInUser() {
+        screenModelScope.launch (DispatcherIO) {
+            authRepo.getSignedInUser().let { result ->
+                if(result is Result.SuccessWithData) {
+                    userRepo.createRemoteUser(result.data).let { result2 ->
+                        if(result2 is Result.Error) {
+                            _uiState.update { state -> state.copy(error = AuthError.ServerError(result2.message)) }
+                        } else {
+                            _uiState.update { state -> state.copy(signedInUser = result.data, createdState = Result.Success) }
                         }
-
-                        else -> Unit
                     }
+                } else if(result is Result.Error) {
+                    _uiState.update {state -> state.copy(error = AuthError.ServerError(result.message)) }
                 }
             }
         }
@@ -119,5 +133,9 @@ class UserInformationScreenModel(
 
     fun onImageChange(image: ByteArray) {
         _uiState.update { it.copy(pfpImageByteArray = image) }
+    }
+
+    fun onScreenStart(signedInUser: User) {
+        _uiState.update { it.copy(signedInUser = signedInUser) }
     }
 }
