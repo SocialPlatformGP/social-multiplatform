@@ -2,6 +2,7 @@ package com.gp.socialapp.data.auth.source.remote
 
 import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.data.auth.source.remote.model.requests.GetUsersByIdsRequest
+import com.gp.socialapp.data.community.source.remote.model.Community
 import com.gp.socialapp.data.post.util.endPoint
 import com.gp.socialapp.util.DataError
 import com.gp.socialapp.util.DataSuccess
@@ -64,26 +65,27 @@ class UserRemoteDataSourceImpl(
     }
 
 
-    override fun getUsersByIds(request: GetUsersByIdsRequest): Flow<Result<List<User>>> = flow {
-        println("Request: $request")
-        emit(Result.Loading)
-        try {
-            val response = httpClient.post {
-                endPoint("getUsersByIds")
-                setBody(request)
+    override fun getUsersByIds(request: GetUsersByIdsRequest): Flow<Results<List<User>, DataError.Network>> =
+        flow {
+            println("Request: $request")
+            emit(Results.Loading)
+            try {
+                val response = httpClient.post {
+                    endPoint("getUsersByIds")
+                    setBody(request)
+                }
+                if (response.status == HttpStatusCode.OK) {
+                    val users = response.body<List<User>>()
+                    emit(Results.Success(users))
+                } else {
+                    val error = response.body<DataError.Network>()
+                    emit(Results.Failure(error))
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                emit(Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN))
             }
-            if (response.status == HttpStatusCode.OK) {
-                val users = response.body<List<User>>()
-                println("Users: $users")
-                emit(Result.SuccessWithData(users))
-            } else {
-                emit(Result.Error("An unknown error occurred ${response.status.description}"))
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            emit(Result.Error(e.message ?: "An unknown error occurred"))
         }
-    }
 
     override suspend fun uploadUserPfp(pfpByteArray: ByteArray, userId: String): Result<String> {
         return try {
@@ -114,6 +116,29 @@ class UserRemoteDataSourceImpl(
         } catch (e: Exception) {
             e.printStackTrace()
             Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN)
+        }
+
+    //TODO 1: Implement the getUserCommunities function IN SERVER
+    override fun getUserCommunities(userId: String): Flow<Results<List<Community>, DataError.Network>> =
+        flow {
+            emit(Results.Loading)
+            try {
+                val response = httpClient.post {
+                    endPoint("getUserCommunities")
+                    setBody(userId)
+                }
+                if (response.status == HttpStatusCode.OK) {
+                    val communities = response.body<List<Community>>()
+                    emit(Results.Success(communities))
+                } else {
+                    val error = response.body<DataError.Network>()
+                    emit(Results.Failure(error))
+                }
+
+            } catch (e: Exception) {
+                emit(Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN))
+            }
+
         }
 
 }

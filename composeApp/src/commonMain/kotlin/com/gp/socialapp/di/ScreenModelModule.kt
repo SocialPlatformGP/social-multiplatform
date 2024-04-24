@@ -10,6 +10,7 @@ import com.gp.socialapp.presentation.chat.createprivate.CreatePrivateChatScreenM
 import com.gp.socialapp.presentation.chat.groupdetails.GroupDetailsScreenModel
 import com.gp.socialapp.presentation.chat.home.ChatHomeScreenModel
 import com.gp.socialapp.presentation.community.createcommunity.CreateCommunityScreenModel
+import com.gp.socialapp.presentation.home.HomeScreenModel
 import com.gp.socialapp.presentation.main.userinfo.UserInformationScreenModel
 import com.gp.socialapp.presentation.material.MaterialScreenModel
 import com.gp.socialapp.presentation.post.create.CreatePostScreenModel
@@ -83,9 +84,12 @@ val screenModelModuleK = DI.Module("screenModelModule") {
         )
     }
     bind<MaterialScreenModel>() with singleton { MaterialScreenModel(instance()) }
+    bind<HomeScreenModel>() with singleton { HomeScreenModel(instance(), instance()) }
+
     bind<CreateCommunityScreenModel>() with singleton {
         CreateCommunityScreenModel(
             instance(),
+            instance()
         )
     }
 }

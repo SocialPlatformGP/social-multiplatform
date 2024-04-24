@@ -3,10 +3,12 @@ package com.gp.socialapp.data.auth.repository
 import com.gp.socialapp.data.auth.source.remote.UserRemoteDataSource
 import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.data.auth.source.remote.model.requests.GetUsersByIdsRequest
+import com.gp.socialapp.data.community.source.remote.model.Community
 import com.gp.socialapp.util.DataError
 import com.gp.socialapp.util.DataSuccess
 import com.gp.socialapp.util.Result
 import com.gp.socialapp.util.Results
+import kotlinx.coroutines.flow.Flow
 
 class UserRepositoryImpl(
     private val userRemoteSource: UserRemoteDataSource
@@ -31,5 +33,9 @@ class UserRepositoryImpl(
 
     override suspend fun createRemoteUser(user: User): Results<DataSuccess.User, DataError.Network> =
         userRemoteSource.createRemoteUser(user)
+
+    override fun getUserCommunities(userId: String): Flow<Results<List<Community>, DataError.Network>> =
+        userRemoteSource.getUserCommunities(userId)
+
 
 }

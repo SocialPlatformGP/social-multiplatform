@@ -2,8 +2,10 @@ package com.gp.socialapp.presentation.community.createcommunity
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
+import com.gp.socialapp.data.auth.repository.AuthenticationRepository
 import com.gp.socialapp.data.community.repository.CommunityRepository
 import com.gp.socialapp.data.community.source.remote.model.Community
+import com.gp.socialapp.util.DispatcherIO
 import com.gp.socialapp.util.Results
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -11,11 +13,21 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class CreateCommunityScreenModel(
-    private val communityRepo: CommunityRepository
+    private val communityRepo: CommunityRepository,
+    private val authRepo: AuthenticationRepository
 ) : ScreenModel {
     private val _uiState = MutableStateFlow(CreateCommunityUiState())
     private lateinit var currentUserId: String
     val uiState = _uiState.asStateFlow()
+
+    init {
+        screenModelScope.launch(DispatcherIO) {
+            authRepo.getCurrentLocalUserId().let {
+                currentUserId = it
+            }
+        }
+    }
+
     fun handleUiAction(action: CreateCommunityAction) {
         when (action) {
             is CreateCommunityAction.OnAddAllowedEmailDomain -> {
