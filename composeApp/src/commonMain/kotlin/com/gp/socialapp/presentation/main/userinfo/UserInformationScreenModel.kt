@@ -8,9 +8,9 @@ import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.presentation.auth.util.AuthError
 import com.gp.socialapp.presentation.auth.util.Validator
 import com.gp.socialapp.util.DispatcherIO
-import com.gp.socialapp.util.LocalDateTimeUtil.now
 import com.gp.socialapp.util.LocalDateTimeUtil.toMillis
 import com.gp.socialapp.util.Result
+import com.gp.socialapp.util.Results
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -73,20 +73,20 @@ class UserInformationScreenModel(
         screenModelScope.launch {
             with(uiState.value) {
                 val user = User(
-                    id = signedInUser?.id?: "",
-                    email = signedInUser?.email?: "",
+                    id = signedInUser?.id ?: "",
+                    email = signedInUser?.email ?: "",
                     firstName = firstName,
                     lastName = lastName,
                     phoneNumber = phoneNumber,
                     birthdate = birthDate.toMillis(),
                     bio = bio,
-                    createdAt = signedInUser?.createdAt?: 0L,
+                    createdAt = signedInUser?.createdAt ?: 0L,
                     isDataComplete = true
                 )
                 val result = userRepo.updateUserInfo(user, pfpImageByteArray)
-                if(result is Result.Success) {
+                if (result is Result.Success) {
                     getSignedInUser()
-                } else if(result is Result.Error){
+                } else if (result is Result.Error) {
                     _uiState.update { it.copy(error = AuthError.ServerError(result.message)) }
                 }
             }
@@ -94,18 +94,32 @@ class UserInformationScreenModel(
     }
 
     private fun getSignedInUser() {
-        screenModelScope.launch (DispatcherIO) {
+        screenModelScope.launch(DispatcherIO) {
             authRepo.getSignedInUser().let { result ->
-                if(result is Result.SuccessWithData) {
+                if (result is Result.SuccessWithData) {
+                    println("User: ${result.data}")
                     userRepo.createRemoteUser(result.data).let { result2 ->
-                        if(result2 is Result.Error) {
-                            _uiState.update { state -> state.copy(error = AuthError.ServerError(result2.message)) }
-                        } else {
-                            _uiState.update { state -> state.copy(signedInUser = result.data, createdState = Result.Success) }
+                        when (result2) {
+                            is Results.Failure -> _uiState.update { state ->
+                                state.copy(
+                                    error = AuthError.ServerError(
+                                        result2.error.userMessage
+                                    )
+                                )
+                            }
+
+                            is Results.Success -> _uiState.update { state ->
+                                state.copy(
+                                    signedInUser = result.data,
+                                    createdState = Result.Success
+                                )
+                            }
+
+                            Results.Loading -> Unit
                         }
                     }
-                } else if(result is Result.Error) {
-                    _uiState.update {state -> state.copy(error = AuthError.ServerError(result.message)) }
+                } else if (result is Result.Error) {
+                    _uiState.update { state -> state.copy(error = AuthError.ServerError(result.message)) }
                 }
             }
         }

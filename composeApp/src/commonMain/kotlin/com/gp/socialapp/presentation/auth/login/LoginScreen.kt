@@ -43,7 +43,6 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import cafe.adriel.voyager.core.lifecycle.LifecycleEffect
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -78,10 +77,11 @@ object LoginScreen : Screen {
         val screenModel = navigator.rememberNavigatorScreenModel<LoginScreenModel>()
         val state by screenModel.uiState.collectAsState()
         if (state.signedInUser != null) {
+            println("Signed in user: ${state.signedInUser}")
             navigator.replaceAll(MainContainer(state.signedInUser!!))
         } else {
             LoginContent(
-            onSignInWithGoogle = { screenModel.signInWithOAuth(Google) },
+                onSignInWithGoogle = { screenModel.signInWithOAuth(Google) },
                 state = state,
                 navigateToSignUp = { navigator.push(SignUpScreen) },
                 navigateToForgotPassword = { navigator.push(PasswordResetScreen) },

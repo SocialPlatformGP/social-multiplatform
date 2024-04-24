@@ -46,4 +46,9 @@ class AuthenticationRepositoryImpl(
 
     override suspend fun getSignedInUser(): Result<User> =
         remoteDataSource.getSignedInUser()
+
+    override suspend fun logout(): Result<Nothing> {
+        clearStorage()
+        return remoteDataSource.logout()
+    }
 }

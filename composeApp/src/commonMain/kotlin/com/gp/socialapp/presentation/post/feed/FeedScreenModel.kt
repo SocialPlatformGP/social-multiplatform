@@ -182,7 +182,7 @@ class FeedScreenModel(
 
     fun logout() {
         screenModelScope.launch {
-            authRepo.clearStorage()
+            authRepo.logout()
             _state.update { it.copy(isLoggedOut = true) }
         }
     }

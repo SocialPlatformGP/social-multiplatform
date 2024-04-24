@@ -88,7 +88,7 @@ object FeedScreen : Screen {
         var isFileBottomSheetOpen by remember { mutableStateOf(false) }
         val bottomSheetState = rememberModalBottomSheetState()
         if (state.isLoggedOut) {
-            navigator.push(LoginScreen)
+            navigator.replaceAll(LoginScreen)
             screenModel.resetState()
         }
         val tabItems = listOf(

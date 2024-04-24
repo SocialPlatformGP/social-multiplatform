@@ -95,6 +95,7 @@ data class UserInformationScreen(
         val state by screenModel.uiState.collectAsState()
         LifecycleEffect(
             onStarted = {
+                println("UserInformationScreen started")
                 screenModel.onScreenStart(signedInUser)
             }
         )
@@ -113,7 +114,7 @@ data class UserInformationScreen(
             }
         )
         if (state.createdState is Result.Success) {
-            navigator.replaceAll(MainContainer(state.signedInUser?: signedInUser))
+            navigator.replaceAll(MainContainer(state.signedInUser ?: signedInUser))
         }
         Scaffold { paddingValues ->
             UserInformationContent(
@@ -215,9 +216,9 @@ data class UserInformationScreen(
                         )
                     }
                 }
-                Row (
+                Row(
                     verticalAlignment = Alignment.CenterVertically
-                ){
+                ) {
                     OutlinedTextField(
                         value = state.firstName,
                         onValueChange = onFirstNameChange,

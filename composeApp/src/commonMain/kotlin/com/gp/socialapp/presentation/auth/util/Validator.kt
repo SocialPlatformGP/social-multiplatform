@@ -18,18 +18,15 @@ object Validator {
     }
 
     object PhoneNumberValidator {
-        fun validateAll(phoneNumber: String) =
-            phoneNumber.matches("^01[0-2]{1}[0-9]{8}\$".toRegex())
+        fun validateAll(phoneNumber: String) = phoneNumber.matches("^\\+[1-9]\\d{1,14}$".toRegex())
     }
 
     object NameValidator {
         //min age is 17
-        fun validateAll(name: String) =
-            name.matches("^\\p{L}+\$".toRegex())
+        fun validateAll(name: String) = name.matches("^\\p{L}+\$".toRegex())
     }
 
     object BirthDateValidator {
-        fun validateAll(birthDate: LocalDateTime) =
-            birthDate.year <= LocalDateTime.now().year - 17
+        fun validateAll(birthDate: LocalDateTime) = birthDate.year <= LocalDateTime.now().year - 17
     }
 }

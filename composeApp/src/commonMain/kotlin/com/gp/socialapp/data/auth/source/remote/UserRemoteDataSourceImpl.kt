@@ -3,7 +3,10 @@ package com.gp.socialapp.data.auth.source.remote
 import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.data.auth.source.remote.model.requests.GetUsersByIdsRequest
 import com.gp.socialapp.data.post.util.endPoint
+import com.gp.socialapp.util.DataError
+import com.gp.socialapp.util.DataSuccess
 import com.gp.socialapp.util.Result
+import com.gp.socialapp.util.Results
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.storage.storage
@@ -36,6 +39,7 @@ class UserRemoteDataSourceImpl(
             }
             Result.Success
         } catch (e: Exception) {
+            e.printStackTrace()
             Result.Error(e.message ?: "An unknown error occurred")
         }
     }
@@ -54,6 +58,7 @@ class UserRemoteDataSourceImpl(
                 emit(Result.Error("An unknown error occurred ${response.status}"))
             }
         } catch (e: Exception) {
+            e.printStackTrace()
             emit(Result.Error(e.message ?: "An unknown error occurred"))
         }
     }
@@ -75,6 +80,7 @@ class UserRemoteDataSourceImpl(
                 emit(Result.Error("An unknown error occurred ${response.status.description}"))
             }
         } catch (e: Exception) {
+            e.printStackTrace()
             emit(Result.Error(e.message ?: "An unknown error occurred"))
         }
     }
@@ -87,23 +93,27 @@ class UserRemoteDataSourceImpl(
             val url = supabaseClient.storage.from("avatars").publicUrl(path)
             Result.SuccessWithData(url)
         } catch (e: Exception) {
+            e.printStackTrace()
             Result.Error(e.message ?: "An unknown error occurred")
         }
     }
 
-    override suspend fun createRemoteUser(user: User): Result<Nothing> {
-        return try {
+    override suspend fun createRemoteUser(user: User): Results<DataSuccess.User, DataError.Network> =
+        try {
             val request = httpClient.post {
                 endPoint("createUser")
                 setBody(user)
             }
             if (request.status == HttpStatusCode.OK) {
-                Result.Success
+                val message = request.body<DataSuccess.User>()
+                Results.Success(message)
             } else {
-                Result.Error("An unknown error occurred ${request.status.description}")
+                val error = request.body<DataError.Network>()
+                Results.Failure(error)
             }
         } catch (e: Exception) {
-            Result.Error(e.message ?: "An unknown error occurred")
+            e.printStackTrace()
+            Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN)
         }
-    }
+
 }
