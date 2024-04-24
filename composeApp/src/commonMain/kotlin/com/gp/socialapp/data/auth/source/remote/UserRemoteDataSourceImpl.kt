@@ -1,6 +1,5 @@
 package com.gp.socialapp.data.auth.source.remote
 
-import com.eygraber.uri.Uri
 import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.data.auth.source.remote.model.requests.GetUsersByIdsRequest
 import com.gp.socialapp.data.post.util.endPoint
@@ -26,7 +25,7 @@ class UserRemoteDataSourceImpl(
         return try {
             supabaseClient.auth.updateUser {
                 phone = user.phoneNumber
-                data{
+                data {
                     put(UserData.FIRST_NAME.value, user.firstName)
                     put(UserData.LAST_NAME.value, user.lastName)
                     put(UserData.BIRTH_DATE.value, user.birthdate)
@@ -41,21 +40,6 @@ class UserRemoteDataSourceImpl(
         }
     }
 
-    override fun createUser(user: User, pfpURI: Uri): Flow<Result<Nothing>> {
-        TODO("Not yet implemented")
-    }
-
-    override fun updateUser(user: User): Flow<Result<Nothing>> {
-        TODO("Not yet implemented")
-    }
-
-    override fun deleteUser(user: User): Flow<Result<Nothing>> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun fetchUser(email: String): Result<User> {
-        TODO("Not yet implemented")
-    }
 
     override fun fetchUsers(): Flow<Result<List<User>>> = flow {
         emit(Result.Loading)
@@ -74,9 +58,6 @@ class UserRemoteDataSourceImpl(
         }
     }
 
-    override fun getCurrentUserEmail(): String {
-        TODO("Not yet implemented")
-    }
 
     override fun getUsersByIds(request: GetUsersByIdsRequest): Flow<Result<List<User>>> = flow {
         println("Request: $request")
@@ -116,7 +97,7 @@ class UserRemoteDataSourceImpl(
                 endPoint("createUser")
                 setBody(user)
             }
-            if(request.status == HttpStatusCode.OK) {
+            if (request.status == HttpStatusCode.OK) {
                 Result.Success
             } else {
                 Result.Error("An unknown error occurred ${request.status.description}")
