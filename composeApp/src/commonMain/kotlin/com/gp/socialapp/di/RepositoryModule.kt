@@ -10,6 +10,8 @@ import com.gp.socialapp.data.chat.repository.RecentRoomRepository
 import com.gp.socialapp.data.chat.repository.RecentRoomRepositoryImpl
 import com.gp.socialapp.data.chat.repository.RoomRepository
 import com.gp.socialapp.data.chat.repository.RoomRepositoryImpl
+import com.gp.socialapp.data.community.repository.CommunityRepository
+import com.gp.socialapp.data.community.repository.CommunityRepositoryImpl
 import com.gp.socialapp.data.material.repository.MaterialRepository
 import com.gp.socialapp.data.material.repository.MaterialRepositoryImpl
 import com.gp.socialapp.data.post.repository.PostRepository
@@ -26,23 +28,23 @@ val repositoryModuleK = DI.Module("repositoryModule") {
     bind<UserRepository>() with singleton { UserRepositoryImpl(instance()) }
     bind<MaterialRepository>() with singleton {
         MaterialRepositoryImpl(
-            instance(),
-            instance(),
-            instance()
+            instance(), instance(), instance()
         )
     }
     bind<AuthenticationRepository>() with singleton {
         AuthenticationRepositoryImpl(
-            instance(),
-            instance()
+            instance(), instance()
         )
     }
     bind<PostRepository>() with singleton {
         PostRepositoryImpl(
+            instance(), instance(), instance(), instance()
+        )
+    }
+    bind<CommunityRepository>() with singleton {
+        CommunityRepositoryImpl(
             instance(),
             instance(),
-            instance(),
-            instance()
         )
     }
     bind<ReplyRepository>() with singleton { ReplyRepositoryImpl(instance(), instance()) }
