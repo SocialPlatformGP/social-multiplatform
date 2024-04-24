@@ -12,6 +12,7 @@ data class Community(
     val description: String = "",
     val members: Map<UserId, isAdmin> = emptyMap(),
     val isAdminApprovalRequired: Boolean = false,
-    val allowedEmailDomains: List<domain> = emptyList(),
+    val allowAnyEmailDomain: Boolean = true,
+    val allowedEmailDomains: Set<domain> = emptySet(),
 )
 

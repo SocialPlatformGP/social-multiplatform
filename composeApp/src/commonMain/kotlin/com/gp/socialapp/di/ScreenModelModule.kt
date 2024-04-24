@@ -3,13 +3,14 @@ package com.gp.socialapp.di
 import com.gp.socialapp.presentation.auth.login.LoginScreenModel
 import com.gp.socialapp.presentation.auth.passwordreset.PasswordResetScreenModel
 import com.gp.socialapp.presentation.auth.signup.SignUpScreenModel
-import com.gp.socialapp.presentation.main.userinfo.UserInformationScreenModel
 import com.gp.socialapp.presentation.chat.addmembers.AddMembersScreenModel
 import com.gp.socialapp.presentation.chat.chatroom.ChatRoomScreenModel
 import com.gp.socialapp.presentation.chat.creategroup.CreateGroupScreenModel
 import com.gp.socialapp.presentation.chat.createprivate.CreatePrivateChatScreenModel
 import com.gp.socialapp.presentation.chat.groupdetails.GroupDetailsScreenModel
 import com.gp.socialapp.presentation.chat.home.ChatHomeScreenModel
+import com.gp.socialapp.presentation.community.createcommunity.CreateCommunityScreenModel
+import com.gp.socialapp.presentation.main.userinfo.UserInformationScreenModel
 import com.gp.socialapp.presentation.material.MaterialScreenModel
 import com.gp.socialapp.presentation.post.create.CreatePostScreenModel
 import com.gp.socialapp.presentation.post.edit.EditPostScreenModel
@@ -28,7 +29,12 @@ val screenModelModuleK = DI.Module("screenModelModule") {
     bind<LoginScreenModel>() with singleton { LoginScreenModel(instance()) }
     bind<PasswordResetScreenModel>() with singleton { PasswordResetScreenModel(instance()) }
     bind<SignUpScreenModel>() with singleton { SignUpScreenModel(instance()) }
-    bind<UserInformationScreenModel>() with singleton { UserInformationScreenModel(instance(), instance()) }
+    bind<UserInformationScreenModel>() with singleton {
+        UserInformationScreenModel(
+            instance(),
+            instance()
+        )
+    }
     bind<FeedScreenModel>() with singleton { FeedScreenModel(instance(), instance()) }
     bind<EditPostScreenModel>() with singleton { EditPostScreenModel(instance()) }
     bind<PostDetailsScreenModel>() with singleton {
@@ -77,6 +83,10 @@ val screenModelModuleK = DI.Module("screenModelModule") {
         )
     }
     bind<MaterialScreenModel>() with singleton { MaterialScreenModel(instance()) }
-
+    bind<CreateCommunityScreenModel>() with singleton {
+        CreateCommunityScreenModel(
+            instance(),
+        )
+    }
 }
 
