@@ -1,11 +1,11 @@
-package com.gp.socialapp.data.group.source.remote.model
+package com.gp.socialapp.data.community.source.remote.model
 
 typealias UserId = String
 typealias domain = String
 typealias isAdmin = Boolean
 
 @kotlinx.serialization.Serializable
-data class Group(
+data class Community(
     val id: String = "",
     val code: String = "",
     val name: String = "",
