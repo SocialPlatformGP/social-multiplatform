@@ -153,15 +153,12 @@ class MaterialRemoteDataSourceImpl(
 private suspend fun FlowCollector<Results<MaterialResponse.GetMaterialResponses, DataError.Network>>.handleServerResponse(
     response: HttpResponse
 ) {
-    val data = response.body<MaterialResponse.GetMaterialResponses>()
+
     if (response.status == HttpStatusCode.OK) {
+        val data = response.body<MaterialResponse.GetMaterialResponses>()
         emit(Results.Success(data))
     } else {
-        when (response.status) {
-            HttpStatusCode.NotFound -> emit(Results.Failure(DataError.Network.NOT_FOUND))
-            HttpStatusCode.BadRequest -> emit(Results.Failure(DataError.Network.BAD_REQUEST))
-            HttpStatusCode.PayloadTooLarge -> emit(Results.Failure(DataError.Network.PAYLOAD_TOO_LARGE))
-            else -> emit(Results.Failure(DataError.Network.CANT_GET_FILES_AT_PATH))
-        }
+        val error = response.body<DataError.Network>()
+        emit(Results.Failure(error))
     }
 }

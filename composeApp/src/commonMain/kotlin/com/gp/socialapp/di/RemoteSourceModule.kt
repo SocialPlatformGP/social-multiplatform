@@ -32,13 +32,13 @@ import kotlin.time.Duration.Companion.seconds
 
 
 val remoteDataSourceModuleK = DI.Module("remoteDataSourceModule") {
-    bind<PostRemoteDataSource>() with singleton { PostRemoteDataSourceImpl() }
+    bind<PostRemoteDataSource>() with singleton { PostRemoteDataSourceImpl(instance()) }
     bind<MaterialRemoteDataSource>() with singleton {
         MaterialRemoteDataSourceImpl(
             instance(),
         )
     }
-    bind<ReplyRemoteDataSource>() with singleton { ReplyRemoteDataSourceImpl() }
+    bind<ReplyRemoteDataSource>() with singleton { ReplyRemoteDataSourceImpl(instance()) }
     bind<AuthenticationRemoteDataSource>() with singleton { AuthenticationRemoteDataSourceImpl() }
     bind<MessageRemoteDataSource>() with singleton {
         MessageRemoteDataSourceImpl(

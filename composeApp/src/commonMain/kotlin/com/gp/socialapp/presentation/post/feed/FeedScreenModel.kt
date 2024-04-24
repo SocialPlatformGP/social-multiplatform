@@ -8,7 +8,7 @@ import com.gp.socialapp.data.post.source.remote.model.Post
 import com.gp.socialapp.data.post.util.PostPopularityUtils
 import com.gp.socialapp.util.DispatcherIO
 import com.gp.socialapp.util.Result
-import kotlinx.coroutines.Dispatchers
+import com.gp.socialapp.util.Results
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -21,19 +21,20 @@ class FeedScreenModel(
 ) : ScreenModel {
     private val _state = MutableStateFlow(FeedUiState())
     val state = _state.asStateFlow()
-    init {
-        screenModelScope.launch (DispatcherIO){
+
+    fun initScreen() {
+        screenModelScope.launch(DispatcherIO) {
             val userId = authRepo.getCurrentLocalUserId()
             _state.update { it.copy(currentUserID = userId) }
             getAllPosts()
         }
-
     }
+
     private fun getAllPosts() {
         screenModelScope.launch(DispatcherIO) {
             postRepo.getPosts().collectLatest { result ->
                 when (result) {
-                    is Result.SuccessWithData -> {
+                    is Results.Success -> {
                         result.data.forEach { post ->
                             _state.update { it.copy(allTags = _state.value.allTags + post.tags) }
                         }
@@ -62,19 +63,18 @@ class FeedScreenModel(
                         }
                     }
 
-                    is Result.Error -> {
+                    is Results.Failure -> {
                         _state.update {
                             it.copy(
-                                isFeedLoaded = Result.Error(result.message),
-                                error = FeedError.NetworkError(result.message)
+                                isFeedLoaded = Result.Error(result.error.userMessage),
+                                error = FeedError.NetworkError(result.error.userMessage)
                             )
                         }
                     }
 
-                    is Result.Loading -> { /*do nothing*/
+                    is Results.Loading -> {
+                        //todo
                     }
-
-                    else -> Unit
                 }
             }
         }
@@ -90,14 +90,17 @@ class FeedScreenModel(
         screenModelScope.launch(DispatcherIO) {
             val result = postRepo.upvotePost(post, state.value.currentUserID)
             when (result) {
-                is Result.Error -> {
-                    _state.update { it.copy(error = FeedError.NetworkError(result.message)) }
+                is Results.Failure -> {
+                    _state.update { it.copy(error = FeedError.NetworkError(result.error.userMessage)) }
                 }
-                is Result.Success -> {
+
+                is Results.Success -> {
                     getAllPosts()
                 }
 
-                else -> Unit
+                Results.Loading -> {
+                    //todo
+                }
             }
 
         }
@@ -107,15 +110,17 @@ class FeedScreenModel(
         screenModelScope.launch(DispatcherIO) {
             val result = postRepo.downvotePost(post, state.value.currentUserID)
             when (result) {
-                is Result.Error -> {
-                    _state.update { it.copy(error = FeedError.NetworkError(result.message)) }
+                is Results.Failure -> {
+                    _state.update { it.copy(error = FeedError.NetworkError(result.error.userMessage)) }
                 }
 
-                is Result.Success -> {
+                is Results.Success -> {
                     getAllPosts()
                 }
 
-                else -> Unit
+                Results.Loading -> {
+                    //todo
+                }
             }
         }
     }
@@ -123,8 +128,8 @@ class FeedScreenModel(
     fun reportPost(post: Post) {
         screenModelScope.launch(DispatcherIO) {
             val result = postRepo.reportPost(post.id, state.value.currentUserID)
-            if (result is Result.Error) {
-                _state.update { it.copy(error = FeedError.NetworkError(result.message)) }
+            if (result is Results.Failure) {
+                _state.update { it.copy(error = FeedError.NetworkError(result.error.userMessage)) }
             }
         }
     }
@@ -133,15 +138,17 @@ class FeedScreenModel(
         screenModelScope.launch(DispatcherIO) {
             val result = postRepo.deletePost(post)
             when (result) {
-                is Result.Error -> {
-                    _state.update { it.copy(error = FeedError.NetworkError(result.message)) }
+                is Results.Failure -> {
+                    _state.update { it.copy(error = FeedError.NetworkError(result.error.userMessage)) }
                 }
 
-                is Result.Success -> {
+                is Results.Success -> {
                     getAllPosts()
                 }
 
-                else -> Unit
+                Results.Loading -> {
+                    //todo
+                }
             }
         }
     }
@@ -166,11 +173,13 @@ class FeedScreenModel(
                 .toSet())
         }
     }
-    fun changeOpenedTab(tab: Int){
+
+    fun changeOpenedTab(tab: Int) {
         _state.update {
             it.copy(openedTabItem = FeedTab.entries[tab])
         }
     }
+
     fun logout() {
         screenModelScope.launch {
             authRepo.clearStorage()

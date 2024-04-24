@@ -36,7 +36,6 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gp.socialapp.data.post.source.remote.model.NestedReply
 import com.gp.socialapp.data.post.source.remote.model.Post
 import com.gp.socialapp.data.post.source.remote.model.Reply
-import com.gp.socialapp.presentatDefaultn.post.postDetails.PostDetailsScreenModel
 import com.gp.socialapp.presentation.post.feed.PostEvent
 import com.gp.socialapp.presentation.post.feed.ReplyEvent
 import com.gp.socialapp.presentation.post.feed.components.FeedPostItem
@@ -85,9 +84,11 @@ data class PostDetailsScreen(val post: Post) : Screen {
                             }
                         }
                     }
+
                     is PostEvent.OnTagClicked -> {
                         navigator.push(SearchResultScreen(searchTag = postEvent.tag, isTag = true))
                     }
+
                     else -> screenModel.handlePostEvent(postEvent)
                 }
             },
@@ -131,7 +132,7 @@ data class PostDetailsScreen(val post: Post) : Screen {
                 clickedReply = null
             },
             onResetActionResult = screenModel::resetActionResult,
-            onBackPressed = {navigator.pop()},
+            onBackPressed = { navigator.pop() },
         )
     }
 
@@ -158,16 +159,16 @@ data class PostDetailsScreen(val post: Post) : Screen {
         Scaffold(
             snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
             topBar = {
-                     TopAppBar(
-                         title = {Text("Post Details")},
-                            navigationIcon = {
-                                IconButton(onClick = {
-                                    onBackPressed()
-                                }) {
-                                    Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-                                }
-                            }
-                         )
+                TopAppBar(
+                    title = { Text("Post Details") },
+                    navigationIcon = {
+                        IconButton(onClick = {
+                            onBackPressed()
+                        }) {
+                            Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        }
+                    }
+                )
             }, modifier = modifier
         ) {
             if (actionResult !is PostDetailsActionResult.NoActionResult) {
@@ -232,7 +233,7 @@ data class PostDetailsScreen(val post: Post) : Screen {
                     AddReplySheet(
                         onDismiss = onDismissAddReplyBottomSheet,
                         onDone = { textReply ->
-                            if(clickedReply == null){
+                            if (clickedReply == null) {
                                 onPostEvent(PostEvent.OnCommentAdded(textReply, post.id))
                             } else {
                                 onReplyEvent(ReplyEvent.OnReplyAdded(textReply, clickedReply))

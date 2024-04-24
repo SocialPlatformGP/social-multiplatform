@@ -1,185 +1,165 @@
 package com.gp.socialapp.data.post.source.remote
 
-import com.gp.socialapp.data.post.source.remote.model.Post
-import com.gp.socialapp.data.post.source.remote.model.PostRequest
 import com.gp.socialapp.data.post.source.remote.model.Reply
 import com.gp.socialapp.data.post.source.remote.model.ReplyRequest
-import com.gp.socialapp.util.AppConstants
-import com.gp.socialapp.util.Result
-import io.github.aakira.napier.Napier
+import com.gp.socialapp.data.post.util.endPoint
+import com.gp.socialapp.util.DataError
+import com.gp.socialapp.util.Results
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.request.HttpRequestBuilder
-import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
-import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
-import io.ktor.http.contentType
-import io.ktor.http.path
-import io.ktor.http.takeFrom
-import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.serialization.json.Json
 
-class ReplyRemoteDataSourceImpl: ReplyRemoteDataSource {
-    val httpClient = HttpClient {
-        install(ContentNegotiation) {
-            json(Json {
-                ignoreUnknownKeys = true
-                useAlternativeNames = false
-                isLenient = true
-                encodeDefaults = true
-            })
-        }
-    }
+class ReplyRemoteDataSourceImpl(
+    private val client: HttpClient
+) : ReplyRemoteDataSource {
 
-    private fun HttpRequestBuilder.endPoint(path: String) {
-        url {
-            takeFrom(AppConstants.BASE_URL)
-            path(path)
-            contentType(ContentType.Application.Json)
-        }
-    }
-    override suspend fun createReply(request: ReplyRequest.CreateRequest): Result<Nothing> {
-        println("createReply: $request *********************125")
+    override suspend fun createReply(request: ReplyRequest.CreateRequest): Results<Unit, DataError.Network> =
         try {
-            val response = httpClient.post {
+            val response = client.post {
                 endPoint("createReply")
                 setBody(
                     request
                 )
             }
-            val message = response.bodyAsText()
             if (response.status == HttpStatusCode.OK) {
-                return Result.Success
+                Results.Success(Unit)
             } else {
-                return Result.Error(message)
+                val error = response.body<DataError.Network>()
+                Results.Failure(error)
+
             }
         } catch (e: Exception) {
-            Napier.e("createReply: ${e.message}")
-            return Result.Error(e.message ?: "An unknown error occurred")
+            e.printStackTrace()
+            Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN)
         }
-    }
 
-    override fun fetchReplies(request: ReplyRequest.FetchRequest): Flow<Result<List<Reply>>> = flow {
-        emit(Result.Loading)
-        try {
-            val response = httpClient.post {
-                endPoint("fetchReplies")
-                setBody(
-                    request
-                )
+
+    override fun fetchReplies(request: ReplyRequest.FetchRequest): Flow<Results<List<Reply>, DataError.Network>> =
+        flow {
+            emit(Results.Loading)
+            try {
+                val response = client.post {
+                    endPoint("fetchReplies")
+                    setBody(
+                        request
+                    )
+                }
+                if (response.status == HttpStatusCode.OK) {
+                    val replies = response.body<List<Reply>>()
+                    emit(Results.Success(replies))
+                } else {
+                    val error = response.body<DataError.Network>()
+                    emit(Results.Failure(error))
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                emit(Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN))
             }
-            println("response: ${response.status}")
-            if (response.status == HttpStatusCode.OK) {
-                val replies = response.body<List<Reply>>()
-                emit(Result.SuccessWithData(replies))
-            } else {
-                emit(Result.Error("An error occurred"))
-            }
-        } catch (e: Exception) {
-            println("fetchReplies: ${e.message}")
-            emit(Result.Error(e.message ?: "An unknown error occurred"))
         }
-    }
 
-    override suspend fun updateReply(request: ReplyRequest.UpdateRequest): Result<Nothing> {
+    override suspend fun updateReply(request: ReplyRequest.UpdateRequest): Results<Unit, DataError.Network> =
         try {
-            val response = httpClient.post {
+            val response = client.post {
                 endPoint("updateReply")
                 setBody(
                     request
                 )
             }
-            val message = response.bodyAsText()
             if (response.status == HttpStatusCode.OK) {
-                return Result.Success
+                Results.Success(Unit)
             } else {
-                return Result.Error(message)
+                val error = response.body<DataError.Network>()
+                Results.Failure(error)
             }
         } catch (e: Exception) {
-            Napier.e("createReply: ${e.message}")
-            return Result.Error(e.message ?: "An unknown error occurred")
+            e.printStackTrace()
+            Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN)
         }
-    }
 
-    override suspend fun deleteReply(request: ReplyRequest.DeleteRequest): Result<Nothing> {
+
+    override suspend fun deleteReply(request: ReplyRequest.DeleteRequest): Results<Unit, DataError.Network> =
         try {
-            val response = httpClient.post {
+            val response = client.post {
                 endPoint("deleteReply")
                 setBody(
                     request
                 )
             }
-            val message = response.bodyAsText()
-            return if (response.status == HttpStatusCode.OK) {
-                Result.Success
+            if (response.status == HttpStatusCode.OK) {
+                Results.Success(Unit)
             } else {
-                Result.Error(message)
+                val message = response.body<DataError.Network>()
+                Results.Failure(message)
             }
         } catch (e: Exception) {
-            return Result.Error(e.message ?: "An unknown error occurred")
+            e.printStackTrace()
+            Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN)
         }
-    }
 
-    override suspend fun upvoteReply(request: ReplyRequest.UpvoteRequest) : Result<Nothing>{
+
+    override suspend fun upvoteReply(request: ReplyRequest.UpvoteRequest): Results<Unit, DataError.Network> =
         try {
-            val response = httpClient.post {
+            val response = client.post {
                 endPoint("upvoteReply")
                 setBody(
                     request
                 )
             }
-            val message = response.bodyAsText()
-            return if (response.status == HttpStatusCode.OK) {
-                Result.Success
+            if (response.status == HttpStatusCode.OK) {
+                Results.Success(Unit)
             } else {
-                Result.Error(message)
+                val error = response.body<DataError.Network>()
+                Results.Failure(error)
             }
         } catch (e: Exception) {
-            return Result.Error(e.message ?: "An unknown error occurred")
+            e.printStackTrace()
+            Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN)
         }
-    }
 
-    override suspend fun downvoteReply(request: ReplyRequest.DownvoteRequest): Result<Nothing> {
+
+    override suspend fun downvoteReply(request: ReplyRequest.DownvoteRequest): Results<Unit, DataError.Network> =
         try {
-            val response = httpClient.post {
+            val response = client.post {
                 endPoint("downvoteReply")
                 setBody(
                     request
                 )
             }
-            val message = response.bodyAsText()
-            return if (response.status == HttpStatusCode.OK) {
-                Result.Success
+            if (response.status == HttpStatusCode.OK) {
+                Results.Success(Unit)
             } else {
-                Result.Error(message)
+                val error = response.body<DataError.Network>()
+                Results.Failure(error)
             }
         } catch (e: Exception) {
-            return Result.Error(e.message ?: "An unknown error occurred")
+            e.printStackTrace()
+            Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN)
         }
-    }
 
-    override suspend fun reportReply(request: ReplyRequest.ReportRequest): Result<Nothing> {
+
+    override suspend fun reportReply(request: ReplyRequest.ReportRequest): Results<Unit, DataError.Network> =
         try {
-            val response = httpClient.post {
+            val response = client.post {
                 endPoint("reportReply")
                 setBody(
                     request
                 )
             }
             val message = response.bodyAsText()
-            return if (response.status == HttpStatusCode.OK) {
-                Result.Success
+            if (response.status == HttpStatusCode.OK) {
+                Results.Success(Unit)
             } else {
-                Result.Error(message)
+                val error = response.body<DataError.Network>()
+                Results.Failure(error)
             }
         } catch (e: Exception) {
-            return Result.Error(e.message ?: "An unknown error occurred")
+            e.printStackTrace()
+            Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN)
         }
-    }
+
 }

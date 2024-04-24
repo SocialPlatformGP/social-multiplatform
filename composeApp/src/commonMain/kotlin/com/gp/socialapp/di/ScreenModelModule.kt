@@ -1,6 +1,5 @@
 package com.gp.socialapp.di
 
-import com.gp.socialapp.presentatDefaultn.post.postDetails.PostDetailsScreenModel
 import com.gp.socialapp.presentation.auth.login.LoginScreenModel
 import com.gp.socialapp.presentation.auth.passwordreset.PasswordResetScreenModel
 import com.gp.socialapp.presentation.auth.signup.SignUpScreenModel
@@ -15,6 +14,7 @@ import com.gp.socialapp.presentation.material.MaterialScreenModel
 import com.gp.socialapp.presentation.post.create.CreatePostScreenModel
 import com.gp.socialapp.presentation.post.edit.EditPostScreenModel
 import com.gp.socialapp.presentation.post.feed.FeedScreenModel
+import com.gp.socialapp.presentation.post.postDetails.PostDetailsScreenModel
 import com.gp.socialapp.presentation.post.search.SearchScreenModel
 import com.gp.socialapp.presentation.post.searchResult.SearchResultScreenModel
 import org.kodein.di.DI

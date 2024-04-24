@@ -9,6 +9,7 @@ import com.gp.socialapp.data.post.source.remote.model.Post
 import com.gp.socialapp.data.post.source.remote.model.PostAttachment
 import com.gp.socialapp.data.post.source.remote.model.Tag
 import com.gp.socialapp.util.Result
+import com.gp.socialapp.util.Results
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -49,11 +50,13 @@ class CreatePostScreenModel(
         }
         _uiState.update { it.copy(tags = (uiState.value.tags + tags)) }
     }
+
     fun onAddTags(tags: Set<Tag>) {
         screenModelScope.launch {
             _uiState.update { it.copy(tags = it.tags + tags) }
         }
     }
+
     fun onRemoveTags(tags: Set<Tag>) {
         screenModelScope.launch {
             _uiState.update { it.copy(tags = it.tags - tags) }
@@ -76,16 +79,17 @@ class CreatePostScreenModel(
                     )
                 ).collect { it ->
                     when (it) {
-                        is Result.SuccessWithData -> {
+                        is Results.Success -> {
                             _uiState.update { it.copy(createdState = true) }
-                            println(it.data)
                         }
 
-                        is Result.Error -> {
-                            println(it.message)
+                        is Results.Failure -> {
+                            println(it.error)
                         }
 
-                        else -> Unit
+                        Results.Loading -> {
+                            //TODO
+                        }
                     }
                 }
             }
@@ -113,6 +117,7 @@ class CreatePostScreenModel(
                         is Result.Error -> {
                             println("Error: cant get user data")
                         }
+
                         else -> Unit
                     }
                 }
@@ -135,7 +140,16 @@ class CreatePostScreenModel(
 
     fun resetUiState() {
         screenModelScope.launch {
-            _uiState.update { it.copy(createdState = false, title = "", body = "", tags = emptyList(), files = emptyList(), cancelPressed = false) }
+            _uiState.update {
+                it.copy(
+                    createdState = false,
+                    title = "",
+                    body = "",
+                    tags = emptyList(),
+                    files = emptyList(),
+                    cancelPressed = false
+                )
+            }
         }
     }
 

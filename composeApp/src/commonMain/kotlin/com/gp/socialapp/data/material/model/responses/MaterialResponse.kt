@@ -4,6 +4,7 @@ import com.gp.socialapp.data.material.model.MaterialFile
 import com.gp.socialapp.data.material.model.MaterialFolder
 import kotlinx.serialization.Serializable
 
+@Serializable
 sealed class MaterialResponse {
     @Serializable
     data class GetMaterialResponses(

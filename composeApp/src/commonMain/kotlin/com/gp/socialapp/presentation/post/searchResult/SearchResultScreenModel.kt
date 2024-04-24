@@ -5,7 +5,7 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import com.gp.socialapp.data.post.repository.PostRepository
 import com.gp.socialapp.data.post.source.remote.model.Tag
 import com.gp.socialapp.util.DispatcherIO
-import com.gp.socialapp.util.Result
+import com.gp.socialapp.util.Results
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -14,35 +14,39 @@ import kotlinx.coroutines.launch
 
 class SearchResultScreenModel(
     private val postRepo: PostRepository
-): ScreenModel {
+) : ScreenModel {
     private val _uiState = MutableStateFlow(SearchResultUiState())
     val uiState = _uiState.asStateFlow()
     fun initScreenModel(searchTerm: String, searchTag: Tag, isTag: Boolean) {
         screenModelScope.launch(DispatcherIO) {
-            if(isTag) {
+            if (isTag) {
                 postRepo.searchByTag(searchTag).collect {
-                    when(it) {
-                        is Result.SuccessWithData -> {
+                    when (it) {
+                        is Results.Success -> {
                             val posts = it.data
                             _uiState.update { it.copy(posts = posts) }
                         }
-                        is Result.Error -> {
+
+                        is Results.Failure -> {
                             // Handle error
                         }
-                        else -> Unit
+
+                        Results.Loading -> Unit
                     }
                 }
             } else {
                 postRepo.searchByTitle(searchTerm).collectLatest {
-                    when(it) {
-                        is Result.SuccessWithData -> {
+                    when (it) {
+                        is Results.Success -> {
                             val posts = it.data
                             _uiState.update { it.copy(posts = posts) }
                         }
-                        is Result.Error -> {
+
+                        is Results.Failure -> {
                             // Handle error
                         }
-                        else -> Unit
+
+                        Results.Loading -> Unit
                     }
                 }
             }

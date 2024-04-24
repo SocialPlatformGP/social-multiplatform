@@ -139,7 +139,7 @@ class MaterialScreenModel(
         when (result) {
             is Results.Failure -> {
                 stopLoading()
-                showError(result.error)
+                showError(result.error.userMessage)
             }
 
             Results.Loading -> {
@@ -189,10 +189,10 @@ class MaterialScreenModel(
         }
     }
 
-    private fun showError(error: DataError.Network) {
+    private fun showError(error: String) {
         uiState.update {
             it.copy(
-                error = error.name
+                error = error
             )
         }
     }

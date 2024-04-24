@@ -27,6 +27,6 @@ object MaterialTab : Tab {
 
     @Composable
     override fun Content() {
-        //Navigator(screen = MaterialScreen())
+        Navigator(screen = com.gp.socialapp.presentation.material.MaterialScreen)
     }
 }
