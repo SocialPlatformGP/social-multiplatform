@@ -17,4 +17,8 @@ interface UserRemoteDataSource {
     suspend fun uploadUserPfp(pfpByteArray: ByteArray, userId: String): Result<String>
     suspend fun createRemoteUser(user: User): Results<DataSuccess.User, DataError.Network>
     fun getUserCommunities(userId: String): Flow<Results<List<Community>, DataError.Network>>
+    fun communityLogout(
+        id: String,
+        selectedCommunityId: String
+    ): Flow<Results<List<Community>, DataError.Network>>
 }

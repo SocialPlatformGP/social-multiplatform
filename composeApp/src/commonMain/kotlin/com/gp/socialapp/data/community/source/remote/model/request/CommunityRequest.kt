@@ -9,4 +9,10 @@ sealed class CommunityRequest {
         val community: Community,
         val creatorId: String
     ) : CommunityRequest()
+
+    @Serializable
+    data class LogoutCommunity(
+        val id: String,
+        val selectedCommunityId: String
+    ) : CommunityRequest()
 }

@@ -36,16 +36,16 @@ object CreateCommunityScreen : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = navigator.rememberNavigatorScreenModel<CreateCommunityScreenModel>()
         val state by screenModel.uiState.collectAsState()
-        if(state.createdCommunity != null) {
-            println("Community created! Community Id: ${state.createdCommunity?.id}")
-            //TODO Navigate to created community
+        if (state.createdCommunity != null) {
+            navigator.pop()
         } else {
             CreateCommunityContent(
                 onAction = { action ->
-                    when(action) {
+                    when (action) {
                         CreateCommunityAction.OnBackClicked -> {
                             navigator.pop()
                         }
+
                         else -> screenModel.handleUiAction(action)
                     }
                 },
@@ -88,8 +88,9 @@ object CreateCommunityScreen : Screen {
             },
             modifier = modifier.fillMaxSize(),
         ) { paddingValues ->
-            Column (
-                modifier = Modifier.padding(paddingValues).padding(horizontal = 16.dp).fillMaxSize(),
+            Column(
+                modifier = Modifier.padding(paddingValues).padding(horizontal = 16.dp)
+                    .fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 CommunityNameSection(
@@ -100,28 +101,58 @@ object CreateCommunityScreen : Screen {
                 )
                 CommunityDescriptionSection(
                     description = communityDescription,
-                    onDescriptionChange = { onAction(CreateCommunityAction.OnUpdateCommunityDescription(it)) },
+                    onDescriptionChange = {
+                        onAction(
+                            CreateCommunityAction.OnUpdateCommunityDescription(
+                                it
+                            )
+                        )
+                    },
                 )
                 Spacer(modifier = Modifier.size(16.dp))
                 SwitchSetting(
                     title = "Require Admin Approval",
                     description = "Require admin approval before joining",
                     isChecked = requireAdminApproval,
-                    onCheckedChange = { onAction(CreateCommunityAction.OnRequireAdminApprovalChanged(it)) },
+                    onCheckedChange = {
+                        onAction(
+                            CreateCommunityAction.OnRequireAdminApprovalChanged(
+                                it
+                            )
+                        )
+                    },
                 )
                 Spacer(modifier = Modifier.size(16.dp))
                 SwitchSetting(
                     title = "Allow any email domain",
                     description = "Allow any email domain to join",
                     isChecked = allowAnyEmailDomain,
-                    onCheckedChange = { onAction(CreateCommunityAction.OnAllowAnyEmailDomainChanged(it)) },
+                    onCheckedChange = {
+                        onAction(
+                            CreateCommunityAction.OnAllowAnyEmailDomainChanged(
+                                it
+                            )
+                        )
+                    },
                 )
-                if(!allowAnyEmailDomain) {
+                if (!allowAnyEmailDomain) {
                     AllowedEmailDomainsSection(
                         modifier = Modifier.weight(1f),
                         allowedEmailDomains = allowedEmailDomains,
-                        onAddEmailDomain = { onAction(CreateCommunityAction.OnAddAllowedEmailDomain(it)) },
-                        onRemoveEmailDomain = { onAction(CreateCommunityAction.OnRemoveAllowedEmailDomain(it)) },
+                        onAddEmailDomain = {
+                            onAction(
+                                CreateCommunityAction.OnAddAllowedEmailDomain(
+                                    it
+                                )
+                            )
+                        },
+                        onRemoveEmailDomain = {
+                            onAction(
+                                CreateCommunityAction.OnRemoveAllowedEmailDomain(
+                                    it
+                                )
+                            )
+                        },
                     )
                 }
                 Button(

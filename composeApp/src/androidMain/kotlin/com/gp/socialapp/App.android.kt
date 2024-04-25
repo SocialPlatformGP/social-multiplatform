@@ -8,7 +8,6 @@ import androidx.activity.compose.setContent
 import com.gp.socialapp.presentation.app.App
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
-import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.gotrue.ExternalAuthAction
@@ -38,9 +37,9 @@ class AppActivity : ComponentActivity() {
             supabaseUrl = "https://vszvbwfzewqeoxxpetgj.supabase.co",
             supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZzenZid2Z6ZXdxZW94eHBldGdqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTM2MjM0MjUsImV4cCI6MjAyOTE5OTQyNX0.dO4SiJ9MCN0gZaY15kjqRdYL0NRFTZWID_xiYWhAnk8"
         ) {
-            install(Auth){
-                host = "com.gp.socialapp"
-                scheme = "edulink"
+            install(Auth) {
+                host = "login"
+                scheme = "com.gp.edulink"
                 defaultExternalAuthAction = ExternalAuthAction.CustomTabs()
             }
         }

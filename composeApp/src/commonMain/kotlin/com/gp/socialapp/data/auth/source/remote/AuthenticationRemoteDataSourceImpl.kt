@@ -96,7 +96,6 @@ class AuthenticationRemoteDataSourceImpl(
     override suspend fun getSignedInUser(): Result<User> {
         val userInfo = supabaseClient.auth.sessionManager.loadSession()?.user
         if (userInfo != null) {
-            println("User: ${userInfo.userMetadata}")
             val isUserDataComplete =
                 userInfo.userMetadata?.get("isUserDataComplete")?.jsonPrimitive?.booleanOrNull
                     ?: false
@@ -156,9 +155,11 @@ class AuthenticationRemoteDataSourceImpl(
             supabaseClient.auth.signOut()
             Result.Success
         } catch (e: Exception) {
+            e.printStackTrace()
             Result.Error(e.message ?: "Null")
         }
     }
+
 
     override fun sendPasswordResetEmail(email: String): Flow<Result<Nothing>> {
         TODO("Not yet implemented")

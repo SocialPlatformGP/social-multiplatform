@@ -59,7 +59,6 @@ import com.gp.socialapp.data.post.source.remote.model.PostAttachment
 import com.gp.socialapp.presentation.auth.login.LoginScreen
 import com.gp.socialapp.presentation.post.create.CreatePostScreen
 import com.gp.socialapp.presentation.post.feed.components.FeedPostItem
-import com.gp.socialapp.presentation.post.feed.components.FeedTopBar
 import com.gp.socialapp.presentation.post.feed.components.FilesBottomSheet
 import com.gp.socialapp.presentation.post.postDetails.PostDetailsScreen
 import com.gp.socialapp.presentation.post.search.SearchScreen
@@ -229,9 +228,9 @@ object FeedScreen : Screen {
                     )
                 }
             },
-            topBar = {
-                FeedTopBar(onNavigationAction)
-            }
+//            topBar = {
+//                FeedTopBar(onNavigationAction)
+//            }
         ) { paddingValues ->
             if (state.error !is FeedError.NoError) {
                 scope.launch {

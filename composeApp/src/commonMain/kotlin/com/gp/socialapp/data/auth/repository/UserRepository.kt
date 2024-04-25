@@ -15,4 +15,8 @@ interface UserRepository {
     fun getUsersByIds(Ids: List<String>): Flow<Results<List<User>, DataError.Network>>
     suspend fun createRemoteUser(user: User): Results<DataSuccess.User, DataError.Network>
     fun getUserCommunities(userId: String): Flow<Results<List<Community>, DataError.Network>>
+    fun communityLogout(
+        id: String,
+        selectedCommunityId: String
+    ): Flow<Results<List<Community>, DataError.Network>>
 }

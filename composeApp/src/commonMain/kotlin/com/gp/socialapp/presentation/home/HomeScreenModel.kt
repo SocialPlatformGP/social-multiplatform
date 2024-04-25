@@ -22,11 +22,9 @@ class HomeScreenModel(
 
     fun init() {
         getUser()
-        getUserCommunities()
     }
 
     private fun getUserCommunities() {
-        println("User in getCommunities: ${uiState.value.user.id}")
         screenModelScope.launch() {
             userRepo.getUserCommunities(uiState.value.user.id).collect {
                 when (it) {
@@ -59,7 +57,6 @@ class HomeScreenModel(
                 }
 
                 is Result.SuccessWithData -> {
-                    println("User in get: ${result.data.id}")
                     setUser(result.data)
                     getUserCommunities()
 
@@ -80,14 +77,12 @@ class HomeScreenModel(
 
     private fun setCommunities(data: List<Community>) {
         _uiState.update {
-            println("Communities: $data")
             it.copy(communities = data)
         }
     }
 
     private fun setLoading() {
         _uiState.update {
-            println("Loading")
             it.copy(loading = true)
         }
     }
@@ -100,7 +95,6 @@ class HomeScreenModel(
 
     private fun setError(userMessage: String) {
         _uiState.update {
-            println("Error: $userMessage")
             it.copy(error = userMessage)
         }
     }
@@ -108,6 +102,58 @@ class HomeScreenModel(
     private fun resetLoading() {
         _uiState.update {
             it.copy(loading = false)
+        }
+    }
+
+    fun communityLogout(id: String) {
+        screenModelScope.launch {
+            userRepo.communityLogout(
+                uiState.value.user.id,
+                id
+            ).collect {
+                when (it) {
+                    is Results.Failure -> {
+                        setError(it.error.userMessage)
+                    }
+
+                    Results.Loading -> {
+                        setLoading()
+                    }
+
+                    is Results.Success -> {
+                        resetLoading()
+                        resetError()
+                        setCommunities(it.data)
+                    }
+                }
+            }
+        }
+    }
+
+    fun joinCommunity(code: String) {
+//        screenModelScope.launch {
+//            userRepo.joinCommunity(uiState.value.user.id, code).collect {
+//                when (it) {
+//                    is Results.Failure -> {
+//                        setError(it.error.userMessage)
+//                    }
+//
+//                    Results.Loading -> {
+//                        setLoading()
+//                    }
+//
+//                    is Results.Success -> {
+//                        resetLoading()
+//                        resetError()
+//                    }
+//                }
+//            }
+//        }
+    }
+
+    fun userLogout() {
+        screenModelScope.launch {
+            authRepo.logout()
         }
     }
 }

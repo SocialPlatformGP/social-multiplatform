@@ -7,5 +7,6 @@ data class HomeUiState(
     val loading: Boolean = false,
     val communities: List<Community> = emptyList(),
     val error: String? = null,
-    val user: User = User()
+    val user: User = User(),
+    val selectedCommunityId: String = ""
 )

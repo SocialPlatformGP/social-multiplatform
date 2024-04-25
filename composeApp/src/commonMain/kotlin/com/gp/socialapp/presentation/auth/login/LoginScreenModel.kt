@@ -42,9 +42,11 @@ class LoginScreenModel(
                 is Result.SuccessWithData -> {
                     _uiState.value = _uiState.value.copy(signedInUser = result.data)
                 }
+
                 is Result.Error -> {
                     Napier.e("getSignedInUser: ${result.message}")
                 }
+
                 else -> Unit
             }
         }
@@ -112,7 +114,9 @@ class LoginScreenModel(
     }
 
     fun onLogOut() {
-        authRepo.clearStorage()
+        screenModelScope.launch {
+            authRepo.logout()
+        }
     }
 
     fun signInWithOAuth(provider: OAuthProvider) {

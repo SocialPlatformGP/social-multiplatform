@@ -52,7 +52,7 @@ import com.gp.socialapp.presentation.auth.signup.SignUpScreen
 import com.gp.socialapp.presentation.auth.util.AuthError.EmailError
 import com.gp.socialapp.presentation.auth.util.AuthError.PasswordError
 import com.gp.socialapp.presentation.auth.util.AuthError.ServerError
-import com.gp.socialapp.presentation.main.MainContainer
+import com.gp.socialapp.presentation.home.HomeScreen
 import io.github.jan.supabase.gotrue.providers.Azure
 import io.github.jan.supabase.gotrue.providers.Google
 import kotlinx.coroutines.launch
@@ -76,9 +76,9 @@ object LoginScreen : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = navigator.rememberNavigatorScreenModel<LoginScreenModel>()
         val state by screenModel.uiState.collectAsState()
+
         if (state.signedInUser != null) {
-            println("Signed in user: ${state.signedInUser}")
-            navigator.replaceAll(MainContainer(state.signedInUser!!))
+            navigator.replaceAll(HomeScreen())
         } else {
             LoginContent(
                 onSignInWithGoogle = { screenModel.signInWithOAuth(Google) },

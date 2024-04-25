@@ -37,5 +37,12 @@ class UserRepositoryImpl(
     override fun getUserCommunities(userId: String): Flow<Results<List<Community>, DataError.Network>> =
         userRemoteSource.getUserCommunities(userId)
 
+    override fun communityLogout(
+        id: String,
+        selectedCommunityId: String
+    ): Flow<Results<List<Community>, DataError.Network>> {
+        return userRemoteSource.communityLogout(id, selectedCommunityId)
+    }
+
 
 }

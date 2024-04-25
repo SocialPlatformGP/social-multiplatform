@@ -17,12 +17,16 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.gp.socialapp.presentation.auth.login.LoginScreen
 import com.gp.socialapp.presentation.community.createcommunity.CreateCommunityScreen
+import com.gp.socialapp.presentation.home.components.ConfirmLogoutDialog
 import com.gp.socialapp.presentation.home.components.HomeBottomSheet
 import com.gp.socialapp.presentation.home.components.HomeContent
 import com.gp.socialapp.presentation.home.components.HomeFab
 import com.gp.socialapp.presentation.home.components.HomeTopBar
 import com.gp.socialapp.presentation.home.components.JoinCommunityDialog
+import com.gp.socialapp.presentation.main.MainContainer
+import com.gp.socialapp.presentation.main.userinfo.UserInformationScreen
 import kotlinx.coroutines.launch
 
 class HomeScreen : Screen {
@@ -30,21 +34,40 @@ class HomeScreen : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = navigator.rememberNavigatorScreenModel<HomeScreenModel>()
-        LifecycleEffect(onStarted = { screenModel.init() })
         val state = screenModel.uiState.collectAsState()
-        HomeScreenContent(
-            state = state.value,
-            action = {
-                when (it) {
-                    is HomeUiAction.OnCommunityClicked -> Unit // TODO(Navigate to community screen)
-                    is HomeUiAction.OnCommunityLogout -> Unit // TODO( Logout from community)
-                    HomeUiAction.OnCreateCommunityClicked -> navigator.push(CreateCommunityScreen)
-                    HomeUiAction.OnJoinCommunityClicked -> Unit//TODO( Join community)
-                    HomeUiAction.OnProfileClicked -> Unit //TODO( Navigate to profile screen)
-                    HomeUiAction.OnUserLogout -> Unit //TODO( Logout user)
+        LifecycleEffect(onStarted = { screenModel.init() })
+        if (!state.value.user.isDataComplete && state.value.user.id.isNotBlank()) {
+            navigator.replaceAll(UserInformationScreen(state.value.user))
+        }
+        HomeScreenContent(state = state.value, action = {
+            when (it) {
+                is HomeUiAction.OnCommunityClicked ->
+                    navigator.replaceAll(
+                        MainContainer(
+                            state.value.user
+                        )
+                    )
+
+                is HomeUiAction.OnCommunityLogout -> {
+                    screenModel.communityLogout(it.id)
+                }
+
+                HomeUiAction.OnCreateCommunityClicked ->
+                    navigator.push(
+                        CreateCommunityScreen
+                    )
+
+                is HomeUiAction.OnJoinCommunityClicked -> {
+                    screenModel.joinCommunity(it.code)
+                }
+
+                HomeUiAction.OnProfileClicked -> Unit //TODO( Navigate to profile screen)
+                HomeUiAction.OnUserLogout -> {
+                    screenModel.userLogout()
+                    navigator.replaceAll(LoginScreen)
                 }
             }
-        )
+        })
     }
 }
 
@@ -56,7 +79,10 @@ fun HomeScreenContent(
     val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState()
     var showBottomSheet by remember { mutableStateOf(false) }
-    var dialogState by remember { mutableStateOf(false) }
+    var joinCommunityDialogState by remember { mutableStateOf(false) }
+    var confirmLogoutDialogState by remember { mutableStateOf(false) }
+    var communityId by remember { mutableStateOf("") }
+
 
     Scaffold(topBar = {
         HomeTopBar(
@@ -68,33 +94,44 @@ fun HomeScreenContent(
         }
     }) { padding ->
         if (showBottomSheet) {
-            HomeBottomSheet(
-                closeSheet = {
-                    scope.launch { sheetState.hide() }.invokeOnCompletion {
-                        if (!sheetState.isVisible) {
-                            showBottomSheet = false
-                        }
+            HomeBottomSheet(closeSheet = {
+                scope.launch { sheetState.hide() }.invokeOnCompletion {
+                    if (!sheetState.isVisible) {
+                        showBottomSheet = false
                     }
-                },
-                sheetState = sheetState,
-                action = action,
-                onJoinCommunityClicked = {
-                    dialogState = true
                 }
-            )
+            }, sheetState = sheetState, action = action, onJoinCommunityClicked = {
+                joinCommunityDialogState = true
+            })
         }
-        if (dialogState) {
-            JoinCommunityDialog(
-                onDismiss = {
-                    dialogState = false
-                },
-                onJoin = {
-                    dialogState = false
-                }
-            )
+        if (joinCommunityDialogState) {
+            JoinCommunityDialog(onDismiss = {
+                joinCommunityDialogState = false
+            }, onJoin = {
+                joinCommunityDialogState = false
+            })
+        }
+        if (confirmLogoutDialogState) {
+            ConfirmLogoutDialog(onDismiss = {
+                confirmLogoutDialogState = false
+            }, onConfirm = {
+                action(HomeUiAction.OnCommunityLogout(communityId))
+                confirmLogoutDialogState = false
+            })
         }
         HomeContent(
-            modifier = Modifier.padding(padding), communities = state.communities, action = action
+            modifier = Modifier.padding(padding),
+            communities = state.communities,
+            action = {
+                when (it) {
+                    is HomeUiAction.OnCommunityLogout -> {
+                        confirmLogoutDialogState = true
+                        communityId = it.id
+                    }
+
+                    else -> action(it)
+                }
+            }
         )
     }
 

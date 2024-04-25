@@ -3,6 +3,7 @@ package com.gp.socialapp.data.auth.source.remote
 import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.data.auth.source.remote.model.requests.GetUsersByIdsRequest
 import com.gp.socialapp.data.community.source.remote.model.Community
+import com.gp.socialapp.data.community.source.remote.model.request.CommunityRequest
 import com.gp.socialapp.data.post.util.endPoint
 import com.gp.socialapp.util.DataError
 import com.gp.socialapp.util.DataSuccess
@@ -139,6 +140,31 @@ class UserRemoteDataSourceImpl(
                 emit(Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN))
             }
 
+        }
+
+    override fun communityLogout(
+        id: String,
+        selectedCommunityId: String
+    ): Flow<Results<List<Community>, DataError.Network>> =
+        flow {
+            emit(Results.Loading)
+            val request = CommunityRequest.LogoutCommunity(id, selectedCommunityId)
+            try {
+                val response = httpClient.post {
+                    endPoint("communityLogout")
+                    setBody(request)
+                }
+                if (response.status == HttpStatusCode.OK) {
+                    val communities = response.body<List<Community>>()
+                    emit(Results.Success(communities))
+                } else {
+                    val error = response.body<DataError.Network>()
+                    emit(Results.Failure(error))
+                }
+
+            } catch (e: Exception) {
+                emit(Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN))
+            }
         }
 
 }

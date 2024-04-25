@@ -58,7 +58,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.presentation.auth.util.AuthError
-import com.gp.socialapp.presentation.main.MainContainer
+import com.gp.socialapp.presentation.home.HomeScreen
 import com.gp.socialapp.util.LocalDateTimeUtil.now
 import com.gp.socialapp.util.LocalDateTimeUtil.toDDMMYYYY
 import com.gp.socialapp.util.LocalDateTimeUtil.toLocalDateTime
@@ -114,9 +114,11 @@ data class UserInformationScreen(
             }
         )
         if (state.createdState is Result.Success) {
-            navigator.replaceAll(MainContainer(state.signedInUser ?: signedInUser))
+            navigator.replaceAll(HomeScreen())
         }
-        Scaffold { paddingValues ->
+        Scaffold(
+
+        ) { paddingValues ->
             UserInformationContent(
                 paddingValues = paddingValues,
                 state = state,

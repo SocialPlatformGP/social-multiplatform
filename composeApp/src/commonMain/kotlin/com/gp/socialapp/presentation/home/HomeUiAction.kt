@@ -5,7 +5,7 @@ sealed interface HomeUiAction {
     data class OnCommunityLogout(val id: String) : HomeUiAction
 
     data object OnCreateCommunityClicked : HomeUiAction
-    data object OnJoinCommunityClicked : HomeUiAction
+    data class OnJoinCommunityClicked(val code: String) : HomeUiAction
     data object OnProfileClicked : HomeUiAction
     data object OnUserLogout : HomeUiAction
 
