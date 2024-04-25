@@ -15,6 +15,7 @@ class UserRepositoryImpl(
 ) : UserRepository {
     override suspend fun updateUserInfo(user: User, pfpByteArray: ByteArray): Result<Nothing> {
         return if (pfpByteArray.isNotEmpty()) {
+            println("Uploading profile picture")
             val result = userRemoteSource.uploadUserPfp(pfpByteArray, user.id)
             if (result is Result.SuccessWithData) {
                 userRemoteSource.updateUserInfo(user.copy(profilePictureURL = result.data))
@@ -22,6 +23,7 @@ class UserRepositoryImpl(
                 Result.Error("An error occurred while uploading the profile picture")
             }
         } else {
+            println("Updating user info and pfp is empty")
             userRemoteSource.updateUserInfo(user)
         }
     }
