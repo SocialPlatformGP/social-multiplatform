@@ -67,6 +67,8 @@ import com.gp.socialapp.presentation.auth.util.AuthError.EmailError
 import com.gp.socialapp.presentation.auth.util.AuthError.PasswordError
 import com.gp.socialapp.presentation.auth.util.AuthError.ServerError
 import com.gp.socialapp.presentation.home.HomeScreen
+import com.gp.socialapp.util.Platform
+import com.gp.socialapp.util.getPlatform
 import io.github.jan.supabase.gotrue.providers.Apple
 import io.github.jan.supabase.gotrue.providers.Azure
 import io.github.jan.supabase.gotrue.providers.Discord
@@ -142,6 +144,7 @@ object LoginScreen : Screen {
         var passwordVisible by remember { mutableStateOf(false) }
         val scope = rememberCoroutineScope()
         val snackbarHostState = remember { SnackbarHostState() }
+        val platform = getPlatform()
         Scaffold(
             snackbarHost = {
                 SnackbarHost(hostState = snackbarHostState)
@@ -268,7 +271,8 @@ object LoginScreen : Screen {
                         OAuthProviderItem(
                             modifier = Modifier.padding(4.dp),
                             provider = provider,
-                            onClick = onSignInWithOAuth
+                            onClick = onSignInWithOAuth,
+                            isEnabled = platform != Platform.ANDROID,
                         )
                     }
                 }
