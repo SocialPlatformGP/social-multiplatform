@@ -21,7 +21,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import kotlinx.serialization.json.JsonElement
 
 @Composable
 fun AddAllowedDomainSection(
@@ -29,20 +28,30 @@ fun AddAllowedDomainSection(
     onAddAllowedDomain: (String) -> Unit,
 ) {
     var name by remember { mutableStateOf("") }
-    Row (
+    var isError by remember { mutableStateOf(false) }
+    Row(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         OutlinedTextField(
             shape = RoundedCornerShape(32.dp),
             value = name,
-            onValueChange = { name = it },
+            onValueChange = {
+                isError = false
+                name = it
+            },
             placeholder = { Text("Add Allowed Domain") },
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Default.AlternateEmail,
                     contentDescription = "Add Allowed Domain",
                 )
+            },
+            isError = isError,
+            supportingText = {
+                if (isError) {
+                    Text("Invalid domain")
+                }
             },
             colors = OutlinedTextFieldDefaults.colors(
                 unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
@@ -51,8 +60,12 @@ fun AddAllowedDomainSection(
         )
         IconButton(
             onClick = {
-                onAddAllowedDomain(name)
-                name = ""
+                if (name.matches("^[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$".toRegex())) {
+                    onAddAllowedDomain(name)
+                    name = ""
+                } else {
+                    isError = true
+                }
             },
             enabled = name.isNotBlank(),
         ) {
