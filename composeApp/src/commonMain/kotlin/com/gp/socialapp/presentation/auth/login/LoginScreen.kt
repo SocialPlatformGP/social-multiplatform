@@ -43,6 +43,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import cafe.adriel.voyager.core.lifecycle.LifecycleEffect
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -76,7 +77,10 @@ object LoginScreen : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = navigator.rememberNavigatorScreenModel<LoginScreenModel>()
         val state by screenModel.uiState.collectAsState()
-
+        LifecycleEffect(
+            onStarted = { screenModel.init() },
+            onDisposed = { screenModel.dispose() },
+        )
         if (state.signedInUser != null) {
             navigator.replaceAll(HomeScreen())
         } else {

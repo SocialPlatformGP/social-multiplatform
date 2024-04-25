@@ -34,28 +34,33 @@ class HomeScreen : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = navigator.rememberNavigatorScreenModel<HomeScreenModel>()
-        val state = screenModel.uiState.collectAsState()
-        LifecycleEffect(onStarted = { screenModel.init() })
-        if (!state.value.user.isDataComplete && state.value.user.id.isNotBlank()) {
-            navigator.replaceAll(UserInformationScreen(state.value.user))
+        val state by screenModel.uiState.collectAsState()
+        LifecycleEffect(
+            onStarted = { screenModel.init() },
+            onDisposed = { screenModel.dispose() }
+        )
+        if (!state.user.isDataComplete && state.user.id.isNotBlank()) {
+            navigator.replaceAll(UserInformationScreen(state.user))
         }
-        HomeScreenContent(state = state.value, action = {
+        if (state.loggedOut) {
+            navigator.replaceAll(LoginScreen)
+
+        }
+        HomeScreenContent(state = state, action = {
             when (it) {
-                is HomeUiAction.OnCommunityClicked ->
-                    navigator.replaceAll(
-                        MainContainer(
-                            state.value.user
-                        )
+                is HomeUiAction.OnCommunityClicked -> navigator.replaceAll(
+                    MainContainer(
+                        state.user
                     )
+                )
 
                 is HomeUiAction.OnCommunityLogout -> {
                     screenModel.communityLogout(it.id)
                 }
 
-                HomeUiAction.OnCreateCommunityClicked ->
-                    navigator.push(
-                        CreateCommunityScreen
-                    )
+                HomeUiAction.OnCreateCommunityClicked -> navigator.push(
+                    CreateCommunityScreen
+                )
 
                 is HomeUiAction.OnJoinCommunityClicked -> {
                     screenModel.joinCommunity(it.code)
@@ -64,7 +69,6 @@ class HomeScreen : Screen {
                 HomeUiAction.OnProfileClicked -> Unit //TODO( Navigate to profile screen)
                 HomeUiAction.OnUserLogout -> {
                     screenModel.userLogout()
-                    navigator.replaceAll(LoginScreen)
                 }
             }
         })
@@ -82,17 +86,16 @@ fun HomeScreenContent(
     var joinCommunityDialogState by remember { mutableStateOf(false) }
     var confirmLogoutDialogState by remember { mutableStateOf(false) }
     var communityId by remember { mutableStateOf("") }
-
-
-    Scaffold(topBar = {
-        HomeTopBar(
-            user = state.user, action = action
-        )
-    }, floatingActionButton = {
-        HomeFab {
-            showBottomSheet = true
-        }
-    }) { padding ->
+    Scaffold(
+        topBar = {
+            HomeTopBar(
+                user = state.user, action = action
+            )
+        }, floatingActionButton = {
+            HomeFab {
+                showBottomSheet = true
+            }
+        }) { padding ->
         if (showBottomSheet) {
             HomeBottomSheet(closeSheet = {
                 scope.launch { sheetState.hide() }.invokeOnCompletion {
@@ -119,8 +122,7 @@ fun HomeScreenContent(
                 confirmLogoutDialogState = false
             })
         }
-        HomeContent(
-            modifier = Modifier.padding(padding),
+        HomeContent(modifier = Modifier.padding(padding),
             communities = state.communities,
             action = {
                 when (it) {
@@ -131,8 +133,7 @@ fun HomeScreenContent(
 
                     else -> action(it)
                 }
-            }
-        )
+            })
     }
 
 

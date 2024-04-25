@@ -153,7 +153,15 @@ class HomeScreenModel(
 
     fun userLogout() {
         screenModelScope.launch {
-            authRepo.logout()
+            authRepo.logout().onSuccess {
+                _uiState.update {
+                    it.copy(loggedOut = true)
+                }
+            }
         }
+    }
+
+    fun dispose() {
+        _uiState.value = HomeUiState()
     }
 }

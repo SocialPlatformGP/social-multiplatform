@@ -28,7 +28,7 @@ class LoginScreenModel(
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState = _uiState.asStateFlow()
 
-    init {
+    fun init() {
         val userId = authRepo.getCurrentLocalUserId()
         if (userId.isNotBlank()) {
             _uiState.update { it.copy(userId = userId) }
@@ -148,5 +148,9 @@ class LoginScreenModel(
                 }
             }
         }
+    }
+
+    fun dispose() {
+        _uiState.value = LoginUiState()
     }
 }

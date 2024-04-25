@@ -8,5 +8,6 @@ data class HomeUiState(
     val communities: List<Community> = emptyList(),
     val error: String? = null,
     val user: User = User(),
-    val selectedCommunityId: String = ""
+    val selectedCommunityId: String = "",
+    val loggedOut: Boolean = false
 )
