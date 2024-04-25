@@ -6,5 +6,5 @@ import com.gp.socialapp.util.DataError
 import com.gp.socialapp.util.Results
 
 interface CommunityRemoteDataSource {
-    suspend fun createCommunity(request: CommunityRequest.CreateCommunity): Results<Community, DataError>
+    suspend fun createCommunity(request: CommunityRequest.CreateCommunity): Results<Community, DataError.Network>
 }

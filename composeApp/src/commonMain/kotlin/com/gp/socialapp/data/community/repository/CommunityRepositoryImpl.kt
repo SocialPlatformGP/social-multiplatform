@@ -11,7 +11,10 @@ class CommunityRepositoryImpl(
     private val communityLocalDataSource: CommunityLocalDataSource,
     private val communityRemoteDataSource: CommunityRemoteDataSource
 ) : CommunityRepository {
-    override suspend fun createCommunity(community: Community, userId: String): Results<Community, DataError> {
+    override suspend fun createCommunity(
+        community: Community,
+        userId: String
+    ): Results<Community, DataError.Network> {
         val request = CommunityRequest.CreateCommunity(community, userId)
         return communityRemoteDataSource.createCommunity(request)
     }

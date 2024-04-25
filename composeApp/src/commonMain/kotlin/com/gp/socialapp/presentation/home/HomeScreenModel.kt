@@ -14,22 +14,20 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class HomeScreenModel(
-    private val authRepo: AuthenticationRepository,
-    private val userRepo: UserRepository
+    private val authRepo: AuthenticationRepository, private val userRepo: UserRepository
 ) : ScreenModel {
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState = _uiState.asStateFlow()
 
-    init {
-        getUser()
-    }
 
     fun init() {
+        getUser()
         getUserCommunities()
     }
 
     private fun getUserCommunities() {
-        screenModelScope.launch {
+        println("User in getCommunities: ${uiState.value.user.id}")
+        screenModelScope.launch() {
             userRepo.getUserCommunities(uiState.value.user.id).collect {
                 when (it) {
                     is Results.Failure -> {
@@ -46,6 +44,7 @@ class HomeScreenModel(
                         resetLoading()
                         resetError()
                         setCommunities(it.data)
+
                     }
                 }
             }
@@ -53,15 +52,17 @@ class HomeScreenModel(
     }
 
     private fun getUser() {
-        screenModelScope.launch {
-            val result = authRepo.getSignedInUser()
-            when (result) {
+        screenModelScope.launch() {
+            when (val result = authRepo.getSignedInUser()) {
                 is Result.Error -> {
                     setError(result.message)
                 }
 
                 is Result.SuccessWithData -> {
+                    println("User in get: ${result.data.id}")
                     setUser(result.data)
+                    getUserCommunities()
+
                 }
 
                 else -> Unit
@@ -69,13 +70,11 @@ class HomeScreenModel(
         }
     }
 
-
     ////////////////////////////////////////////
 
-    private fun setUser(user: User?) {
+    private fun setUser(user: User) {
         _uiState.update {
-            println("User: $user")
-            it.copy(user = user ?: User())
+            it.copy(user = user)
         }
     }
 

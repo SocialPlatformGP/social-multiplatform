@@ -14,6 +14,7 @@ sealed interface Results<out D, out E : RootError> {
 
     @Serializable
     data class Failure<out E : RootError>(val error: E) : Results<Nothing, E>
+
     fun isSuccessful(): Boolean = this is Success
 
     companion object {
