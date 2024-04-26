@@ -22,17 +22,18 @@ sealed class CommunityRequest {
         val code: String
     ) : CommunityRequest()
 
-    data class AcceptCommunityRequest (
-        val communityId: String,
-        val userId: String
+    data class AcceptCommunityRequest(
+        val requestId: String
     ) : CommunityRequest()
-    data class DeclineCommunityRequest (
-        val communityId: String,
-        val userId: String
+
+    data class DeclineCommunityRequest(
+        val requestId: String
     ) : CommunityRequest()
+
     data class FetchCommunityMembersRequests(
         val communityId: String
     ) : CommunityRequest()
+
     data class FetchCommunity(
         val communityId: String
     ) : CommunityRequest()

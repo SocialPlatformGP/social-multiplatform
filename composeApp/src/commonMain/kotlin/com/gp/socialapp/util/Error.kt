@@ -9,6 +9,8 @@ sealed interface Error
 sealed interface DataError : Error {
     @Serializable
     enum class Network(val userMessage: String) : DataError {
+        WAIT_FOR_APPROVAL_FROM_ADMIN("Wait for approval from admin"),
+
         YOUR_EMAIL_DOMAIN_IS_NOT_ALLOWED("Your email domain is not allowed"), INVALID_CODE("Invalid code"), NO_INTERNET_OR_SERVER_DOWN(
             "No internet connection or server down"
         ),
