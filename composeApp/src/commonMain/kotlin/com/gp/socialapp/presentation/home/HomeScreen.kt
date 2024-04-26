@@ -18,23 +18,31 @@ import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gp.socialapp.presentation.auth.login.LoginScreen
+import com.gp.socialapp.presentation.auth.userinfo.UserInformationScreen
+import com.gp.socialapp.presentation.community.communityhome.CommunityHomeContainer
 import com.gp.socialapp.presentation.community.createcommunity.CreateCommunityScreen
 import com.gp.socialapp.presentation.home.components.ConfirmLogoutDialog
 import com.gp.socialapp.presentation.home.components.HomeBottomSheet
 import com.gp.socialapp.presentation.home.components.HomeContent
 import com.gp.socialapp.presentation.home.components.HomeFab
 import com.gp.socialapp.presentation.home.components.JoinCommunityDialog
-import com.gp.socialapp.presentation.auth.userinfo.UserInformationScreen
-import com.gp.socialapp.presentation.community.communityhome.CommunityHomeContainer
 import kotlinx.coroutines.launch
 
-object HomeScreen : Screen {
+data class HomeScreen(
+    val onBottomBarVisibilityChanged: (Boolean) -> Unit
+) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = navigator.rememberNavigatorScreenModel<HomeScreenModel>()
         val state by screenModel.uiState.collectAsState()
-        LifecycleEffect(onStarted = { screenModel.init() }, onDisposed = { screenModel.dispose() })
+        LifecycleEffect(
+            onStarted = {
+                onBottomBarVisibilityChanged(true)
+                screenModel.init()
+            }, onDisposed = {
+                screenModel.dispose()
+            })
         if (!state.user.isDataComplete && state.user.id.isNotBlank()) {
             navigator.replaceAll(UserInformationScreen(state.user))
         }
@@ -44,9 +52,12 @@ object HomeScreen : Screen {
         }
         HomeScreenContent(state = state, action = {
             when (it) {
-                is HomeUiAction.OnCommunityClicked -> navigator.replaceAll(
-                    CommunityHomeContainer(it.communityId)
-                )
+                is HomeUiAction.OnCommunityClicked -> {
+                    onBottomBarVisibilityChanged(false)
+                    navigator.replaceAll(
+                        CommunityHomeContainer(it.communityId)
+                    )
+                }
 
                 is HomeUiAction.OnCommunityLogout -> {
                     screenModel.communityLogout(it.id)
@@ -82,10 +93,10 @@ fun HomeScreenContent(
     var communityId by remember { mutableStateOf("") }
     Scaffold(
         floatingActionButton = {
-        HomeFab {
-            showBottomSheet = true
-        }
-    }) { padding ->
+            HomeFab {
+                showBottomSheet = true
+            }
+        }) { padding ->
         if (showBottomSheet) {
             HomeBottomSheet(closeSheet = {
                 scope.launch { sheetState.hide() }.invokeOnCompletion {

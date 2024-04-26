@@ -67,7 +67,7 @@ fun CommunityMemberRequestItem(
             modifier = Modifier
         ) {
             IconButton(
-                onClick = { onAcceptRequest(request.userId) },
+                onClick = { onAcceptRequest(request.id) },
             ) {
                 Icon(
                     imageVector = Icons.Default.Check,
@@ -77,7 +77,7 @@ fun CommunityMemberRequestItem(
                 )
             }
             IconButton(
-                onClick = { onDeclineRequest(request.userId) },
+                onClick = { onDeclineRequest(request.id) },
             ) {
                 Icon(
                     imageVector = Icons.Default.Close,

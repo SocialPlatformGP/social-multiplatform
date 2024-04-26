@@ -6,7 +6,9 @@ import com.gp.socialapp.data.auth.repository.AuthenticationRepository
 import com.gp.socialapp.data.community.repository.CommunityRepository
 import com.gp.socialapp.data.community.source.remote.model.Community
 import com.gp.socialapp.util.DispatcherIO
+import com.gp.socialapp.util.Result
 import com.gp.socialapp.util.Results
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -20,10 +22,21 @@ class CreateCommunityScreenModel(
     private lateinit var currentUserId: String
     val uiState = _uiState.asStateFlow()
 
-    init {
+    fun init() {
         screenModelScope.launch(DispatcherIO) {
-            authRepo.getCurrentLocalUserId().let {
-                currentUserId = it
+            authRepo.getSignedInUser().collect { result ->
+                when (result) {
+                    is Result.SuccessWithData -> {
+                        currentUserId = result.data.id
+                    }
+
+                    is Result.Error -> {
+                        Napier.e("Error getting signed in user")
+                    }
+
+                    else -> Unit
+                }
+
             }
         }
     }
@@ -123,5 +136,9 @@ class CreateCommunityScreenModel(
         screenModelScope.launch {
             _uiState.update { it.copy(allowedEmailDomains = it.allowedEmailDomains - domain) }
         }
+    }
+
+    fun dispose() {
+        _uiState.value = CreateCommunityUiState()
     }
 }

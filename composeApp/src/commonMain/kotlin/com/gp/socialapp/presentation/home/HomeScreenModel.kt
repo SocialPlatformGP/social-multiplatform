@@ -8,6 +8,7 @@ import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.data.community.source.remote.model.Community
 import com.gp.socialapp.util.Result
 import com.gp.socialapp.util.Results
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -138,6 +139,7 @@ class HomeScreenModel(
                     is Results.Failure -> {
                         setError(it.error.userMessage)
                         println(it.error.userMessage)
+                        Napier.e(it.error.userMessage)
                     }
 
                     Results.Loading -> {

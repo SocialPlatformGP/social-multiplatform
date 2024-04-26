@@ -10,7 +10,9 @@ import com.gp.socialapp.data.community.repository.CommunityRepository
 import com.gp.socialapp.data.community.source.remote.model.UserId
 import com.gp.socialapp.data.community.source.remote.model.isAdmin
 import com.gp.socialapp.util.DispatcherIO
+import com.gp.socialapp.util.Result
 import com.gp.socialapp.util.Results
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -26,11 +28,25 @@ class CommunityMembersScreenModel(
     fun onInit(communityId: String) {
         getUserId()
         getCommunity(communityId)
+
     }
 
     private fun getUserId() {
         screenModelScope.launch(DispatcherIO) {
-            _uiState.update { it.copy(currentUserId = authRepo.getCurrentLocalUserId()) }
+            authRepo.getSignedInUser().collect { result ->
+                when (result) {
+                    is Result.SuccessWithData -> {
+                        _uiState.update { it.copy(currentUserId = result.data.id) }
+                    }
+
+                    is Result.Error -> {
+                        println("Error: ${result.message}")
+                    }
+
+                    else -> Unit
+                }
+            }
+
         }
     }
 
@@ -39,14 +55,19 @@ class CommunityMembersScreenModel(
             communityRepo.fetchCommunity(communityId).collect { result ->
                 when (result) {
                     is Results.Success -> {
-                        _uiState.update { it.copy(communityName = result.data.name) }
+                        _uiState.update {
+                            it.copy(
+                                communityName = result.data.name,
+                                communityId = communityId
+                            )
+                        }
                         val memberIds = result.data.members.keys
                         getMembers(memberIds)
                         updateAdmins(result.data.members)
                     }
 
                     is Results.Failure -> {
-                        //TODO: Handle error
+                        println("Error: ${result.error.userMessage}")
                     }
 
                     else -> Unit
@@ -61,10 +82,13 @@ class CommunityMembersScreenModel(
                 when (it) {
                     is Results.Success -> {
                         updateMembers(it.data)
+                        println("Members: ${it.data}")
+                        Napier.d("Members: ${it.data}")
                     }
 
                     is Results.Failure -> {
-                        //TODO: Handle error
+                        println("Error: ${it.error.userMessage}")
+                        Napier.e("Error getting members")
                     }
 
                     else -> Unit
@@ -79,7 +103,10 @@ class CommunityMembersScreenModel(
 
     private fun updateAdmins(members: Map<UserId, isAdmin>) {
         val admins = members.filter { it.value }.keys
+        Napier.d("Admins: $admins")
         _uiState.update { it.copy(admins = admins.toList()) }
+        Napier.d("Current ${_uiState.value.currentUserId}")
+        Napier.d("Current ${admins.contains(_uiState.value.currentUserId)}")
         if (admins.contains(_uiState.value.currentUserId)) {
             getRequests()
         }
@@ -91,9 +118,14 @@ class CommunityMembersScreenModel(
                 when (it) {
                     is Results.Success -> {
                         updateRequests(it.data)
+                        Napier.d("Requests: ${it.data}")
                     }
 
-                    is Results.Failure -> {}
+                    is Results.Failure -> {
+                        println("Error: ${it.error.userMessage}")
+                        Napier.e("Error getting requests")
+                    }
+
                     else -> Unit
                 }
             }

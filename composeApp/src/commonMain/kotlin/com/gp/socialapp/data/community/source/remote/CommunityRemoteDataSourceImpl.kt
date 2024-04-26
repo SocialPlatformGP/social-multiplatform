@@ -62,6 +62,7 @@ class CommunityRemoteDataSourceImpl(
                 Results.failure(DataError.Network.SERVER_ERROR)
             }
         } catch (e: Exception) {
+            e.printStackTrace()
             Results.failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN)
         }
     }
@@ -81,6 +82,7 @@ class CommunityRemoteDataSourceImpl(
                     emit(Results.failure(DataError.Network.SERVER_ERROR))
                 }
             } catch (e: Exception) {
+                e.printStackTrace()
                 emit(Results.failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN))
             }
         }
@@ -90,7 +92,7 @@ class CommunityRemoteDataSourceImpl(
             emit(Results.Loading)
             try {
                 val response = httpClient.post {
-                    endPoint("fetchCommunity")
+                    endPoint("fetchCommunityMembersRequests")
                     setBody(request)
                 }
                 if (response.status == HttpStatusCode.OK) {
@@ -100,6 +102,7 @@ class CommunityRemoteDataSourceImpl(
                     emit(Results.failure(DataError.Network.SERVER_ERROR))
                 }
             } catch (e: Exception) {
+                e.printStackTrace()
                 emit(Results.failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN))
             }
         }

@@ -21,6 +21,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.core.lifecycle.LifecycleEffect
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -36,6 +37,14 @@ object CreateCommunityScreen : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = navigator.rememberNavigatorScreenModel<CreateCommunityScreenModel>()
         val state by screenModel.uiState.collectAsState()
+        LifecycleEffect(
+            onStarted = {
+                screenModel.init()
+            },
+            onDisposed = {
+                screenModel.dispose()
+            }
+        )
         if (state.createdCommunity != null) {
             navigator.pop()
         } else {

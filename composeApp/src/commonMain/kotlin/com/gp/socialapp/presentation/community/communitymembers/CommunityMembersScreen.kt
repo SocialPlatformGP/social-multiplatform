@@ -25,16 +25,22 @@ import com.gp.socialapp.data.community.model.CommunityMemberRequest
 import com.gp.socialapp.presentation.community.communitymembers.components.CommunityMemberRequestsList
 import com.gp.socialapp.presentation.community.communitymembers.components.CommunityMembersList
 import com.gp.socialapp.presentation.community.communitymembers.components.CommunityMembersSection
+import io.github.aakira.napier.Napier
 
 data class CommunityMembersScreen(
     val communityId: String
 ) : Screen {
     @Composable
     override fun Content() {
+        Napier.e("CommunityMembersScreen Content${communityId}")
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = navigator.rememberNavigatorScreenModel<CommunityMembersScreenModel>()
         val state by screenModel.uiState.collectAsState()
-        LifecycleEffect(onStarted = { screenModel.onInit(communityId) },
+        LifecycleEffect(
+            onStarted = {
+                println("CommunityMembersScreen onStarted")
+                screenModel.onInit(communityId)
+            },
             onDisposed = { screenModel.onDispose() })
         CommunityMembersContent(
             requests = state.requests,

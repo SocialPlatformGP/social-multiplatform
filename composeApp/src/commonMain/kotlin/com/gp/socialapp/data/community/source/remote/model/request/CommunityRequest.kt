@@ -22,18 +22,22 @@ sealed class CommunityRequest {
         val code: String
     ) : CommunityRequest()
 
+    @Serializable
     data class AcceptCommunityRequest(
         val requestId: String
     ) : CommunityRequest()
 
+    @Serializable
     data class DeclineCommunityRequest(
         val requestId: String
     ) : CommunityRequest()
 
+    @Serializable
     data class FetchCommunityMembersRequests(
         val communityId: String
     ) : CommunityRequest()
 
+    @Serializable
     data class FetchCommunity(
         val communityId: String
     ) : CommunityRequest()

@@ -18,7 +18,7 @@ object MaterialTab : Tab {
 
             return remember {
                 TabOptions(
-                    index = 2u,
+                    index = 1u,
                     title = title,
                     icon = icon
                 )

@@ -3,15 +3,16 @@ package com.gp.socialapp.di
 import com.gp.socialapp.presentation.auth.login.LoginScreenModel
 import com.gp.socialapp.presentation.auth.passwordreset.PasswordResetScreenModel
 import com.gp.socialapp.presentation.auth.signup.SignUpScreenModel
+import com.gp.socialapp.presentation.auth.userinfo.UserInformationScreenModel
 import com.gp.socialapp.presentation.chat.addmembers.AddMembersScreenModel
 import com.gp.socialapp.presentation.chat.chatroom.ChatRoomScreenModel
 import com.gp.socialapp.presentation.chat.creategroup.CreateGroupScreenModel
 import com.gp.socialapp.presentation.chat.createprivate.CreatePrivateChatScreenModel
 import com.gp.socialapp.presentation.chat.groupdetails.GroupDetailsScreenModel
 import com.gp.socialapp.presentation.chat.home.ChatHomeScreenModel
+import com.gp.socialapp.presentation.community.communitymembers.CommunityMembersScreenModel
 import com.gp.socialapp.presentation.community.createcommunity.CreateCommunityScreenModel
 import com.gp.socialapp.presentation.home.HomeScreenModel
-import com.gp.socialapp.presentation.auth.userinfo.UserInformationScreenModel
 import com.gp.socialapp.presentation.material.MaterialScreenModel
 import com.gp.socialapp.presentation.post.create.CreatePostScreenModel
 import com.gp.socialapp.presentation.post.edit.EditPostScreenModel
@@ -92,5 +93,13 @@ val screenModelModuleK = DI.Module("screenModelModule") {
             instance()
         )
     }
+    bind<CommunityMembersScreenModel>() with singleton {
+        CommunityMembersScreenModel(
+            instance(),
+            instance(),
+            instance()
+        )
+    }
+
 }
 
