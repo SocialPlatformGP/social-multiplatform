@@ -73,6 +73,7 @@ apollo-runtime = { module = "com.apollographql.apollo3:apollo-runtime", version.
 dotsindicator = { module = "com.tbuonomo:dotsindicator", version.ref = "dotsIndicator" }
 kodein-di-framework-compose = { module = "org.kodein.di:kodein-di-framework-compose", version.ref = "kodeinDiFrameworkCompose" }
 
+
 ktor-client-encoding = { module = "io.ktor:ktor-client-encoding", version.ref = "ktor-client" }
 ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor-client" }
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor-client" }

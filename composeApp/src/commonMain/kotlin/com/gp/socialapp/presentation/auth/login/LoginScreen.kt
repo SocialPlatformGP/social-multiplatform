@@ -67,7 +67,6 @@ import com.gp.socialapp.presentation.auth.util.AuthError.EmailError
 import com.gp.socialapp.presentation.auth.util.AuthError.PasswordError
 import com.gp.socialapp.presentation.auth.util.AuthError.ServerError
 import com.gp.socialapp.presentation.home.HomeScreen
-import com.gp.socialapp.util.Platform
 import com.gp.socialapp.util.getPlatform
 import io.github.jan.supabase.gotrue.providers.Apple
 import io.github.jan.supabase.gotrue.providers.Azure
@@ -102,6 +101,7 @@ object LoginScreen : Screen {
             onStarted = { screenModel.init() },
             onDisposed = { screenModel.dispose() },
         )
+
         if (state.signedInUser != null) {
             navigator.replaceAll(HomeScreen())
         } else {
@@ -272,7 +272,7 @@ object LoginScreen : Screen {
                             modifier = Modifier.padding(4.dp),
                             provider = provider,
                             onClick = onSignInWithOAuth,
-                            isEnabled = platform != Platform.ANDROID,
+                            isEnabled = true,
                         )
                     }
                 }

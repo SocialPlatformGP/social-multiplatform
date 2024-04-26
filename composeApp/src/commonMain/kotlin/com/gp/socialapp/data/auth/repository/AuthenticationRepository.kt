@@ -15,6 +15,6 @@ interface AuthenticationRepository {
     fun signInWithOAuth(provider: OAuthProvider): Flow<Result<User>>
     fun signInWithEmail(email: String, password: String): Flow<Result<User>>
     fun signUpWithEmail(email: String, password: String): Flow<Result<User>>
-    suspend fun getSignedInUser(): Result<User>
+    fun getSignedInUser(): Flow<Result<User>>
     suspend fun logout(): Result<Nothing>
 }

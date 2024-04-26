@@ -2,6 +2,7 @@ package com.gp.socialapp.data.auth.source.remote
 
 import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.util.Result
+import io.github.aakira.napier.Napier
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.gotrue.SessionStatus
 import io.github.jan.supabase.gotrue.auth
@@ -20,22 +21,34 @@ class AuthenticationRemoteDataSourceImpl(
 ) : AuthenticationRemoteDataSource {
 
     private val sessionStatusFlow = supabaseClient.auth.sessionStatus
-
-
     override fun signInWithOAuth(provider: OAuthProvider): Flow<Result<User>> = flow {
         emit(Result.Loading)
         try {
             supabaseClient.auth.signInWith(provider) {
                 scopes.addAll(listOf("email", "profile"))
             }
-            sessionStatusFlow.collect {
-                when (it) {
+            sessionStatusFlow.collect { session ->
+                when (session) {
                     is SessionStatus.Authenticated -> {
-                        val user = getSignedInUser()
-                        emit(user)
+                        getSignedInUser().collect { result ->
+                            emit(result)
+                        }
                     }
 
-                    else -> Unit
+                    SessionStatus.LoadingFromStorage -> {
+                        Napier.e("Loading from storage")
+                        emit(Result.Loading)
+                    }
+
+                    SessionStatus.NetworkError -> {
+                        Napier.e("Network Error")
+                        emit(Result.Error("Network Error"))
+                    }
+
+                    is SessionStatus.NotAuthenticated -> {
+
+                        emit(Result.Error("Not Authenticated"))
+                    }
                 }
             }
         } catch (e: Exception) {
@@ -56,8 +69,9 @@ class AuthenticationRemoteDataSourceImpl(
             sessionStatusFlow.collect {
                 when (it) {
                     is SessionStatus.Authenticated -> {
-                        val user = getSignedInUser()
-                        emit(user)
+                        getSignedInUser().collect {
+                            emit(it)
+                        }
                     }
 
                     else -> Unit
@@ -81,8 +95,9 @@ class AuthenticationRemoteDataSourceImpl(
             sessionStatusFlow.collect {
                 when (it) {
                     is SessionStatus.Authenticated -> {
-                        val user = getSignedInUser()
-                        emit(user)
+                        getSignedInUser().collect {
+                            emit(it)
+                        }
                     }
 
                     else -> Unit
@@ -93,9 +108,10 @@ class AuthenticationRemoteDataSourceImpl(
         }
     }
 
-    override suspend fun getSignedInUser(): Result<User> {
+    override fun getSignedInUser(): Flow<Result<User>> = flow {
         val userInfo = supabaseClient.auth.sessionManager.loadSession()?.user
         if (userInfo != null) {
+            println("User Info: ${userInfo.userMetadata}")
             val isUserDataComplete =
                 userInfo.userMetadata?.get("isUserDataComplete")?.jsonPrimitive?.booleanOrNull
                     ?: false
@@ -144,9 +160,9 @@ class AuthenticationRemoteDataSourceImpl(
                     isDataComplete = false
                 )
             }
-            return Result.SuccessWithData(user)
+            emit(Result.SuccessWithData(user))
         } else {
-            return Result.Error("User is null")
+            emit(Result.Error("User not found"))
         }
     }
 

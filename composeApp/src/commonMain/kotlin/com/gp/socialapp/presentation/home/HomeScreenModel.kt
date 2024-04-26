@@ -51,22 +51,23 @@ class HomeScreenModel(
 
     private fun getUser() {
         screenModelScope.launch() {
-            when (val result = authRepo.getSignedInUser()) {
-                is Result.Error -> {
-                    setError(result.message)
+            authRepo.getSignedInUser().collect { result ->
+                when (result) {
+                    is Result.Error -> {
+                        setError(result.message)
+                    }
+
+                    is Result.SuccessWithData -> {
+                        setUser(result.data)
+                        getUserCommunities()
+
+                    }
+
+                    else -> Unit
                 }
-
-                is Result.SuccessWithData -> {
-                    setUser(result.data)
-                    getUserCommunities()
-
-                }
-
-                else -> Unit
             }
         }
     }
-
     ////////////////////////////////////////////
 
     private fun setUser(user: User) {
@@ -131,24 +132,27 @@ class HomeScreenModel(
     }
 
     fun joinCommunity(code: String) {
-//        screenModelScope.launch {
-//            userRepo.joinCommunity(uiState.value.user.id, code).collect {
-//                when (it) {
-//                    is Results.Failure -> {
-//                        setError(it.error.userMessage)
-//                    }
-//
-//                    Results.Loading -> {
-//                        setLoading()
-//                    }
-//
-//                    is Results.Success -> {
-//                        resetLoading()
-//                        resetError()
-//                    }
-//                }
-//            }
-//        }
+        screenModelScope.launch {
+            userRepo.joinCommunity(uiState.value.user.id, code).collect {
+                when (it) {
+                    is Results.Failure -> {
+                        setError(it.error.userMessage)
+                        println(it.error.userMessage)
+                    }
+
+                    Results.Loading -> {
+                        setLoading()
+                    }
+
+                    is Results.Success -> {
+                        resetLoading()
+                        resetError()
+                        println(it.data.map { it.name })
+                        setCommunities(it.data)
+                    }
+                }
+            }
+        }
     }
 
     fun userLogout() {

@@ -16,6 +16,12 @@ sealed class CommunityRequest {
         val selectedCommunityId: String
     ) : CommunityRequest()
 
+    @Serializable
+    data class JoinCommunity(
+        val id: String,
+        val code: String
+    ) : CommunityRequest()
+
     data class AcceptCommunityRequest (
         val communityId: String,
         val userId: String

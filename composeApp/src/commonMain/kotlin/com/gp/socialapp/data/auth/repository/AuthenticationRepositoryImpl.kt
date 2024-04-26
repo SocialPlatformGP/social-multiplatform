@@ -44,7 +44,7 @@ class AuthenticationRepositoryImpl(
     override fun signUpWithEmail(email: String, password: String): Flow<Result<User>> =
         remoteDataSource.signUpWithEmail(email, password)
 
-    override suspend fun getSignedInUser(): Result<User> =
+    override fun getSignedInUser(): Flow<Result<User>> =
         remoteDataSource.getSignedInUser()
 
     override suspend fun logout(): Result<Nothing> {
