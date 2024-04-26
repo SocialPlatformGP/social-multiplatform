@@ -34,10 +34,8 @@ data class CommunityMembersScreen(
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = navigator.rememberNavigatorScreenModel<CommunityMembersScreenModel>()
         val state by screenModel.uiState.collectAsState()
-        LifecycleEffect(
-            onStarted = { screenModel.onInit(communityId) },
-            onDisposed = { screenModel.onDispose() }
-        )
+        LifecycleEffect(onStarted = { screenModel.onInit(communityId) },
+            onDisposed = { screenModel.onDispose() })
         CommunityMembersContent(
             requests = state.requests,
             communityName = state.communityName,
@@ -53,90 +51,71 @@ data class CommunityMembersScreen(
         )
     }
 
-    companion object {
-        @OptIn(ExperimentalMaterial3Api::class)
-        @Composable
-        fun CommunityMembersContent(
-            modifier: Modifier = Modifier,
-            requests: List<CommunityMemberRequest>,
-            communityName: String,
-            admins: List<String>,
-            isAdmin: Boolean,
-            onAction: (CommunityMembersUiAction) -> Unit,
-            members: List<User>
-        ) {
-            Scaffold(
-                modifier = modifier.padding(16.dp),
-                topBar = {
-                    TopAppBar(
-                        title = { Text(text = communityName) },
-                        navigationIcon = {
-                            IconButton(
-                                onClick = {
-                                    onAction(CommunityMembersUiAction.OnBackClicked)
-                                }
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.ArrowBackIosNew,
-                                    contentDescription = "Back"
-                                )
-                            }
-                        },
-                        actions = {},
-                    )
-                }
-            ) { paddingValues ->
-                Column(
-                    modifier = Modifier.padding(paddingValues)
-                ) {
-                    if (isAdmin && requests.isNotEmpty()) {
-                        CommunityMembersSection(
-                            title = "Requests",
-                            body = {
-                                CommunityMemberRequestsList(
-                                    requests = requests,
-                                    onAcceptRequest = { id ->
-                                        onAction(
-                                            CommunityMembersUiAction.OnAcceptRequest(
-                                                id
-                                            )
-                                        )
-                                    },
-                                    onDeclineRequest = { id ->
-                                        onAction(
-                                            CommunityMembersUiAction.OnDeclineRequest(
-                                                id
-                                            )
-                                        )
-                                    },
-                                    onUserClicked = { id ->
-                                        onAction(
-                                            CommunityMembersUiAction.OnUserClicked(
-                                                id
-                                            )
-                                        )
-                                    }
-                                )
-                            }
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun CommunityMembersContent(
+        modifier: Modifier = Modifier,
+        requests: List<CommunityMemberRequest>,
+        communityName: String,
+        admins: List<String>,
+        isAdmin: Boolean,
+        onAction: (CommunityMembersUiAction) -> Unit,
+        members: List<User>
+    ) {
+        Scaffold(modifier = modifier.padding(16.dp), topBar = {
+            TopAppBar(
+                title = { Text(text = communityName) },
+                navigationIcon = {
+                    IconButton(onClick = {
+                        onAction(CommunityMembersUiAction.OnBackClicked)
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBackIosNew,
+                            contentDescription = "Back"
                         )
                     }
-                    CommunityMembersSection(
-                        title = "Members",
-                        body = {
-                            CommunityMembersList(
-                                members = members,
-                                admins = admins,
-                                onUserClicked = { id ->
-                                    onAction(
-                                        CommunityMembersUiAction.OnUserClicked(
-                                            id
-                                        )
+                },
+                actions = {},
+            )
+        }) { paddingValues ->
+            Column(
+                modifier = Modifier.padding(paddingValues)
+            ) {
+                if (isAdmin && requests.isNotEmpty()) {
+                    CommunityMembersSection(title = "Requests", body = {
+                        CommunityMemberRequestsList(requests = requests,
+                            onAcceptRequest = { id ->
+                                onAction(
+                                    CommunityMembersUiAction.OnAcceptRequest(
+                                        id
                                     )
-                                }
-                            )
-                        }
-                    )
+                                )
+                            },
+                            onDeclineRequest = { id ->
+                                onAction(
+                                    CommunityMembersUiAction.OnDeclineRequest(
+                                        id
+                                    )
+                                )
+                            },
+                            onUserClicked = { id ->
+                                onAction(
+                                    CommunityMembersUiAction.OnUserClicked(
+                                        id
+                                    )
+                                )
+                            })
+                    })
                 }
+                CommunityMembersSection(title = "Members", body = {
+                    CommunityMembersList(members = members, admins = admins, onUserClicked = { id ->
+                        onAction(
+                            CommunityMembersUiAction.OnUserClicked(
+                                id
+                            )
+                        )
+                    })
+                })
             }
         }
     }

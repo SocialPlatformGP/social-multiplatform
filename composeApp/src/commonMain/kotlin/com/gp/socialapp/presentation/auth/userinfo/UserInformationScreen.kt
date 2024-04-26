@@ -1,4 +1,4 @@
-package com.gp.socialapp.presentation.main.userinfo
+package com.gp.socialapp.presentation.auth.userinfo
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -58,6 +58,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.presentation.auth.util.AuthError
+import com.gp.socialapp.presentation.home.HomeContainer
 import com.gp.socialapp.presentation.home.HomeScreen
 import com.gp.socialapp.util.LocalDateTimeUtil.now
 import com.gp.socialapp.util.LocalDateTimeUtil.toDDMMYYYY
@@ -114,7 +115,7 @@ data class UserInformationScreen(
             }
         )
         if (state.createdState is Result.Success) {
-            navigator.replaceAll(HomeScreen())
+            navigator.replaceAll(HomeContainer)
         }
         Scaffold(
 

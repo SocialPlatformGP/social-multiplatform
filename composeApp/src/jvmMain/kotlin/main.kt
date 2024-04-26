@@ -7,12 +7,8 @@ import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.data.community.model.CommunityMemberRequest
-import com.gp.socialapp.data.post.source.remote.model.Post
-import com.gp.socialapp.data.post.source.remote.model.PostAttachment
 import com.gp.socialapp.presentation.app.App
-import com.gp.socialapp.presentation.community.communitymembers.CommunityMembersScreen.Companion.CommunityMembersContent
 import com.gp.socialapp.theme.AppTheme
-import com.mohamedrejeb.calf.picker.FilePickerFileType
 import java.awt.Dimension
 
 fun main() = application {
@@ -31,17 +27,18 @@ fun main() = application {
 fun PreviewApp() {
     AppTheme {
         Column {
-            CommunityMembersContent(
-                requests = requests,
-                admins = admin,
-                isAdmin = true,
-                onAction = {},
-                members = members
-            )
+//            CommunityMembersContent(
+//                requests = requests,
+//                admins = admin,
+//                isAdmin = true,
+//                onAction = {},
+//                members = members
+//            )
         }
 
     }
 }
+
 val requests = listOf<CommunityMemberRequest>(
     CommunityMemberRequest(
         communityId = "honestatis",

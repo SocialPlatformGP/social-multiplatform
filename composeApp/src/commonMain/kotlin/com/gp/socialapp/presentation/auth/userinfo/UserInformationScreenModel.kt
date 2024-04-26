@@ -1,4 +1,4 @@
-package com.gp.socialapp.presentation.main.userinfo
+package com.gp.socialapp.presentation.auth.userinfo
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope

@@ -12,8 +12,8 @@ interface CommunityRepository {
         community: Community,
         userId: String
     ): Results<Community, DataError.Network>
-    suspend fun acceptCommunityRequest(communityId: String, userId: String): Results<Unit, DataError.Network>
-    suspend fun declineCommunityRequest(communityId: String, userId: String): Results<Unit, DataError.Network>
+    suspend fun acceptCommunityRequest(requestId: String): Results<Unit, DataError.Network>
+    suspend fun declineCommunityRequest(requestId: String): Results<Unit, DataError.Network>
     fun fetchCommunity(communityId: String): Flow<Results<Community, DataError.Network>>
     fun fetchCommunityMembersRequests(communityId: String): Flow<Results<List<CommunityMemberRequest>, DataError.Network>>
 }

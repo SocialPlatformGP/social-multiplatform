@@ -110,15 +110,16 @@ class CommunityMembersScreenModel(
 
     fun handleUiAction(action: CommunityMembersUiAction) {
         when (action) {
-            is CommunityMembersUiAction.OnAcceptRequest -> acceptRequest(action.userId)
-            is CommunityMembersUiAction.OnDeclineRequest -> declineRequest(action.userId)
+            is CommunityMembersUiAction.OnAcceptRequest -> acceptRequest(action.requestId)
+            is CommunityMembersUiAction.OnDeclineRequest -> declineRequest(action.requestId)
             is CommunityMembersUiAction.OnUserClicked -> onUserClicked(action.userId)
+            else -> Unit
         }
     }
 
-    private fun acceptRequest(userId: String) {
+    private fun acceptRequest(requestId: String) {
         screenModelScope.launch {
-            val result = communityRepo.acceptCommunityRequest(_uiState.value.communityId, userId)
+            val result = communityRepo.acceptCommunityRequest(requestId)
             if (result is Results.Success) {
                 getRequests()
             } else {
@@ -127,9 +128,9 @@ class CommunityMembersScreenModel(
         }
     }
 
-    private fun declineRequest(userId: String) {
+    private fun declineRequest(requestId: String) {
         screenModelScope.launch {
-            val result = communityRepo.declineCommunityRequest(_uiState.value.communityId, userId)
+            val result = communityRepo.declineCommunityRequest(requestId)
             if (result is Results.Success) {
                 getRequests()
             } else {

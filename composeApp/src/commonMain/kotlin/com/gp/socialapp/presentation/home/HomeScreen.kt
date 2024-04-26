@@ -23,22 +23,18 @@ import com.gp.socialapp.presentation.home.components.ConfirmLogoutDialog
 import com.gp.socialapp.presentation.home.components.HomeBottomSheet
 import com.gp.socialapp.presentation.home.components.HomeContent
 import com.gp.socialapp.presentation.home.components.HomeFab
-import com.gp.socialapp.presentation.home.components.HomeTopBar
 import com.gp.socialapp.presentation.home.components.JoinCommunityDialog
-import com.gp.socialapp.presentation.main.MainContainer
-import com.gp.socialapp.presentation.main.userinfo.UserInformationScreen
+import com.gp.socialapp.presentation.auth.userinfo.UserInformationScreen
+import com.gp.socialapp.presentation.community.communityhome.CommunityHomeContainer
 import kotlinx.coroutines.launch
 
-class HomeScreen : Screen {
+object HomeScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = navigator.rememberNavigatorScreenModel<HomeScreenModel>()
         val state by screenModel.uiState.collectAsState()
-        LifecycleEffect(
-            onStarted = { screenModel.init() },
-            onDisposed = { screenModel.dispose() }
-        )
+        LifecycleEffect(onStarted = { screenModel.init() }, onDisposed = { screenModel.dispose() })
         if (!state.user.isDataComplete && state.user.id.isNotBlank()) {
             navigator.replaceAll(UserInformationScreen(state.user))
         }
@@ -49,9 +45,7 @@ class HomeScreen : Screen {
         HomeScreenContent(state = state, action = {
             when (it) {
                 is HomeUiAction.OnCommunityClicked -> navigator.replaceAll(
-                    MainContainer(
-                        state.user
-                    )
+                    CommunityHomeContainer(it.communityId)
                 )
 
                 is HomeUiAction.OnCommunityLogout -> {
@@ -87,15 +81,11 @@ fun HomeScreenContent(
     var confirmLogoutDialogState by remember { mutableStateOf(false) }
     var communityId by remember { mutableStateOf("") }
     Scaffold(
-        topBar = {
-            HomeTopBar(
-                action = action
-            )
-        }, floatingActionButton = {
-            HomeFab {
-                showBottomSheet = true
-            }
-        }) { padding ->
+        floatingActionButton = {
+        HomeFab {
+            showBottomSheet = true
+        }
+    }) { padding ->
         if (showBottomSheet) {
             HomeBottomSheet(closeSheet = {
                 scope.launch { sheetState.hide() }.invokeOnCompletion {
@@ -136,7 +126,5 @@ fun HomeScreenContent(
                 }
             })
     }
-
-
 }
 

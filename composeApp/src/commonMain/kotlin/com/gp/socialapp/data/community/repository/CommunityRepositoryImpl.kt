@@ -22,18 +22,16 @@ class CommunityRepositoryImpl(
     }
 
     override suspend fun acceptCommunityRequest(
-        communityId: String,
-        userId: String
+        requestId: String
     ): Results<Unit, DataError.Network> {
-        val request = CommunityRequest.AcceptCommunityRequest(communityId, userId)
+        val request = CommunityRequest.AcceptCommunityRequest(requestId)
         return communityRemoteDataSource.acceptCommunityRequest(request)
     }
 
     override suspend fun declineCommunityRequest(
-        communityId: String,
-        userId: String
+        requestId: String
     ): Results<Unit, DataError.Network> {
-        val request = CommunityRequest.DeclineCommunityRequest(communityId, userId)
+        val request = CommunityRequest.DeclineCommunityRequest(requestId)
         return communityRemoteDataSource.declineCommunityRequest(request)
     }
 

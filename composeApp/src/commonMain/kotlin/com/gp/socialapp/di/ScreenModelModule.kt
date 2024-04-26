@@ -11,7 +11,7 @@ import com.gp.socialapp.presentation.chat.groupdetails.GroupDetailsScreenModel
 import com.gp.socialapp.presentation.chat.home.ChatHomeScreenModel
 import com.gp.socialapp.presentation.community.createcommunity.CreateCommunityScreenModel
 import com.gp.socialapp.presentation.home.HomeScreenModel
-import com.gp.socialapp.presentation.main.userinfo.UserInformationScreenModel
+import com.gp.socialapp.presentation.auth.userinfo.UserInformationScreenModel
 import com.gp.socialapp.presentation.material.MaterialScreenModel
 import com.gp.socialapp.presentation.post.create.CreatePostScreenModel
 import com.gp.socialapp.presentation.post.edit.EditPostScreenModel

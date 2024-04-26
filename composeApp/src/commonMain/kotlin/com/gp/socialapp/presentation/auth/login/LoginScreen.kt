@@ -66,6 +66,7 @@ import com.gp.socialapp.presentation.auth.signup.SignUpScreen
 import com.gp.socialapp.presentation.auth.util.AuthError.EmailError
 import com.gp.socialapp.presentation.auth.util.AuthError.PasswordError
 import com.gp.socialapp.presentation.auth.util.AuthError.ServerError
+import com.gp.socialapp.presentation.home.HomeContainer
 import com.gp.socialapp.presentation.home.HomeScreen
 import com.gp.socialapp.util.getPlatform
 import io.github.jan.supabase.gotrue.providers.Apple
@@ -103,7 +104,7 @@ object LoginScreen : Screen {
         )
 
         if (state.signedInUser != null) {
-            navigator.replaceAll(HomeScreen())
+            navigator.replaceAll(HomeContainer)
         } else {
             val providers = listOf(
                 MyOAuthProvider("Google", OAuthProviderIcons.Google, Google),

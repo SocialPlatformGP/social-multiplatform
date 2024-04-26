@@ -1,4 +1,4 @@
-package com.gp.socialapp.presentation.main
+package com.gp.socialapp.presentation.community.communityhome
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
