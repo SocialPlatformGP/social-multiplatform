@@ -89,7 +89,7 @@ fun HomeScreenContent(
     Scaffold(
         topBar = {
             HomeTopBar(
-                user = state.user, action = action
+                action = action
             )
         }, floatingActionButton = {
             HomeFab {
@@ -112,6 +112,7 @@ fun HomeScreenContent(
                 joinCommunityDialogState = false
             }, onJoin = {
                 joinCommunityDialogState = false
+                action(HomeUiAction.OnJoinCommunityClicked(it))
             })
         }
         if (confirmLogoutDialogState) {

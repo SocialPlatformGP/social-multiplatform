@@ -167,4 +167,32 @@ class UserRemoteDataSourceImpl(
             }
         }
 
+    override fun joinCommunity(
+        id: String,
+        code: String
+    ): Flow<Results<List<Community>, DataError.Network>> =
+        flow {
+            emit(Results.Loading)
+            val request = CommunityRequest.JoinCommunity(id, code)
+            try {
+                println(request)
+                val response = httpClient.post {
+                    endPoint("/joinCommunity")
+                    setBody(request)
+                }
+                println(response)
+                if (response.status == HttpStatusCode.OK) {
+                    val communities = response.body<List<Community>>()
+                    emit(Results.Success(communities))
+                } else {
+                    val error = response.body<DataError.Network>()
+                    emit(Results.Failure(error))
+                }
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+                emit(Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN))
+            }
+        }
+
 }

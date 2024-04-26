@@ -1,40 +1,65 @@
 package com.gp.socialapp.presentation.home.components
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.presentation.home.HomeUiAction
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeTopBar(
-    user: User, action: (HomeUiAction) -> Unit
+    action: (HomeUiAction) -> Unit,
+    onNotificationClicked: () -> Unit = {}
 ) {
-    TopAppBar(title = {
-        Text(
-            text = "Hello, ${user.firstName}",
-            modifier = Modifier.padding(8.dp).fillMaxWidth(),
-            textAlign = TextAlign.Center
-        )
-    }, navigationIcon = {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(60.dp)
+            .background(
+                MaterialTheme.colorScheme.onPrimaryContainer
+            )
+            .padding(16.dp)
+
+    ) {
         IconButton(onClick = {
             action(HomeUiAction.OnUserLogout)
         }) {
             Icon(
-                imageVector = Icons.AutoMirrored.Filled.Logout, contentDescription = "Logout"
+                imageVector = Icons.AutoMirrored.Filled.Logout,
+                contentDescription = "Logout",
+                tint = MaterialTheme.colorScheme.onPrimary
+            )
+        }
+        Text(
+            text = "EduLink",
+            color = MaterialTheme.colorScheme.onPrimary,
+            style = MaterialTheme.typography.headlineSmall,
+            modifier = Modifier
+                .weight(1f)
+                .wrapContentWidth(align = Alignment.CenterHorizontally)
+        )
+        IconButton(onClick = {
+            onNotificationClicked()
+        }) {
+            Icon(
+                imageVector = Icons.Default.NotificationsActive,
+                contentDescription = "notification",
+                tint = MaterialTheme.colorScheme.onPrimary
             )
         }
 
-    })
+    }
 }

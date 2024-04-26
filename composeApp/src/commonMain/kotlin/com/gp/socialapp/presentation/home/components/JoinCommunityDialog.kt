@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -24,10 +23,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-@OptIn(ExperimentalMaterial3Api::class)
 fun JoinCommunityDialog(
     onDismiss: () -> Unit,
-    onJoin: () -> Unit
+    onJoin: (String) -> Unit
 ) {
     var codeValue by remember { mutableStateOf("") }
     AlertDialog(
@@ -41,7 +39,7 @@ fun JoinCommunityDialog(
         },
         onDismissRequest = onDismiss,
         confirmButton = {
-            TextButton(onClick = onJoin) {
+            TextButton(onClick = { onJoin(codeValue) }) {
                 Text(text = "Join")
             }
         },

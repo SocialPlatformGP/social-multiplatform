@@ -19,4 +19,6 @@ interface UserRepository {
         id: String,
         selectedCommunityId: String
     ): Flow<Results<List<Community>, DataError.Network>>
+
+    fun joinCommunity(id: String, code: String): Flow<Results<List<Community>, DataError.Network>>
 }

@@ -51,23 +51,10 @@ class AppActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
+        setContent {
+            App()
+        }
         Log.d("seerde", "action: ${intent.action}, data: ${intent.data}")
     }
 }
-//@Preview
-//@Composable
-//fun PreviewApp() {
-//    AppTheme {
-//        FileDetails(
-//            MaterialFile(
-//                "data",
-//                "file",
-//                "url",
-//            )
-//        )
-//
-//    }
-//}
-
-
 
