@@ -2,7 +2,14 @@ package com.gp.socialapp.presentation.community.communitymembers
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -21,7 +28,7 @@ import com.gp.socialapp.presentation.community.communitymembers.components.Commu
 
 data class CommunityMembersScreen(
     val communityId: String
-): Screen{
+) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
@@ -33,24 +40,51 @@ data class CommunityMembersScreen(
         )
         CommunityMembersContent(
             requests = state.requests,
+            communityName = state.communityName,
             admins = state.admins,
             isAdmin = state.admins.contains(state.currentUserId),
-            onAction = { action -> screenModel.handleUiAction(action) },
+            onAction = { action ->
+                when (action) {
+                    is CommunityMembersUiAction.OnBackClicked -> navigator.pop()
+                    else -> screenModel.handleUiAction(action)
+                }
+            },
             members = state.members
         )
     }
+
     companion object {
+        @OptIn(ExperimentalMaterial3Api::class)
         @Composable
         fun CommunityMembersContent(
             modifier: Modifier = Modifier,
             requests: List<CommunityMemberRequest>,
+            communityName: String,
             admins: List<String>,
             isAdmin: Boolean,
             onAction: (CommunityMembersUiAction) -> Unit,
             members: List<User>
         ) {
             Scaffold(
-                modifier = modifier.padding(16.dp)
+                modifier = modifier.padding(16.dp),
+                topBar = {
+                    TopAppBar(
+                        title = { Text(text = communityName) },
+                        navigationIcon = {
+                            IconButton(
+                                onClick = {
+                                    onAction(CommunityMembersUiAction.OnBackClicked)
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.ArrowBackIosNew,
+                                    contentDescription = "Back"
+                                )
+                            }
+                        },
+                        actions = {},
+                    )
+                }
             ) { paddingValues ->
                 Column(
                     modifier = Modifier.padding(paddingValues)
@@ -61,9 +95,27 @@ data class CommunityMembersScreen(
                             body = {
                                 CommunityMemberRequestsList(
                                     requests = requests,
-                                    onAcceptRequest = { id -> onAction(CommunityMembersUiAction.OnAcceptRequest(id)) },
-                                    onDeclineRequest = { id -> onAction(CommunityMembersUiAction.OnDeclineRequest(id)) },
-                                    onUserClicked = { id -> onAction(CommunityMembersUiAction.OnUserClicked(id)) }
+                                    onAcceptRequest = { id ->
+                                        onAction(
+                                            CommunityMembersUiAction.OnAcceptRequest(
+                                                id
+                                            )
+                                        )
+                                    },
+                                    onDeclineRequest = { id ->
+                                        onAction(
+                                            CommunityMembersUiAction.OnDeclineRequest(
+                                                id
+                                            )
+                                        )
+                                    },
+                                    onUserClicked = { id ->
+                                        onAction(
+                                            CommunityMembersUiAction.OnUserClicked(
+                                                id
+                                            )
+                                        )
+                                    }
                                 )
                             }
                         )
@@ -74,7 +126,13 @@ data class CommunityMembersScreen(
                             CommunityMembersList(
                                 members = members,
                                 admins = admins,
-                                onUserClicked =  { id -> onAction(CommunityMembersUiAction.OnUserClicked(id)) }
+                                onUserClicked = { id ->
+                                    onAction(
+                                        CommunityMembersUiAction.OnUserClicked(
+                                            id
+                                        )
+                                    )
+                                }
                             )
                         }
                     )
