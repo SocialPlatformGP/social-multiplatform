@@ -15,4 +15,19 @@ sealed class CommunityRequest {
         val id: String,
         val selectedCommunityId: String
     ) : CommunityRequest()
+
+    data class AcceptCommunityRequest (
+        val communityId: String,
+        val userId: String
+    ) : CommunityRequest()
+    data class DeclineCommunityRequest (
+        val communityId: String,
+        val userId: String
+    ) : CommunityRequest()
+    data class FetchCommunityMembersRequests(
+        val communityId: String
+    ) : CommunityRequest()
+    data class FetchCommunity(
+        val communityId: String
+    ) : CommunityRequest()
 }
