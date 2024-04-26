@@ -38,16 +38,19 @@ class LoginScreenModel(
 
     private fun getSignedInUser() {
         screenModelScope.launch(DispatcherIO) {
-            when (val result = authRepo.getSignedInUser()) {
-                is Result.SuccessWithData -> {
-                    _uiState.value = _uiState.value.copy(signedInUser = result.data)
-                }
+            authRepo.getSignedInUser().collect { result ->
+                Napier.e("getSignedInUserAll: $result")
+                when (result) {
+                    is Result.SuccessWithData -> {
+                        _uiState.update { it.copy(signedInUser = result.data) }
+                    }
 
-                is Result.Error -> {
-                    Napier.e("getSignedInUser: ${result.message}")
-                }
+                    is Result.Error -> {
+                        Napier.e("getSignedInUser: ${result.message}")
+                    }
 
-                else -> Unit
+                    else -> Unit
+                }
             }
         }
     }
@@ -124,6 +127,7 @@ class LoginScreenModel(
             authRepo.signInWithOAuth(provider).collect { result ->
                 when (result) {
                     is Result.SuccessWithData -> {
+                        Napier.e("signInWithOAutht: ${result.data}")
                         authRepo.setLocalUserId(result.data.id)
                         _uiState.update {
                             it.copy(
@@ -135,13 +139,15 @@ class LoginScreenModel(
                     }
 
                     is Result.Error -> {
+                        Napier.e("signInWithOAutht: ${result.message}")
+
                         _uiState.update {
                             it.copy(error = ServerError(result.message))
                         }
                     }
 
                     is Result.Loading -> {
-                        Napier.d("signInWithOAuth: Loading")
+                        Napier.d("signInWithOAutht: Loading")
                     }
 
                     else -> Unit
@@ -151,6 +157,10 @@ class LoginScreenModel(
     }
 
     fun dispose() {
-        _uiState.value = LoginUiState()
+        _uiState.update {
+            it.copy(
+                signedInUser = null,
+            )
+        }
     }
 }

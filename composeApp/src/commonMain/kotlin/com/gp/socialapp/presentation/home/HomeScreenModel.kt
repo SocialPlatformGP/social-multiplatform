@@ -51,22 +51,23 @@ class HomeScreenModel(
 
     private fun getUser() {
         screenModelScope.launch() {
-            when (val result = authRepo.getSignedInUser()) {
-                is Result.Error -> {
-                    setError(result.message)
+            authRepo.getSignedInUser().collect { result ->
+                when (result) {
+                    is Result.Error -> {
+                        setError(result.message)
+                    }
+
+                    is Result.SuccessWithData -> {
+                        setUser(result.data)
+                        getUserCommunities()
+
+                    }
+
+                    else -> Unit
                 }
-
-                is Result.SuccessWithData -> {
-                    setUser(result.data)
-                    getUserCommunities()
-
-                }
-
-                else -> Unit
             }
         }
     }
-
     ////////////////////////////////////////////
 
     private fun setUser(user: User) {

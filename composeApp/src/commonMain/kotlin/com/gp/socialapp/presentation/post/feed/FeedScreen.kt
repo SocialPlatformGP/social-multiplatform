@@ -243,7 +243,7 @@ object FeedScreen : Screen {
             }
             Column(
                 modifier = Modifier
-                    .padding(paddingValues)
+//                    .padding(paddingValues)
                     .fillMaxSize()
             ) {
                 TabRow(
