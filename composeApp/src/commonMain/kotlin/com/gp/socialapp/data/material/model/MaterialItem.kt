@@ -1,6 +1,7 @@
 package com.gp.socialapp.data.material.model
 
 data class MaterialItem(
+    val communityId: String = "",
     val id: String = "",
     val path: String = "",
     val fileType: FileType = FileType.OTHER,

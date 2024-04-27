@@ -106,7 +106,7 @@ data class FeedScreen(val communityId: String) : Screen {
             onPostEvent = { action ->
                 when (action) {
                     is PostEvent.OnAddPost -> {
-                        navigator.push(CreatePostScreen(state.openedTabItem))
+                        navigator.push(CreatePostScreen(state.openedTabItem, communityId))
                     }
 
                     is PostEvent.OnPostClicked -> {

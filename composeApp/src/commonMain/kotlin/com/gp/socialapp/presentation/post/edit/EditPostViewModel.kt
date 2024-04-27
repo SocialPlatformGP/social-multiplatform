@@ -15,8 +15,6 @@ import kotlinx.coroutines.launch
 class EditPostScreenModel(
     private val postRepository: PostRepository
 ) : ScreenModel {
-
-
     val _post = MutableStateFlow(Post())
     val post = _post.asStateFlow()
     val channelTags = MutableStateFlow(emptyList<Tag>())
@@ -36,9 +34,9 @@ class EditPostScreenModel(
         }
     }
 
-    fun getChannelTags() {
+    fun getChannelTags(communityId: String) {
         screenModelScope.launch {
-            postRepository.getAllTags().collect {
+            postRepository.getAllTags(communityId).collect {
                 channelTags.value = it
             }
         }

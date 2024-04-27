@@ -20,7 +20,7 @@ interface PostRemoteDataSource {
     suspend fun downvotePost(request: DownvoteRequest): Results<Unit, DataError.Network>
     suspend fun reportPost(request: PostRequest.ReportRequest): Results<Unit, DataError.Network>
 
-    fun getAllTags(): Flow<List<Tag>>
+    fun getAllTags(communityId: String): Flow<List<Tag>>
     suspend fun insertTag(tag: Tag)
     fun fetchAllPosts(): Flow<Results<List<Post>, DataError.Network>>
     fun searchByTitle(title: String): Flow<Results<List<Post>, DataError.Network>>

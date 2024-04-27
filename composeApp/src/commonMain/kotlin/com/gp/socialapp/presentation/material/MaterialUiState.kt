@@ -11,8 +11,9 @@ data class MaterialUiState(
     val error: String? = null,
     val currentFolder: Folder = Folder("root", "root"),
     val listOfPreviousFolder: List<Folder> = listOf(),
+    val currentCommunityId: String = ""
 
-    )
+)
 
 data class Folder(
     val path: String,
