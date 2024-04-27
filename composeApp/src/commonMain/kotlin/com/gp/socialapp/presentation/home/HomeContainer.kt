@@ -2,15 +2,22 @@ package com.gp.socialapp.presentation.home
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.lifecycle.LifecycleEffect
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
@@ -34,6 +41,8 @@ object HomeContainer : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = navigator.rememberNavigatorScreenModel<HomeScreenModel>()
         val state by screenModel.uiState.collectAsState()
+        val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+        val scope = rememberCoroutineScope()
         var barsVisibility by remember { mutableStateOf(true) }
         LifecycleEffect(onStarted = { screenModel.init() }, onDisposed = { screenModel.dispose() })
         if (!state.user.isDataComplete && state.user.id.isNotBlank()) {
@@ -43,7 +52,7 @@ object HomeContainer : Screen {
             navigator.replaceAll(LoginScreen)
 
         }
-        val onNavigation: (Boolean) -> Unit = { barsVisibility = it}
+        val onNavigation: (Boolean) -> Unit = { barsVisibility = it }
         val onAction: (HomeUiAction) -> Unit = {
             when (it) {
                 HomeUiAction.OnUserLogout -> {
@@ -53,31 +62,43 @@ object HomeContainer : Screen {
                 else -> Unit
             }
         }
-        TabNavigator(CommunitiesTab(onNavigation)) {
-            Scaffold(
-                content = {
-                    Column(
-                        modifier = Modifier.padding(it)
-                    ) {
-                        CurrentTab()
-                    }
-                },
-                topBar = {
-                    if (barsVisibility) HomeTopBar(
-                        action = onAction
-                    )
-                },
+        ModalNavigationDrawer(
+            drawerState = drawerState,
+            drawerContent = {
+                ModalDrawerSheet {
+                    Text("EduLink", modifier = Modifier.padding(16.dp))
 
-                bottomBar = {
-                    if (barsVisibility) NavigationBar {
-                        BottomTabNavigationItem(tab = ChatTab(onNavigation))
-                        BottomTabNavigationItem(tab = AssignmentsTab)
-                        BottomTabNavigationItem(tab = CommunitiesTab(onNavigation))
-                        BottomTabNavigationItem(tab = CalendarTab)
-                        BottomTabNavigationItem(tab = GradesTab)
-                    }
-                },
-            )
+                    //todo: add navigation drawer items
+                }
+            }
+        ) {
+            TabNavigator(CommunitiesTab(onNavigation)) {
+                Scaffold(
+                    content = {
+                        Column(
+                            modifier = Modifier.padding(it)
+                        ) {
+                            CurrentTab()
+                        }
+                    },
+                    topBar = {
+                        if (barsVisibility) HomeTopBar(
+                            action = onAction
+                        )
+                    },
+
+                    bottomBar = {
+                        if (barsVisibility) NavigationBar {
+                            BottomTabNavigationItem(tab = ChatTab(onNavigation))
+                            BottomTabNavigationItem(tab = AssignmentsTab)
+                            BottomTabNavigationItem(tab = CommunitiesTab(onNavigation))
+                            BottomTabNavigationItem(tab = CalendarTab)
+                            BottomTabNavigationItem(tab = GradesTab)
+                        }
+                    },
+                )
+            }
         }
+
     }
 }
