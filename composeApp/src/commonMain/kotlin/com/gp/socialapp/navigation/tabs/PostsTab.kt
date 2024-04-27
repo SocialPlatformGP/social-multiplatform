@@ -1,4 +1,4 @@
-package com.gp.socialapp.tabs
+package com.gp.socialapp.navigation.tabs
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Public
@@ -15,6 +15,7 @@ import com.gp.socialapp.presentation.post.feed.FeedScreen
 import kotlin.jvm.Transient
 
 data class PostsTab(
+  val communityId: String,
     @Transient
     private val onNavigation: (Boolean) -> Unit
 ) : Tab {
@@ -34,7 +35,7 @@ data class PostsTab(
 
     @Composable
     override fun Content() {
-        Navigator(screen = FeedScreen){ navigator ->
+        Navigator(screen = FeedScreen(communityId)){ navigator ->
             LaunchedEffect(navigator.lastItem) {
                 onNavigation(navigator.lastItem is FeedScreen)
             }
