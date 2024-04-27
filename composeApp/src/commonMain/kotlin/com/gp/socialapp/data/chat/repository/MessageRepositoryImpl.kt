@@ -6,14 +6,20 @@ import com.gp.socialapp.data.chat.source.local.MessageLocalDataSource
 import com.gp.socialapp.data.chat.source.remote.MessageRemoteDataSource
 import com.gp.socialapp.data.chat.source.remote.model.request.MessageRequest
 import com.gp.socialapp.data.chat.source.remote.model.response.NewDataResponse
+import com.gp.socialapp.data.material.model.MaterialFile
+import com.gp.socialapp.data.material.source.remote.MaterialRemoteDataSource
+import com.gp.socialapp.data.material.utils.FileManager
 import com.gp.socialapp.util.Platform
 import com.gp.socialapp.util.Result
+import com.gp.socialapp.util.Results
 import com.gp.socialapp.util.getPlatform
 import kotlinx.coroutines.flow.Flow
 
 class MessageRepositoryImpl(
     private val messageRemoteDataSource: MessageRemoteDataSource,
-    private val messageLocalDataSource: MessageLocalDataSource
+    private val messageLocalDataSource: MessageLocalDataSource,
+    private val materialRemoteDataSource: MaterialRemoteDataSource,
+    private val fileManager: FileManager
 ) : MessageRepository {
     override suspend fun connectToSocket(userId: String, roomId: String): Result<Nothing> =
         messageRemoteDataSource.connectToSocket(userId, roomId)
@@ -94,6 +100,28 @@ class MessageRepositoryImpl(
             messageLocalDataSource.deleteMessage(messageId)
         } else {
             Result.Error("An error occurred")
+        }
+    }
+
+    override suspend fun openAttachment(url: String, mimeType: String) {
+        try {
+            val data = materialRemoteDataSource.downloadFile(url)
+            when (data) {
+                is Results.Failure -> {
+                    println(data.error)
+                }
+
+                Results.Loading -> {
+                    //TODO
+                }
+
+                is Results.Success -> {
+                    val localPath = fileManager.saveFile(data.data.data, data.data.fileName, mimeType)
+                    fileManager.openFile(localPath, mimeType)
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 }

@@ -5,10 +5,11 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import com.gp.socialapp.data.auth.repository.AuthenticationRepository
 import com.gp.socialapp.data.post.repository.PostRepository
 import com.gp.socialapp.data.post.repository.ReplyRepository
+import com.gp.socialapp.presentation.material.utils.MimeType
 import com.gp.socialapp.data.post.source.remote.model.Post
+import com.gp.socialapp.data.post.source.remote.model.PostAttachment
 import com.gp.socialapp.data.post.source.remote.model.Reply
 import com.gp.socialapp.data.post.util.ToNestedReplies.toNestedReplies
-import com.gp.socialapp.presentation.post.feed.FeedError
 import com.gp.socialapp.presentation.post.feed.PostEvent
 import com.gp.socialapp.presentation.post.feed.ReplyEvent
 import com.gp.socialapp.util.DispatcherIO
@@ -361,8 +362,17 @@ class PostDetailsScreenModel(
                 println("reply in screen model: $reply")
                 insertReply(reply)
             }
-
+            is PostEvent.OnAttachmentClicked -> {
+                openAttachment(event.attachment)
+            }
             else -> {}
+        }
+    }
+
+    private fun openAttachment(attachment: PostAttachment) {
+        screenModelScope.launch (DispatcherIO){
+            val mimeType = MimeType.getMimeTypeFromFileName(attachment.name).mimeType
+            postRepo.openAttachment(attachment.url, mimeType)
         }
     }
 

@@ -23,4 +23,5 @@ interface PostRepository {
     suspend fun deleteRecentSearch(search: String)
     suspend fun addRecentSearch(search: String)
     fun searchByTag(tag: Tag): Flow<Results<List<Post>, DataError.Network>>
+    suspend fun openAttachment(url: String, mimeType: String)
 }

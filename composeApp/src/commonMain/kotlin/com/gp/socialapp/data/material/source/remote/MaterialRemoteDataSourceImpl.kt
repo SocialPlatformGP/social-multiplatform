@@ -145,6 +145,7 @@ class MaterialRemoteDataSourceImpl(
                 }
             }
         } catch (e: Exception) {
+            e.printStackTrace()
             Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN)
         }
     }

@@ -25,6 +25,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.gp.socialapp.util.AppConstants
 
 @Composable
 fun ImageMessageWithTimestamp(
@@ -41,7 +42,8 @@ fun ImageMessageWithTimestamp(
         shape = RoundedCornerShape(20.dp), modifier = modifier
     ) {
         Box {
-            MessageImageAttachment(imageURL = imageURL,
+            MessageImageAttachment(
+                imageURL = AppConstants.BASE_URL +imageURL,
                 onImageClicked = { onImageClicked() },
                 maxHeight = maxHeight,
                 modifier = Modifier.onGloballyPositioned {

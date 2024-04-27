@@ -50,6 +50,7 @@ fun FilesBottomSheet(
 ) {
 
     ModalBottomSheet(
+        modifier = modifier,
         onDismissRequest = onDismiss,
         sheetState = state
     ) {
@@ -79,7 +80,7 @@ fun FilesBottomSheet(
                                 imageVector = Icons.Filled.VideoFile,
                                 contentDescription = "video file",
                                 modifier = Modifier.size(75.dp)
-                                    .clickable { onPostEvent(PostEvent.OnVideoClicked(it)) },
+                                    .clickable { onPostEvent(PostEvent.OnAttachmentClicked(it)) },
                                 colorFilter = ColorFilter.tint(
                                     Color.Blue.copy(alpha = 0.7f)
                                 )
@@ -99,7 +100,7 @@ fun FilesBottomSheet(
                                 imageVector = Icons.Filled.Image,
                                 contentDescription = "image file",
                                 modifier = Modifier.size(75.dp)
-                                    .clickable { onPostEvent(PostEvent.OnImageClicked(it)) },
+                                    .clickable { onPostEvent(PostEvent.OnAttachmentClicked(it)) },
                                 colorFilter = ColorFilter.tint(
                                     Color.Green.copy(alpha = 0.7f)
                                 )
@@ -118,7 +119,7 @@ fun FilesBottomSheet(
                                 imageVector = Icons.Filled.InsertDriveFile,
                                 contentDescription = "document file",
                                 modifier = Modifier.size(75.dp)
-                                    .clickable { onPostEvent(PostEvent.OnDocumentClicked(it)) },
+                                    .clickable { onPostEvent(PostEvent.OnAttachmentClicked(it)) },
                                 colorFilter = ColorFilter.tint(
                                     Color.Blue.copy(alpha = 0.7f)
                                 )
@@ -130,7 +131,7 @@ fun FilesBottomSheet(
                                 imageVector = Icons.Filled.PictureAsPdf,
                                 contentDescription = "pdf file",
                                 modifier = Modifier.size(75.dp)
-                                    .clickable { onPostEvent(PostEvent.OnDocumentClicked(it)) },
+                                    .clickable { onPostEvent(PostEvent.OnAttachmentClicked(it)) },
                                 colorFilter = ColorFilter.tint(
                                     Color.Red.copy(alpha = 0.7f)
                                 )
@@ -146,7 +147,7 @@ fun FilesBottomSheet(
                                 imageVector = Icons.Filled.FolderZip,
                                 contentDescription = "zip file",
                                 modifier = Modifier.size(75.dp)
-                                    .clickable { onPostEvent(PostEvent.OnDocumentClicked(it)) },
+                                    .clickable { onPostEvent(PostEvent.OnAttachmentClicked(it)) },
                                 colorFilter = ColorFilter.tint(
                                     Color.Yellow.copy(alpha = 0.7f)
                                 )
@@ -162,7 +163,7 @@ fun FilesBottomSheet(
                                 imageVector = Icons.Filled.AudioFile,
                                 contentDescription = "audio file",
                                 modifier = Modifier.size(75.dp)
-                                    .clickable { onPostEvent(PostEvent.OnAudioClicked(it)) },
+                                    .clickable { onPostEvent(PostEvent.OnAttachmentClicked(it)) },
                                 colorFilter = ColorFilter.tint(
                                     Color.Cyan.copy(alpha = 0.7f)
                                 )
@@ -174,7 +175,7 @@ fun FilesBottomSheet(
                                 imageVector = Icons.Filled.InsertDriveFile,
                                 contentDescription = "document file",
                                 modifier = Modifier.size(75.dp)
-                                    .clickable { onPostEvent(PostEvent.OnDocumentClicked(it)) },
+                                    .clickable { onPostEvent(PostEvent.OnAttachmentClicked(it)) },
                                 colorFilter = ColorFilter.tint(
                                     Color.Blue.copy(alpha = 0.7f)
                                 )

@@ -6,6 +6,7 @@ import com.gp.socialapp.data.auth.repository.AuthenticationRepository
 import com.gp.socialapp.data.chat.model.MessageAttachment
 import com.gp.socialapp.data.chat.repository.MessageRepository
 import com.gp.socialapp.data.chat.repository.RoomRepository
+import com.gp.socialapp.presentation.material.utils.MimeType
 import com.gp.socialapp.util.DispatcherIO
 import com.gp.socialapp.util.Result
 import kotlinx.coroutines.Job
@@ -150,7 +151,7 @@ class ChatRoomScreenModel(
             }
 
             is ChatRoomAction.OnFileClicked -> {
-                //TODO implement
+                openAttachment(action.attachment)
             }
 
             is ChatRoomAction.OnAttachmentPicked -> {
@@ -166,6 +167,13 @@ class ChatRoomScreenModel(
             }
 
             else -> Unit
+        }
+    }
+
+    private fun openAttachment(attachment: MessageAttachment) {
+        screenModelScope.launch (DispatcherIO) {
+            val mimeType = MimeType.getMimeTypeFromFileName(attachment.name).mimeType
+            messageRepo.openAttachment(attachment.url, mimeType)
         }
     }
 }

@@ -6,7 +6,9 @@ import com.gp.socialapp.data.auth.repository.AuthenticationRepository
 import com.gp.socialapp.data.community.repository.CommunityRepository
 import com.gp.socialapp.data.post.repository.PostRepository
 import com.gp.socialapp.data.post.source.remote.model.Post
+import com.gp.socialapp.data.post.source.remote.model.PostAttachment
 import com.gp.socialapp.data.post.util.PostPopularityUtils
+import com.gp.socialapp.presentation.material.utils.MimeType
 import com.gp.socialapp.util.DispatcherIO
 import com.gp.socialapp.util.Result
 import com.gp.socialapp.util.Results
@@ -237,6 +239,13 @@ class FeedScreenModel(
     fun resetState() {
         screenModelScope.launch {
             _state.update { FeedUiState() }
+        }
+    }
+
+    fun openAttachment(attachment: PostAttachment) {
+        screenModelScope.launch (DispatcherIO) {
+            val mimeType = MimeType.getMimeTypeFromFileName(attachment.name).mimeType
+            postRepo.openAttachment(attachment.url, mimeType)
         }
     }
 }
