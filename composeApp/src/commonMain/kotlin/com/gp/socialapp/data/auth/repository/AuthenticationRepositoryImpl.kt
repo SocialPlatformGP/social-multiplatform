@@ -15,22 +15,6 @@ class AuthenticationRepositoryImpl(
     override fun sendPasswordResetEmail(email: String) =
         remoteDataSource.sendPasswordResetEmail(email)
 
-    override fun getLocalUserToken(): String? {
-        return localKeyValueStorage.token
-    }
-
-    override fun getCurrentLocalUserId(): String {
-        return localKeyValueStorage.userId ?: ""
-    }
-
-    override fun setLocalUserId(id: String) {
-        localKeyValueStorage.userId = id
-    }
-
-    override fun setLocalUserToken(token: String) {
-        localKeyValueStorage.token = token
-    }
-
     override fun clearStorage() {
         localKeyValueStorage.cleanStorage()
     }
@@ -44,7 +28,7 @@ class AuthenticationRepositoryImpl(
     override fun signUpWithEmail(email: String, password: String): Flow<Result<User>> =
         remoteDataSource.signUpWithEmail(email, password)
 
-    override fun getSignedInUser(): Flow<Result<User>> =
+    override suspend fun getSignedInUser(): Result<User> =
         remoteDataSource.getSignedInUser()
 
     override suspend fun logout(): Result<Nothing> {

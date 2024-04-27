@@ -33,7 +33,7 @@ class CommunityMembersScreenModel(
 
     private fun getUserId() {
         screenModelScope.launch(DispatcherIO) {
-            authRepo.getSignedInUser().collect { result ->
+            authRepo.getSignedInUser().let { result ->
                 when (result) {
                     is Result.SuccessWithData -> {
                         _uiState.update { it.copy(currentUserId = result.data.id) }

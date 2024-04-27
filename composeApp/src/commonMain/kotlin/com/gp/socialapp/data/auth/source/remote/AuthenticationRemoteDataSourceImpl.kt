@@ -30,7 +30,7 @@ class AuthenticationRemoteDataSourceImpl(
             sessionStatusFlow.collect { session ->
                 when (session) {
                     is SessionStatus.Authenticated -> {
-                        getSignedInUser().collect { result ->
+                        getSignedInUser().let { result ->
                             emit(result)
                         }
                     }
@@ -69,7 +69,7 @@ class AuthenticationRemoteDataSourceImpl(
             sessionStatusFlow.collect {
                 when (it) {
                     is SessionStatus.Authenticated -> {
-                        getSignedInUser().collect {
+                        getSignedInUser().let {
                             emit(it)
                         }
                     }
@@ -95,7 +95,7 @@ class AuthenticationRemoteDataSourceImpl(
             sessionStatusFlow.collect {
                 when (it) {
                     is SessionStatus.Authenticated -> {
-                        getSignedInUser().collect {
+                        getSignedInUser().let {
                             emit(it)
                         }
                     }
@@ -108,9 +108,9 @@ class AuthenticationRemoteDataSourceImpl(
         }
     }
 
-    override fun getSignedInUser(): Flow<Result<User>> = flow {
+    override suspend fun getSignedInUser(): Result<User> {
         val userInfo = supabaseClient.auth.sessionManager.loadSession()?.user
-        if (userInfo != null) {
+        return if (userInfo != null) {
             println("User Info: ${userInfo.userMetadata}")
             val isUserDataComplete =
                 userInfo.userMetadata?.get("isUserDataComplete")?.jsonPrimitive?.booleanOrNull
@@ -160,9 +160,9 @@ class AuthenticationRemoteDataSourceImpl(
                     isDataComplete = false
                 )
             }
-            emit(Result.SuccessWithData(user))
+            Result.SuccessWithData(user)
         } else {
-            emit(Result.Error("User not found"))
+            Result.Error("User not found")
         }
     }
 
