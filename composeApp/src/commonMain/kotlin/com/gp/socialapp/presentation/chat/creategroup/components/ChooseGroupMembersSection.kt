@@ -50,54 +50,6 @@ fun ChooseGroupMembersSection(
                     onUserClick = {
                         onUserClick(user)
                     })
-
-                GroupMemberItem(
-                    selectableUser = user,
-                    isSelected = user.isSelected,
-                    isSelectable = true,
-                    onUserClick = {
-                        onUserClick(user)
-                    })
-
-                GroupMemberItem(
-                    selectableUser = user,
-                    isSelected = user.isSelected,
-                    isSelectable = true,
-                    onUserClick = {
-                        onUserClick(user)
-                    })
-
-                GroupMemberItem(
-                    selectableUser = user,
-                    isSelected = user.isSelected,
-                    isSelectable = true,
-                    onUserClick = {
-                        onUserClick(user)
-                    })
-
-                GroupMemberItem(
-                    selectableUser = user,
-                    isSelected = user.isSelected,
-                    isSelectable = true,
-                    onUserClick = {
-                        onUserClick(user)
-                    })
-
-                GroupMemberItem(
-                    selectableUser = user,
-                    isSelected = user.isSelected,
-                    isSelectable = true,
-                    onUserClick = {
-                        onUserClick(user)
-                    })
-
-                GroupMemberItem(
-                    selectableUser = user,
-                    isSelected = user.isSelected,
-                    isSelectable = true,
-                    onUserClick = {
-                        onUserClick(user)
-                    })
             }
         }
     }
