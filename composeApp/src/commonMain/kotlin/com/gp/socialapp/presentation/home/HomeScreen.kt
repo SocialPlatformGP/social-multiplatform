@@ -75,6 +75,8 @@ data class HomeScreen(
                 HomeUiAction.OnUserLogout -> {
                     screenModel.userLogout()
                 }
+
+                else -> Unit
             }
         })
     }

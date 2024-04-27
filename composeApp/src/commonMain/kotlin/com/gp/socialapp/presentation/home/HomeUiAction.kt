@@ -8,5 +8,6 @@ sealed interface HomeUiAction {
     data class OnJoinCommunityClicked(val code: String) : HomeUiAction
     data object OnProfileClicked : HomeUiAction
     data object OnUserLogout : HomeUiAction
+    data object OnOpenDrawer : HomeUiAction
 
 }

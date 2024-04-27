@@ -60,6 +60,7 @@ class HomeScreenModel(
 
                     is Result.SuccessWithData -> {
                         setUser(result.data)
+                        println(result.data)
                         getUserCommunities()
 
                     }
