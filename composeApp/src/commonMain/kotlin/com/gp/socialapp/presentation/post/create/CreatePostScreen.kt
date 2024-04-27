@@ -18,6 +18,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import cafe.adriel.voyager.core.lifecycle.LifecycleEffect
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -47,12 +48,17 @@ import org.jetbrains.compose.resources.stringResource
 import socialmultiplatform.composeapp.generated.resources.Res
 import socialmultiplatform.composeapp.generated.resources.create_post
 
-data class CreatePostScreen(val openedFeedTab: FeedTab) : Screen {
+data class CreatePostScreen(val openedFeedTab: FeedTab, val communityId: String) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = navigator.rememberNavigatorScreenModel<CreatePostScreenModel>()
         val state by screenModel.uiState.collectAsState()
+        LifecycleEffect(
+            onStarted = {
+                screenModel.init(openedFeedTab, communityId)
+            }
+        )
         val existingTags by screenModel.channelTags.collectAsState()
         if (state.createdState) {
             navigator.pop()
@@ -65,9 +71,8 @@ data class CreatePostScreen(val openedFeedTab: FeedTab) : Screen {
                 onBackClick = { navigator.pop() },
                 onPostClick = { title, body ->
                     screenModel.onCreatePost(
-                        title,
-                        body,
-                        openedFeedTab.title
+                        title = title,
+                        body = body,
                     )
                 },
                 confirmNewTags = {

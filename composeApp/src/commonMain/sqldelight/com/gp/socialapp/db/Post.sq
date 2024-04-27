@@ -15,7 +15,8 @@ CREATE TABLE IF NOT EXISTS  posts (
   tags TEXT NOT NULL DEFAULT "",
   type TEXT NOT NULL DEFAULT "general",
   attachments TEXT NOT NULL DEFAULT "",
-  last_modified INTEGER NOT NULL DEFAULT 0
+  last_modified INTEGER NOT NULL DEFAULT 0,
+  community_id TEXT NOT NULL DEFAULT ""
 );
 --QUERIES
 getAll:
@@ -51,7 +52,8 @@ INSERT OR REPLACE INTO `posts` (
     `tags`,
     `type`,
     `attachments`,
-    `last_modified`
+    `last_modified`,
+    `community_id`
 ) VALUES (
     :id,
     :title,
@@ -69,7 +71,8 @@ INSERT OR REPLACE INTO `posts` (
     :tags,
     :type,
     :attachments,
-    :last_modified
+    :last_modified,
+    :community_id
 );
 searchByTitle:
 SELECT * FROM `posts` WHERE title LIKE '%' || :title || '%' ORDER BY created_at DESC;

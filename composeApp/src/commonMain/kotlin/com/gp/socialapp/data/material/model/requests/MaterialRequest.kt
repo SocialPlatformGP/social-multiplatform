@@ -12,6 +12,7 @@ sealed class MaterialRequest {
     data class CreateFolderRequest(
         val name: String = "",
         val path: String = "",
+        val communityId: String,
     )
 
     @Serializable
@@ -20,6 +21,7 @@ sealed class MaterialRequest {
         val type: String = "",
         val content: ByteArray = byteArrayOf(),
         val path: String = "",
+        val communityId: String,
     )
 
     @Serializable

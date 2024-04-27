@@ -14,4 +14,6 @@ data class CreatePostUIState(
     var tags: List<Tag> = emptyList(),
     var type: String = FeedTab.entries.first().title,
     var files: List<PostAttachment> = emptyList(),
+    var currentTab: FeedTab = FeedTab.entries.first(),
+    var communityId: String = "",
 )

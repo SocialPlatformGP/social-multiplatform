@@ -20,51 +20,63 @@ class PostLocalDataSourceImpl(
     override suspend fun insertPost(post: Post) {
         val entity = post.toEntity()
         with(entity) {
-            postQueries.insert(
-                id = id,
-                title = title,
-                body = body,
-                reply_count = replyCount.toLong(),
-                author_name = authorName,
-                author_pfp = authorPfp,
-                author_id = authorID,
-                created_at = createdAt.toLong(),
-                votes = votes.toLong(),
-                downvotes = downvoted,
-                upvotes = upvoted,
-                moderation_status = moderationStatus,
-                edited_status = editedStatus.toLong(),
-                tags = tags,
-                type = type,
-                attachments = attachments,
-                last_modified = lastModified.toLong()
-            )
+            try {
+                postQueries.insert(
+                    id = id,
+                    title = title,
+                    body = body,
+                    reply_count = replyCount.toLong(),
+                    author_name = authorName,
+                    author_pfp = authorPfp,
+                    author_id = authorID,
+                    created_at = createdAt.toLong(),
+                    votes = votes.toLong(),
+                    downvotes = downvoted,
+                    upvotes = upvoted,
+                    moderation_status = moderationStatus,
+                    edited_status = editedStatus.toLong(),
+                    tags = tags,
+                    type = type,
+                    attachments = attachments,
+                    last_modified = lastModified.toLong(),
+                    community_id = communityID
+                )
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 
     override fun getAllPosts(): Flow<List<Post>> {
-        return postQueries.getAll().asFlow().mapToList(Dispatchers.Default).map { list ->
-            list.map {
-                PostEntity(
-                    replyCount = it.reply_count.toInt(),
-                    authorName = it.author_name,
-                    authorPfp = it.author_pfp,
-                    id = it.id,
-                    authorID = it.author_id,
-                    createdAt = it.created_at,
-                    title = it.title,
-                    body = it.body,
-                    votes = it.votes.toInt(),
-                    downvoted = it.downvotes,
-                    upvoted = it.upvotes,
-                    moderationStatus = it.moderation_status,
-                    editedStatus = it.edited_status.toInt(),
-                    tags = it.tags,
-                    type = it.type,
-                    attachments = it.attachments,
-                    lastModified = it.last_modified
-                ).toPost()
+        return try {
+
+            postQueries.getAll().asFlow().mapToList(Dispatchers.Default).map { list ->
+                list.map {
+                    PostEntity(
+                        replyCount = it.reply_count.toInt(),
+                        authorName = it.author_name,
+                        authorPfp = it.author_pfp,
+                        id = it.id,
+                        authorID = it.author_id,
+                        createdAt = it.created_at,
+                        title = it.title,
+                        body = it.body,
+                        votes = it.votes.toInt(),
+                        downvoted = it.downvotes,
+                        upvoted = it.upvotes,
+                        moderationStatus = it.moderation_status,
+                        editedStatus = it.edited_status.toInt(),
+                        tags = it.tags,
+                        type = it.type,
+                        attachments = it.attachments,
+                        lastModified = it.last_modified,
+                        communityID = it.community_id
+                    ).toPost()
+                }
             }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            throw e
         }
     }
 
@@ -88,7 +100,8 @@ class PostLocalDataSourceImpl(
                     tags = posts.tags,
                     type = posts.type,
                     attachments = posts.attachments,
-                    lastModified = posts.last_modified
+                    lastModified = posts.last_modified,
+                    communityID = posts.community_id
                 ).toPost()
             }.first()
         }
@@ -123,7 +136,8 @@ class PostLocalDataSourceImpl(
                         tags = it.tags,
                         type = it.type,
                         attachments = it.attachments,
-                        lastModified = it.last_modified
+                        lastModified = it.last_modified,
+                        communityID = it.community_id
                     ).toPost()
                 }
             }
@@ -149,7 +163,8 @@ class PostLocalDataSourceImpl(
                     tags = it.tags,
                     type = it.type,
                     attachments = it.attachments,
-                    lastModified = it.last_modified
+                    lastModified = it.last_modified,
+                    communityID = it.community_id
                 ).toPost()
             }
         }

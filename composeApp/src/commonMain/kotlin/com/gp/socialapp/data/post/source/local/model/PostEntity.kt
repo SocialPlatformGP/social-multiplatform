@@ -9,6 +9,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
 
 data class PostEntity(
+    val communityID: String = "",
     val replyCount: Int = 0,
     val authorName: String = "",
     val authorPfp: String = "",
@@ -44,11 +45,12 @@ data class PostEntity(
                     upvoted = upvoted.split(",").filter { it.isNotBlank() },
                     moderationStatus = moderationStatus,
                     editedStatus = editedStatus == 1,
-                    tags = tags.split(",").filter{ it.isNotBlank() }.map { it.toTag() },
+                    tags = tags.split(",").filter { it.isNotBlank() }.map { it.toTag() },
                     type = type,
                     attachments = attachments.split(",").filter { it.isNotBlank() }
                         .map { it.toPostFile() },
-                    lastModified = lastModified
+                    lastModified = lastModified,
+                    communityID = communityID
                 )
             }
         }

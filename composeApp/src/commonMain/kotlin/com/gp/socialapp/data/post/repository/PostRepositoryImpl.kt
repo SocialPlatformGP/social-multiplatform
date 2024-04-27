@@ -91,10 +91,11 @@ class PostRepositoryImpl(
                 println("getPosts: $lastUpdated repo *********************126")
 
                 getRemotePosts().collect {
+                    println(it)
+                    println("getPosts: $lastUpdated repo *********************127")
                     if (it is Results.Success && it.data.isNotEmpty()) {
                         println("getPosts: $lastUpdated repo *********************127")
-                        lastUpdated =
-                            LocalDateTime.now().toInstant(TimeZone.UTC).epochSeconds
+                        lastUpdated = LocalDateTime.now().toInstant(TimeZone.UTC).epochSeconds
                         it.data.forEach { post ->
                             insertLocalPost(post)
                         }
@@ -158,7 +159,7 @@ class PostRepositoryImpl(
         return postLocalSource.getPostById(id)
     }
 
-    override fun getAllTags() = postRemoteSource.getAllTags()
+    override fun getAllTags(communityId: String) = postRemoteSource.getAllTags(communityId)
 
     override suspend fun insertTag(tag: Tag) = postRemoteSource.insertTag(tag)
     override suspend fun getRecentSearches(): List<String> {

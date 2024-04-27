@@ -11,6 +11,7 @@ import kotlinx.datetime.toInstant
 
 @kotlinx.serialization.Serializable
 data class Post(
+    val communityID: String = "",
     val replyCount: Int = 0,
     val authorName: String = "",
     val authorPfp: String = "",
@@ -39,6 +40,7 @@ data class Post(
 
         fun Post.toEntity(): PostEntity {
             return PostEntity(
+                communityID = communityID,
                 replyCount = replyCount,
                 authorName = authorName,
                 authorPfp = authorPfp,

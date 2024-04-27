@@ -24,7 +24,6 @@ class FeedScreenModel(
 ) : ScreenModel {
     private val _state = MutableStateFlow(FeedUiState())
     val state = _state.asStateFlow()
-
     fun initScreen(communityId: String) {
         screenModelScope.launch(DispatcherIO) {
             authRepo.getSignedInUser().let { result ->
@@ -36,6 +35,8 @@ class FeedScreenModel(
                                 currentUser = result.data
                             )
                         }
+                        getAllPosts()
+                        getCurrentCommunity(communityId)
                     }
 
                     is Result.Error -> {
@@ -46,9 +47,9 @@ class FeedScreenModel(
                     else -> Unit
                 }
             }
-            getAllPosts()
+
         }
-        getCurrentCommunity(communityId)
+
     }
 
     private fun getCurrentCommunity(communityId: String) {
@@ -102,9 +103,9 @@ class FeedScreenModel(
                                 )
                             }
                         }
-                        _state.update {
-                            it.copy(
-                                posts = sortedPosts,
+                        _state.update { oldState ->
+                            oldState.copy(
+                                posts = sortedPosts.filter { it.communityID == oldState.currentCommunity.id },
                                 isFeedLoaded = Result.Success
                             )
                         }

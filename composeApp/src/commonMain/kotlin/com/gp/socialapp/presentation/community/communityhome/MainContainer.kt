@@ -58,7 +58,7 @@ data class CommunityHomeContainer(val communityId: String) : Screen {
             },
             drawerState = drawerState,
         ) {
-            TabNavigator(PostsTab(communityId,onNavigation)) {
+            TabNavigator(PostsTab(communityId, onNavigation)) {
                 Scaffold(content = {
                     Column(
                         modifier = Modifier.padding(it)
@@ -80,8 +80,8 @@ data class CommunityHomeContainer(val communityId: String) : Screen {
                 }, bottomBar = {
                     if (isBarsVisible) {
                         NavigationBar {
-                            BottomTabNavigationItem(tab = PostsTab(communityId,onNavigation))
-                            BottomTabNavigationItem(tab = MaterialTab)
+                            BottomTabNavigationItem(tab = PostsTab(communityId, onNavigation))
+                            BottomTabNavigationItem(tab = MaterialTab(communityId))
                             BottomTabNavigationItem(tab = CommunityMembersTab(communityId))
                         }
                     }

@@ -17,7 +17,7 @@ interface PostRepository {
     suspend fun createPost(post: Post): Flow<Results<Unit, DataError.Network>>
     suspend fun reportPost(postId: String, reporterId: String): Results<Unit, DataError.Network>
     fun searchByTitle(title: String): Flow<Results<List<Post>, DataError.Network>>
-    fun getAllTags(): Flow<List<Tag>>
+    fun getAllTags(communityId: String): Flow<List<Tag>>
     suspend fun insertTag(tag: Tag)
     suspend fun getRecentSearches(): List<String>
     suspend fun deleteRecentSearch(search: String)
