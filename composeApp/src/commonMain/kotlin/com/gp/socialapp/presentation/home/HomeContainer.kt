@@ -53,9 +53,7 @@ object HomeContainer : Screen {
                 else -> Unit
             }
         }
-        TabNavigator(CommunitiesTab {
-            barsVisibility = it
-        }) {
+        TabNavigator(CommunitiesTab(onNavigation)) {
             Scaffold(
                 content = {
                     Column(
@@ -73,10 +71,10 @@ object HomeContainer : Screen {
                 bottomBar = {
                     if (barsVisibility) NavigationBar {
                         BottomTabNavigationItem(tab = ChatTab(onNavigation))
-                        BottomTabNavigationItem(tab = CalendarTab)
-                        BottomTabNavigationItem(tab = CommunitiesTab(onNavigation))
-                        BottomTabNavigationItem(tab = GradesTab)
                         BottomTabNavigationItem(tab = AssignmentsTab)
+                        BottomTabNavigationItem(tab = CommunitiesTab(onNavigation))
+                        BottomTabNavigationItem(tab = CalendarTab)
+                        BottomTabNavigationItem(tab = GradesTab)
                     }
                 },
             )
