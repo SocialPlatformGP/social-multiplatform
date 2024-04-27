@@ -156,8 +156,9 @@ private fun EditPostContent(
                 }
             )
             FilesRow(
+                modifier = Modifier.fillMaxWidth(),
                 state.attachments,
-                onFileClick = { file ->
+                onFileDelete = { file ->
                     println("File clicked: $file")
                 }
             )
@@ -203,7 +204,7 @@ private fun EditPostContent(
                     selectedTags += it
                 },
 
-            )
+                )
         }
         if (newTagDialogState) {
             NewTagAlertDialog(

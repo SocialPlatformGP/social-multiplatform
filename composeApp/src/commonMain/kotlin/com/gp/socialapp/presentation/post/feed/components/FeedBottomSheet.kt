@@ -48,6 +48,7 @@ fun FilesBottomSheet(
     state: SheetState,
     onPostEvent: (PostEvent) -> Unit = { },
 ) {
+
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = state
@@ -84,6 +85,7 @@ fun FilesBottomSheet(
                                 )
                             )
                         }
+
                         in listOf(
                             MimeType.IMAGE.value,
                             MimeType.JPEG.value,
@@ -103,6 +105,7 @@ fun FilesBottomSheet(
                                 )
                             )
                         }
+
                         in listOf(
                             MimeType.WORD.value,
                             MimeType.DOCX.value,
@@ -121,6 +124,7 @@ fun FilesBottomSheet(
                                 )
                             )
                         }
+
                         MimeType.PDF.value -> {
                             Image(
                                 imageVector = Icons.Filled.PictureAsPdf,
@@ -132,6 +136,7 @@ fun FilesBottomSheet(
                                 )
                             )
                         }
+
                         in listOf(
                             MimeType.ZIP.value,
                             MimeType.RAR.value,
@@ -147,6 +152,7 @@ fun FilesBottomSheet(
                                 )
                             )
                         }
+
                         in listOf(
                             MimeType.MP3.value,
                             MimeType.WAV.value,
@@ -162,6 +168,7 @@ fun FilesBottomSheet(
                                 )
                             )
                         }
+
                         else -> {
                             Image(
                                 imageVector = Icons.Filled.InsertDriveFile,
