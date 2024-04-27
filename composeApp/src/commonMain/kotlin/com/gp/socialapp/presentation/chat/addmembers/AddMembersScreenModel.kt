@@ -11,6 +11,7 @@ import com.gp.socialapp.util.Result
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -59,7 +60,17 @@ class AddMembersScreenModel(
 
     private fun getUserID() {
         screenModelScope.launch (DispatcherIO) {
-            currentUserId = authRepo.getCurrentLocalUserId()
+            authRepo.getSignedInUser().collect{ result ->
+                when(result) {
+                    is Result.SuccessWithData -> {
+                        currentUserId = result.data.id
+                    }
+                    is Result.Error -> {
+                        //TODO handle error
+                    }
+                    else -> Unit
+                }
+            }
         }
     }
 

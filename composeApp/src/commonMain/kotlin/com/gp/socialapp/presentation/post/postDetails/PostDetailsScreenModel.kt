@@ -8,10 +8,13 @@ import com.gp.socialapp.data.post.repository.ReplyRepository
 import com.gp.socialapp.data.post.source.remote.model.Post
 import com.gp.socialapp.data.post.source.remote.model.Reply
 import com.gp.socialapp.data.post.util.ToNestedReplies.toNestedReplies
+import com.gp.socialapp.presentation.post.feed.FeedError
 import com.gp.socialapp.presentation.post.feed.PostEvent
 import com.gp.socialapp.presentation.post.feed.ReplyEvent
 import com.gp.socialapp.util.DispatcherIO
+import com.gp.socialapp.util.Result
 import com.gp.socialapp.util.Results
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -26,8 +29,18 @@ class PostDetailsScreenModel(
     val uiState = _uiState.asStateFlow()
     fun initScreenModel(post: Post) {
         screenModelScope.launch(DispatcherIO) {
-            val userId = authRepo.getCurrentLocalUserId()
-            _uiState.update { it.copy(post = post, currentUserId = userId) }
+            authRepo.getSignedInUser().collect{ result ->
+                when(result){
+                    is Result.SuccessWithData -> {
+                        _uiState.update { it.copy(post = post, currentUserId = result.data.id) }
+                    }
+                    is Result.Error -> {
+                        Napier.e("Error: ${result.message}")
+                        //TODO Handle error
+                    }
+                    else -> Unit
+                }
+            }
             getRepliesById(post.id)
         }
     }

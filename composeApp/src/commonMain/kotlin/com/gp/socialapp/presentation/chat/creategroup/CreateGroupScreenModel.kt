@@ -8,9 +8,11 @@ import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.data.chat.repository.RoomRepository
 import com.gp.socialapp.presentation.chat.creategroup.SelectableUser.Companion.toSelectableUser
 import com.gp.socialapp.util.DispatcherIO
+import com.gp.socialapp.util.Result
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -30,8 +32,18 @@ class CreateGroupScreenModel(
 
     private fun getUsers() {
         screenModelScope.launch(DispatcherIO) {
-            currentUserId = authRepo.getCurrentLocalUserId()
-            getAllUsers()
+            authRepo.getSignedInUser().collect{ result ->
+                when(result) {
+                    is Result.SuccessWithData -> {
+                        currentUserId = result.data.id
+                        getAllUsers()
+                    }
+                    is Result.Error -> {
+                        //TODO handle error
+                    }
+                    else -> Unit
+                }
+            }
         }
     }
 

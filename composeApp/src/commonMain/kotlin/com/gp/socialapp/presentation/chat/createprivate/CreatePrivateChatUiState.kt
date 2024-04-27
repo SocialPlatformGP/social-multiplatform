@@ -5,6 +5,6 @@ import com.gp.socialapp.data.chat.model.Room
 
 data class CreatePrivateChatUiState(
     val users: List<User> = emptyList(),
-    val currentUser: String = "",
+    val currentUserId: String = "",
     val room: Room? = null,
 )

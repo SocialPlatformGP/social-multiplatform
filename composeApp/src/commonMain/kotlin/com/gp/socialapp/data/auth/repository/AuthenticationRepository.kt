@@ -7,10 +7,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface AuthenticationRepository {
     fun sendPasswordResetEmail(email: String): Flow<Result<Nothing>>
-    fun getLocalUserToken(): String?
-    fun getCurrentLocalUserId(): String
-    fun setLocalUserId(id: String)
-    fun setLocalUserToken(token: String)
     fun clearStorage()
     fun signInWithOAuth(provider: OAuthProvider): Flow<Result<User>>
     fun signInWithEmail(email: String, password: String): Flow<Result<User>>

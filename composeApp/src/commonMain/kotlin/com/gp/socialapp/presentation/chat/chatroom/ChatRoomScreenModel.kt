@@ -72,9 +72,22 @@ class ChatRoomScreenModel(
 
     private fun getCurrentUserId() {
         screenModelScope.launch(DispatcherIO) {
-            val userId = authRepo.getCurrentLocalUserId()
-            _uiState.update { it.copy(currentUserId = userId) }
+            authRepo.getSignedInUser().collect{
+                when(it) {
+                    is Result.SuccessWithData -> {
+                        updateCurrentUserId(it.data.id)
+                    }
+                    is Result.Error -> {
+                        //TODO handle error
+                    }
+                    else -> Unit
+                }
+            }
         }
+    }
+
+    private fun updateCurrentUserId(id: String) {
+        _uiState.update { it.copy(currentUserId = id) }
     }
 
     private fun sendMessage(content: String) {

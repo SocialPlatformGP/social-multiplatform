@@ -9,6 +9,7 @@ import com.gp.socialapp.data.post.util.PostPopularityUtils
 import com.gp.socialapp.util.DispatcherIO
 import com.gp.socialapp.util.Result
 import com.gp.socialapp.util.Results
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -24,8 +25,18 @@ class FeedScreenModel(
 
     fun initScreen() {
         screenModelScope.launch(DispatcherIO) {
-            val userId = authRepo.getCurrentLocalUserId()
-            _state.update { it.copy(currentUserID = userId) }
+            authRepo.getSignedInUser().collect{ result ->
+                when(result){
+                    is Result.SuccessWithData -> {
+                        _state.update { it.copy(currentUserID = result.data.id) }
+                    }
+                    is Result.Error -> {
+                        Napier.e("Error: ${result.message}")
+                        _state.update { it.copy(error = FeedError.NetworkError(result.message)) }
+                    }
+                    else -> Unit
+                }
+            }
             getAllPosts()
         }
     }

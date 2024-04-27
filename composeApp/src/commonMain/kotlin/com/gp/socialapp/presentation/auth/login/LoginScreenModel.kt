@@ -29,11 +29,7 @@ class LoginScreenModel(
     val uiState = _uiState.asStateFlow()
 
     fun init() {
-        val userId = authRepo.getCurrentLocalUserId()
-        if (userId.isNotBlank()) {
-            _uiState.update { it.copy(userId = userId) }
-            getSignedInUser()
-        }
+        getSignedInUser()
     }
 
     private fun getSignedInUser() {
@@ -42,7 +38,7 @@ class LoginScreenModel(
                 Napier.e("getSignedInUserAll: $result")
                 when (result) {
                     is Result.SuccessWithData -> {
-                        _uiState.update { it.copy(signedInUser = result.data) }
+                        _uiState.update { it.copy(signedInUser = result.data,userId = result.data.id,) }
                     }
 
                     is Result.Error -> {
@@ -81,7 +77,6 @@ class LoginScreenModel(
                 authRepo.signInWithEmail(email, password).collect { result ->
                     when (result) {
                         is Result.SuccessWithData -> {
-                            authRepo.setLocalUserId(result.data.id)
                             _uiState.update {
                                 it.copy(
                                     userId = result.data.id,
@@ -128,7 +123,6 @@ class LoginScreenModel(
                 when (result) {
                     is Result.SuccessWithData -> {
                         Napier.e("signInWithOAutht: ${result.data}")
-                        authRepo.setLocalUserId(result.data.id)
                         _uiState.update {
                             it.copy(
                                 userId = result.data.id,

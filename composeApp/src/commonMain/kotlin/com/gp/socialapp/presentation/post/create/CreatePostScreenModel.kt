@@ -107,19 +107,17 @@ class CreatePostScreenModel(
 
     private fun getCurrentUser() {
         screenModelScope.launch {
-            authRepository.getCurrentLocalUserId().let { id ->
-                authRepository.getSignedInUser().collect {
-                    when (it) {
-                        is Result.SuccessWithData -> {
-                            currentUser.value = it.data
-                        }
-
-                        is Result.Error -> {
-                            println("Error: cant get user data")
-                        }
-
-                        else -> Unit
+            authRepository.getSignedInUser().collect {
+                when (it) {
+                    is Result.SuccessWithData -> {
+                        currentUser.value = it.data
                     }
+
+                    is Result.Error -> {
+                        println("Error: cant get user data")
+                    }
+
+                    else -> Unit
                 }
             }
         }
