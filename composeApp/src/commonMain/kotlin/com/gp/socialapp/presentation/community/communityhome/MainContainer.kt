@@ -12,7 +12,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
@@ -34,6 +38,8 @@ data class CommunityHomeContainer(val communityId: String) : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
         val scope = rememberCoroutineScope()
+        var isBarsVisible by remember { mutableStateOf(true) }
+        val onNavigation: (Boolean) -> Unit = { isBarsVisible = it }
         ModalNavigationDrawer(
             drawerContent = {
                 ModalDrawerSheet {
@@ -52,7 +58,7 @@ data class CommunityHomeContainer(val communityId: String) : Screen {
             },
             drawerState = drawerState,
         ) {
-            TabNavigator(PostsTab(communityId)) {
+            TabNavigator(PostsTab(communityId,onNavigation)) {
                 Scaffold(content = {
                     Column(
                         modifier = Modifier.padding(it)
@@ -60,20 +66,24 @@ data class CommunityHomeContainer(val communityId: String) : Screen {
                         CurrentTab()
                     }
                 }, topBar = {
-                    MainTopBar(onSearchClicked = { /*TODO*/ },
-                        onNotificationClicked = { /*TODO*/ },
-                        onNavDrawerIconClicked = {
-                            scope.launch {
-                                drawerState.apply {
-                                    if (isClosed) open() else close()
+                    if (isBarsVisible) {
+                        MainTopBar(onSearchClicked = { /*TODO*/ },
+                            onNotificationClicked = { /*TODO*/ },
+                            onNavDrawerIconClicked = {
+                                scope.launch {
+                                    drawerState.apply {
+                                        if (isClosed) open() else close()
+                                    }
                                 }
-                            }
-                        })
+                            })
+                    }
                 }, bottomBar = {
-                    NavigationBar {
-                        BottomTabNavigationItem(tab = PostsTab(communityId))
-                        BottomTabNavigationItem(tab = MaterialTab)
-                        BottomTabNavigationItem(tab = CommunityMembersTab(communityId))
+                    if (isBarsVisible) {
+                        NavigationBar {
+                            BottomTabNavigationItem(tab = PostsTab(communityId,onNavigation))
+                            BottomTabNavigationItem(tab = MaterialTab)
+                            BottomTabNavigationItem(tab = CommunityMembersTab(communityId))
+                        }
                     }
                 })
             }

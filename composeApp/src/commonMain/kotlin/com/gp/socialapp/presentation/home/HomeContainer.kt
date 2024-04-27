@@ -43,6 +43,7 @@ object HomeContainer : Screen {
             navigator.replaceAll(LoginScreen)
 
         }
+        val onNavigation: (Boolean) -> Unit = { barsVisibility = it}
         val onAction: (HomeUiAction) -> Unit = {
             when (it) {
                 HomeUiAction.OnUserLogout -> {
@@ -52,9 +53,7 @@ object HomeContainer : Screen {
                 else -> Unit
             }
         }
-        TabNavigator(CommunitiesTab {
-            barsVisibility = it
-        }) {
+        TabNavigator(CommunitiesTab(onNavigation)) {
             Scaffold(
                 content = {
                     Column(
@@ -71,13 +70,11 @@ object HomeContainer : Screen {
 
                 bottomBar = {
                     if (barsVisibility) NavigationBar {
-                        BottomTabNavigationItem(tab = ChatTab)
-                        BottomTabNavigationItem(tab = CalendarTab)
-                        BottomTabNavigationItem(tab = CommunitiesTab {
-                            barsVisibility = it
-                        })
-                        BottomTabNavigationItem(tab = GradesTab)
+                        BottomTabNavigationItem(tab = ChatTab(onNavigation))
                         BottomTabNavigationItem(tab = AssignmentsTab)
+                        BottomTabNavigationItem(tab = CommunitiesTab(onNavigation))
+                        BottomTabNavigationItem(tab = CalendarTab)
+                        BottomTabNavigationItem(tab = GradesTab)
                     }
                 },
             )
