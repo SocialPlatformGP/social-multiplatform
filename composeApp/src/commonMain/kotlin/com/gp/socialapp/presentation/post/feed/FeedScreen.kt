@@ -54,6 +54,8 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.gp.socialapp.data.community.source.remote.model.UserId
+import com.gp.socialapp.data.community.source.remote.model.isAdmin
 import com.gp.socialapp.data.post.source.remote.model.Post
 import com.gp.socialapp.data.post.source.remote.model.PostAttachment
 import com.gp.socialapp.presentation.auth.login.LoginScreen
@@ -71,7 +73,7 @@ import socialmultiplatform.composeapp.generated.resources.Res
 import socialmultiplatform.composeapp.generated.resources.general
 import socialmultiplatform.composeapp.generated.resources.spotlight
 
-object FeedScreen : Screen {
+data class FeedScreen(val communityId: String) : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
@@ -79,7 +81,7 @@ object FeedScreen : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = navigator.rememberNavigatorScreenModel<FeedScreenModel>()
         LifecycleEffect(
-            onStarted = { screenModel.initScreen() }
+            onStarted = { screenModel.initScreen(communityId) }
         )
         var currentAttachments by remember { mutableStateOf(emptyList<PostAttachment>()) }
         val scope = rememberCoroutineScope()
@@ -219,18 +221,21 @@ object FeedScreen : Screen {
                 SnackbarHost(hostState = snackbarHostState)
             },
             floatingActionButton = {
-                FloatingActionButton(
-                    onClick = { onPostEvent(PostEvent.OnAddPost) }
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Add,
-                        contentDescription = null
-                    )
-                }
+                if (!currentUserIsAdmin(
+                        state.currentUser.id,
+                        state.currentCommunity.members
+                    ) && selectedTabIndex == 1
+                )
+                else
+                    FloatingActionButton(
+                        onClick = { onPostEvent(PostEvent.OnAddPost) }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Add,
+                            contentDescription = null
+                        )
+                    }
             },
-//            topBar = {
-//                FeedTopBar(onNavigationAction)
-//            }
         ) { paddingValues ->
             if (state.error !is FeedError.NoError) {
                 scope.launch {
@@ -327,6 +332,11 @@ object FeedScreen : Screen {
                 }
             }
         }
+    }
+
+    private fun currentUserIsAdmin(id: String, members: Map<UserId, isAdmin>): Boolean {
+        return members[id] == true
+
     }
 
     @Composable

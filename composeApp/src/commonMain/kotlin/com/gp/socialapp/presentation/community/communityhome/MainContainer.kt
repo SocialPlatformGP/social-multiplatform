@@ -22,8 +22,8 @@ import cafe.adriel.voyager.navigator.tab.CurrentTab
 import cafe.adriel.voyager.navigator.tab.TabNavigator
 import com.gp.socialapp.navigation.tabs.CommunityMembersTab
 import com.gp.socialapp.navigation.tabs.MaterialTab
+import com.gp.socialapp.navigation.tabs.PostsTab
 import com.gp.socialapp.navigation.util.BottomTabNavigationItem
-import com.gp.socialapp.tabs.PostsTab
 import kotlinx.coroutines.launch
 
 
@@ -52,7 +52,7 @@ data class CommunityHomeContainer(val communityId: String) : Screen {
             },
             drawerState = drawerState,
         ) {
-            TabNavigator(PostsTab) {
+            TabNavigator(PostsTab(communityId)) {
                 Scaffold(content = {
                     Column(
                         modifier = Modifier.padding(it)
@@ -71,7 +71,7 @@ data class CommunityHomeContainer(val communityId: String) : Screen {
                         })
                 }, bottomBar = {
                     NavigationBar {
-                        BottomTabNavigationItem(tab = PostsTab)
+                        BottomTabNavigationItem(tab = PostsTab(communityId))
                         BottomTabNavigationItem(tab = MaterialTab)
                         BottomTabNavigationItem(tab = CommunityMembersTab(communityId))
                     }

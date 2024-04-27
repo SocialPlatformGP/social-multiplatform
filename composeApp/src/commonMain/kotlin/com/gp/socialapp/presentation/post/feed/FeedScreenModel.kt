@@ -3,6 +3,7 @@ package com.gp.socialapp.presentation.post.feed
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.gp.socialapp.data.auth.repository.AuthenticationRepository
+import com.gp.socialapp.data.community.repository.CommunityRepository
 import com.gp.socialapp.data.post.repository.PostRepository
 import com.gp.socialapp.data.post.source.remote.model.Post
 import com.gp.socialapp.data.post.util.PostPopularityUtils
@@ -18,26 +19,61 @@ import kotlinx.coroutines.launch
 
 class FeedScreenModel(
     private val postRepo: PostRepository,
-    private val authRepo: AuthenticationRepository
+    private val authRepo: AuthenticationRepository,
+    private val communityRepository: CommunityRepository
 ) : ScreenModel {
     private val _state = MutableStateFlow(FeedUiState())
     val state = _state.asStateFlow()
 
-    fun initScreen() {
+    fun initScreen(communityId: String) {
         screenModelScope.launch(DispatcherIO) {
-            authRepo.getSignedInUser().let{ result ->
-                when(result){
+            authRepo.getSignedInUser().let { result ->
+                when (result) {
                     is Result.SuccessWithData -> {
-                        _state.update { it.copy(currentUserID = result.data.id) }
+                        _state.update {
+                            it.copy(
+                                currentUserID = result.data.id,
+                                currentUser = result.data
+                            )
+                        }
                     }
+
                     is Result.Error -> {
                         Napier.e("Error: ${result.message}")
                         _state.update { it.copy(error = FeedError.NetworkError(result.message)) }
                     }
+
                     else -> Unit
                 }
             }
             getAllPosts()
+        }
+        getCurrentCommunity(communityId)
+    }
+
+    private fun getCurrentCommunity(communityId: String) {
+        screenModelScope.launch(DispatcherIO) {
+            communityRepository.fetchCommunity(communityId).collect { result ->
+                when (result) {
+                    is Results.Success -> {
+                        _state.update {
+                            it.copy(
+                                currentCommunity = result.data
+                            )
+                        }
+                    }
+
+                    is Results.Failure -> {
+                        _state.update {
+                            it.copy(
+                                error = FeedError.NetworkError(result.error.userMessage)
+                            )
+                        }
+                    }
+
+                    else -> Unit
+                }
+            }
         }
     }
 
