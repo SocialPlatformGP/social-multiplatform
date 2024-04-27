@@ -63,6 +63,7 @@ import com.gp.socialapp.presentation.post.feed.components.FilesBottomSheet
 import com.gp.socialapp.presentation.post.postDetails.PostDetailsScreen
 import com.gp.socialapp.presentation.post.search.SearchScreen
 import com.gp.socialapp.presentation.post.searchResult.SearchResultScreen
+import com.mohamedrejeb.calf.picker.FilePickerFileType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -314,7 +315,7 @@ object FeedScreen : Screen {
                 }
                 if (isFileBottomSheetOpen) {
                     FilesBottomSheet(
-                        attachments = currentAttachments,
+                        attachments = currentAttachments.filter { it.type != FilePickerFileType.ImageContentType },
                         onDismiss = onDismissBottomSheet,
                         onPostEvent = onPostEvent,
                         state = bottomSheetState,
