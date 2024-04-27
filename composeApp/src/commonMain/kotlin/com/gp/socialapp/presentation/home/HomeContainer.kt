@@ -43,6 +43,7 @@ object HomeContainer : Screen {
             navigator.replaceAll(LoginScreen)
 
         }
+        val onNavigation: (Boolean) -> Unit = { barsVisibility = it}
         val onAction: (HomeUiAction) -> Unit = {
             when (it) {
                 HomeUiAction.OnUserLogout -> {
@@ -71,11 +72,9 @@ object HomeContainer : Screen {
 
                 bottomBar = {
                     if (barsVisibility) NavigationBar {
-                        BottomTabNavigationItem(tab = ChatTab)
+                        BottomTabNavigationItem(tab = ChatTab(onNavigation))
                         BottomTabNavigationItem(tab = CalendarTab)
-                        BottomTabNavigationItem(tab = CommunitiesTab {
-                            barsVisibility = it
-                        })
+                        BottomTabNavigationItem(tab = CommunitiesTab(onNavigation))
                         BottomTabNavigationItem(tab = GradesTab)
                         BottomTabNavigationItem(tab = AssignmentsTab)
                     }
