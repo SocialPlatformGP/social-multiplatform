@@ -1,5 +1,6 @@
 package com.gp.socialapp.di
 
+import android.content.Intent
 import com.gp.socialapp.data.chat.source.local.MessageLocalDataSource
 import com.gp.socialapp.data.chat.source.local.MessageLocalDataSourceImpl
 import com.gp.socialapp.data.chat.source.local.RecentRoomLocalDataSource
@@ -64,4 +65,10 @@ actual val platformModule = DI.Module("platformModule") {
             }
         }
     }
+    bind<HandleDeepLink>() with singleton { HandleDeepLinkImpl(instance()) }
+}
+
+interface HandleDeepLink {
+    fun handleDeepLink(intent: Intent)
+
 }
