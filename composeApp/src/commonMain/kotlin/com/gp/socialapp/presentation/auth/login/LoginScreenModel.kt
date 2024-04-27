@@ -34,7 +34,7 @@ class LoginScreenModel(
 
     private fun getSignedInUser() {
         screenModelScope.launch(DispatcherIO) {
-            authRepo.getSignedInUser().collect { result ->
+            authRepo.getSignedInUser().let { result ->
                 Napier.e("getSignedInUserAll: $result")
                 when (result) {
                     is Result.SuccessWithData -> {

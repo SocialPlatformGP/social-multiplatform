@@ -95,7 +95,7 @@ class UserInformationScreenModel(
 
     private fun getSignedInUser() {
         screenModelScope.launch(DispatcherIO) {
-            authRepo.getSignedInUser().collect { result ->
+            authRepo.getSignedInUser().let { result ->
                 if (result is Result.SuccessWithData) {
                     println("User: ${result.data}")
                     userRepo.createRemoteUser(result.data).let { result2 ->

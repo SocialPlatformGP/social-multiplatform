@@ -110,7 +110,6 @@ object LoginScreen : Screen {
                 MyOAuthProvider("Google", OAuthProviderIcons.Google, Google),
                 MyOAuthProvider("Microsoft", OAuthProviderIcons.Microsoft, Azure),
                 MyOAuthProvider("Facebook", OAuthProviderIcons.Facebook, Facebook),
-                MyOAuthProvider("Apple", OAuthProviderIcons.Apple, Apple),
                 MyOAuthProvider("Twitter", OAuthProviderIcons.Twitter, Twitter),
                 MyOAuthProvider("GitHub", OAuthProviderIcons.Github, Github),
                 MyOAuthProvider("Linkedin", OAuthProviderIcons.Linkedin, LinkedIn),

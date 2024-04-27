@@ -24,7 +24,7 @@ class CreateCommunityScreenModel(
 
     fun init() {
         screenModelScope.launch(DispatcherIO) {
-            authRepo.getSignedInUser().collect { result ->
+            authRepo.getSignedInUser().let { result ->
                 when (result) {
                     is Result.SuccessWithData -> {
                         currentUserId = result.data.id

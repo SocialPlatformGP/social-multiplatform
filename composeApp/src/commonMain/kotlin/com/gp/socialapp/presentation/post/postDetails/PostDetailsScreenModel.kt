@@ -29,7 +29,7 @@ class PostDetailsScreenModel(
     val uiState = _uiState.asStateFlow()
     fun initScreenModel(post: Post) {
         screenModelScope.launch(DispatcherIO) {
-            authRepo.getSignedInUser().collect{ result ->
+            authRepo.getSignedInUser().let{ result ->
                 when(result){
                     is Result.SuccessWithData -> {
                         _uiState.update { it.copy(post = post, currentUserId = result.data.id) }

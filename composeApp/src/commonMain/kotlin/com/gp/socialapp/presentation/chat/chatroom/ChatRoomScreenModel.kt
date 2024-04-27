@@ -72,7 +72,7 @@ class ChatRoomScreenModel(
 
     private fun getCurrentUserId() {
         screenModelScope.launch(DispatcherIO) {
-            authRepo.getSignedInUser().collect{
+            authRepo.getSignedInUser().let{
                 when(it) {
                     is Result.SuccessWithData -> {
                         updateCurrentUserId(it.data.id)
