@@ -73,8 +73,7 @@ class MaterialRepositoryImpl(
                         }
 
                         is Results.Success -> {
-                            val localPath =
-                                fileManager.saveFile(data.data.data, data.data.fileName, mimeType)
+                            val localPath = fileManager.saveFile(data.data.data, data.data.fileName, mimeType)
                             localDataSource.insertFile(
                                 MaterialFile(
                                     id = fileId,

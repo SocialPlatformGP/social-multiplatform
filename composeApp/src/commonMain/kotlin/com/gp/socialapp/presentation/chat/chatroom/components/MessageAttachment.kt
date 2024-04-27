@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.gp.socialapp.util.AppConstants
 
 @Composable
 fun MessageAttachment(
@@ -24,7 +25,7 @@ fun MessageAttachment(
         when {
              fileType.contains("image".toRegex()) -> {
                 MessageImageAttachment(
-                    imageURL = fileUrl,
+                    imageURL = AppConstants.BASE_URL +fileUrl,
                     onImageClicked = { onImageClicked() },
                     maxHeight = maxHeight,
                     modifier = modifier,

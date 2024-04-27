@@ -121,20 +121,8 @@ data class FeedScreen(val communityId: String) : Screen {
                         navigator.push(SearchResultScreen(searchTag = action.tag, isTag = true))
                     }
 
-                    is PostEvent.OnAudioClicked -> {
-                        //todo navigate to audio player
-                    }
-
-                    is PostEvent.OnDocumentClicked -> {
-                        //todo navigate to document viewer
-                    }
-
-                    is PostEvent.OnImageClicked -> {
-                        //todo navigate to image viewer
-                    }
-
-                    is PostEvent.OnVideoClicked -> {
-                        //todo navigate to video player
+                    is PostEvent.OnAttachmentClicked -> {
+                        screenModel.openAttachment(action.attachment)
                     }
 
                     is PostEvent.OnPostUpVoted -> {

@@ -1,6 +1,8 @@
 package com.gp.socialapp.data.post.repository
 
 import com.gp.socialapp.data.auth.source.local.AuthKeyValueStorage
+import com.gp.socialapp.data.material.source.remote.MaterialRemoteDataSource
+import com.gp.socialapp.data.material.utils.FileManager
 import com.gp.socialapp.data.post.source.local.PostLocalDataSource
 import com.gp.socialapp.data.post.source.remote.PostRemoteDataSource
 import com.gp.socialapp.data.post.source.remote.model.Post
@@ -23,7 +25,8 @@ import kotlinx.datetime.toInstant
 class PostRepositoryImpl(
     private val postLocalSource: PostLocalDataSource,
     private val postRemoteSource: PostRemoteDataSource,
-    private val authStorage: AuthKeyValueStorage,
+    private val materialRemoteDataSource: MaterialRemoteDataSource,
+    private val fileManager: FileManager,
     private val settings: Settings
 ) : PostRepository {
     private var lastUpdated: Long
@@ -199,6 +202,27 @@ class PostRepositoryImpl(
             }
         } catch (e: Exception) {
             emit(Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN))
+        }
+    }
+
+    override suspend fun openAttachment(url: String, mimeType: String) {
+        try {
+            when (val data = materialRemoteDataSource.downloadFile(url)) {
+                is Results.Failure -> {
+                    println(data.error)
+                }
+
+                Results.Loading -> {
+                    //TODO
+                }
+
+                is Results.Success -> {
+                    val localPath = fileManager.saveFile(data.data.data, data.data.fileName, mimeType)
+                    fileManager.openFile(localPath, mimeType)
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 }
