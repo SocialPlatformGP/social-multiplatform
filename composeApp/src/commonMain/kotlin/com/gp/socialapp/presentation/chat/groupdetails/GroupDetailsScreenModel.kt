@@ -23,7 +23,6 @@ class GroupDetailsScreenModel(
     val uiState = _uiState.asStateFlow()
     private lateinit var roomId: String
     fun init(roomId: String, roomTitle: String, roomAvatarUrl: String) {
-        resetState()
         _uiState.value = GroupDetailsUiState(
             groupName = roomTitle,
             groupAvatarUrl = roomAvatarUrl
@@ -107,10 +106,28 @@ class GroupDetailsScreenModel(
                 removeMember(action.userId)
             }
 
+            is GroupDetailsAction.OnMessageUser -> {
+                onMessageUser(action.userId)
+            }
+
             else -> Unit
         }
     }
-
+    private fun onMessageUser(userId: String) {
+        screenModelScope.launch {
+            roomRepo.checkIfRoomExists(_uiState.value.currentUserId, userId).collect { result ->
+                result.onSuccessWithData { data ->
+                    _uiState.update { oldState ->
+                        oldState.copy(
+                            privateRoom = data
+                        )
+                    }
+                }.onFailure {
+                    println("Error: $it")
+                }
+            }
+        }
+    }
     private fun removeMember(userId: String) {
         screenModelScope.launch(DispatcherIO) {
             roomRepo.removeMember(roomId, userId).onSuccess {
@@ -146,8 +163,7 @@ class GroupDetailsScreenModel(
             }
         }
     }
-
-    private fun resetState() {
+    fun dispose() {
         _uiState.value = GroupDetailsUiState()
     }
 }
