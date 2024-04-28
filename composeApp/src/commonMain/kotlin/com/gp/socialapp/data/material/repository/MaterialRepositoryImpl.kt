@@ -73,7 +73,8 @@ class MaterialRepositoryImpl(
                         }
 
                         is Results.Success -> {
-                            val localPath = fileManager.saveFile(data.data.data, data.data.fileName, mimeType)
+                            val localPath =
+                                fileManager.saveFile(data.data.data, data.data.fileName, mimeType)
                             localDataSource.insertFile(
                                 MaterialFile(
                                     id = fileId,
@@ -86,6 +87,13 @@ class MaterialRepositoryImpl(
                 }
             }
 
+    }
+
+    override fun renameFolder(
+        folderId: String,
+        newName: String
+    ): Flow<Results<MaterialResponse.GetMaterialResponses, DataError.Network>> {
+        return remoteDataSource.renameFolder(folderId, newName)
     }
 
     override suspend fun shareLink(url: String) {

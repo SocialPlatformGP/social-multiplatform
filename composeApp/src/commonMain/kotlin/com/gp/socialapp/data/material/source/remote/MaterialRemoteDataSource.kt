@@ -31,6 +31,10 @@ interface MaterialRemoteDataSource {
 
     suspend fun deleteFolder(folderId: String): Flow<Results<MaterialResponse.GetMaterialResponses, DataError.Network>>
     suspend fun downloadFile(url: String): Results<MaterialResponse.DownloadFileResponse, DataError.Network>
+    fun renameFolder(
+        folderId: String,
+        newName: String
+    ): Flow<Results<MaterialResponse.GetMaterialResponses, DataError.Network>>
 
 }
 

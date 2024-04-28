@@ -154,6 +154,32 @@ class MaterialRemoteDataSourceImpl(
             Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN)
         }
     }
+
+    override fun renameFolder(
+        folderId: String,
+        newName: String
+    ): Flow<Results<MaterialResponse.GetMaterialResponses, DataError.Network>> {
+        val request = MaterialRequest.RenameFolderRequest(
+            folderId = folderId,
+            newName = newName
+        )
+        return flow {
+            emit(Results.Loading)
+            try {
+                val response = this@MaterialRemoteDataSourceImpl.client.post {
+                    endPoint("renameFolder")
+                    setBody(
+                        request
+                    )
+                }
+                handleServerResponse(response)
+
+            } catch (e: Exception) {
+                emit(Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN))
+                e.printStackTrace()
+            }
+        }
+    }
 }
 
 private suspend fun FlowCollector<Results<MaterialResponse.GetMaterialResponses, DataError.Network>>.handleServerResponse(
