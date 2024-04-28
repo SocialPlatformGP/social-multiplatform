@@ -26,17 +26,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.lifecycle.LifecycleEffect
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.core.stack.popUntil
 import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
 import cafe.adriel.voyager.kodein.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.presentation.chat.addmembers.AddMembersScreen
+import com.gp.socialapp.presentation.chat.chatroom.ChatRoomScreen
 import com.gp.socialapp.presentation.chat.creategroup.components.GroupAvatarSection
 import com.gp.socialapp.presentation.chat.groupdetails.components.GroupDetailsNameSection
 import com.gp.socialapp.presentation.chat.groupdetails.components.GroupMembersSection
 import com.gp.socialapp.presentation.chat.groupdetails.components.RemoveMemberAlertDialog
 import com.gp.socialapp.presentation.chat.groupdetails.components.UserClickedDialog
+import com.gp.socialapp.presentation.chat.home.ChatHomeScreen
 import org.jetbrains.compose.resources.stringResource
 import socialmultiplatform.composeapp.generated.resources.Res
 import socialmultiplatform.composeapp.generated.resources.confirm_member_removal
@@ -53,44 +56,53 @@ data class GroupDetailsScreen(
         LifecycleEffect(
             onStarted = {
                 screenModel.init(roomId, roomTitle, roomAvatarUrl)
+            },
+            onDisposed = {
+                screenModel.dispose()
             }
         )
         val state by screenModel.uiState.collectAsState()
-        GroupDetailsContent(
-            avatarURL = state.groupAvatarUrl,
-            isAdmin = state.isAdmin,
-            onAction = { action ->
-                when (action) {
-                    is GroupDetailsAction.OnAddMembersClicked -> {
-                        navigator.push(
-                            AddMembersScreen(
-                                roomId = roomId,
-                                groupMembersIds = state.members.map { it.id })
-                        )
-                    }
+        if(state.privateRoom != null) {
+            navigator.push(ChatRoomScreen(
+                roomId = state.privateRoom!!.id,
+                roomTitle = state.privateRoom!!.name,
+                roomAvatarUrl = state.privateRoom!!.picUrl,
+                isPrivate = true
+            ))
+            navigator.popUntil { it is ChatHomeScreen }
+        } else {
+            GroupDetailsContent(
+                avatarURL = state.groupAvatarUrl,
+                isAdmin = state.isAdmin,
+                onAction = { action ->
+                    when (action) {
+                        is GroupDetailsAction.OnAddMembersClicked -> {
+                            navigator.push(
+                                AddMembersScreen(
+                                    roomId = roomId,
+                                    groupMembersIds = state.members.map { it.id })
+                            )
+                        }
 
-                    is GroupDetailsAction.OnMessageUser -> {
-                        //todo navigate to chat
-                    }
+                        is GroupDetailsAction.OnViewUserProfile -> {
+                            //todo navigate to user profile
+                        }
 
-                    is GroupDetailsAction.OnViewUserProfile -> {
-                        //todo navigate to user profile
-                    }
+                        is GroupDetailsAction.OnBackClicked -> {
+                            navigator.pop()
+                        }
 
-                    is GroupDetailsAction.OnBackClicked -> {
-                        navigator.pop()
+                        else -> {
+                            screenModel.handleUiAction(action)
+                        }
                     }
-
-                    else -> {
-                        screenModel.handleUiAction(action)
-                    }
-                }
-            },
-            name = state.groupName,
-            members = state.members,
-            admins = state.admins,
-            currentUserId = state.currentUserId,
-        )
+                },
+                name = state.groupName,
+                members = state.members,
+                admins = state.admins,
+                currentUserId = state.currentUserId,
+            )
+        }
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
