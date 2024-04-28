@@ -192,27 +192,27 @@ data class HomeContainer(
         {
 
 
-        val defaultTab = when(startingTab) {
-            HomeTab.CHAT -> ChatTab(onNavigation)
-            HomeTab.ASSIGNMENTS -> AssignmentsTab
-            HomeTab.COMMUNITIES -> CommunitiesTab(onNavigation)
-            HomeTab.CALENDAR -> CalendarTab
-            HomeTab.GRADES -> GradesTab
-        }
-        TabNavigator(defaultTab) {
-            Scaffold(
-                content = {
-                    Column(
-                        modifier = Modifier.padding(it)
-                    ) {
-                        CurrentTab()
-                    }
-                },
-                topBar = {
-                    if (barsVisibility) HomeTopBar(
-                        action = onAction
-                    )
-                },
+            val defaultTab = when (startingTab) {
+                HomeTab.CHAT -> ChatTab(onNavigation)
+                HomeTab.ASSIGNMENTS -> AssignmentsTab
+                HomeTab.COMMUNITIES -> CommunitiesTab(onNavigation, onAction)
+                HomeTab.CALENDAR -> CalendarTab
+                HomeTab.GRADES -> GradesTab
+            }
+            TabNavigator(defaultTab) {
+                Scaffold(
+                    content = {
+                        Column(
+                            modifier = Modifier.padding(it)
+                        ) {
+                            CurrentTab()
+                        }
+                    },
+                    topBar = {
+                        if (barsVisibility) HomeTopBar(
+                            action = onAction
+                        )
+                    },
 
                     bottomBar = {
 
@@ -236,6 +236,7 @@ data class HomeContainer(
 
     }
 }
+
 enum class HomeTab {
     CHAT,
     ASSIGNMENTS,

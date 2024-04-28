@@ -84,9 +84,7 @@ data class CommunityHomeContainer(
                 }
 
                 is HomeUiAction.OnCommunityClicked -> {
-                    navigator.pop()
-                    communityId = it.communityId
-                    tabNavigator?.current = MaterialTab(it.communityId)
+                    isBarsVisible = false
 
 
                 }
@@ -158,7 +156,7 @@ data class CommunityHomeContainer(
                             selected = false,
                             onClick = {
                                 navigator.replaceAll(
-                                    HomeContainer
+                                    HomeContainer()
                                 )
                             }
                         )
@@ -217,46 +215,6 @@ data class CommunityHomeContainer(
             })
 
         {
-            TabNavigator(PostsTab(communityId, onNavigation)) {
-                tabNavigator = it
-                Scaffold(
-                    content = {
-                        Column(
-                            modifier = Modifier.padding(it)
-                        ) {
-                            CurrentTab()
-                        }
-                    }, topBar = {
-                        if (isBarsVisible) MainTopBar(
-                            {},
-                            {},
-                            onNavDrawerIconClicked = { onAction(HomeUiAction.OnOpenDrawer) }
-                        )
-                    },
-                    bottomBar = {
-                        if (isBarsVisible) {
-                            NavigationBar {
-                                BottomTabNavigationItem(tab = MaterialTab(communityId))
-                                BottomTabNavigationItem(tab = PostsTab(communityId, onNavigation))
-                                BottomTabNavigationItem(tab = CommunityMembersTab(communityId))
-                            }
-                        }
-                    })
-                    Text("EduLink", modifier = Modifier.padding(16.dp))
-                    HorizontalDivider()
-                    NavigationDrawerItem(label = { Text(text = "Item 1") },
-                        selected = true,
-                        onClick = { /*TODO*/ })
-                    NavigationDrawerItem(label = { Text(text = "Item 2") },
-                        selected = false,
-                        onClick = { /*TODO*/ })
-                    NavigationDrawerItem(label = { Text(text = "Item 3") },
-                        selected = false,
-                        onClick = { /*TODO*/ })
-                }
-            },
-            drawerState = drawerState,
-        ) {
             TabNavigator(defaultTab) {
                 Scaffold(content = {
                     Column(
@@ -286,9 +244,12 @@ data class CommunityHomeContainer(
                     }
                 })
             }
+
+
         }
     }
 }
+
 enum class CommunityHomeTab {
     POSTS, MATERIALS, MEMBERS
 }

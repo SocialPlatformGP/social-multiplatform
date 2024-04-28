@@ -38,7 +38,7 @@ data class CommunitiesTab(
     override fun Content() {
         Navigator(
             screen = HomeScreen(
-                onBottomBarVisibilityChanged,
+                { onBottomBarVisibilityChanged(it) },
                 action = action
             )
         ) { navigator ->

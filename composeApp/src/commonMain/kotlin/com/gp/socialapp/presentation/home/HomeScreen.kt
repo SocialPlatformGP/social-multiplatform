@@ -50,6 +50,7 @@ data class HomeScreen(
                 onBottomBarVisibilityChanged(true)
                 screenModel.init()
             }, onDisposed = {
+//                onBottomBarVisibilityChanged(false)
             })
         if (!state.user.isDataComplete && state.user.id.isNotBlank()) {
             navigator.replaceAll(UserInformationScreen(state.user))
@@ -61,8 +62,8 @@ data class HomeScreen(
         }
         HomeScreenContent(
             state = state,
-            onAction = { acions ->
-                when (acions) {
+            onAction = { it ->
+                when (it) {
                     is HomeUiAction.OnCommunityClicked -> {
                         onBottomBarVisibilityChanged(false)
                         navigator.replaceAll(
@@ -70,13 +71,13 @@ data class HomeScreen(
                                 communities = state.communities,
                                 user = state.user,
                                 onAction = { action(it) },
-                                acions.communityId
+                                it.communityId
                             )
                         )
                     }
 
                     is HomeUiAction.OnCommunityLogout -> {
-                        screenModel.communityLogout(acions.id)
+                        screenModel.communityLogout(it.id)
                     }
 
                     HomeUiAction.OnCreateCommunityClicked -> navigator.push(
@@ -84,7 +85,7 @@ data class HomeScreen(
                     )
 
                     is HomeUiAction.OnJoinCommunityClicked -> {
-                        screenModel.joinCommunity(acions.code)
+                        screenModel.joinCommunity(it.code)
                     }
 
                     HomeUiAction.OnProfileClicked -> Unit //TODO( Navigate to profile screen)
@@ -92,40 +93,46 @@ data class HomeScreen(
                         screenModel.userLogout()
                     }
 
-                is HomeUiAction.OnDeleteCommunityClicked -> {
-                    screenModel.deleteCommunity(it.communityId)
-                }
+                    is HomeUiAction.OnDeleteCommunityClicked -> {
+                        screenModel.deleteCommunity(it.communityId)
+                    }
 
-                is HomeUiAction.OnEditCommunityClicked -> {
-                    navigator.push(EditCommunityScreen(it.community))
-                }
+                    is HomeUiAction.OnEditCommunityClicked -> {
+                        navigator.push(EditCommunityScreen(it.community))
+                    }
 
-                is HomeUiAction.OnManageMembersClicked -> {
-                    navigator.push(
-                        CommunityHomeContainer(
-                            communityId = it.communityId,
-                            startingTab = CommunityHomeTab.MEMBERS
+                    is HomeUiAction.OnManageMembersClicked -> {
+                        navigator.push(
+                            CommunityHomeContainer(
+                                communityId = it.communityId,
+                                user = state.user,
+                                onAction = { action(it) },
+                                communities = state.communities,
+                                startingTab = CommunityHomeTab.MEMBERS
+                            )
                         )
-                    )
-                }
+                    }
 
-                is HomeUiAction.OnShareJoinCodeClicked -> {
-                    val clipboardManager = ClipboardManager()
-                    clipboardManager.setText(it.code)
-                }
+                    is HomeUiAction.OnShareJoinCodeClicked -> {
+                        val clipboardManager = ClipboardManager()
+                        clipboardManager.setText(it.code)
+                    }
 
-                is HomeUiAction.OnViewMembersClicked -> {
-                    navigator.push(
-                        CommunityHomeContainer(
-                            communityId = it.communityId,
-                            startingTab = CommunityHomeTab.MEMBERS
+                    is HomeUiAction.OnViewMembersClicked -> {
+                        navigator.push(
+                            CommunityHomeContainer(
+                                communityId = it.communityId,
+                                startingTab = CommunityHomeTab.MEMBERS,
+                                user = state.user,
+                                onAction = { action(it) },
+                                communities = state.communities
+                            )
                         )
-                    )
-                }
+                    }
 
-                else -> Unit
-            }
-        })
+                    else -> Unit
+                }
+            })
     }
 }
 
