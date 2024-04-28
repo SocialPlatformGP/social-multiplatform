@@ -28,7 +28,7 @@ class PostLocalDataSourceImpl(
                 author_name = authorName,
                 author_pfp = authorPfp,
                 author_id = authorID,
-                created_at = createdAt.toLong(),
+                created_at = createdAt,
                 votes = votes.toLong(),
                 downvotes = downvoted,
                 upvotes = upvoted,
@@ -37,7 +37,8 @@ class PostLocalDataSourceImpl(
                 tags = tags,
                 type = type,
                 attachments = attachments,
-                last_modified = lastModified.toLong()
+                last_modified = lastModified,
+                community_id = communityID
             )
         }
     }
