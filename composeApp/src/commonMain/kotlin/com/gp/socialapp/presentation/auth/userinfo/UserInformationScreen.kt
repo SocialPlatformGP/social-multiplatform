@@ -115,7 +115,7 @@ data class UserInformationScreen(
             }
         )
         if (state.createdState is Result.Success) {
-            navigator.replaceAll(HomeContainer)
+            navigator.replaceAll(HomeContainer())
         }
         Scaffold(
 

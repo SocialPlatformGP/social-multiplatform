@@ -104,7 +104,7 @@ object LoginScreen : Screen {
         )
 
         if (state.signedInUser != null) {
-            navigator.replaceAll(HomeContainer)
+            navigator.replaceAll(HomeContainer())
         } else {
             val providers = listOf(
                 MyOAuthProvider("Google", OAuthProviderIcons.Google, Google),
