@@ -44,4 +44,14 @@ class CommunityRepositoryImpl(
         val request = CommunityRequest.FetchCommunityMembersRequests(communityId)
         return communityRemoteDataSource.fetchCommunityMembersRequests(request)
     }
+
+    override suspend fun deleteCommunity(communityId: String): Results<Unit, DataError.Network> {
+        val request = CommunityRequest.DeleteCommunity(communityId)
+        return communityRemoteDataSource.deleteCommunity(request)
+    }
+
+    override suspend fun editCommunity(community: Community): Results<Unit, DataError.Network> {
+        val request = CommunityRequest.EditCommunity(community)
+        return communityRemoteDataSource.editCommunity(request)
+    }
 }

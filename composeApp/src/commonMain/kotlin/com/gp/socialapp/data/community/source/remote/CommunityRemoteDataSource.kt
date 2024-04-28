@@ -13,4 +13,6 @@ interface CommunityRemoteDataSource {
     suspend fun declineCommunityRequest(request: CommunityRequest.DeclineCommunityRequest): Results<Unit, DataError.Network>
     fun fetchCommunity(request: CommunityRequest.FetchCommunity): Flow<Results<Community, DataError.Network>>
     fun fetchCommunityMembersRequests(request: CommunityRequest.FetchCommunityMembersRequests): Flow<Results<List<CommunityMemberRequest>, DataError.Network>>
+    suspend fun deleteCommunity(request: CommunityRequest.DeleteCommunity): Results<Unit, DataError.Network>
+    suspend fun editCommunity(request: CommunityRequest.EditCommunity): Results<Unit, DataError.Network>
 }

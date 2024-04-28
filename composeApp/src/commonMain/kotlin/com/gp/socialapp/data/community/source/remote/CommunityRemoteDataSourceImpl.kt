@@ -106,4 +106,38 @@ class CommunityRemoteDataSourceImpl(
                 emit(Results.failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN))
             }
         }
+
+    override suspend fun deleteCommunity(request: CommunityRequest.DeleteCommunity): Results<Unit, DataError.Network> {
+        return try {
+            val response = httpClient.post {
+                endPoint("deleteCommunity")
+                setBody(request)
+            }
+            if (response.status == HttpStatusCode.OK) {
+                Results.success(Unit)
+            } else {
+                Results.failure(DataError.Network.SERVER_ERROR)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Results.failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN)
+        }
+    }
+
+    override suspend fun editCommunity(request: CommunityRequest.EditCommunity): Results<Unit, DataError.Network> {
+        return try {
+            val response = httpClient.post {
+                endPoint("editCommunity")
+                setBody(request)
+            }
+            if (response.status == HttpStatusCode.OK) {
+                Results.success(Unit)
+            } else {
+                Results.failure(DataError.Network.SERVER_ERROR)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Results.failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN)
+        }
+    }
 }
