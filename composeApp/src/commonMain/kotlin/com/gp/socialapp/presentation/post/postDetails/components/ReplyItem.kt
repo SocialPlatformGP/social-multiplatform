@@ -162,7 +162,6 @@ fun ReplyItem(
                         val dropDownItems = if (nestedReply.reply?.authorID == currentUserId) {
                             listOf(
                                 ReplyDropDownItem(stringResource(Res.string.edit)) {
-                                    //TODO(Implement Reply Editing)
                                     replyEvent(
                                         ReplyEvent.OnReplyEdited(
                                             reply = nestedReply.reply ?: Reply()
@@ -240,7 +239,7 @@ fun ReplyItem(
                             contentDescription = "Like"
                         )
                     }
-                    Text(text = (nestedReply.reply?.votes?:0).toString())
+                    Text(text = (nestedReply.reply?.votes ?: 0).toString())
                     IconButton(
                         onClick = {
                             replyEvent(

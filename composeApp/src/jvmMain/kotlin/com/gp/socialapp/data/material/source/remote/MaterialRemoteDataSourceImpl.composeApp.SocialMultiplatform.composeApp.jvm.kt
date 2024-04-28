@@ -17,7 +17,7 @@ class FileManagerImpl() : FileManager {
             folder.mkdirs()
         }
         val file =
-            File(folder.path + "/" + fileName)//todo get the file name from the server and save it
+            File(folder.path + "/" + fileName)
         file.writeBytes(data)
         println("File saved at ${file.path}")
         return file.path
