@@ -66,7 +66,7 @@ object SignUpScreen : Screen {
         val screenModel = navigator.rememberNavigatorScreenModel<SignUpScreenModel>()
         val state by screenModel.uiState.collectAsState()
         if (state.signedUpUser != null) {
-            navigator.replaceAll(HomeContainer(true))
+            navigator.replaceAll(HomeContainer)
         }
         SignUpContent(
             state = state,

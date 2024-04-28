@@ -65,7 +65,6 @@ import com.gp.socialapp.presentation.auth.signup.SignUpScreen
 import com.gp.socialapp.presentation.auth.util.AuthError.EmailError
 import com.gp.socialapp.presentation.auth.util.AuthError.PasswordError
 import com.gp.socialapp.presentation.auth.util.AuthError.ServerError
-import com.gp.socialapp.presentation.home.HomeContainer
 import com.gp.socialapp.util.getPlatform
 import io.github.jan.supabase.gotrue.providers.Azure
 import io.github.jan.supabase.gotrue.providers.Discord
@@ -101,7 +100,7 @@ object LoginScreen : Screen {
         )
 
         if (state.signedInUser != null) {
-            navigator.replaceAll(HomeContainer(fromLogin = true))
+            navigator.replaceAll(com.gp.socialapp.presentation.home.HomeContainer)
         } else {
             val providers = listOf(
                 MyOAuthProvider("Google", OAuthProviderIcons.Google, Google),

@@ -49,70 +49,73 @@ data class HomeScreen(
                 onBottomBarVisibilityChanged(true)
                 screenModel.init()
             }, onDisposed = {
-                screenModel.dispose()
+
             })
         if (!state.user.isDataComplete && state.user.id.isNotBlank()) {
             navigator.replaceAll(UserInformationScreen(state.user))
         }
         if (state.loggedOut) {
+            screenModel.dispose()
             navigator.replaceAll(LoginScreen)
 
         }
-        HomeScreenContent(state = state, onAction = {
-            when (it) {
-                is HomeUiAction.OnCommunityClicked -> {
-                    onBottomBarVisibilityChanged(false)
-                    navigator.replaceAll(
-                        CommunityHomeContainer(
-                            communities = state.communities,
-                            user = state.user,
-                            onAction = action,
-                            it.communityId
+        HomeScreenContent(
+            state = state,
+            onAction = { acions ->
+                when (acions) {
+                    is HomeUiAction.OnCommunityClicked -> {
+                        onBottomBarVisibilityChanged(false)
+                        navigator.replaceAll(
+                            CommunityHomeContainer(
+                                communities = state.communities,
+                                user = state.user,
+                                onAction = { action(it) },
+                                acions.communityId
+                            )
                         )
+                    }
+
+                    is HomeUiAction.OnCommunityLogout -> {
+                        screenModel.communityLogout(acions.id)
+                    }
+
+                    HomeUiAction.OnCreateCommunityClicked -> navigator.push(
+                        CreateCommunityScreen
                     )
+
+                    is HomeUiAction.OnJoinCommunityClicked -> {
+                        screenModel.joinCommunity(acions.code)
+                    }
+
+                    HomeUiAction.OnProfileClicked -> Unit //TODO( Navigate to profile screen)
+                    HomeUiAction.OnUserLogout -> {
+                        screenModel.userLogout()
+                    }
+
+                    is HomeUiAction.OnDeleteCommunityClicked -> {
+                        screenModel.deleteCommunity(acions.communityId)
+                    }
+
+                    is HomeUiAction.OnEditCommunityClicked -> {
+                        navigator.push(EditCommunityScreen(acions.community))
+                    }
+
+                    is HomeUiAction.OnManageMembersClicked -> {
+                        TODO()
+                    }
+
+                    is HomeUiAction.OnShareJoinCodeClicked -> {
+                        val clipboardManager = ClipboardManager()
+                        clipboardManager.setText(acions.code)
+                    }
+
+                    is HomeUiAction.OnViewMembersClicked -> {
+                        TODO()
+                    }
+
+                    else -> Unit
                 }
-
-                is HomeUiAction.OnCommunityLogout -> {
-                    screenModel.communityLogout(it.id)
-                }
-
-                HomeUiAction.OnCreateCommunityClicked -> navigator.push(
-                    CreateCommunityScreen
-                )
-
-                is HomeUiAction.OnJoinCommunityClicked -> {
-                    screenModel.joinCommunity(it.code)
-                }
-
-                HomeUiAction.OnProfileClicked -> Unit //TODO( Navigate to profile screen)
-                HomeUiAction.OnUserLogout -> {
-                    screenModel.userLogout()
-                }
-
-                is HomeUiAction.OnDeleteCommunityClicked -> {
-                    screenModel.deleteCommunity(it.communityId)
-                }
-
-                is HomeUiAction.OnEditCommunityClicked -> {
-                    navigator.push(EditCommunityScreen(it.community))
-                }
-
-                is HomeUiAction.OnManageMembersClicked -> {
-                    TODO()
-                }
-
-                is HomeUiAction.OnShareJoinCodeClicked -> {
-                    val clipboardManager = ClipboardManager()
-                    clipboardManager.setText(it.code)
-                }
-
-                is HomeUiAction.OnViewMembersClicked -> {
-                    TODO()
-                }
-
-                else -> Unit
-            }
-        })
+            })
     }
 }
 

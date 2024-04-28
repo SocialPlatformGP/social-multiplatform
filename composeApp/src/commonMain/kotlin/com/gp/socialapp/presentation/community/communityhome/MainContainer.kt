@@ -1,5 +1,7 @@
 package com.gp.socialapp.presentation.community.communityhome
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -7,8 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.DrawerValue
@@ -30,6 +30,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -61,6 +62,7 @@ data class CommunityHomeContainer(
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
+        var tabNavigator: TabNavigator? = null
         val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
         val scope = rememberCoroutineScope()
         var communityId by remember { mutableStateOf(communityId) }
@@ -69,7 +71,7 @@ data class CommunityHomeContainer(
         val onAction: (HomeUiAction) -> Unit = {
             when (it) {
                 HomeUiAction.OnUserLogout -> {
-                    navigator.replaceAll(HomeContainer(false))
+                    navigator.replaceAll(LoginScreen)
                 }
 
                 HomeUiAction.OnOpenDrawer -> {
@@ -80,7 +82,17 @@ data class CommunityHomeContainer(
                     }
                 }
 
-                else -> Unit
+                is HomeUiAction.OnCommunityClicked -> {
+                    navigator.pop()
+                    communityId = it.communityId
+                    tabNavigator?.current = MaterialTab(it.communityId)
+
+
+                }
+
+                else -> {
+                    onAction(it)
+                }
             }
         }
         ModalNavigationDrawer(
@@ -90,15 +102,32 @@ data class CommunityHomeContainer(
                     Column(
                         modifier = Modifier.padding(8.dp).fillMaxSize()
                     ) {
-                        println("Drawer content")
-                        AutoSizeImage(
-                            url = user.profilePictureURL,
-                            contentDescription = "user image",
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier.padding(top = 16.dp)
-                                .align(Alignment.CenterHorizontally)
-                                .size(64.dp).clip(CircleShape)
-                        )
+                        if (user.profilePictureURL.isNotBlank())
+
+                            AutoSizeImage(
+                                url = user.profilePictureURL,
+                                contentDescription = "user image",
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier.padding(top = 16.dp)
+                                    .align(Alignment.CenterHorizontally)
+                                    .size(64.dp).clip(CircleShape)
+                            )
+                        else
+                            Box(
+                                modifier = Modifier.padding(top = 16.dp)
+                                    .align(Alignment.CenterHorizontally)
+                                    .size(64.dp).clip(CircleShape)
+                                    .background(Color.Red)
+                            ) {
+                                Text(
+                                    text = if (user.firstName.isNotBlank()) user.firstName[0].toString()
+                                        .uppercase() + user.lastName[0].toString()
+                                        .uppercase() else "Unknown",
+                                    fontSize = 24.sp,
+                                    color = Color.White,
+                                    modifier = Modifier.align(Alignment.Center)
+                                )
+                            }
                         Spacer(modifier = Modifier.padding(8.dp))
                         Text(
                             user.firstName + " " + user.lastName,
@@ -122,36 +151,25 @@ data class CommunityHomeContainer(
                             label = { Text(text = "Home") },
                             selected = false,
                             onClick = {
-                                navigator.replaceAll(HomeContainer(false))
+                                navigator.replaceAll(
+                                    HomeContainer
+                                )
                             }
                         )
                         HorizontalDivider(
                             modifier = Modifier.padding(vertical = 8.dp)
                         )
-                        Text(
-                            "Communities",
-                            fontSize = 20.sp,
-                            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
-                            modifier = Modifier.padding(vertical = 8.dp)
-                        )
 
-                        LazyColumn(
-                            modifier = Modifier.fillMaxWidth().weight(1f)
-                        ) {
-                            items(communities) {
-                                NavigationDrawerItem(label = { Text(text = it.name) },
-                                    selected = it.id == communityId,
-                                    onClick = {
-                                        communityId = it.id
-                                        onAction(
-                                            HomeUiAction.OnCommunityClicked(
-                                                it.id
-                                            )
-                                        )
-                                    }
-                                )
-                            }
-                        }
+                        NavigationDrawerItem(
+                            label = {
+                                Text(text = communities.filter { it.id == communityId }
+                                    .first().name)
+                            },
+                            selected = true,
+                            onClick = {},
+                        )
+                        Spacer(modifier = Modifier.weight(1f))
+
                         HorizontalDivider(
                             modifier = Modifier.padding(vertical = 8.dp)
                         )
@@ -194,19 +212,21 @@ data class CommunityHomeContainer(
 
         {
             TabNavigator(PostsTab(communityId, onNavigation)) {
-                Scaffold(content = {
-                    Column(
-                        modifier = Modifier.padding(it)
-                    ) {
-                        CurrentTab()
-                    }
-                }, topBar = {
-                    if (isBarsVisible) MainTopBar(
-                        {},
-                        {},
-                        onNavDrawerIconClicked = { onAction(HomeUiAction.OnOpenDrawer) }
-                    )
-                },
+                tabNavigator = it
+                Scaffold(
+                    content = {
+                        Column(
+                            modifier = Modifier.padding(it)
+                        ) {
+                            CurrentTab()
+                        }
+                    }, topBar = {
+                        if (isBarsVisible) MainTopBar(
+                            {},
+                            {},
+                            onNavDrawerIconClicked = { onAction(HomeUiAction.OnOpenDrawer) }
+                        )
+                    },
                     bottomBar = {
                         if (isBarsVisible) {
                             NavigationBar {

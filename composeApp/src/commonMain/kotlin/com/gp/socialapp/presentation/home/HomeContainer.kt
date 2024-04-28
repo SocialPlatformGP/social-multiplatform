@@ -1,5 +1,7 @@
 package com.gp.socialapp.presentation.home
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -7,8 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.DrawerValue
@@ -31,10 +31,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
 import cafe.adriel.voyager.core.lifecycle.LifecycleEffect
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
@@ -54,8 +54,7 @@ import com.gp.socialapp.presentation.home.components.HomeTopBar
 import com.seiko.imageloader.ui.AutoSizeImage
 import kotlinx.coroutines.launch
 
-data class HomeContainer(val fromLogin: Boolean) : Screen {
-    @OptIn(InternalVoyagerApi::class)
+object HomeContainer : Screen {
     @Composable
     override fun Content() {
         var navigator = LocalNavigator.currentOrThrow
@@ -70,7 +69,7 @@ data class HomeContainer(val fromLogin: Boolean) : Screen {
         }
         val onNavigation: (Boolean) -> Unit = { barsVisibility = it }
         if (state.loggedOut) {
-            navigator.popAll()
+            navigator.popUntilRoot()
         }
         val onAction: (HomeUiAction) -> Unit = {
             when (it) {
@@ -86,10 +85,6 @@ data class HomeContainer(val fromLogin: Boolean) : Screen {
                     }
                 }
 
-                is HomeUiAction.OnCommunityClicked -> {
-
-                }
-
                 else -> Unit
             }
         }
@@ -100,14 +95,31 @@ data class HomeContainer(val fromLogin: Boolean) : Screen {
                     Column(
                         modifier = Modifier.padding(8.dp).fillMaxSize()
                     ) {
-                        AutoSizeImage(
-                            url = state.user.profilePictureURL,
-                            contentDescription = "user image",
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier.padding(top = 16.dp)
-                                .align(Alignment.CenterHorizontally)
-                                .size(64.dp).clip(CircleShape)
-                        )
+                        if (state.user.profilePictureURL.isNotBlank())
+                            AutoSizeImage(
+                                url = state.user.profilePictureURL,
+                                contentDescription = "user image",
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier.padding(top = 16.dp)
+                                    .align(Alignment.CenterHorizontally)
+                                    .size(64.dp).clip(CircleShape)
+                            )
+                        else
+                            Box(
+                                modifier = Modifier.padding(top = 16.dp)
+                                    .align(Alignment.CenterHorizontally)
+                                    .size(64.dp).clip(CircleShape)
+                                    .background(Color.Red)
+                            ) {
+                                Text(
+                                    text = if (state.user.firstName.isNotBlank()) state.user.firstName[0].toString()
+                                        .uppercase() + state.user.lastName[0].toString()
+                                        .uppercase() else "Unknown",
+                                    fontSize = 24.sp,
+                                    color = Color.White,
+                                    modifier = Modifier.align(Alignment.Center)
+                                )
+                            }
                         Spacer(modifier = Modifier.padding(8.dp))
                         Text(
                             state.user.firstName + " " + state.user.lastName,
@@ -132,27 +144,9 @@ data class HomeContainer(val fromLogin: Boolean) : Screen {
                             selected = true,
                             onClick = {}
                         )
-                        HorizontalDivider(
-                            modifier = Modifier.padding(vertical = 8.dp)
-                        )
-                        Text(
-                            "Communities",
-                            fontSize = 20.sp,
-                            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
-                            modifier = Modifier.padding(vertical = 8.dp)
-                        )
+                        Spacer(modifier = Modifier.weight(1f))
 
-                        LazyColumn(
-                            modifier = Modifier.fillMaxWidth().weight(1f)
-                        ) {
-                            items(state.communities) {
-                                NavigationDrawerItem(label = { Text(text = it.name) },
-                                    selected = false,
-                                    onClick = {
 
-                                    })
-                            }
-                        }
                         HorizontalDivider(
                             modifier = Modifier.padding(vertical = 8.dp)
                         )
@@ -204,30 +198,28 @@ data class HomeContainer(val fromLogin: Boolean) : Screen {
                         }
                     },
                     topBar = {
-                        if (!state.loggedOut) {
 
-                            if (barsVisibility) HomeTopBar(
-                                action = onAction
-                            )
-                        }
+                        if (barsVisibility) HomeTopBar(
+                            action = onAction
+                        )
+
                     },
 
                     bottomBar = {
-                        if (!state.loggedOut) {
 
-                            if (barsVisibility) NavigationBar {
-                                BottomTabNavigationItem(tab = ChatTab(onNavigation))
-                                BottomTabNavigationItem(tab = AssignmentsTab)
-                                BottomTabNavigationItem(
-                                    tab = CommunitiesTab(
-                                        onNavigation,
-                                        onAction
-                                    )
+                        if (barsVisibility) NavigationBar {
+                            BottomTabNavigationItem(tab = ChatTab(onNavigation))
+                            BottomTabNavigationItem(tab = AssignmentsTab)
+                            BottomTabNavigationItem(
+                                tab = CommunitiesTab(
+                                    onNavigation,
+                                    onAction
                                 )
-                                BottomTabNavigationItem(tab = CalendarTab)
-                                BottomTabNavigationItem(tab = GradesTab)
-                            }
+                            )
+                            BottomTabNavigationItem(tab = CalendarTab)
+                            BottomTabNavigationItem(tab = GradesTab)
                         }
+
                     },
                 )
             }
