@@ -16,14 +16,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.gp.socialapp.data.material.model.MaterialFile
+import com.gp.socialapp.data.material.model.MaterialFolder
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DetailsDialog(
+fun FolderDetailsDialog(
     onDismissRequest: () -> Unit = {},
-    file: MaterialFile,
-    onOpenLinkClicked: (String) -> Unit
+    folder: MaterialFolder,
 ) {
     BasicAlertDialog(
         onDismissRequest = {
@@ -42,7 +41,7 @@ fun DetailsDialog(
                 verticalArrangement = Arrangement.Center,
             ) {
                 Text(
-                    text = "File Details",
+                    text = "Folder Details",
                     style = MaterialTheme.typography.headlineSmall,
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center
@@ -52,12 +51,10 @@ fun DetailsDialog(
                     thickness = 1.dp,
                     color = MaterialTheme.colorScheme.onSurface
                 )
-                FileDetails(
-                    file,
-                    onOpenLinkClicked = onOpenLinkClicked
+                FolderDetails(
+                    folder,
                 )
             }
         }
     }
 }
-

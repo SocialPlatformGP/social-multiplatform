@@ -37,6 +37,10 @@ interface MaterialRepository {
     suspend fun openFile(fileId: String, url: String, mimeType: String)
     suspend fun shareLink(url: String)
     suspend fun openLink(url: String)
+    fun renameFolder(
+        folderId: String,
+        newName: String
+    ): Flow<Results<MaterialResponse.GetMaterialResponses, DataError.Network>>
 
 }
 

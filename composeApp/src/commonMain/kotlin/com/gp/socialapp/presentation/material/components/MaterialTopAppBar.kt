@@ -24,12 +24,13 @@ fun MaterialTopAppBar(
             Text(names.joinToString(separator = "/") + "/" + currentFolder.name)
         },
         navigationIcon = {
-            IconButton(onClick = { action(MaterialAction.OnBackClicked) }) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBackIosNew,
-                    contentDescription = "Back",
-                )
-            }
+            if (pathes.isNotEmpty())
+                IconButton(onClick = { action(MaterialAction.OnBackClicked) }) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBackIosNew,
+                        contentDescription = "Back",
+                    )
+                }
         }
     )
 }

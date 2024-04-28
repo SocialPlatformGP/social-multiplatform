@@ -26,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.gp.socialapp.data.material.model.MaterialFile
+import com.gp.socialapp.data.material.model.MaterialFolder
 import com.gp.socialapp.presentation.material.MaterialAction
 import com.gp.socialapp.presentation.material.MaterialUiState
 import com.gp.socialapp.util.SnackbarVisualsWithError
@@ -45,7 +46,10 @@ fun MaterialScreenContent(
     val scope = rememberCoroutineScope()
     var dialogState by remember { mutableStateOf(false) }
     var detialsDialogState by remember { mutableStateOf(false) }
+    var folderDetialsDialogState by remember { mutableStateOf(false) }
     var fileDetails by remember { mutableStateOf(MaterialFile()) }
+    var editFolderNameDialoge by remember { mutableStateOf(false) }
+    var folderDetails by remember { mutableStateOf(MaterialFolder()) }
     val snackbarHostState = remember { SnackbarHostState() }
     if (state.error != null) {
         scope.launch {
@@ -113,8 +117,23 @@ fun MaterialScreenContent(
             ) {
                 items(state.currentFolders) { folder ->
                     FolderItem(
-                        folder
-                    ) { action(MaterialAction.OnFolderClicked(it)) }
+                        folder = folder,
+                        action = {
+                            when (it) {
+                                is MaterialAction.OnFolderDetailsClicked -> {
+                                    folderDetialsDialogState = true
+                                    folderDetails = it.folder
+                                }
+
+                                is MaterialAction.OnRenameFolderClicked -> {
+                                    editFolderNameDialoge = true
+                                    folderDetails = it.folder
+                                }
+
+                                else -> action(it)
+                            }
+                        }
+                    )
                 }
                 items(state.currentFiles) { file ->
                     FileItem(
@@ -145,6 +164,21 @@ fun MaterialScreenContent(
             onDismissRequest = { detialsDialogState = false },
             file = fileDetails,
             onOpenLinkClicked = { action(MaterialAction.OpenLink(it)) }
+        )
+    }
+    if (folderDetialsDialogState) {
+        FolderDetailsDialog(
+            onDismissRequest = { folderDetialsDialogState = false },
+            folder = folderDetails,
+        )
+    }
+    if (editFolderNameDialoge) {
+        EditFolderName(
+            onDismissRequest = { editFolderNameDialoge = false },
+            folder = folderDetails,
+            onRenameFolderClicked = {
+                action(MaterialAction.OnRenameFolderClicked(folderDetails.copy(name = it)))
+            }
         )
     }
 }

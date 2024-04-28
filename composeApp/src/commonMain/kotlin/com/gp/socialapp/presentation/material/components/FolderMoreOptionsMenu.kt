@@ -6,14 +6,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 
 @Composable
-fun MoreOptionsMenu(
+fun FolderMoreOptionsMenu(
     isExpanded: Boolean,
     onCloseMenu: () -> Unit,
     onDelete: () -> Unit,
-    onOpenFile: () -> Unit,
-    onDownload: () -> Unit,
+    onRename: () -> Unit,
     onDetails: () -> Unit,
-    onShareFileClicked: () -> Unit
+    onOpen: () -> Unit
 ) {
     if (isExpanded) {
         DropdownMenu(
@@ -23,7 +22,7 @@ fun MoreOptionsMenu(
             DropdownMenuItem(
                 text = { Text("Open") },
                 onClick = {
-                    onOpenFile()
+                    onOpen()
                     onCloseMenu()
                 }
             )
@@ -35,16 +34,9 @@ fun MoreOptionsMenu(
                 }
             )
             DropdownMenuItem(
-                text = { Text("Share") },
+                text = { Text("Rename") },
                 onClick = {
-                    onShareFileClicked()
-                    onCloseMenu()
-                }
-            )
-            DropdownMenuItem(
-                text = { Text("Download") },
-                onClick = {
-                    onDownload()
+                    onRename()
                     onCloseMenu()
                 }
             )
@@ -60,4 +52,3 @@ fun MoreOptionsMenu(
         }
     }
 }
-

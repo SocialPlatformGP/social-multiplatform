@@ -32,4 +32,7 @@ sealed class MaterialRequest {
 
     @Serializable
     data class DownloadFileRequest(val url: String) : MaterialRequest()
+
+    @Serializable
+    data class RenameFolderRequest(val folderId: String, val newName: String) : MaterialRequest()
 }
