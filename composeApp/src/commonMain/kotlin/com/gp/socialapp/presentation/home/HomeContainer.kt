@@ -28,7 +28,9 @@ import com.gp.socialapp.presentation.auth.login.LoginScreen
 import com.gp.socialapp.presentation.auth.userinfo.UserInformationScreen
 import com.gp.socialapp.presentation.home.components.HomeTopBar
 
-object HomeContainer : Screen {
+data class HomeContainer(
+    val startingTab: HomeTab = HomeTab.COMMUNITIES
+) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
@@ -41,7 +43,6 @@ object HomeContainer : Screen {
         }
         if (state.loggedOut) {
             navigator.replaceAll(LoginScreen)
-
         }
         val onNavigation: (Boolean) -> Unit = { barsVisibility = it}
         val onAction: (HomeUiAction) -> Unit = {
@@ -53,7 +54,14 @@ object HomeContainer : Screen {
                 else -> Unit
             }
         }
-        TabNavigator(CommunitiesTab(onNavigation)) {
+        val defaultTab = when(startingTab) {
+            HomeTab.CHAT -> ChatTab(onNavigation)
+            HomeTab.ASSIGNMENTS -> AssignmentsTab
+            HomeTab.COMMUNITIES -> CommunitiesTab(onNavigation)
+            HomeTab.CALENDAR -> CalendarTab
+            HomeTab.GRADES -> GradesTab
+        }
+        TabNavigator(defaultTab) {
             Scaffold(
                 content = {
                     Column(
@@ -80,4 +88,11 @@ object HomeContainer : Screen {
             )
         }
     }
+}
+enum class HomeTab {
+    CHAT,
+    ASSIGNMENTS,
+    COMMUNITIES,
+    CALENDAR,
+    GRADES
 }

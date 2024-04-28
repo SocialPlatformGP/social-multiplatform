@@ -31,7 +31,10 @@ import com.gp.socialapp.navigation.util.BottomTabNavigationItem
 import kotlinx.coroutines.launch
 
 
-data class CommunityHomeContainer(val communityId: String) : Screen {
+data class CommunityHomeContainer(
+    val communityId: String,
+    val startingTab: CommunityHomeTab = CommunityHomeTab.POSTS
+) : Screen {
 
     @Composable
     override fun Content() {
@@ -40,6 +43,11 @@ data class CommunityHomeContainer(val communityId: String) : Screen {
         val scope = rememberCoroutineScope()
         var isBarsVisible by remember { mutableStateOf(true) }
         val onNavigation: (Boolean) -> Unit = { isBarsVisible = it }
+        val defaultTab = when (startingTab) {
+            CommunityHomeTab.POSTS -> PostsTab(communityId, onNavigation)
+            CommunityHomeTab.MATERIALS -> MaterialTab(communityId)
+            CommunityHomeTab.MEMBERS -> CommunityMembersTab(communityId)
+        }
         ModalNavigationDrawer(
             drawerContent = {
                 ModalDrawerSheet {
@@ -58,7 +66,7 @@ data class CommunityHomeContainer(val communityId: String) : Screen {
             },
             drawerState = drawerState,
         ) {
-            TabNavigator(PostsTab(communityId, onNavigation)) {
+            TabNavigator(defaultTab) {
                 Scaffold(content = {
                     Column(
                         modifier = Modifier.padding(it)
@@ -89,5 +97,7 @@ data class CommunityHomeContainer(val communityId: String) : Screen {
             }
         }
     }
-
+}
+enum class CommunityHomeTab {
+    POSTS, MATERIALS, MEMBERS
 }
