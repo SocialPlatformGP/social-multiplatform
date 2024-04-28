@@ -49,9 +49,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import cafe.adriel.voyager.core.lifecycle.LifecycleEffect
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
+import cafe.adriel.voyager.kodein.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gp.socialapp.data.community.source.remote.model.UserId
@@ -80,10 +79,10 @@ data class FeedScreen(val communityId: String) : Screen {
     override fun Content() {
 
         val navigator = LocalNavigator.currentOrThrow
-        val screenModel = navigator.rememberNavigatorScreenModel<FeedScreenModel>()
-        LifecycleEffect(
-            onStarted = { screenModel.initScreen(communityId) }
-        )
+        val screenModel = rememberScreenModel<FeedScreenModel>()
+        LaunchedEffect(true)
+        { screenModel.initScreen(communityId) }
+        
         var currentAttachments by remember { mutableStateOf(emptyList<PostAttachment>()) }
         val scope = rememberCoroutineScope()
         val state by screenModel.state.collectAsState()

@@ -34,6 +34,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
 import cafe.adriel.voyager.core.lifecycle.LifecycleEffect
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
@@ -53,24 +54,24 @@ import com.gp.socialapp.presentation.home.components.HomeTopBar
 import com.seiko.imageloader.ui.AutoSizeImage
 import kotlinx.coroutines.launch
 
-object HomeContainer : Screen {
+data class HomeContainer(val fromLogin: Boolean) : Screen {
+    @OptIn(InternalVoyagerApi::class)
     @Composable
     override fun Content() {
-        val navigator = LocalNavigator.currentOrThrow
+        var navigator = LocalNavigator.currentOrThrow
         val screenModel = navigator.rememberNavigatorScreenModel<HomeScreenModel>()
         val state by screenModel.uiState.collectAsState()
         val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
         val scope = rememberCoroutineScope()
         var barsVisibility by remember { mutableStateOf(true) }
-        LifecycleEffect(onStarted = { screenModel.init() }, onDisposed = { screenModel.dispose() })
+        LifecycleEffect(onStarted = { screenModel.init() }, onDisposed = { })
         if (!state.user.isDataComplete && state.user.id.isNotBlank()) {
             navigator.replaceAll(UserInformationScreen(state.user))
         }
-        if (state.loggedOut) {
-            navigator.replaceAll(LoginScreen)
-
-        }
         val onNavigation: (Boolean) -> Unit = { barsVisibility = it }
+        if (state.loggedOut) {
+            navigator.popAll()
+        }
         val onAction: (HomeUiAction) -> Unit = {
             when (it) {
                 HomeUiAction.OnUserLogout -> {
@@ -85,99 +86,115 @@ object HomeContainer : Screen {
                     }
                 }
 
+                is HomeUiAction.OnCommunityClicked -> {
+
+                }
+
                 else -> Unit
             }
         }
-        ModalNavigationDrawer(drawerState = drawerState, drawerContent = {
-            ModalDrawerSheet {
-                Column(
-                    modifier = Modifier.padding(8.dp).fillMaxSize()
-                ) {
-                    AutoSizeImage(
-                        url = state.user.profilePictureURL,
-                        contentDescription = "user image",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.padding(top = 16.dp).align(Alignment.CenterHorizontally)
-                            .size(64.dp).clip(CircleShape)
-                    )
-                    Spacer(modifier = Modifier.padding(8.dp))
-                    Text(
-                        state.user.firstName + " " + state.user.lastName,
-                        fontSize = 24.sp,
-                        fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Spacer(modifier = Modifier.padding(4.dp))
-                    Text(
-                        state.user.email,
-                        fontSize = 12.sp,
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Spacer(modifier = Modifier.padding(4.dp))
-                    HorizontalDivider(
-                        modifier = Modifier.padding(vertical = 8.dp)
-                    )
-                    Text(
-                        "Communities",
-                        fontSize = 20.sp,
-                        fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
-                        modifier = Modifier.padding(vertical = 8.dp)
-                    )
-
-                    LazyColumn(
-                        modifier = Modifier.fillMaxWidth().weight(1f)
+        ModalNavigationDrawer(
+            drawerState = drawerState,
+            drawerContent = {
+                ModalDrawerSheet {
+                    Column(
+                        modifier = Modifier.padding(8.dp).fillMaxSize()
                     ) {
-                        items(state.communities) {
-                            NavigationDrawerItem(label = { Text(text = it.name) },
-                                selected = false,
+                        AutoSizeImage(
+                            url = state.user.profilePictureURL,
+                            contentDescription = "user image",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.padding(top = 16.dp)
+                                .align(Alignment.CenterHorizontally)
+                                .size(64.dp).clip(CircleShape)
+                        )
+                        Spacer(modifier = Modifier.padding(8.dp))
+                        Text(
+                            state.user.firstName + " " + state.user.lastName,
+                            fontSize = 24.sp,
+                            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        Spacer(modifier = Modifier.padding(4.dp))
+                        Text(
+                            state.user.email,
+                            fontSize = 12.sp,
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        Spacer(modifier = Modifier.padding(4.dp))
+                        HorizontalDivider(
+                            modifier = Modifier.padding(vertical = 8.dp)
+                        )
+                        NavigationDrawerItem(
+                            label = { Text(text = "Home") },
+                            selected = true,
+                            onClick = {}
+                        )
+                        HorizontalDivider(
+                            modifier = Modifier.padding(vertical = 8.dp)
+                        )
+                        Text(
+                            "Communities",
+                            fontSize = 20.sp,
+                            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                            modifier = Modifier.padding(vertical = 8.dp)
+                        )
+
+                        LazyColumn(
+                            modifier = Modifier.fillMaxWidth().weight(1f)
+                        ) {
+                            items(state.communities) {
+                                NavigationDrawerItem(label = { Text(text = it.name) },
+                                    selected = false,
+                                    onClick = {
+
+                                    })
+                            }
+                        }
+                        HorizontalDivider(
+                            modifier = Modifier.padding(vertical = 8.dp)
+                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+
+                            OutlinedButton(
+                                onClick = {
+                                    screenModel.userLogout()
+                                    navigator.replaceAll(LoginScreen)
+                                },
+                                modifier = Modifier.weight(1f).padding(8.dp)
+                            ) {
+                                Text(
+                                    text = "Logout",
+                                    modifier = Modifier.fillMaxWidth(),
+                                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                                )
+                            }
+
+                            Button(
                                 onClick = {
 
-                                })
-                        }
-                    }
-                    HorizontalDivider(
-                        modifier = Modifier.padding(vertical = 8.dp)
-                    )
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
+                                },
+                                modifier = Modifier.weight(1f).padding(8.dp)
 
-                        OutlinedButton(
-                            onClick = {
-                                screenModel.userLogout()
-                                navigator.replaceAll(LoginScreen)
-                            },
-                            modifier = Modifier.weight(1f).padding(8.dp)
-                        ) {
-                            Text(
-                                text = "Logout",
-                                modifier = Modifier.fillMaxWidth(),
-                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                            )
-                        }
-
-                        Button(
-                            onClick = {
-
-                            },
-                            modifier = Modifier.weight(1f).padding(8.dp)
-
-                        ) {
-                            Text(
-                                text = "Settings",
-                                modifier = Modifier.fillMaxWidth(),
-                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                            )
+                            ) {
+                                Text(
+                                    text = "Settings",
+                                    modifier = Modifier.fillMaxWidth(),
+                                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                                )
+                            }
                         }
                     }
                 }
-            }
-        })
+            })
         {
-            TabNavigator(CommunitiesTab(onNavigation)) {
+
+            TabNavigator(CommunitiesTab({ onNavigation(it) }, { onAction(it) })) {
                 Scaffold(
                     content = {
                         Column(
@@ -187,18 +204,29 @@ object HomeContainer : Screen {
                         }
                     },
                     topBar = {
-                        if (barsVisibility) HomeTopBar(
-                            action = onAction
-                        )
+                        if (!state.loggedOut) {
+
+                            if (barsVisibility) HomeTopBar(
+                                action = onAction
+                            )
+                        }
                     },
 
                     bottomBar = {
-                        if (barsVisibility) NavigationBar {
-                            BottomTabNavigationItem(tab = ChatTab(onNavigation))
-                            BottomTabNavigationItem(tab = AssignmentsTab)
-                            BottomTabNavigationItem(tab = CommunitiesTab(onNavigation))
-                            BottomTabNavigationItem(tab = CalendarTab)
-                            BottomTabNavigationItem(tab = GradesTab)
+                        if (!state.loggedOut) {
+
+                            if (barsVisibility) NavigationBar {
+                                BottomTabNavigationItem(tab = ChatTab(onNavigation))
+                                BottomTabNavigationItem(tab = AssignmentsTab)
+                                BottomTabNavigationItem(
+                                    tab = CommunitiesTab(
+                                        onNavigation,
+                                        onAction
+                                    )
+                                )
+                                BottomTabNavigationItem(tab = CalendarTab)
+                                BottomTabNavigationItem(tab = GradesTab)
+                            }
                         }
                     },
                 )

@@ -29,7 +29,8 @@ import com.gp.socialapp.presentation.home.components.JoinCommunityDialog
 import kotlinx.coroutines.launch
 
 data class HomeScreen(
-    val onBottomBarVisibilityChanged: (Boolean) -> Unit
+    val onBottomBarVisibilityChanged: (Boolean) -> Unit,
+    val action: (HomeUiAction) -> Unit
 ) : Screen {
     @Composable
     override fun Content() {
@@ -55,7 +56,12 @@ data class HomeScreen(
                 is HomeUiAction.OnCommunityClicked -> {
                     onBottomBarVisibilityChanged(false)
                     navigator.replaceAll(
-                        CommunityHomeContainer(it.communityId)
+                        CommunityHomeContainer(
+                            communities = state.communities,
+                            user = state.user,
+                            onAction = action,
+                            it.communityId
+                        )
                     )
                 }
 
