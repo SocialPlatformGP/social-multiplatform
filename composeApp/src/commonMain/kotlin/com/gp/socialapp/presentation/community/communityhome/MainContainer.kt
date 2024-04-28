@@ -37,7 +37,6 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.CurrentTab
-import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.TabNavigator
 import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.data.community.source.remote.model.Community
@@ -65,7 +64,6 @@ data class CommunityHomeContainer(
         val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
         val scope = rememberCoroutineScope()
         var communityId by remember { mutableStateOf(communityId) }
-        val tabNavigator = LocalTabNavigator.current
         var isBarsVisible by remember { mutableStateOf(true) }
         val onNavigation: (Boolean) -> Unit = { isBarsVisible = it }
         val onAction: (HomeUiAction) -> Unit = {

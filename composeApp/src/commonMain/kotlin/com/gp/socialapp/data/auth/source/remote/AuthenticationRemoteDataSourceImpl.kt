@@ -125,7 +125,7 @@ class AuthenticationRemoteDataSourceImpl(
                         ?: ""
                 val email = userInfo.email ?: ""
                 val pfpUrl =
-                    userInfo.userMetadata?.get("avatar_url")?.jsonPrimitive?.contentOrNull
+                    userInfo.userMetadata?.get(UserData.PROFILE_PICTURE_URL.value)?.jsonPrimitive?.contentOrNull
                         ?: ""
                 val phoneNumber = userInfo.phone ?: ""
                 val birthDate =

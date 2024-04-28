@@ -22,14 +22,12 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gp.socialapp.data.community.source.remote.model.Community
 import com.gp.socialapp.presentation.auth.login.LoginScreen
 import com.gp.socialapp.presentation.auth.userinfo.UserInformationScreen
-import com.gp.socialapp.presentation.chat.home.components.FabWithOptionButtons
 import com.gp.socialapp.presentation.chat.home.components.SingleFab
-import com.gp.socialapp.presentation.community.editcommunity.EditCommunityScreen
 import com.gp.socialapp.presentation.community.communityhome.CommunityHomeContainer
 import com.gp.socialapp.presentation.community.createcommunity.CreateCommunityScreen
+import com.gp.socialapp.presentation.community.editcommunity.EditCommunityScreen
 import com.gp.socialapp.presentation.home.components.CommunityOptionsBottomSheet
 import com.gp.socialapp.presentation.home.components.ConfirmLogoutDialog
-import com.gp.socialapp.presentation.home.components.HomeBottomSheet
 import com.gp.socialapp.presentation.home.components.HomeContent
 import com.gp.socialapp.presentation.home.components.HomeFab
 import com.gp.socialapp.presentation.home.components.JoinCommunityDialog
@@ -91,24 +89,27 @@ data class HomeScreen(
                     screenModel.userLogout()
                 }
 
-                else -> Unit
-
                 is HomeUiAction.OnDeleteCommunityClicked -> {
                     screenModel.deleteCommunity(it.communityId)
                 }
+
                 is HomeUiAction.OnEditCommunityClicked -> {
                     navigator.push(EditCommunityScreen(it.community))
                 }
+
                 is HomeUiAction.OnManageMembersClicked -> {
                     TODO()
                 }
+
                 is HomeUiAction.OnShareJoinCodeClicked -> {
                     val clipboardManager = ClipboardManager()
                     clipboardManager.setText(it.code)
                 }
+
                 is HomeUiAction.OnViewMembersClicked -> {
                     TODO()
                 }
+
                 else -> Unit
             }
         })
@@ -127,12 +128,12 @@ fun HomeScreenContent(
     var confirmLogoutDialogState by remember { mutableStateOf(false) }
     var communityId by remember { mutableStateOf("") }
     var clickedCommunity by remember { mutableStateOf(Community()) }
-    val options = if(clickedCommunity.members.getOrElse(state.user.id) { false }){
+    val options = if (clickedCommunity.members.getOrElse(state.user.id) { false }) {
         listOf(
             OptionItem("Share Join Code") {
                 onAction(HomeUiAction.OnShareJoinCodeClicked(clickedCommunity.code))
             },
-            OptionItem("Manage Members"){
+            OptionItem("Manage Members") {
                 onAction(HomeUiAction.OnManageMembersClicked(clickedCommunity.id))
             },
             OptionItem("Edit Community") {
@@ -150,7 +151,7 @@ fun HomeScreenContent(
             OptionItem("Share Join Code") {
                 onAction(HomeUiAction.OnShareJoinCodeClicked(clickedCommunity.code))
             },
-            OptionItem("View Members"){
+            OptionItem("View Members") {
                 onAction(HomeUiAction.OnViewMembersClicked(clickedCommunity.id))
             },
             OptionItem("Leave Community") {
@@ -176,7 +177,7 @@ fun HomeScreenContent(
                 )
             }
         }) { padding ->
-        if(showBottomSheet) {
+        if (showBottomSheet) {
             CommunityOptionsBottomSheet(
                 sheetState = sheetState,
                 options = options,
@@ -213,6 +214,7 @@ fun HomeScreenContent(
                         confirmLogoutDialogState = true
                         communityId = it.id
                     }
+
                     is HomeUiAction.OnOptionsMenuClicked -> {
                         clickedCommunity = it.community
                         showBottomSheet = true
