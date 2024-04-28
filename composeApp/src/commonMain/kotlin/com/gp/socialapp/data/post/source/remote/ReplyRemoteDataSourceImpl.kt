@@ -42,6 +42,7 @@ class ReplyRemoteDataSourceImpl(
     override fun fetchReplies(request: ReplyRequest.FetchRequest): Flow<Results<List<Reply>, DataError.Network>> =
         flow {
             emit(Results.Loading)
+            println("fetchReplies: $request")
             try {
                 val response = client.post {
                     endPoint("fetchReplies")

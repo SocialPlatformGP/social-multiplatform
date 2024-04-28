@@ -67,6 +67,7 @@ class FeedScreenModel(
                     }
 
                     is Results.Failure -> {
+                        println("Error: ${result.error.userMessage}")
                         _state.update {
                             it.copy(
                                 error = FeedError.NetworkError(result.error.userMessage)

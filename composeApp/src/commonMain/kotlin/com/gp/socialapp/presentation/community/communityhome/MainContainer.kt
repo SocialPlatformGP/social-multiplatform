@@ -48,6 +48,7 @@ import com.gp.socialapp.navigation.util.BottomTabNavigationItem
 import com.gp.socialapp.presentation.auth.login.LoginScreen
 import com.gp.socialapp.presentation.home.HomeContainer
 import com.gp.socialapp.presentation.home.HomeUiAction
+import com.gp.socialapp.presentation.post.search.SearchScreen
 import com.seiko.imageloader.ui.AutoSizeImage
 import kotlinx.coroutines.launch
 
@@ -63,7 +64,6 @@ data class CommunityHomeContainer(
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        var tabNavigator: TabNavigator? = null
         val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
         val scope = rememberCoroutineScope()
         var communityId by remember { mutableStateOf(communityId) }
@@ -215,16 +215,30 @@ data class CommunityHomeContainer(
             })
 
         {
-            TabNavigator(defaultTab) {
-                Scaffold(content = {
+            TabNavigator(defaultTab) { tabNavigator ->
+                Scaffold(content = { paddingValues ->
                     Column(
-                        modifier = Modifier.padding(it)
+                        modifier = Modifier.padding(paddingValues)
                     ) {
                         CurrentTab()
                     }
                 }, topBar = {
                     if (isBarsVisible) {
-                        MainTopBar(onSearchClicked = { /*TODO*/ },
+                        MainTopBar(
+                            onSearchClicked = {
+                                when (tabNavigator.current) {
+                                    is PostsTab -> {
+                                        navigator.push(SearchScreen)
+                                        onNavigation(false)
+                                    }
+                                    is MaterialTab -> {
+                                        /*TODO*/
+                                    }
+                                    is CommunityMembersTab -> {
+                                        /*TODO*/
+                                    }
+                                }
+                            },
                             onNotificationClicked = { /*TODO*/ },
                             onNavDrawerIconClicked = {
                                 scope.launch {
