@@ -89,5 +89,7 @@ data class CommunityHomeContainer(val communityId: String) : Screen {
             }
         }
     }
-
+}
+enum class CommunityHomeTab {
+    POSTS, MATERIALS, MEMBERS
 }

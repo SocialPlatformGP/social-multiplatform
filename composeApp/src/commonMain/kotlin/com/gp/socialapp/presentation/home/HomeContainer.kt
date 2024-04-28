@@ -81,3 +81,10 @@ object HomeContainer : Screen {
         }
     }
 }
+enum class HomeTab {
+    CHAT,
+    ASSIGNMENTS,
+    COMMUNITIES,
+    CALENDAR,
+    GRADES
+}
