@@ -24,6 +24,7 @@ import com.gp.socialapp.presentation.auth.login.LoginScreen
 import com.gp.socialapp.presentation.auth.userinfo.UserInformationScreen
 import com.gp.socialapp.presentation.chat.home.components.SingleFab
 import com.gp.socialapp.presentation.community.communityhome.CommunityHomeContainer
+import com.gp.socialapp.presentation.community.communityhome.CommunityHomeTab
 import com.gp.socialapp.presentation.community.createcommunity.CreateCommunityScreen
 import com.gp.socialapp.presentation.community.editcommunity.EditCommunityScreen
 import com.gp.socialapp.presentation.home.components.CommunityOptionsBottomSheet
@@ -49,7 +50,6 @@ data class HomeScreen(
                 onBottomBarVisibilityChanged(true)
                 screenModel.init()
             }, onDisposed = {
-
             })
         if (!state.user.isDataComplete && state.user.id.isNotBlank()) {
             navigator.replaceAll(UserInformationScreen(state.user))
@@ -92,30 +92,40 @@ data class HomeScreen(
                         screenModel.userLogout()
                     }
 
-                    is HomeUiAction.OnDeleteCommunityClicked -> {
-                        screenModel.deleteCommunity(acions.communityId)
-                    }
-
-                    is HomeUiAction.OnEditCommunityClicked -> {
-                        navigator.push(EditCommunityScreen(acions.community))
-                    }
-
-                    is HomeUiAction.OnManageMembersClicked -> {
-                        TODO()
-                    }
-
-                    is HomeUiAction.OnShareJoinCodeClicked -> {
-                        val clipboardManager = ClipboardManager()
-                        clipboardManager.setText(acions.code)
-                    }
-
-                    is HomeUiAction.OnViewMembersClicked -> {
-                        TODO()
-                    }
-
-                    else -> Unit
+                is HomeUiAction.OnDeleteCommunityClicked -> {
+                    screenModel.deleteCommunity(it.communityId)
                 }
-            })
+
+                is HomeUiAction.OnEditCommunityClicked -> {
+                    navigator.push(EditCommunityScreen(it.community))
+                }
+
+                is HomeUiAction.OnManageMembersClicked -> {
+                    navigator.push(
+                        CommunityHomeContainer(
+                            communityId = it.communityId,
+                            startingTab = CommunityHomeTab.MEMBERS
+                        )
+                    )
+                }
+
+                is HomeUiAction.OnShareJoinCodeClicked -> {
+                    val clipboardManager = ClipboardManager()
+                    clipboardManager.setText(it.code)
+                }
+
+                is HomeUiAction.OnViewMembersClicked -> {
+                    navigator.push(
+                        CommunityHomeContainer(
+                            communityId = it.communityId,
+                            startingTab = CommunityHomeTab.MEMBERS
+                        )
+                    )
+                }
+
+                else -> Unit
+            }
+        })
     }
 }
 

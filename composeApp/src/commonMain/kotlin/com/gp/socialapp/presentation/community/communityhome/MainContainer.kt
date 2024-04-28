@@ -56,7 +56,8 @@ data class CommunityHomeContainer(
     val communities: List<Community>,
     val user: User,
     val onAction: (HomeUiAction) -> Unit,
-    val communityId: String
+    val communityId: String,
+    val startingTab: CommunityHomeTab = CommunityHomeTab.POSTS
 ) : Screen {
 
     @Composable
@@ -94,6 +95,11 @@ data class CommunityHomeContainer(
                     onAction(it)
                 }
             }
+        }
+        val defaultTab = when (startingTab) {
+            CommunityHomeTab.POSTS -> PostsTab(communityId, onNavigation)
+            CommunityHomeTab.MATERIALS -> MaterialTab(communityId)
+            CommunityHomeTab.MEMBERS -> CommunityMembersTab(communityId)
         }
         ModalNavigationDrawer(
             drawerState = drawerState,
@@ -236,8 +242,53 @@ data class CommunityHomeContainer(
                             }
                         }
                     })
+                    Text("EduLink", modifier = Modifier.padding(16.dp))
+                    HorizontalDivider()
+                    NavigationDrawerItem(label = { Text(text = "Item 1") },
+                        selected = true,
+                        onClick = { /*TODO*/ })
+                    NavigationDrawerItem(label = { Text(text = "Item 2") },
+                        selected = false,
+                        onClick = { /*TODO*/ })
+                    NavigationDrawerItem(label = { Text(text = "Item 3") },
+                        selected = false,
+                        onClick = { /*TODO*/ })
+                }
+            },
+            drawerState = drawerState,
+        ) {
+            TabNavigator(defaultTab) {
+                Scaffold(content = {
+                    Column(
+                        modifier = Modifier.padding(it)
+                    ) {
+                        CurrentTab()
+                    }
+                }, topBar = {
+                    if (isBarsVisible) {
+                        MainTopBar(onSearchClicked = { /*TODO*/ },
+                            onNotificationClicked = { /*TODO*/ },
+                            onNavDrawerIconClicked = {
+                                scope.launch {
+                                    drawerState.apply {
+                                        if (isClosed) open() else close()
+                                    }
+                                }
+                            })
+                    }
+                }, bottomBar = {
+                    if (isBarsVisible) {
+                        NavigationBar {
+                            BottomTabNavigationItem(tab = PostsTab(communityId, onNavigation))
+                            BottomTabNavigationItem(tab = MaterialTab(communityId))
+                            BottomTabNavigationItem(tab = CommunityMembersTab(communityId))
+                        }
+                    }
+                })
             }
         }
     }
-
+}
+enum class CommunityHomeTab {
+    POSTS, MATERIALS, MEMBERS
 }

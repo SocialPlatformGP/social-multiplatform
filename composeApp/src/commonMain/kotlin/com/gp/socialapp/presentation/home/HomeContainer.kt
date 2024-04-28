@@ -54,7 +54,9 @@ import com.gp.socialapp.presentation.home.components.HomeTopBar
 import com.seiko.imageloader.ui.AutoSizeImage
 import kotlinx.coroutines.launch
 
-object HomeContainer : Screen {
+data class HomeContainer(
+    val startingTab: HomeTab = HomeTab.COMMUNITIES
+) : Screen {
     @Composable
     override fun Content() {
         var navigator = LocalNavigator.currentOrThrow
@@ -70,6 +72,7 @@ object HomeContainer : Screen {
         val onNavigation: (Boolean) -> Unit = { barsVisibility = it }
         if (state.loggedOut) {
             navigator.popUntilRoot()
+            navigator.replaceAll(LoginScreen)
         }
         val onAction: (HomeUiAction) -> Unit = {
             when (it) {
@@ -188,22 +191,28 @@ object HomeContainer : Screen {
             })
         {
 
-            TabNavigator(CommunitiesTab({ onNavigation(it) }, { onAction(it) })) {
-                Scaffold(
-                    content = {
-                        Column(
-                            modifier = Modifier.padding(it)
-                        ) {
-                            CurrentTab()
-                        }
-                    },
-                    topBar = {
 
-                        if (barsVisibility) HomeTopBar(
-                            action = onAction
-                        )
-
-                    },
+        val defaultTab = when(startingTab) {
+            HomeTab.CHAT -> ChatTab(onNavigation)
+            HomeTab.ASSIGNMENTS -> AssignmentsTab
+            HomeTab.COMMUNITIES -> CommunitiesTab(onNavigation)
+            HomeTab.CALENDAR -> CalendarTab
+            HomeTab.GRADES -> GradesTab
+        }
+        TabNavigator(defaultTab) {
+            Scaffold(
+                content = {
+                    Column(
+                        modifier = Modifier.padding(it)
+                    ) {
+                        CurrentTab()
+                    }
+                },
+                topBar = {
+                    if (barsVisibility) HomeTopBar(
+                        action = onAction
+                    )
+                },
 
                     bottomBar = {
 
@@ -226,4 +235,11 @@ object HomeContainer : Screen {
         }
 
     }
+}
+enum class HomeTab {
+    CHAT,
+    ASSIGNMENTS,
+    COMMUNITIES,
+    CALENDAR,
+    GRADES
 }

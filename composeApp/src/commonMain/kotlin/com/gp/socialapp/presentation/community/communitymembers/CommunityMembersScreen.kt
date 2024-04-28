@@ -68,22 +68,7 @@ data class CommunityMembersScreen(
         onAction: (CommunityMembersUiAction) -> Unit,
         members: List<User>
     ) {
-        Scaffold(modifier = modifier.padding(16.dp), topBar = {
-            TopAppBar(
-                title = { Text(text = communityName) },
-                navigationIcon = {
-                    IconButton(onClick = {
-                        onAction(CommunityMembersUiAction.OnBackClicked)
-                    }) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBackIosNew,
-                            contentDescription = "Back"
-                        )
-                    }
-                },
-                actions = {},
-            )
-        }) { paddingValues ->
+        Scaffold(modifier = modifier.padding(16.dp)) { paddingValues ->
             Column(
                 modifier = Modifier.padding(paddingValues)
             ) {
