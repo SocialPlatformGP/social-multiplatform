@@ -119,7 +119,6 @@ class UserRemoteDataSourceImpl(
             Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN)
         }
 
-    //TODO 1: Implement the getUserCommunities function IN SERVER
     override fun getUserCommunities(userId: String): Flow<Results<List<Community>, DataError.Network>> =
         flow {
             emit(Results.Loading)

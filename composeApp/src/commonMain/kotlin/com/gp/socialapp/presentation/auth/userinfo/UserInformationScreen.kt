@@ -59,7 +59,6 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.presentation.auth.util.AuthError
 import com.gp.socialapp.presentation.home.HomeContainer
-import com.gp.socialapp.presentation.home.HomeScreen
 import com.gp.socialapp.util.LocalDateTimeUtil.now
 import com.gp.socialapp.util.LocalDateTimeUtil.toDDMMYYYY
 import com.gp.socialapp.util.LocalDateTimeUtil.toLocalDateTime

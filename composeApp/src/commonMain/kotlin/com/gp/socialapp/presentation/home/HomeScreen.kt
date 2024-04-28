@@ -37,7 +37,8 @@ import kotlinx.coroutines.launch
 import org.jetbrains.skiko.ClipboardManager
 
 data class HomeScreen(
-    val onBottomBarVisibilityChanged: (Boolean) -> Unit
+    val onBottomBarVisibilityChanged: (Boolean) -> Unit,
+    val action: (HomeUiAction) -> Unit
 ) : Screen {
     @Composable
     override fun Content() {
@@ -49,75 +50,89 @@ data class HomeScreen(
                 onBottomBarVisibilityChanged(true)
                 screenModel.init()
             }, onDisposed = {
-                screenModel.dispose()
+//                onBottomBarVisibilityChanged(false)
             })
         if (!state.user.isDataComplete && state.user.id.isNotBlank()) {
             navigator.replaceAll(UserInformationScreen(state.user))
         }
         if (state.loggedOut) {
+            screenModel.dispose()
             navigator.replaceAll(LoginScreen)
 
         }
-        HomeScreenContent(state = state, onAction = {
-            when (it) {
-                is HomeUiAction.OnCommunityClicked -> {
-                    onBottomBarVisibilityChanged(false)
-                    navigator.replaceAll(
-                        CommunityHomeContainer(it.communityId)
-                    )
-                }
-
-                is HomeUiAction.OnCommunityLogout -> {
-                    screenModel.communityLogout(it.id)
-                }
-
-                HomeUiAction.OnCreateCommunityClicked -> navigator.push(
-                    CreateCommunityScreen
-                )
-
-                is HomeUiAction.OnJoinCommunityClicked -> {
-                    screenModel.joinCommunity(it.code)
-                }
-
-                HomeUiAction.OnProfileClicked -> Unit //TODO( Navigate to profile screen)
-                HomeUiAction.OnUserLogout -> {
-                    screenModel.userLogout()
-                }
-
-                is HomeUiAction.OnDeleteCommunityClicked -> {
-                    screenModel.deleteCommunity(it.communityId)
-                }
-
-                is HomeUiAction.OnEditCommunityClicked -> {
-                    navigator.push(EditCommunityScreen(it.community))
-                }
-
-                is HomeUiAction.OnManageMembersClicked -> {
-                    navigator.push(
-                        CommunityHomeContainer(
-                            communityId = it.communityId,
-                            startingTab = CommunityHomeTab.MEMBERS
+        HomeScreenContent(
+            state = state,
+            onAction = { it ->
+                when (it) {
+                    is HomeUiAction.OnCommunityClicked -> {
+                        onBottomBarVisibilityChanged(false)
+                        navigator.replaceAll(
+                            CommunityHomeContainer(
+                                communities = state.communities,
+                                user = state.user,
+                                onAction = { action(it) },
+                                it.communityId
+                            )
                         )
+                    }
+
+                    is HomeUiAction.OnCommunityLogout -> {
+                        screenModel.communityLogout(it.id)
+                    }
+
+                    HomeUiAction.OnCreateCommunityClicked -> navigator.push(
+                        CreateCommunityScreen
                     )
-                }
 
-                is HomeUiAction.OnShareJoinCodeClicked -> {
-                    val clipboardManager = ClipboardManager()
-                    clipboardManager.setText(it.code)
-                }
+                    is HomeUiAction.OnJoinCommunityClicked -> {
+                        screenModel.joinCommunity(it.code)
+                    }
 
-                is HomeUiAction.OnViewMembersClicked -> {
-                    navigator.push(
-                        CommunityHomeContainer(
-                            communityId = it.communityId,
-                            startingTab = CommunityHomeTab.MEMBERS
+                    HomeUiAction.OnProfileClicked -> Unit //TODO( Navigate to profile screen)
+                    HomeUiAction.OnUserLogout -> {
+                        screenModel.userLogout()
+                    }
+
+                    is HomeUiAction.OnDeleteCommunityClicked -> {
+                        screenModel.deleteCommunity(it.communityId)
+                    }
+
+                    is HomeUiAction.OnEditCommunityClicked -> {
+                        navigator.push(EditCommunityScreen(it.community))
+                    }
+
+                    is HomeUiAction.OnManageMembersClicked -> {
+                        navigator.push(
+                            CommunityHomeContainer(
+                                communityId = it.communityId,
+                                user = state.user,
+                                onAction = { action(it) },
+                                communities = state.communities,
+                                startingTab = CommunityHomeTab.MEMBERS
+                            )
                         )
-                    )
-                }
+                    }
 
-                else -> Unit
-            }
-        })
+                    is HomeUiAction.OnShareJoinCodeClicked -> {
+                        val clipboardManager = ClipboardManager()
+                        clipboardManager.setText(it.code)
+                    }
+
+                    is HomeUiAction.OnViewMembersClicked -> {
+                        navigator.push(
+                            CommunityHomeContainer(
+                                communityId = it.communityId,
+                                startingTab = CommunityHomeTab.MEMBERS,
+                                user = state.user,
+                                onAction = { action(it) },
+                                communities = state.communities
+                            )
+                        )
+                    }
+
+                    else -> Unit
+                }
+            })
     }
 }
 

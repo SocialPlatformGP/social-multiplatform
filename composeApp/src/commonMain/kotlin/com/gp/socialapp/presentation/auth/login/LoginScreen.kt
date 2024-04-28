@@ -52,7 +52,6 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gp.socialapp.presentation.auth.login.components.MyOAuthProvider
 import com.gp.socialapp.presentation.auth.login.components.OAuthProviderItem
 import com.gp.socialapp.presentation.auth.login.components.imagevectors.OAuthProviderIcons
-import com.gp.socialapp.presentation.auth.login.components.imagevectors.oauthprovidericons.Apple
 import com.gp.socialapp.presentation.auth.login.components.imagevectors.oauthprovidericons.Discord
 import com.gp.socialapp.presentation.auth.login.components.imagevectors.oauthprovidericons.Facebook
 import com.gp.socialapp.presentation.auth.login.components.imagevectors.oauthprovidericons.Github
@@ -66,10 +65,7 @@ import com.gp.socialapp.presentation.auth.signup.SignUpScreen
 import com.gp.socialapp.presentation.auth.util.AuthError.EmailError
 import com.gp.socialapp.presentation.auth.util.AuthError.PasswordError
 import com.gp.socialapp.presentation.auth.util.AuthError.ServerError
-import com.gp.socialapp.presentation.home.HomeContainer
-import com.gp.socialapp.presentation.home.HomeScreen
 import com.gp.socialapp.util.getPlatform
-import io.github.jan.supabase.gotrue.providers.Apple
 import io.github.jan.supabase.gotrue.providers.Azure
 import io.github.jan.supabase.gotrue.providers.Discord
 import io.github.jan.supabase.gotrue.providers.Facebook
@@ -104,7 +100,7 @@ object LoginScreen : Screen {
         )
 
         if (state.signedInUser != null) {
-            navigator.replaceAll(HomeContainer())
+            navigator.replaceAll(com.gp.socialapp.presentation.home.HomeContainer())
         } else {
             val providers = listOf(
                 MyOAuthProvider("Google", OAuthProviderIcons.Google, Google),

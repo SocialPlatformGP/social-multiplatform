@@ -12,7 +12,7 @@ import cafe.adriel.voyager.navigator.tab.Tab
 fun RowScope.BottomTabNavigationItem(tab: Tab) {
     val tabNavigator = LocalTabNavigator.current
     NavigationBarItem(
-        selected = tabNavigator.current == tab,
+        selected = tabNavigator.current.options.index == tab.options.index,
         alwaysShowLabel = false,
         onClick = { tabNavigator.current = tab },
         label = { Text(tab.options.title) },

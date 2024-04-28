@@ -15,5 +15,6 @@ sealed interface HomeUiAction {
     data object OnProfileClicked : HomeUiAction
     data object OnUserLogout : HomeUiAction
     data class OnOptionsMenuClicked(val community: Community): HomeUiAction
+    data object OnOpenDrawer : HomeUiAction
 
 }
