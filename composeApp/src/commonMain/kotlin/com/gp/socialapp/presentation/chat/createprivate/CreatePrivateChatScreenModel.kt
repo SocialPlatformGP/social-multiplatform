@@ -8,8 +8,8 @@ import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.data.chat.repository.RoomRepository
 import com.gp.socialapp.util.DispatcherIO
 import com.gp.socialapp.util.Result
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -57,8 +57,9 @@ class CreatePrivateChatScreenModel(
         screenModelScope.launch {
             userRepository.fetchUsers().collect { result ->
                 result.onSuccessWithData { data ->
+                    val users = data.filter { it.id != state.value.currentUserId }
                     state.update {
-                        it.copy(users = data.filter { it.id != state.value.currentUserId })
+                        it.copy(allUsers = users, matchingUsers = users)
                     }
                 }.onFailure {
                     println("Error: $it")
@@ -84,10 +85,16 @@ class CreatePrivateChatScreenModel(
     }
 
     fun clear() {
-        state.update {
-            it.copy(
-                room = null
-            )
+        state.value = CreatePrivateChatUiState()
+    }
+
+    fun onSearchQueryChanged(s: String) {
+        screenModelScope.launch (Dispatchers.Default) {
+            state.update { oldState ->
+                oldState.copy(
+                    matchingUsers = oldState.allUsers.filter { (it.firstName+" "+it.lastName).contains(s, ignoreCase = true) }
+                )
+            }
         }
     }
 }
