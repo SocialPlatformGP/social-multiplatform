@@ -1,6 +1,8 @@
 package com.gp.socialapp.presentation.home
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -17,16 +19,22 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.gp.socialapp.data.community.source.remote.model.Community
 import com.gp.socialapp.presentation.auth.login.LoginScreen
 import com.gp.socialapp.presentation.auth.userinfo.UserInformationScreen
+import com.gp.socialapp.presentation.chat.home.components.FabWithOptionButtons
+import com.gp.socialapp.presentation.chat.home.components.SingleFab
+import com.gp.socialapp.presentation.community.editcommunity.EditCommunityScreen
 import com.gp.socialapp.presentation.community.communityhome.CommunityHomeContainer
 import com.gp.socialapp.presentation.community.createcommunity.CreateCommunityScreen
+import com.gp.socialapp.presentation.home.components.CommunityOptionsBottomSheet
 import com.gp.socialapp.presentation.home.components.ConfirmLogoutDialog
-import com.gp.socialapp.presentation.home.components.HomeBottomSheet
 import com.gp.socialapp.presentation.home.components.HomeContent
 import com.gp.socialapp.presentation.home.components.HomeFab
 import com.gp.socialapp.presentation.home.components.JoinCommunityDialog
+import com.gp.socialapp.presentation.home.components.OptionItem
 import kotlinx.coroutines.launch
+import org.jetbrains.skiko.ClipboardManager
 
 data class HomeScreen(
     val onBottomBarVisibilityChanged: (Boolean) -> Unit
@@ -50,7 +58,7 @@ data class HomeScreen(
             navigator.replaceAll(LoginScreen)
 
         }
-        HomeScreenContent(state = state, action = {
+        HomeScreenContent(state = state, onAction = {
             when (it) {
                 is HomeUiAction.OnCommunityClicked -> {
                     onBottomBarVisibilityChanged(false)
@@ -75,6 +83,24 @@ data class HomeScreen(
                 HomeUiAction.OnUserLogout -> {
                     screenModel.userLogout()
                 }
+
+                is HomeUiAction.OnDeleteCommunityClicked -> {
+                    screenModel.deleteCommunity(it.communityId)
+                }
+                is HomeUiAction.OnEditCommunityClicked -> {
+                    navigator.push(EditCommunityScreen(it.community))
+                }
+                is HomeUiAction.OnManageMembersClicked -> {
+                    TODO()
+                }
+                is HomeUiAction.OnShareJoinCodeClicked -> {
+                    val clipboardManager = ClipboardManager()
+                    clipboardManager.setText(it.code)
+                }
+                is HomeUiAction.OnViewMembersClicked -> {
+                    TODO()
+                }
+                else -> Unit
             }
         })
     }
@@ -83,7 +109,7 @@ data class HomeScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreenContent(
-    state: HomeUiState, action: (HomeUiAction) -> Unit
+    state: HomeUiState, onAction: (HomeUiAction) -> Unit
 ) {
     val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState()
@@ -91,36 +117,82 @@ fun HomeScreenContent(
     var joinCommunityDialogState by remember { mutableStateOf(false) }
     var confirmLogoutDialogState by remember { mutableStateOf(false) }
     var communityId by remember { mutableStateOf("") }
+    var clickedCommunity by remember { mutableStateOf(Community()) }
+    val options = if(clickedCommunity.members.getOrElse(state.user.id) { false }){
+        listOf(
+            OptionItem("Share Join Code") {
+                onAction(HomeUiAction.OnShareJoinCodeClicked(clickedCommunity.code))
+            },
+            OptionItem("Manage Members"){
+                onAction(HomeUiAction.OnManageMembersClicked(clickedCommunity.id))
+            },
+            OptionItem("Edit Community") {
+                onAction(HomeUiAction.OnEditCommunityClicked(clickedCommunity))
+            },
+            OptionItem("Leave Community") {
+                onAction(HomeUiAction.OnCommunityLogout(clickedCommunity.id))
+            },
+            OptionItem("Delete Community") {
+                onAction(HomeUiAction.OnDeleteCommunityClicked(clickedCommunity.id))
+            }
+        )
+    } else {
+        listOf(
+            OptionItem("Share Join Code") {
+                onAction(HomeUiAction.OnShareJoinCodeClicked(clickedCommunity.code))
+            },
+            OptionItem("View Members"){
+                onAction(HomeUiAction.OnViewMembersClicked(clickedCommunity.id))
+            },
+            OptionItem("Leave Community") {
+                onAction(HomeUiAction.OnCommunityLogout(clickedCommunity.id))
+            }
+        )
+    }
+    var fabState = remember { mutableStateOf(false) }
     Scaffold(
         floatingActionButton = {
-            HomeFab {
-                showBottomSheet = true
+            if (!fabState.value) SingleFab(
+                fabState, Icons.Default.Add
+            )
+            else {
+                HomeFab(
+                    fabState,
+                    onCreateCommunityClicked = {
+                        onAction(HomeUiAction.OnCreateCommunityClicked)
+                    },
+                    onJoinCommunityClicked = {
+                        joinCommunityDialogState = true
+                    }
+                )
             }
         }) { padding ->
-        if (showBottomSheet) {
-            HomeBottomSheet(closeSheet = {
-                scope.launch { sheetState.hide() }.invokeOnCompletion {
-                    if (!sheetState.isVisible) {
-                        showBottomSheet = false
+        if(showBottomSheet) {
+            CommunityOptionsBottomSheet(
+                sheetState = sheetState,
+                options = options,
+                onDismiss = {
+                    scope.launch { sheetState.hide() }.invokeOnCompletion {
+                        if (!sheetState.isVisible) {
+                            showBottomSheet = false
+                        }
                     }
                 }
-            }, sheetState = sheetState, action = action, onJoinCommunityClicked = {
-                joinCommunityDialogState = true
-            })
+            )
         }
         if (joinCommunityDialogState) {
             JoinCommunityDialog(onDismiss = {
                 joinCommunityDialogState = false
             }, onJoin = {
                 joinCommunityDialogState = false
-                action(HomeUiAction.OnJoinCommunityClicked(it))
+                onAction(HomeUiAction.OnJoinCommunityClicked(it))
             })
         }
         if (confirmLogoutDialogState) {
             ConfirmLogoutDialog(onDismiss = {
                 confirmLogoutDialogState = false
             }, onConfirm = {
-                action(HomeUiAction.OnCommunityLogout(communityId))
+                onAction(HomeUiAction.OnCommunityLogout(communityId))
                 confirmLogoutDialogState = false
             })
         }
@@ -132,8 +204,13 @@ fun HomeScreenContent(
                         confirmLogoutDialogState = true
                         communityId = it.id
                     }
+                    is HomeUiAction.OnOptionsMenuClicked -> {
+                        clickedCommunity = it.community
+                        showBottomSheet = true
+                        scope.launch { sheetState.show() }
+                    }
 
-                    else -> action(it)
+                    else -> onAction(it)
                 }
             })
     }

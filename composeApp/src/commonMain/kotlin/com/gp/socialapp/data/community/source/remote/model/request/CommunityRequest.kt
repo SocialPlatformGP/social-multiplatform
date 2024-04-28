@@ -41,4 +41,8 @@ sealed class CommunityRequest {
     data class FetchCommunity(
         val communityId: String
     ) : CommunityRequest()
+    @Serializable
+    data class DeleteCommunity(val communityId: String)
+    @Serializable
+    data class EditCommunity(val community: Community)
 }
