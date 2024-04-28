@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.automirrored.filled.More
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -52,6 +53,16 @@ fun HomeContent(
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                         ) {
+                            IconButton(
+                                onClick = {
+                                    action(HomeUiAction.OnOptionsMenuClicked(community))
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.More,
+                                    contentDescription = "Options Menu"
+                                )
+                            }
                             Text(
                                 text = community.name,
                                 modifier = Modifier.padding(8.dp).weight(1f),

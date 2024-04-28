@@ -5,7 +5,9 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import com.gp.socialapp.data.auth.repository.AuthenticationRepository
 import com.gp.socialapp.data.auth.repository.UserRepository
 import com.gp.socialapp.data.auth.source.remote.model.User
+import com.gp.socialapp.data.community.repository.CommunityRepository
 import com.gp.socialapp.data.community.source.remote.model.Community
+import com.gp.socialapp.util.DispatcherIO
 import com.gp.socialapp.util.Result
 import com.gp.socialapp.util.Results
 import io.github.aakira.napier.Napier
@@ -15,7 +17,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class HomeScreenModel(
-    private val authRepo: AuthenticationRepository, private val userRepo: UserRepository
+    private val authRepo: AuthenticationRepository,
+    private val userRepo: UserRepository,
+    private val communityRepo: CommunityRepository
 ) : ScreenModel {
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState = _uiState.asStateFlow()
@@ -26,7 +30,7 @@ class HomeScreenModel(
     }
 
     private fun getUserCommunities() {
-        screenModelScope.launch() {
+        screenModelScope.launch {
             userRepo.getUserCommunities(uiState.value.user.id).collect {
                 when (it) {
                     is Results.Failure -> {
@@ -51,7 +55,7 @@ class HomeScreenModel(
     }
 
     private fun getUser() {
-        screenModelScope.launch() {
+        screenModelScope.launch {
             authRepo.getSignedInUser().let { result ->
                 when (result) {
                     is Result.Error -> {
@@ -110,8 +114,7 @@ class HomeScreenModel(
     fun communityLogout(id: String) {
         screenModelScope.launch {
             userRepo.communityLogout(
-                uiState.value.user.id,
-                id
+                uiState.value.user.id, id
             ).collect {
                 when (it) {
                     is Results.Failure -> {
@@ -169,5 +172,29 @@ class HomeScreenModel(
 
     fun dispose() {
         _uiState.value = HomeUiState()
+    }
+
+    fun deleteCommunity(communityId: String) {
+        screenModelScope.launch(DispatcherIO) {
+            communityRepo.deleteCommunity(communityId).let {
+                when (it) {
+                    is Results.Failure -> {
+                        setError(it.error.userMessage)
+                    }
+
+                    Results.Loading -> {
+                        setLoading()
+                    }
+
+                    is Results.Success -> {
+                        resetLoading()
+                        resetError()
+                        _uiState.update { state ->
+                            state.copy(communities = state.communities.filter { it.id != communityId })
+                        }
+                    }
+                }
+            }
+        }
     }
 }
