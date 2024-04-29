@@ -109,10 +109,12 @@ class CommunityRemoteDataSourceImpl(
 
     override suspend fun deleteCommunity(request: CommunityRequest.DeleteCommunity): Results<Unit, DataError.Network> {
         return try {
+            println("deleteCommunity request: $request")
             val response = httpClient.post {
                 endPoint("deleteCommunity")
                 setBody(request)
             }
+            println("deleteCommunity response: $response")
             if (response.status == HttpStatusCode.OK) {
                 Results.success(Unit)
             } else {
@@ -126,14 +128,18 @@ class CommunityRemoteDataSourceImpl(
 
     override suspend fun editCommunity(request: CommunityRequest.EditCommunity): Results<Unit, DataError.Network> {
         return try {
+            println("editCommunity request: $request")
             val response = httpClient.post {
                 endPoint("editCommunity")
                 setBody(request)
             }
+            println("editCommunity response: $response")
             if (response.status == HttpStatusCode.OK) {
                 Results.success(Unit)
             } else {
-                Results.failure(DataError.Network.SERVER_ERROR)
+                val error = response.body<DataError.Network>()
+                println("editCommunity error: $error")
+                Results.failure(error)
             }
         } catch (e: Exception) {
             e.printStackTrace()

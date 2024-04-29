@@ -98,6 +98,7 @@ data class HomeScreen(
                     }
 
                     is HomeUiAction.OnEditCommunityClicked -> {
+                        println("HomeScreen OnEditCommunityClicked: ${it.community}")
                         navigator.push(EditCommunityScreen(it.community))
                     }
 
