@@ -3,6 +3,7 @@ package com.gp.socialapp.presentation.community.editcommunity
 import com.gp.socialapp.presentation.community.createcommunity.EmailDomain
 
 data class EditCommunityUiState(
+    val communityId: String = "",
     val communityName: String = "",
     val communityDescription: String = "",
     val requireAdminApproval: Boolean = false,
