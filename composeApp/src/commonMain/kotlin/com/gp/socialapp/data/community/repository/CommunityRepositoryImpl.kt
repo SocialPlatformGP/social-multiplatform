@@ -52,6 +52,7 @@ class CommunityRepositoryImpl(
 
     override suspend fun editCommunity(community: Community): Results<Unit, DataError.Network> {
         val request = CommunityRequest.EditCommunity(community)
+        println("CommunityRepositoryImpl editCommunity request: $request")
         return communityRemoteDataSource.editCommunity(request)
     }
 }
