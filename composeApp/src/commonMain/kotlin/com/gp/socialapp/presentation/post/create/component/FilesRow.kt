@@ -18,8 +18,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.gp.socialapp.data.post.source.remote.model.PostAttachment
+import com.gp.socialapp.util.AppConstants.BASE_URL
 import com.mohamedrejeb.calf.picker.FilePickerFileType
-import com.mohamedrejeb.calf.picker.toImageBitmap
+import com.seiko.imageloader.rememberImagePainter
 
 @Composable
 fun FilesRow(
@@ -37,10 +38,10 @@ fun FilesRow(
                     .height(150.dp)
                     .clickable { onFileDelete(postFile) }
             ) {
-                if (FilePickerFileType.ImageContentType == postFile.type)
+                if (FilePickerFileType.ImageContentType == postFile.type && postFile.file.isNotEmpty())
                     Image(
                         modifier = Modifier.fillMaxSize().align(Alignment.Center),
-                        bitmap = postFile.file.toImageBitmap(),
+                        painter = rememberImagePainter(BASE_URL + postFile.url),
                         contentDescription = null,
                         contentScale = androidx.compose.ui.layout.ContentScale.FillHeight
                     )
