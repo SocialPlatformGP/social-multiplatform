@@ -45,6 +45,9 @@ data class EditCommunityScreen(private val community: Community): Screen {
         LifecycleEffect (
             onStarted = {
                 screenModel.init(community)
+            },
+            onDisposed = {
+                screenModel.clear()
             }
         )
         if (state.isFinished){

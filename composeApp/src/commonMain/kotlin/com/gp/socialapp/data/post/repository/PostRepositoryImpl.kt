@@ -110,6 +110,7 @@ class PostRepositoryImpl(
 
             }
         } catch (e: Exception) {
+            e.printStackTrace()
             emit(Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN))
         }
     }
