@@ -19,6 +19,7 @@ class EditCommunityScreenModel(
     fun init(community: Community) {
         _uiState.update {
             it.copy(
+                communityId = community.id,
                 communityName = community.name,
                 communityDescription = community.description,
                 requireAdminApproval = community.isAdminApprovalRequired,
@@ -29,44 +30,53 @@ class EditCommunityScreenModel(
     }
 
     fun handleUiAction(action: EditCommunityUiAction) {
-        when(action){
+        when (action) {
             is EditCommunityUiAction.OnAddAllowedEmailDomain -> {
                 addAllowedEmailDomain(action.domain)
             }
+
             is EditCommunityUiAction.OnAllowAnyEmailDomainChanged -> {
                 setAllowAnyEmailDomain(action.value)
             }
+
             is EditCommunityUiAction.OnRemoveAllowedEmailDomain -> {
                 removeAllowedEmailDomain(action.domain)
             }
+
             is EditCommunityUiAction.OnRequireAdminApprovalChanged -> {
                 setRequireAdminApproval(action.value)
             }
+
             EditCommunityUiAction.OnSaveClicked -> {
                 editCommunity()
             }
+
             is EditCommunityUiAction.OnUpdateCommunityDescription -> {
                 setCommunityDescription(action.description)
             }
+
             is EditCommunityUiAction.OnUpdateCommunityName -> {
                 setCommunityName(action.name)
             }
+
             else -> Unit
         }
     }
 
     private fun editCommunity() {
-        screenModelScope.launch (DispatcherIO) {
+        println("EditCommunityScreenModel editCommunity uiState: ${uiState.value}")
+        screenModelScope.launch(DispatcherIO) {
             communityRepo.editCommunity(
                 Community(
+                    id = uiState.value.communityId,
                     name = uiState.value.communityName,
                     description = uiState.value.communityDescription,
                     isAdminApprovalRequired = uiState.value.requireAdminApproval,
                     allowAnyEmailDomain = uiState.value.allowAnyEmailDomain,
                     allowedEmailDomains = uiState.value.allowedEmailDomains
                 )
-            ).let{ result ->
-                if(result.isSuccessful()){
+            ).let { result ->
+                if (result.isSuccessful()) {
                     _uiState.update { oldState ->
                         oldState.copy(isFinished = true)
                     }
