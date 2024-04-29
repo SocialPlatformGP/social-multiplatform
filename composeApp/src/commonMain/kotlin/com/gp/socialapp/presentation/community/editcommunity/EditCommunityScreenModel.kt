@@ -134,4 +134,8 @@ class EditCommunityScreenModel(
             }
         }
     }
+
+    fun clear() {
+        _uiState.value = EditCommunityUiState()
+    }
 }
