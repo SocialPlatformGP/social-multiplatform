@@ -255,27 +255,28 @@ data class CreatePostScreen(val openedFeedTab: FeedTab, val communityId: String)
         }
     }
 
-    private fun uploadPostFiles(
-        scope: CoroutineScope,
-        files: List<KmpFile>,
-        context: PlatformContext,
-        onAddFile: (PostAttachment) -> Unit,
-        type: String
-    ) {
-        scope.launch {
-            files.forEach { file ->
-                val image = file.readByteArray(context)
-                onAddFile(
-                    PostAttachment(
-                        file = image,
-                        name = file.getName(context) ?: "",
-                        type = type,
-                        size = image.size.toLong()
-                    )
+
+}
+
+fun uploadPostFiles(
+    scope: CoroutineScope,
+    files: List<KmpFile>,
+    context: PlatformContext,
+    onAddFile: (PostAttachment) -> Unit,
+    type: String
+) {
+    scope.launch {
+        files.forEach { file ->
+            val image = file.readByteArray(context)
+            onAddFile(
+                PostAttachment(
+                    file = image,
+                    name = file.getName(context) ?: "",
+                    type = type,
+                    size = image.size.toLong()
                 )
-            }
+            )
         }
     }
-
 }
 
