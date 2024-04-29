@@ -1,4 +1,4 @@
-package com.gp.socialapp.presentation.home
+package com.gp.socialapp.presentation.home.screen
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope

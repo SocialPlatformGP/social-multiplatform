@@ -1,4 +1,4 @@
-package com.gp.socialapp.presentation.home
+package com.gp.socialapp.presentation.home.screen
 
 import com.gp.socialapp.data.community.source.remote.model.Community
 

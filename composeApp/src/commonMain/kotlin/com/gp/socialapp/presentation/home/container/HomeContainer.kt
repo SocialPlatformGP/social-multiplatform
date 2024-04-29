@@ -1,4 +1,4 @@
-package com.gp.socialapp.presentation.home
+package com.gp.socialapp.presentation.home.container
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -37,7 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.lifecycle.LifecycleEffect
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
+import cafe.adriel.voyager.kodein.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.CurrentTab
@@ -51,6 +51,7 @@ import com.gp.socialapp.navigation.util.BottomTabNavigationItem
 import com.gp.socialapp.presentation.auth.login.LoginScreen
 import com.gp.socialapp.presentation.auth.userinfo.UserInformationScreen
 import com.gp.socialapp.presentation.home.components.HomeTopBar
+import com.gp.socialapp.presentation.home.screen.HomeUiAction
 import com.seiko.imageloader.ui.AutoSizeImage
 import kotlinx.coroutines.launch
 
@@ -60,36 +61,20 @@ data class HomeContainer(
     @Composable
     override fun Content() {
         var navigator = LocalNavigator.currentOrThrow
-        val screenModel = navigator.rememberNavigatorScreenModel<HomeScreenModel>()
+        val screenModel = rememberScreenModel<HomeContainerScreenModel>()
         val state by screenModel.uiState.collectAsState()
         val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
         val scope = rememberCoroutineScope()
         var barsVisibility by remember { mutableStateOf(true) }
-        LifecycleEffect(onStarted = { screenModel.init() }, onDisposed = { })
-        if (!state.user.isDataComplete && state.user.id.isNotBlank()) {
-            navigator.replaceAll(UserInformationScreen(state.user))
+        LifecycleEffect(
+            onStarted = { screenModel.init() },
+            onDisposed = { screenModel.onDispose()})
+        if (!state.currentUser.isDataComplete && state.currentUser.id.isNotBlank()) {
+            navigator.replaceAll(UserInformationScreen(state.currentUser))
         }
         val onNavigation: (Boolean) -> Unit = { barsVisibility = it }
-        if (state.loggedOut) {
-            navigator.popUntilRoot()
+        if (state.isLoggedOut) {
             navigator.replaceAll(LoginScreen)
-        }
-        val onAction: (HomeUiAction) -> Unit = {
-            when (it) {
-                HomeUiAction.OnUserLogout -> {
-                    screenModel.userLogout()
-                }
-
-                HomeUiAction.OnOpenDrawer -> {
-                    scope.launch {
-                        drawerState.apply {
-                            if (isClosed) open() else close()
-                        }
-                    }
-                }
-
-                else -> Unit
-            }
         }
         ModalNavigationDrawer(
             drawerState = drawerState,
@@ -98,9 +83,9 @@ data class HomeContainer(
                     Column(
                         modifier = Modifier.padding(8.dp).fillMaxSize()
                     ) {
-                        if (state.user.profilePictureURL.isNotBlank())
+                        if (state.currentUser.profilePictureURL.isNotBlank())
                             AutoSizeImage(
-                                url = state.user.profilePictureURL,
+                                url = state.currentUser.profilePictureURL,
                                 contentDescription = "user image",
                                 contentScale = ContentScale.Crop,
                                 modifier = Modifier.padding(top = 16.dp)
@@ -115,8 +100,8 @@ data class HomeContainer(
                                     .background(Color.Red)
                             ) {
                                 Text(
-                                    text = if (state.user.firstName.isNotBlank()) state.user.firstName[0].toString()
-                                        .uppercase() + state.user.lastName[0].toString()
+                                    text = if (state.currentUser.firstName.isNotBlank()) state.currentUser.firstName[0].toString()
+                                        .uppercase() + state.currentUser.lastName[0].toString()
                                         .uppercase() else "Unknown",
                                     fontSize = 24.sp,
                                     color = Color.White,
@@ -125,7 +110,7 @@ data class HomeContainer(
                             }
                         Spacer(modifier = Modifier.padding(8.dp))
                         Text(
-                            state.user.firstName + " " + state.user.lastName,
+                            state.currentUser.firstName + " " + state.currentUser.lastName,
                             fontSize = 24.sp,
                             fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
                             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
@@ -133,7 +118,7 @@ data class HomeContainer(
                         )
                         Spacer(modifier = Modifier.padding(4.dp))
                         Text(
-                            state.user.email,
+                            state.currentUser.email,
                             fontSize = 12.sp,
                             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                             modifier = Modifier.fillMaxWidth()
@@ -160,7 +145,7 @@ data class HomeContainer(
 
                             OutlinedButton(
                                 onClick = {
-                                    screenModel.userLogout()
+                                    screenModel.logout()
                                     navigator.replaceAll(LoginScreen)
                                 },
                                 modifier = Modifier.weight(1f).padding(8.dp)
@@ -195,7 +180,7 @@ data class HomeContainer(
             val defaultTab = when (startingTab) {
                 HomeTab.CHAT -> ChatTab(onNavigation)
                 HomeTab.ASSIGNMENTS -> AssignmentsTab
-                HomeTab.COMMUNITIES -> CommunitiesTab(onNavigation, onAction)
+                HomeTab.COMMUNITIES -> CommunitiesTab(onNavigation)
                 HomeTab.CALENDAR -> CalendarTab
                 HomeTab.GRADES -> GradesTab
             }
@@ -209,9 +194,15 @@ data class HomeContainer(
                         }
                     },
                     topBar = {
-                        if (barsVisibility) HomeTopBar(
-                            action = onAction
-                        )
+                        if (barsVisibility)
+                            HomeTopBar(
+                                onDrawerIconClicked = {
+                                    scope.launch {
+                                        drawerState.apply {
+                                            if (isClosed) open() else close()
+                                        }
+                                    }
+                                })
                     },
 
                     bottomBar = {
@@ -221,8 +212,7 @@ data class HomeContainer(
                             BottomTabNavigationItem(tab = AssignmentsTab)
                             BottomTabNavigationItem(
                                 tab = CommunitiesTab(
-                                    onNavigation,
-                                    onAction
+                                    onNavigation
                                 )
                             )
                             BottomTabNavigationItem(tab = CalendarTab)

@@ -22,7 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.gp.socialapp.data.community.source.remote.model.Community
-import com.gp.socialapp.presentation.home.HomeUiAction
+import com.gp.socialapp.presentation.home.screen.HomeUiAction
 
 @Composable
 fun HomeContent(

@@ -1,4 +1,4 @@
-package com.gp.socialapp.presentation.home
+package com.gp.socialapp.presentation.home.screen
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -38,7 +38,6 @@ import org.jetbrains.skiko.ClipboardManager
 
 data class HomeScreen(
     val onBottomBarVisibilityChanged: (Boolean) -> Unit,
-    val action: (HomeUiAction) -> Unit
 ) : Screen {
     @Composable
     override fun Content() {
@@ -140,34 +139,50 @@ fun HomeScreenContent(
     var confirmLogoutDialogState by remember { mutableStateOf(false) }
     var communityId by remember { mutableStateOf("") }
     var clickedCommunity by remember { mutableStateOf(Community()) }
+    var newOnAction: (HomeUiAction) -> Unit = {
+        when (it) {
+            is HomeUiAction.OnCommunityLogout -> {
+                confirmLogoutDialogState = true
+                communityId = it.id
+            }
+
+            is HomeUiAction.OnOptionsMenuClicked -> {
+                clickedCommunity = it.community
+                showBottomSheet = true
+                scope.launch { sheetState.show() }
+            }
+
+            else -> onAction(it)
+        }
+    }
     val options = if (clickedCommunity.members.getOrElse(state.user.id) { false }) {
         listOf(
             OptionItem("Share Join Code") {
-                onAction(HomeUiAction.OnShareJoinCodeClicked(clickedCommunity.code))
+                newOnAction(HomeUiAction.OnShareJoinCodeClicked(clickedCommunity.code))
             },
             OptionItem("Manage Members") {
-                onAction(HomeUiAction.OnManageMembersClicked(clickedCommunity.id))
+                newOnAction(HomeUiAction.OnManageMembersClicked(clickedCommunity.id))
             },
             OptionItem("Edit Community") {
-                onAction(HomeUiAction.OnEditCommunityClicked(clickedCommunity))
+                newOnAction(HomeUiAction.OnEditCommunityClicked(clickedCommunity))
             },
             OptionItem("Leave Community") {
-                onAction(HomeUiAction.OnCommunityLogout(clickedCommunity.id))
+                newOnAction(HomeUiAction.OnCommunityLogout(clickedCommunity.id))
             },
             OptionItem("Delete Community") {
-                onAction(HomeUiAction.OnDeleteCommunityClicked(clickedCommunity.id))
+                newOnAction(HomeUiAction.OnDeleteCommunityClicked(clickedCommunity.id))
             }
         )
     } else {
         listOf(
             OptionItem("Share Join Code") {
-                onAction(HomeUiAction.OnShareJoinCodeClicked(clickedCommunity.code))
+                newOnAction(HomeUiAction.OnShareJoinCodeClicked(clickedCommunity.code))
             },
             OptionItem("View Members") {
-                onAction(HomeUiAction.OnViewMembersClicked(clickedCommunity.id))
+                newOnAction(HomeUiAction.OnViewMembersClicked(clickedCommunity.id))
             },
             OptionItem("Leave Community") {
-                onAction(HomeUiAction.OnCommunityLogout(clickedCommunity.id))
+                newOnAction(HomeUiAction.OnCommunityLogout(clickedCommunity.id))
             }
         )
     }
@@ -181,7 +196,7 @@ fun HomeScreenContent(
                 HomeFab(
                     fabState,
                     onCreateCommunityClicked = {
-                        onAction(HomeUiAction.OnCreateCommunityClicked)
+                        newOnAction(HomeUiAction.OnCreateCommunityClicked)
                     },
                     onJoinCommunityClicked = {
                         joinCommunityDialogState = true
@@ -220,22 +235,8 @@ fun HomeScreenContent(
         }
         HomeContent(modifier = Modifier.padding(padding),
             communities = state.communities,
-            action = {
-                when (it) {
-                    is HomeUiAction.OnCommunityLogout -> {
-                        confirmLogoutDialogState = true
-                        communityId = it.id
-                    }
-
-                    is HomeUiAction.OnOptionsMenuClicked -> {
-                        clickedCommunity = it.community
-                        showBottomSheet = true
-                        scope.launch { sheetState.show() }
-                    }
-
-                    else -> onAction(it)
-                }
-            })
+            action = newOnAction
+        )
     }
 }
 

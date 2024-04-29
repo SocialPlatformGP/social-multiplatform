@@ -17,11 +17,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.gp.socialapp.presentation.home.HomeUiAction
+import com.gp.socialapp.presentation.home.screen.HomeUiAction
 
 @Composable
 fun HomeTopBar(
-    action: (HomeUiAction) -> Unit,
+    onDrawerIconClicked: () -> Unit,
     onNotificationClicked: () -> Unit = {}
 ) {
     Row(
@@ -35,7 +35,7 @@ fun HomeTopBar(
 
     ) {
         IconButton(onClick = {
-            action(HomeUiAction.OnOpenDrawer)
+            onDrawerIconClicked()
         }) {
             Icon(
                 imageVector = Icons.Default.Menu,
