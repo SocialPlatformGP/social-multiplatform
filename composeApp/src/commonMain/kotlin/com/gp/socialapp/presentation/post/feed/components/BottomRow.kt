@@ -15,7 +15,6 @@ import androidx.compose.material.icons.automirrored.outlined.Chat
 import androidx.compose.material.icons.filled.Attachment
 import androidx.compose.material.icons.filled.KeyboardDoubleArrowDown
 import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.outlined.Chat
 import androidx.compose.material.icons.twotone.KeyboardDoubleArrowUp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -128,7 +127,7 @@ fun BottomRow(
                 )
             }
         }
-        if (filesCount > 0 ) {
+        if (filesCount > 0) {
             Spacer(modifier = Modifier.width(16.dp))
             OutlinedButton(
                 onClick = onShowFilesClicked,
@@ -160,7 +159,7 @@ fun BottomRow(
         }
         Spacer(modifier = Modifier.weight(1f))
         OutlinedButton(
-            onClick = { onShareClicked() },
+            onClick = { },
             contentPadding = PaddingValues(),
             border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outline),
 

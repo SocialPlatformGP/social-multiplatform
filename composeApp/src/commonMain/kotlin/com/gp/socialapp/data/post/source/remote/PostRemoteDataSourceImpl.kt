@@ -182,16 +182,19 @@ class PostRemoteDataSourceImpl(
 
     override suspend fun updatePost(request: PostRequest.UpdateRequest): Results<Unit, DataError.Network> =
         try {
+            println("updatePost: ${request.post}")
             val response = httpClient.post {
                 endPoint("updatePost")
                 setBody(
                     request
                 )
             }
+            println("response: ${response.status}")
             if (response.status == HttpStatusCode.OK) {
                 Results.Success(Unit)
             } else {
                 val error = response.body<DataError.Network>()
+                println("error: $error")
                 Results.Failure(error)
             }
         } catch (e: Exception) {

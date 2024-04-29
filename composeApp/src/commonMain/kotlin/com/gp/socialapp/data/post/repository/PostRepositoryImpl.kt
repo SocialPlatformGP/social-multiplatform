@@ -1,6 +1,5 @@
 package com.gp.socialapp.data.post.repository
 
-import com.gp.socialapp.data.auth.source.local.AuthKeyValueStorage
 import com.gp.socialapp.data.material.source.remote.MaterialRemoteDataSource
 import com.gp.socialapp.data.material.utils.FileManager
 import com.gp.socialapp.data.post.source.local.PostLocalDataSource
@@ -165,7 +164,11 @@ class PostRepositoryImpl(
 
     override fun getAllTags(communityId: String) = postRemoteSource.getAllTags(communityId)
 
-    override suspend fun insertTag(tag: Tag) = postRemoteSource.insertTag(tag)
+    override suspend fun insertTag(tag: Tag) {
+        println("insertTag: $tag")
+        postRemoteSource.insertTag(tag)
+    }
+
     override suspend fun getRecentSearches(): List<String> {
         return recentSearches.split("%69%").filter { it.isNotEmpty() }
     }
@@ -218,7 +221,8 @@ class PostRepositoryImpl(
                 }
 
                 is Results.Success -> {
-                    val localPath = fileManager.saveFile(data.data.data, data.data.fileName, mimeType)
+                    val localPath =
+                        fileManager.saveFile(data.data.data, data.data.fileName, mimeType)
                     fileManager.openFile(localPath, mimeType)
                 }
             }
