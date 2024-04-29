@@ -97,6 +97,9 @@ data class UserInformationScreen(
             onStarted = {
                 println("UserInformationScreen started")
                 screenModel.onScreenStart(signedInUser)
+            },
+            onDisposed = {
+                screenModel.onDispose()
             }
         )
         val scope = rememberCoroutineScope()

@@ -152,4 +152,9 @@ class UserInformationScreenModel(
     fun onScreenStart(signedInUser: User) {
         _uiState.update { it.copy(signedInUser = signedInUser) }
     }
+
+    override fun onDispose() {
+        super.onDispose()
+        _uiState.value = UserInformationUiState()
+    }
 }
