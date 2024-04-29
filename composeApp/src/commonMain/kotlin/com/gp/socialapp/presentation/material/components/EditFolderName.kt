@@ -72,6 +72,7 @@ fun EditFolderName(
                     TextButton(
                         onClick = {
                             onRenameFolderClicked(text)
+                            onDismissRequest()
                         },
                         modifier = Modifier.padding(8.dp)
                     ) {
