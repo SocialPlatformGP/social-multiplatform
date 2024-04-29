@@ -316,25 +316,26 @@ class PostDetailsScreenModel(
 
     private fun updateReply(reply: Reply) {
         screenModelScope.launch(DispatcherIO) {
-            val result = replyRepo.updateReply(reply)
-            when (result) {
-                is Results.Success -> {
-                    getRepliesById(reply.postId)
-                    _uiState.update { it.copy(actionResult = PostDetailsActionResult.ReplyUpdated) }
-                }
-
-                is Results.Failure -> {
-                    _uiState.update {
-                        it.copy(
-                            actionResult = PostDetailsActionResult.NetworkError(
-                                result.error.userMessage
-                            )
-                        )
+            replyRepo.updateReply(reply.id, reply.content).let { result ->
+                when (result) {
+                    is Results.Success -> {
+                        getRepliesById(reply.postId)
+                        _uiState.update { it.copy(actionResult = PostDetailsActionResult.ReplyUpdated) }
                     }
-                }
 
-                Results.Loading -> {
-                    // TODO
+                    is Results.Failure -> {
+                        _uiState.update {
+                            it.copy(
+                                actionResult = PostDetailsActionResult.NetworkError(
+                                    result.error.userMessage
+                                )
+                            )
+                        }
+                    }
+
+                    Results.Loading -> {
+                        // TODO
+                    }
                 }
             }
         }
@@ -395,6 +396,9 @@ class PostDetailsScreenModel(
 
             is ReplyEvent.OnReplyReported -> {
                 reportReply(event.reply)
+            }
+            is ReplyEvent.OnReplyEdited -> {
+                updateReply(event.reply)
             }
 
             else -> {}

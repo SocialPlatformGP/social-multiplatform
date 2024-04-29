@@ -65,12 +65,14 @@ class ReplyRemoteDataSourceImpl(
 
     override suspend fun updateReply(request: ReplyRequest.UpdateRequest): Results<Unit, DataError.Network> =
         try {
+            println("updateReply request: $request")
             val response = client.post {
                 endPoint("updateReply")
                 setBody(
                     request
                 )
             }
+            println("updateReply response: ${response.status}")
             if (response.status == HttpStatusCode.OK) {
                 Results.Success(Unit)
             } else {

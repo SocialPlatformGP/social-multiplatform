@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface ReplyRepository {
     fun getReplies(postId: String): Flow<Results<List<Reply>, DataError.Network>>
-    suspend fun updateReply(reply: Reply): Results<Unit, DataError.Network>
+    suspend fun updateReply(replyId: String, replyContent: String): Results<Unit, DataError.Network>
     suspend fun deleteReply(replyId: String): Results<Unit, DataError.Network>
     suspend fun upvoteReply(
         replyId: String,

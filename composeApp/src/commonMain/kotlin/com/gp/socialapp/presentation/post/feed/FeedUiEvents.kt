@@ -35,6 +35,7 @@ sealed class ReplyEvent {
     data class OnReplyClicked(val reply: Reply) : ReplyEvent()
     data class OnReplyDeleted(val reply: Reply) : ReplyEvent()
     data class OnReplyEdited(val reply: Reply) : ReplyEvent()
+    data class OnEditReply(val reply: Reply) : ReplyEvent()
     data class OnReplyUpVoted(val reply: Reply) : ReplyEvent()
     data class OnReplyDownVoted(val reply: Reply) : ReplyEvent()
     data class OnAddReply(val reply: Reply) : ReplyEvent()

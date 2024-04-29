@@ -163,7 +163,7 @@ fun ReplyItem(
                             listOf(
                                 ReplyDropDownItem(stringResource(Res.string.edit)) {
                                     replyEvent(
-                                        ReplyEvent.OnReplyEdited(
+                                        ReplyEvent.OnEditReply(
                                             reply = nestedReply.reply ?: Reply()
                                         )
                                     )

@@ -29,6 +29,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.core.lifecycle.LifecycleEffect
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -65,12 +66,17 @@ data class PostDetailsScreen(val post: Post) : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = navigator.rememberNavigatorScreenModel<PostDetailsScreenModel>()
-        screenModel.initScreenModel(post)
+        LifecycleEffect(
+            onStarted = {
+                screenModel.initScreenModel(post)
+            },
+        )
         val state by screenModel.uiState.collectAsState()
         val scope = rememberCoroutineScope()
         var clickedReply by remember { mutableStateOf<Reply?>(null) }
         var isReportDialogVisible by remember { mutableStateOf(false) }
         val bottomSheetState = rememberModalBottomSheetState()
+        var isEditingReply by remember { mutableStateOf(false) }
         PostDetailsContent(
             replies = state.currentReplies,
             onPostEvent = { postEvent ->
@@ -110,6 +116,19 @@ data class PostDetailsScreen(val post: Post) : Screen {
                             }
                         }
                     }
+                    is ReplyEvent.OnEditReply -> {
+                        scope.launch {
+                            if (bottomSheetState.isVisible) {
+                                isEditingReply = false
+                                clickedReply = null
+                                bottomSheetState.hide()
+                            } else {
+                                clickedReply = replyEvent.reply
+                                isEditingReply = true
+                                bottomSheetState.show()
+                            }
+                        }
+                    }
 
                     else -> screenModel.handleReplyEvent(replyEvent)
                 }
@@ -133,6 +152,7 @@ data class PostDetailsScreen(val post: Post) : Screen {
             },
             onResetActionResult = screenModel::resetActionResult,
             onBackPressed = { navigator.pop() },
+            isEditingReply = isEditingReply,
         )
     }
 
@@ -148,6 +168,7 @@ data class PostDetailsScreen(val post: Post) : Screen {
         scope: CoroutineScope = rememberCoroutineScope(),
         onResetActionResult: () -> Unit,
         clickedReply: Reply?,
+        isEditingReply: Boolean,
         bottomSheetState: SheetState,
         isReportDialogVisible: Boolean = false,
         onDismissReportDialog: () -> Unit,
@@ -232,8 +253,12 @@ data class PostDetailsScreen(val post: Post) : Screen {
                 if (bottomSheetState.isVisible) {
                     AddReplySheet(
                         onDismiss = onDismissAddReplyBottomSheet,
+                        initialValue = if(isEditingReply) clickedReply?.content.orEmpty() else "",
                         onDone = { textReply ->
-                            if (clickedReply == null) {
+                            if(isEditingReply && clickedReply != null) {
+                                onReplyEvent(ReplyEvent.OnReplyEdited(clickedReply.copy(content = textReply)))
+                                onReplyEvent(ReplyEvent.OnEditReply(clickedReply))
+                            } else if (clickedReply == null) {
                                 onPostEvent(PostEvent.OnCommentAdded(textReply, post.id))
                             } else {
                                 onReplyEvent(ReplyEvent.OnReplyAdded(textReply, clickedReply))

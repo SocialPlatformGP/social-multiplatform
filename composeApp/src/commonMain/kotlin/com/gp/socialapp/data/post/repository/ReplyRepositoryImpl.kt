@@ -17,8 +17,8 @@ class ReplyRepositoryImpl(
         return remoteSource.fetchReplies(request)
     }
 
-    override suspend fun updateReply(reply: Reply): Results<Unit, DataError.Network> {
-        val request = ReplyRequest.UpdateRequest(reply)
+    override suspend fun updateReply(replyId: String, replyContent: String): Results<Unit, DataError.Network> {
+        val request = ReplyRequest.UpdateRequest(replyId, replyContent)
         return remoteSource.updateReply(request)
     }
 
