@@ -68,9 +68,6 @@ data class HomeScreen(
                         onBottomBarVisibilityChanged(false)
                         navigator.replaceAll(
                             CommunityHomeContainer(
-                                communities = state.communities,
-                                user = state.user,
-                                onAction = { action(it) },
                                 it.communityId
                             )
                         )
@@ -106,9 +103,6 @@ data class HomeScreen(
                         navigator.push(
                             CommunityHomeContainer(
                                 communityId = it.communityId,
-                                user = state.user,
-                                onAction = { action(it) },
-                                communities = state.communities,
                                 startingTab = CommunityHomeTab.MEMBERS
                             )
                         )
@@ -124,9 +118,6 @@ data class HomeScreen(
                             CommunityHomeContainer(
                                 communityId = it.communityId,
                                 startingTab = CommunityHomeTab.MEMBERS,
-                                user = state.user,
-                                onAction = { action(it) },
-                                communities = state.communities
                             )
                         )
                     }
