@@ -5,6 +5,7 @@ data class Tag(
     val label: String = "",
     val intColor: Int = 0,
     val hexColor: String = "#000000",
+    val communityID: String = ""
 ) {
     companion object {
         fun Tag.toDbString(): String {

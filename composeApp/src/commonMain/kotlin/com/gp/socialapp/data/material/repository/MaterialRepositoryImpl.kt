@@ -26,17 +26,19 @@ class MaterialRepositoryImpl(
     override suspend fun createFolder(
         name: String,
         path: String,
+        communityId: String,
     ): Flow<Results<MaterialResponse.GetMaterialResponses, DataError.Network>> {
-        return remoteDataSource.createFolder(name, path)
+        return remoteDataSource.createFolder(name, path, communityId)
     }
 
     override suspend fun createFile(
         name: String,
         type: String,
         path: String,
-        content: ByteArray
+        content: ByteArray,
+        communityId: String
     ): Flow<Results<MaterialResponse.GetMaterialResponses, DataError.Network>> {
-        return remoteDataSource.createFile(name, type, path, content)
+        return remoteDataSource.createFile(name, type, path, content, communityId)
     }
 
     override suspend fun deleteFile(
@@ -85,6 +87,13 @@ class MaterialRepositoryImpl(
                 }
             }
 
+    }
+
+    override fun renameFolder(
+        folderId: String,
+        newName: String
+    ): Flow<Results<MaterialResponse.GetMaterialResponses, DataError.Network>> {
+        return remoteDataSource.renameFolder(folderId, newName)
     }
 
     override suspend fun shareLink(url: String) {

@@ -15,7 +15,7 @@ fun Attachments(
     val images = attachments.filter {
         it.type == FilePickerFileType.ImageContentType
     }
-    if (images.isNotEmpty()) {
+    images.forEach { _ ->
         ImagePager(
             pageCount = images.size,
             images = images,

@@ -5,6 +5,8 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import com.gp.socialapp.data.auth.repository.AuthenticationRepository
 import com.gp.socialapp.data.chat.repository.RecentRoomRepository
 import com.gp.socialapp.util.DispatcherIO
+import com.gp.socialapp.util.Result
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -27,13 +29,22 @@ class ChatHomeScreenModel(
 
     fun getCurrentUser() {
         screenModelScope.launch(DispatcherIO) {
-            val userId = authenticationRepository.getCurrentLocalUserId()
-            println("UserId: $userId")
-            state.update {
-                it.copy(currentUserId = userId)
+            authenticationRepository.getSignedInUser().let { result ->
+                when(result) {
+                    is Result.SuccessWithData -> {
+                        state.update {
+                            it.copy(currentUserId = result.data.id)
+                        }
+                        getRecentRooms()
+                        connectToSocket()
+                    }
+                    is Result.Error -> {
+                        // TODO Handle error
+                        Napier.d("Error: ${result.message}")
+                    }
+                    else -> Unit
+                }
             }
-            getRecentRooms()
-            connectToSocket()
         }
     }
 

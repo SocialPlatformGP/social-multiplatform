@@ -5,13 +5,17 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import com.gp.socialapp.data.auth.repository.AuthenticationRepository
 import com.gp.socialapp.data.post.repository.PostRepository
 import com.gp.socialapp.data.post.repository.ReplyRepository
+import com.gp.socialapp.presentation.material.utils.MimeType
 import com.gp.socialapp.data.post.source.remote.model.Post
+import com.gp.socialapp.data.post.source.remote.model.PostAttachment
 import com.gp.socialapp.data.post.source.remote.model.Reply
 import com.gp.socialapp.data.post.util.ToNestedReplies.toNestedReplies
 import com.gp.socialapp.presentation.post.feed.PostEvent
 import com.gp.socialapp.presentation.post.feed.ReplyEvent
 import com.gp.socialapp.util.DispatcherIO
+import com.gp.socialapp.util.Result
 import com.gp.socialapp.util.Results
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -26,8 +30,18 @@ class PostDetailsScreenModel(
     val uiState = _uiState.asStateFlow()
     fun initScreenModel(post: Post) {
         screenModelScope.launch(DispatcherIO) {
-            val userId = authRepo.getCurrentLocalUserId()
-            _uiState.update { it.copy(post = post, currentUserId = userId) }
+            authRepo.getSignedInUser().let{ result ->
+                when(result){
+                    is Result.SuccessWithData -> {
+                        _uiState.update { it.copy(post = post, currentUserId = result.data.id) }
+                    }
+                    is Result.Error -> {
+                        Napier.e("Error: ${result.message}")
+                        //TODO Handle error
+                    }
+                    else -> Unit
+                }
+            }
             getRepliesById(post.id)
         }
     }
@@ -302,25 +316,26 @@ class PostDetailsScreenModel(
 
     private fun updateReply(reply: Reply) {
         screenModelScope.launch(DispatcherIO) {
-            val result = replyRepo.updateReply(reply)
-            when (result) {
-                is Results.Success -> {
-                    getRepliesById(reply.postId)
-                    _uiState.update { it.copy(actionResult = PostDetailsActionResult.ReplyUpdated) }
-                }
-
-                is Results.Failure -> {
-                    _uiState.update {
-                        it.copy(
-                            actionResult = PostDetailsActionResult.NetworkError(
-                                result.error.userMessage
-                            )
-                        )
+            replyRepo.updateReply(reply.id, reply.content).let { result ->
+                when (result) {
+                    is Results.Success -> {
+                        getRepliesById(reply.postId)
+                        _uiState.update { it.copy(actionResult = PostDetailsActionResult.ReplyUpdated) }
                     }
-                }
 
-                Results.Loading -> {
-                    // TODO
+                    is Results.Failure -> {
+                        _uiState.update {
+                            it.copy(
+                                actionResult = PostDetailsActionResult.NetworkError(
+                                    result.error.userMessage
+                                )
+                            )
+                        }
+                    }
+
+                    Results.Loading -> {
+                        // TODO
+                    }
                 }
             }
         }
@@ -348,8 +363,17 @@ class PostDetailsScreenModel(
                 println("reply in screen model: $reply")
                 insertReply(reply)
             }
-
+            is PostEvent.OnAttachmentClicked -> {
+                openAttachment(event.attachment)
+            }
             else -> {}
+        }
+    }
+
+    private fun openAttachment(attachment: PostAttachment) {
+        screenModelScope.launch (DispatcherIO){
+            val mimeType = MimeType.getMimeTypeFromFileName(attachment.name).mimeType
+            postRepo.openAttachment(attachment.url, mimeType)
         }
     }
 
@@ -372,6 +396,9 @@ class PostDetailsScreenModel(
 
             is ReplyEvent.OnReplyReported -> {
                 reportReply(event.reply)
+            }
+            is ReplyEvent.OnReplyEdited -> {
+                updateReply(event.reply)
             }
 
             else -> {}

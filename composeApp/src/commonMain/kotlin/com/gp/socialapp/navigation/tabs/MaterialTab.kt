@@ -9,7 +9,9 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 
-object MaterialTab : Tab {
+data class MaterialTab(
+    val communityId: String
+) : Tab {
     override val options: TabOptions
         @Composable
         get() {
@@ -18,7 +20,7 @@ object MaterialTab : Tab {
 
             return remember {
                 TabOptions(
-                    index = 2u,
+                    index = 1u,
                     title = title,
                     icon = icon
                 )
@@ -27,6 +29,6 @@ object MaterialTab : Tab {
 
     @Composable
     override fun Content() {
-        Navigator(screen = com.gp.socialapp.presentation.material.MaterialScreen)
+        Navigator(screen = com.gp.socialapp.presentation.material.MaterialScreen(communityId))
     }
 }

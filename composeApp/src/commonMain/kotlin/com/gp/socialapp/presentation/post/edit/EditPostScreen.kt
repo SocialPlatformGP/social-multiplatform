@@ -17,12 +17,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import cafe.adriel.voyager.core.lifecycle.LifecycleEffect
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gp.socialapp.data.post.source.remote.model.Post
-import com.gp.socialapp.data.post.source.remote.model.PostAttachment
 import com.gp.socialapp.data.post.source.remote.model.Tag
 import com.gp.socialapp.presentation.post.create.component.BottomOptionRow
 import com.gp.socialapp.presentation.post.create.component.CreatePostTopBar
@@ -32,10 +32,11 @@ import com.gp.socialapp.presentation.post.create.component.MyExistingTagAlertDia
 import com.gp.socialapp.presentation.post.create.component.MyTextField
 import com.gp.socialapp.presentation.post.create.component.NewTagAlertDialog
 import com.gp.socialapp.presentation.post.create.component.TagsRow
+import com.gp.socialapp.presentation.post.create.uploadPostFiles
+import com.gp.socialapp.presentation.post.edit.EditPostAction
 import com.gp.socialapp.presentation.post.edit.EditPostScreenModel
+import com.gp.socialapp.presentation.post.edit.EditPostUIState
 import com.mohamedrejeb.calf.core.LocalPlatformContext
-import com.mohamedrejeb.calf.io.getName
-import com.mohamedrejeb.calf.io.readByteArray
 import com.mohamedrejeb.calf.picker.FilePickerFileType
 import com.mohamedrejeb.calf.picker.FilePickerSelectionMode
 import com.mohamedrejeb.calf.picker.rememberFilePickerLauncher
@@ -49,27 +50,24 @@ class EditPostScreen(val post: Post) : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = navigator.rememberNavigatorScreenModel<EditPostScreenModel>()
-        val state by screenModel.post.collectAsState()
-        val existingTags by screenModel.channelTags.collectAsState()
-        val success by screenModel.success.collectAsState()
-        screenModel.setPost(post)
-        if (success) {
+        LifecycleEffect(
+            onStarted = { screenModel.init(post) },
+            onDisposed = { screenModel.dispose() }
+        )
+        val state by screenModel.uiState.collectAsState()
+        if (state.editSuccess) {
             navigator.pop()
         }
         MaterialTheme {
             EditPostContent(
                 state = state,
-                channelTags = existingTags,
-                onBackClick = { navigator.pop() },
-                onPostClick = { screenModel.updatePost() },
-                onTitleChange = { screenModel.updateTitle(it) },
-                onBodyChange = { screenModel.updateBody(it) },
-                confirmNewTags = {
-                    screenModel.addTag(it.toList())
-                },
-                onAddImage = { file ->
-                    screenModel.addFile(listOf(file))
+                action = {
+                    when (it) {
+                        EditPostAction.NavigateBack -> navigator.pop()
+                        else -> screenModel.handleAction(it)
+                    }
                 }
+
             )
         }
     }
@@ -79,17 +77,12 @@ class EditPostScreen(val post: Post) : Screen {
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 private fun EditPostContent(
-    state: Post,
-    channelTags: List<Tag>,
-    onBackClick: () -> Unit,
-    onPostClick: () -> Unit,
-    onTitleChange: (String) -> Unit,
-    onBodyChange: (String) -> Unit,
-    confirmNewTags: (Set<Tag>) -> Unit,
-    onAddImage: (PostAttachment) -> Unit
-) {
+    action: (EditPostAction) -> Unit,
+    state: EditPostUIState,
+
+    ) {
     var openBottomSheet by rememberSaveable { mutableStateOf(false) }
-    var skipPartiallyExpanded by remember { mutableStateOf(false) }
+    val skipPartiallyExpanded by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val bottomSheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = skipPartiallyExpanded
@@ -100,32 +93,52 @@ private fun EditPostContent(
     val context = LocalPlatformContext.current
     val imagePicker = rememberFilePickerLauncher(
         type = FilePickerFileType.Image,
-        selectionMode = FilePickerSelectionMode.Single,
+        selectionMode = FilePickerSelectionMode.Multiple,
         onResult = { files ->
-            scope.launch {
-                files.firstOrNull()?.let { file ->
-                    val image = file.readByteArray(context)
-                    onAddImage(
-                        PostAttachment(
-                            file = image,
-                            name = file.getName(context) ?: "",
-                            type = FilePickerFileType.Image.toString(),
-                            size = image.size.toLong()
-                        )
-                    )
-                }
-            }
+            uploadPostFiles(
+                scope,
+                files,
+                context,
+                { action(EditPostAction.OnFileAdded(it)) },
+                FilePickerFileType.ImageContentType
+            )
+        }
+    )
+    val videoPicker = rememberFilePickerLauncher(
+        type = FilePickerFileType.Video,
+        selectionMode = FilePickerSelectionMode.Multiple,
+        onResult = { files ->
+            uploadPostFiles(
+                scope,
+                files,
+                context,
+                { action(EditPostAction.OnFileAdded(it)) },
+                FilePickerFileType.VideoContentType
+            )
+        }
+    )
+    val filePicker = rememberFilePickerLauncher(
+        type = FilePickerFileType.All,
+        selectionMode = FilePickerSelectionMode.Multiple,
+        onResult = { files ->
+            uploadPostFiles(
+                scope,
+                files,
+                context,
+                { action(EditPostAction.OnFileAdded(it)) },
+                FilePickerFileType.AllContentType
+            )
         }
     )
     Scaffold(
         topBar = {
             CreatePostTopBar(
-                onBackClick = onBackClick,
-                onPostClick = onPostClick,
+                onBackClick = { action(EditPostAction.NavigateBack) },
+                onPostClick = { action(EditPostAction.OnApplyEditClicked) },
                 stringResource(Res.string.edit_post)
             )
         }
-    ) {
+    ) { it ->
         Column(
             modifier = Modifier
                 .padding(it)
@@ -134,7 +147,9 @@ private fun EditPostContent(
             MyTextField(
                 value = state.title,
                 label = "Title",
-                onValueChange = { onTitleChange(it) },
+                onValueChange = { newTitle ->
+                    action(EditPostAction.OnTitleChanged(newTitle))
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(0.2f)
@@ -142,31 +157,34 @@ private fun EditPostContent(
             MyTextField(
                 value = state.body,
                 label = "Body",
-                onValueChange = { onBodyChange(it) },
+                onValueChange = { newBody ->
+                    action(EditPostAction.OnContentChanged(newBody))
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
             )
             TagsRow(
-                tags = selectedTags.toSet().toList(),
+                tags = state.postTags.toList(),
                 onTagClick = { tag ->
-                    println("Tag clicked: $tag")
-                    println("Selected tags: $selectedTags")
-                    selectedTags -= tag
+                    action(EditPostAction.OnTagRemoved(tag))
                 }
             )
             FilesRow(
-                state.attachments,
-                onFileClick = { file ->
-                    println("File clicked: $file")
+                modifier = Modifier.fillMaxWidth(),
+                state.postAttachments,
+                onFileDelete = { file ->
+                    action(EditPostAction.OnFileRemoved(file))
                 }
             )
             HorizontalDivider()
             BottomOptionRow(
-                onAddFileClicked = { /**/ },
+                modifier = Modifier.fillMaxWidth(),
+                onAddFileClicked = {
+                    filePicker.launch()
+                },
                 onAddImageClicked = {
                     imagePicker.launch()
-
                 },
                 onAddTagClicked = {
                     scope.launch { bottomSheetState.show() }.invokeOnCompletion {
@@ -175,43 +193,44 @@ private fun EditPostContent(
                         }
                     }
                 },
-                onAddVideoClicked = {/*TODO: Add video picker*/ },
-                pickedFileType = state.attachments.firstOrNull()?.type ?: ""
+                onAddVideoClicked = {
+                    videoPicker.launch()
+                },
+                pickedFileType = state.postAttachments.firstOrNull()?.type ?: ""
             )
         }
         if (openBottomSheet) {
             MyBottomSheet(
-                openBottomSheet = {
-                    openBottomSheet = it
+                openBottomSheet = { value ->
+                    openBottomSheet = value
                 },
                 bottomSheetState = bottomSheetState,
-                existingTagsDialogState = {
-                    existingTagsDialogState = it
+                existingTagsDialogState = { value ->
+                    existingTagsDialogState = value
                 },
-                newTagDialogState = {
-                    newTagDialogState = it
+                newTagDialogState = { value ->
+                    newTagDialogState = value
                 },
             )
         }
         if (existingTagsDialogState) {
             MyExistingTagAlertDialog(
-                existingTagsDialogState = {
-                    existingTagsDialogState = it
+                existingTagsDialogState = { value ->
+                    existingTagsDialogState = value
                 },
-                channelTags = channelTags,
+                channelTags = state.channelTags.toList(),
                 selectedTags = {
-                    selectedTags += it
+                    action(EditPostAction.OnTagAdded(it))
                 },
-
             )
         }
         if (newTagDialogState) {
             NewTagAlertDialog(
-                newTagDialogState = {
-                    newTagDialogState = it
+                newTagDialogState = { value ->
+                    newTagDialogState = value
                 },
                 confirmNewTags = {
-                    confirmNewTags(it)
+                    action(EditPostAction.OnTagAdded(it))
                 },
             )
 

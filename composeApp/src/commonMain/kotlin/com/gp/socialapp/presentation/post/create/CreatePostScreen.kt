@@ -18,6 +18,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import cafe.adriel.voyager.core.lifecycle.LifecycleEffect
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -34,22 +35,30 @@ import com.gp.socialapp.presentation.post.create.component.NewTagAlertDialog
 import com.gp.socialapp.presentation.post.create.component.TagsRow
 import com.gp.socialapp.presentation.post.feed.FeedTab
 import com.mohamedrejeb.calf.core.LocalPlatformContext
+import com.mohamedrejeb.calf.core.PlatformContext
+import com.mohamedrejeb.calf.io.KmpFile
 import com.mohamedrejeb.calf.io.getName
 import com.mohamedrejeb.calf.io.readByteArray
 import com.mohamedrejeb.calf.picker.FilePickerFileType
 import com.mohamedrejeb.calf.picker.FilePickerSelectionMode
 import com.mohamedrejeb.calf.picker.rememberFilePickerLauncher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import socialmultiplatform.composeapp.generated.resources.Res
 import socialmultiplatform.composeapp.generated.resources.create_post
 
-data class CreatePostScreen(val openedFeedTab: FeedTab) : Screen {
+data class CreatePostScreen(val openedFeedTab: FeedTab, val communityId: String) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = navigator.rememberNavigatorScreenModel<CreatePostScreenModel>()
         val state by screenModel.uiState.collectAsState()
+        LifecycleEffect(
+            onStarted = {
+                screenModel.init(openedFeedTab, communityId)
+            }
+        )
         val existingTags by screenModel.channelTags.collectAsState()
         if (state.createdState) {
             navigator.pop()
@@ -60,15 +69,19 @@ data class CreatePostScreen(val openedFeedTab: FeedTab) : Screen {
                 state = state,
                 channelTags = existingTags,
                 onBackClick = { navigator.pop() },
-                onPostClick = { title, body -> screenModel.onCreatePost(title, body, openedFeedTab.title) },
+                onPostClick = { title, body ->
+                    screenModel.onCreatePost(
+                        title = title,
+                        body = body,
+                    )
+                },
                 confirmNewTags = {
                     screenModel.insertNewTags(it)
                 },
-                onAddImage = { file ->
-                    screenModel.onAddFile(file)
-                },
                 onAddTags = screenModel::onAddTags,
-                onRemoveTags = screenModel::onRemoveTags
+                onRemoveTags = screenModel::onRemoveTags,
+                onAddFile = screenModel::onAddFile,
+                onRemoveFile = screenModel::onRemoveFile
             )
         }
 
@@ -84,7 +97,8 @@ data class CreatePostScreen(val openedFeedTab: FeedTab) : Screen {
         onAddTags: (Set<Tag>) -> Unit,
         onRemoveTags: (Set<Tag>) -> Unit,
         confirmNewTags: (Set<Tag>) -> Unit,
-        onAddImage: (PostAttachment) -> Unit
+        onAddFile: (PostAttachment) -> Unit,
+        onRemoveFile: (PostAttachment) -> Unit
     ) {
         var openBottomSheet by rememberSaveable { mutableStateOf(false) }
         val skipPartiallyExpanded by remember { mutableStateOf(false) }
@@ -100,28 +114,48 @@ data class CreatePostScreen(val openedFeedTab: FeedTab) : Screen {
         val context = LocalPlatformContext.current
         val imagePicker = rememberFilePickerLauncher(
             type = FilePickerFileType.Image,
-            selectionMode = FilePickerSelectionMode.Single,
+            selectionMode = FilePickerSelectionMode.Multiple,
             onResult = { files ->
-                scope.launch {
-                    files.firstOrNull()?.let { file ->
-                        val image = file.readByteArray(context)
-                        onAddImage(
-                            PostAttachment(
-                                file = image,
-                                name = file.getName(context) ?: "",
-                                type = FilePickerFileType.ImageContentType,
-                                size = image.size.toLong()
-                            )
-                        )
-                    }
-                }
+                uploadPostFiles(
+                    scope,
+                    files,
+                    context,
+                    onAddFile,
+                    FilePickerFileType.ImageContentType
+                )
+            }
+        )
+        val videoPicker = rememberFilePickerLauncher(
+            type = FilePickerFileType.Video,
+            selectionMode = FilePickerSelectionMode.Multiple,
+            onResult = { files ->
+                uploadPostFiles(
+                    scope,
+                    files,
+                    context,
+                    onAddFile,
+                    FilePickerFileType.VideoContentType
+                )
+            }
+        )
+        val filePicker = rememberFilePickerLauncher(
+            type = FilePickerFileType.All,
+            selectionMode = FilePickerSelectionMode.Multiple,
+            onResult = { files ->
+                uploadPostFiles(
+                    scope,
+                    files,
+                    context,
+                    onAddFile,
+                    FilePickerFileType.AllContentType
+                )
             }
         )
         Scaffold(
             topBar = {
                 CreatePostTopBar(
                     onBackClick = onBackClick,
-                    onPostClick = {onPostClick(title, body)},
+                    onPostClick = { onPostClick(title, body) },
                     stringResource(Res.string.create_post)
                 )
             }
@@ -135,7 +169,7 @@ data class CreatePostScreen(val openedFeedTab: FeedTab) : Screen {
                     value = title,
                     label = "Title",
                     onValueChange = { newTitle ->
-                        title =newTitle
+                        title = newTitle
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -153,22 +187,25 @@ data class CreatePostScreen(val openedFeedTab: FeedTab) : Screen {
                 )
                 TagsRow(
                     tags = state.tags,
-                    onTagClick = {tag ->
+                    onTagClick = { tag ->
                         onRemoveTags(setOf(tag))
                     }
                 )
                 FilesRow(
+                    modifier = Modifier.fillMaxWidth(),
                     state.files,
-                    onFileClick = { file ->
-                        println("File clicked: $file")
+                    onFileDelete = { file ->
+                        onRemoveFile(file)
                     }
                 )
                 HorizontalDivider()
                 BottomOptionRow(
-                    onAddFileClicked = { /**/ },
+                    modifier = Modifier.fillMaxWidth(),
+                    onAddFileClicked = {
+                        filePicker.launch()
+                    },
                     onAddImageClicked = {
                         imagePicker.launch()
-
                     },
                     onAddTagClicked = {
                         scope.launch { bottomSheetState.show() }.invokeOnCompletion {
@@ -177,7 +214,9 @@ data class CreatePostScreen(val openedFeedTab: FeedTab) : Screen {
                             }
                         }
                     },
-                    onAddVideoClicked = {/*TODO: Add video picker*/ },
+                    onAddVideoClicked = {
+                        videoPicker.launch()
+                    },
                     pickedFileType = state.files.firstOrNull()?.type ?: ""
                 )
             }
@@ -216,5 +255,28 @@ data class CreatePostScreen(val openedFeedTab: FeedTab) : Screen {
         }
     }
 
+
+}
+
+fun uploadPostFiles(
+    scope: CoroutineScope,
+    files: List<KmpFile>,
+    context: PlatformContext,
+    onAddFile: (PostAttachment) -> Unit,
+    type: String
+) {
+    scope.launch {
+        files.forEach { file ->
+            val image = file.readByteArray(context)
+            onAddFile(
+                PostAttachment(
+                    file = image,
+                    name = file.getName(context) ?: "",
+                    type = type,
+                    size = image.size.toLong()
+                )
+            )
+        }
+    }
 }
 

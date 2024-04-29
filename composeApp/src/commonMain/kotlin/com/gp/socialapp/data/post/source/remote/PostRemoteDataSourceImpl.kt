@@ -26,6 +26,7 @@ class PostRemoteDataSourceImpl(
 ) : PostRemoteDataSource {
 
     override suspend fun createPost(request: PostRequest.CreateRequest): Flow<Results<Unit, DataError.Network>> {
+        println("createPost: ${request.post.communityID}")
         return flow {
             emit(Results.Loading)
             try {
@@ -36,14 +37,15 @@ class PostRemoteDataSourceImpl(
                     )
                 }
                 if (response.status == HttpStatusCode.OK) {
+                    println("createPost: ${response.bodyAsText()}")
                     emit(Results.Success(Unit))
                 } else {
                     val error = response.body<DataError.Network>()
                     emit(Results.Failure(error))
                 }
             } catch (e: Exception) {
-                emit(Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN))
                 e.printStackTrace()
+                emit(Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN))
             }
         }
     }
@@ -69,11 +71,12 @@ class PostRemoteDataSourceImpl(
         }
     }
 
-    override fun getAllTags(): Flow<List<Tag>> {
+    override fun getAllTags(communityId: String): Flow<List<Tag>> {
         return flow {
             try {
-                val response = httpClient.get {
+                val response = httpClient.post {
                     endPoint("getAllTags")
+                    setBody(communityId)
                 }
                 if (response.status == HttpStatusCode.OK) {
                     val tags = response.body<List<Tag>>()
@@ -83,8 +86,8 @@ class PostRemoteDataSourceImpl(
                     emit(emptyList())
                 }
             } catch (e: Exception) {
-                emit(emptyList())
                 e.printStackTrace()
+                emit(emptyList())
             }
         }
     }
@@ -94,22 +97,27 @@ class PostRemoteDataSourceImpl(
         flow {
             emit(Results.Loading)
             try {
+                println("fetchPosts: ${request.lastUpdated}")
                 val response = httpClient.post {
                     endPoint("getNewPosts")
                     setBody(
                         request
                     )
                 }
+                println("response: ${response.status}")
                 if (response.status == HttpStatusCode.OK) {
                     val posts = response.body<List<Post>>()
+                    println("posts: $posts")
                     emit(Results.Success(posts))
                 } else {
                     val error = response.body<DataError.Network>()
+                    println("error: $error")
                     emit(Results.Failure(error))
                 }
             } catch (e: Exception) {
-                emit(Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN))
                 e.printStackTrace()
+                emit(Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN))
+
             }
         }
 
@@ -174,16 +182,19 @@ class PostRemoteDataSourceImpl(
 
     override suspend fun updatePost(request: PostRequest.UpdateRequest): Results<Unit, DataError.Network> =
         try {
+            println("updatePost: ${request.post}")
             val response = httpClient.post {
                 endPoint("updatePost")
                 setBody(
                     request
                 )
             }
+            println("response: ${response.status}")
             if (response.status == HttpStatusCode.OK) {
                 Results.Success(Unit)
             } else {
                 val error = response.body<DataError.Network>()
+                println("error: $error")
                 Results.Failure(error)
             }
         } catch (e: Exception) {

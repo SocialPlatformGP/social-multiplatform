@@ -32,6 +32,7 @@ class MaterialRemoteDataSourceImpl(
                 }
                 handleServerResponse(response)
             } catch (e: Exception) {
+                println("Exception: $e")
                 emit(Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN))
                 e.printStackTrace()
             }
@@ -42,8 +43,10 @@ class MaterialRemoteDataSourceImpl(
     override suspend fun createFolder(
         name: String,
         path: String,
+        communityId: String,
     ): Flow<Results<MaterialResponse.GetMaterialResponses, DataError.Network>> {
-        val request = MaterialRequest.CreateFolderRequest(name = name, path = path)
+        val request =
+            MaterialRequest.CreateFolderRequest(name = name, path = path, communityId = communityId)
         return flow {
             emit(Results.Loading)
             try {
@@ -65,13 +68,15 @@ class MaterialRemoteDataSourceImpl(
         name: String,
         type: String,
         path: String,
-        content: ByteArray
+        content: ByteArray,
+        communityId: String
     ): Flow<Results<MaterialResponse.GetMaterialResponses, DataError.Network>> {
         val request = MaterialRequest.CreateFileRequest(
             name = name,
             type = type,
             path = path,
-            content = content
+            content = content,
+            communityId = communityId
         )
         return flow {
             emit(Results.Loading)
@@ -145,7 +150,34 @@ class MaterialRemoteDataSourceImpl(
                 }
             }
         } catch (e: Exception) {
+            e.printStackTrace()
             Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN)
+        }
+    }
+
+    override fun renameFolder(
+        folderId: String,
+        newName: String
+    ): Flow<Results<MaterialResponse.GetMaterialResponses, DataError.Network>> {
+        val request = MaterialRequest.RenameFolderRequest(
+            folderId = folderId,
+            newName = newName
+        )
+        return flow {
+            emit(Results.Loading)
+            try {
+                val response = this@MaterialRemoteDataSourceImpl.client.post {
+                    endPoint("renameFolder")
+                    setBody(
+                        request
+                    )
+                }
+                handleServerResponse(response)
+
+            } catch (e: Exception) {
+                emit(Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN))
+                e.printStackTrace()
+            }
         }
     }
 }
@@ -156,9 +188,11 @@ private suspend fun FlowCollector<Results<MaterialResponse.GetMaterialResponses,
 
     if (response.status == HttpStatusCode.OK) {
         val data = response.body<MaterialResponse.GetMaterialResponses>()
+        println("Data: $data")
         emit(Results.Success(data))
     } else {
         val error = response.body<DataError.Network>()
+        println("Error: $error")
         emit(Results.Failure(error))
     }
 }

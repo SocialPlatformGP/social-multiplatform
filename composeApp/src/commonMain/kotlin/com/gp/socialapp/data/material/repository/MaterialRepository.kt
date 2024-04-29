@@ -13,13 +13,15 @@ interface MaterialRepository {
     suspend fun createFolder(
         name: String,
         path: String,
+        communityId: String,
     ): Flow<Results<MaterialResponse.GetMaterialResponses, DataError.Network>>
 
     suspend fun createFile(
         name: String,
         type: String,
         path: String,
-        content: ByteArray
+        content: ByteArray,
+        communityId: String
     ): Flow<Results<MaterialResponse.GetMaterialResponses, DataError.Network>>
 
     suspend fun deleteFile(
@@ -35,6 +37,10 @@ interface MaterialRepository {
     suspend fun openFile(fileId: String, url: String, mimeType: String)
     suspend fun shareLink(url: String)
     suspend fun openLink(url: String)
+    fun renameFolder(
+        folderId: String,
+        newName: String
+    ): Flow<Results<MaterialResponse.GetMaterialResponses, DataError.Network>>
 
 }
 

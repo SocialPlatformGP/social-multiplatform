@@ -1,5 +1,6 @@
 package com.gp.socialapp.di
 
+import android.content.Intent
 import com.gp.socialapp.data.chat.source.local.MessageLocalDataSource
 import com.gp.socialapp.data.chat.source.local.MessageLocalDataSourceImpl
 import com.gp.socialapp.data.chat.source.local.RecentRoomLocalDataSource
@@ -16,6 +17,7 @@ import com.gp.socialapp.data.material.utils.FileManager
 import com.gp.socialapp.data.post.source.local.PostLocalDataSource
 import com.gp.socialapp.data.post.source.local.PostLocalDataSourceImpl
 import com.gp.socialapp.db.AppDatabase
+import io.github.aakira.napier.Napier
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.gotrue.Auth
@@ -48,18 +50,25 @@ actual val platformModule = DI.Module("platformModule") {
     bind<MaterialLocalDataSource>() with singleton { MaterialLocalDataSourceImpl(instance()) }
 
     bind<FileManager>() with singleton { FileManagerImpl() }
-
     bind<SupabaseClient>() with singleton {
+        Napier.e("onCreate" + "${this}")
         createSupabaseClient(
             supabaseUrl = "https://vszvbwfzewqeoxxpetgj.supabase.co",
             supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZzenZid2Z6ZXdxZW94eHBldGdqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTM2MjM0MjUsImV4cCI6MjAyOTE5OTQyNX0.dO4SiJ9MCN0gZaY15kjqRdYL0NRFTZWID_xiYWhAnk8"
         ) {
             install(Auth) {
                 flowType = FlowType.PKCE
+                enableLifecycleCallbacks = true
                 host = "login"
                 scheme = "com.gp.edulink"
                 defaultExternalAuthAction = ExternalAuthAction.CustomTabs()
             }
         }
     }
+    bind<HandleDeepLink>() with singleton { HandleDeepLinkImpl(instance()) }
+}
+
+interface HandleDeepLink {
+    fun handleDeepLink(intent: Intent)
+
 }

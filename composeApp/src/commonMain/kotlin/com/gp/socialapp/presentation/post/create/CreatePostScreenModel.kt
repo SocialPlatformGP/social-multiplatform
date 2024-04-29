@@ -8,6 +8,7 @@ import com.gp.socialapp.data.post.repository.PostRepository
 import com.gp.socialapp.data.post.source.remote.model.Post
 import com.gp.socialapp.data.post.source.remote.model.PostAttachment
 import com.gp.socialapp.data.post.source.remote.model.Tag
+import com.gp.socialapp.presentation.post.feed.FeedTab
 import com.gp.socialapp.util.Result
 import com.gp.socialapp.util.Results
 import kotlinx.coroutines.Dispatchers
@@ -25,16 +26,15 @@ class CreatePostScreenModel(
     val currentUser = MutableStateFlow(User())
     val channelTags = MutableStateFlow<List<Tag>>(emptyList())
 
-
-    init {
+    fun init(openedFeedTab: FeedTab, communityId: String) {
+        _uiState.update { it.copy(currentTab = openedFeedTab, communityId = communityId) }
         getCurrentUser()
-        getChannelTags()
+        getChannelTags(communityId)
     }
 
-
-    private fun getChannelTags() {
+    private fun getChannelTags(communityId: String) {
         screenModelScope.launch {
-            postRepository.getAllTags().collect { tags ->
+            postRepository.getAllTags(communityId).collect { tags ->
                 channelTags.update { tags }
                 println(channelTags.value)
             }
@@ -43,35 +43,40 @@ class CreatePostScreenModel(
 
     //
     fun insertNewTags(tags: Set<Tag>) {
+        val commTags = tags.map { it.copy(communityID = uiState.value.communityId) }
         screenModelScope.launch {
-            tags.toSet().forEach {
+            commTags.toSet().forEach {
                 postRepository.insertTag(it)
             }
         }
-        _uiState.update { it.copy(tags = (uiState.value.tags + tags)) }
+        _uiState.update { it.copy(tags = (uiState.value.tags + commTags)) }
     }
 
     fun onAddTags(tags: Set<Tag>) {
+        val commTags = tags.map { it.copy(communityID = uiState.value.communityId) }
         screenModelScope.launch {
-            _uiState.update { it.copy(tags = it.tags + tags) }
+            _uiState.update { it.copy(tags = it.tags + commTags) }
         }
     }
 
     fun onRemoveTags(tags: Set<Tag>) {
+        val commTags = tags.map { it.copy(communityID = uiState.value.communityId) }
         screenModelScope.launch {
-            _uiState.update { it.copy(tags = it.tags - tags) }
+            _uiState.update { it.copy(tags = it.tags - commTags.toSet()) }
         }
     }
 
-    fun onCreatePost(title: String, body: String, postType: String) {
+    fun onCreatePost(title: String, body: String) {
         screenModelScope.launch {
             with(uiState.value) {
+                println("Creating post" + uiState.value.communityId)
                 postRepository.createPost(
                     Post(
+                        communityID = communityId,
                         title = title,
                         body = body,
                         tags = tags,
-                        type = postType,
+                        type = uiState.value.currentTab.title,
                         authorName = currentUser.value.firstName + " " + currentUser.value.lastName,
                         authorPfp = currentUser.value.profilePictureURL,
                         authorID = currentUser.value.email,
@@ -107,19 +112,17 @@ class CreatePostScreenModel(
 
     private fun getCurrentUser() {
         screenModelScope.launch {
-            authRepository.getCurrentLocalUserId().let { id ->
-                authRepository.getSignedInUser().let {
-                    when (it) {
-                        is Result.SuccessWithData -> {
-                            currentUser.value = it.data
-                        }
-
-                        is Result.Error -> {
-                            println("Error: cant get user data")
-                        }
-
-                        else -> Unit
+            authRepository.getSignedInUser().let {
+                when (it) {
+                    is Result.SuccessWithData -> {
+                        currentUser.value = it.data
                     }
+
+                    is Result.Error -> {
+                        println("Error: cant get user data")
+                    }
+
+                    else -> Unit
                 }
             }
         }
@@ -147,10 +150,13 @@ class CreatePostScreenModel(
                     body = "",
                     tags = emptyList(),
                     files = emptyList(),
-                    cancelPressed = false
+                    cancelPressed = false,
+                    communityId = "",
+                    currentTab = FeedTab.entries.first()
                 )
             }
         }
     }
+
 
 }

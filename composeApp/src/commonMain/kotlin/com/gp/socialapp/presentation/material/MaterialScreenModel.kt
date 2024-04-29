@@ -20,6 +20,12 @@ class MaterialScreenModel(
 ) : ScreenModel {
     private val uiState = MutableStateFlow(MaterialUiState())
     val state = uiState.asStateFlow()
+    fun init(communityId: String) {
+        uiState.update {
+            it.copy(currentCommunityId = communityId)
+        }
+        getMaterial()
+    }
 
     fun getMaterial() {
         screenModelScope.launch {
@@ -37,6 +43,7 @@ class MaterialScreenModel(
             materialRepo.createFolder(
                 name = folderName,
                 path = state.value.currentFolder.path,
+                communityId = state.value.currentCommunityId
             ).collect { result ->
                 handleUiState(result)
             }
@@ -51,7 +58,8 @@ class MaterialScreenModel(
                 name = fileName,
                 type = fileType,
                 path = state.value.currentFolder.path,
-                content = fileContent
+                content = fileContent,
+                communityId = state.value.currentCommunityId
             ).collect { result ->
                 handleUiState(result)
             }
@@ -124,6 +132,11 @@ class MaterialScreenModel(
                 event.url, MimeType.getMimeTypeFromFileName(event.fileName)
             )
 
+            is MaterialAction.OnRenameFolderClicked -> renameFolder(
+                event.folder.id,
+                event.folder.name
+            )
+
             is MaterialAction.OnFileClicked -> openFile(
                 event.fileId, event.url, MimeType.getMimeTypeFromFileName(event.fileName)
             )
@@ -132,6 +145,14 @@ class MaterialScreenModel(
             is MaterialAction.OnDeleteFolderClicked -> deleteFolder(event.folderId)
             is MaterialAction.OpenLink -> openLink(event.link)
             else -> Unit
+        }
+    }
+
+    private fun renameFolder(folderId: String, newName: String) {
+        screenModelScope.launch {
+            materialRepo.renameFolder(folderId, newName).collect { result ->
+                handleUiState(result)
+            }
         }
     }
 
@@ -208,7 +229,8 @@ class MaterialScreenModel(
     private fun updateData(data: MaterialResponse.GetMaterialResponses) {
         uiState.update {
             it.copy(
-                currentFiles = data.files, currentFolders = data.folders
+                currentFiles = data.files.filter { it.communityId == state.value.currentCommunityId },
+                currentFolders = data.folders.filter { it.communityId == state.value.currentCommunityId }
             )
         }
     }

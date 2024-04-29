@@ -34,6 +34,7 @@ import com.gp.socialapp.presentation.post.feed.PostEvent
 @Composable
 fun AddReplySheet(
     modifier: Modifier = Modifier,
+    initialValue: String = "",
     onDismiss: () -> Unit,
     onDone: (String) -> Unit,
     bottomSheetState: SheetState = rememberModalBottomSheetState()
@@ -44,7 +45,7 @@ fun AddReplySheet(
         shape = RoundedCornerShape(16.dp),
         tonalElevation = 8.dp
     ) {
-        var value by remember { mutableStateOf("") }
+        var value by remember { mutableStateOf(initialValue) }
         Row(
             modifier = Modifier
                 .fillMaxWidth()

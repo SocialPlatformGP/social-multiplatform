@@ -1,4 +1,4 @@
-package com.gp.socialapp.presentation.main.userinfo
+package com.gp.socialapp.presentation.auth.userinfo
 
 import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.data.auth.source.remote.model.responses.AuthResponse

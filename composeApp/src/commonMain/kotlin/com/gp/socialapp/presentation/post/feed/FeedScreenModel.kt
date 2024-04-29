@@ -3,12 +3,16 @@ package com.gp.socialapp.presentation.post.feed
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.gp.socialapp.data.auth.repository.AuthenticationRepository
+import com.gp.socialapp.data.community.repository.CommunityRepository
 import com.gp.socialapp.data.post.repository.PostRepository
 import com.gp.socialapp.data.post.source.remote.model.Post
+import com.gp.socialapp.data.post.source.remote.model.PostAttachment
 import com.gp.socialapp.data.post.util.PostPopularityUtils
+import com.gp.socialapp.presentation.material.utils.MimeType
 import com.gp.socialapp.util.DispatcherIO
 import com.gp.socialapp.util.Result
 import com.gp.socialapp.util.Results
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -17,16 +21,63 @@ import kotlinx.coroutines.launch
 
 class FeedScreenModel(
     private val postRepo: PostRepository,
-    private val authRepo: AuthenticationRepository
+    private val authRepo: AuthenticationRepository,
+    private val communityRepository: CommunityRepository
 ) : ScreenModel {
     private val _state = MutableStateFlow(FeedUiState())
     val state = _state.asStateFlow()
-
-    fun initScreen() {
+    fun initScreen(communityId: String) {
         screenModelScope.launch(DispatcherIO) {
-            val userId = authRepo.getCurrentLocalUserId()
-            _state.update { it.copy(currentUserID = userId) }
-            getAllPosts()
+            authRepo.getSignedInUser().let { result ->
+                when (result) {
+                    is Result.SuccessWithData -> {
+                        _state.update {
+                            it.copy(
+                                currentUserID = result.data.id,
+                                currentUser = result.data
+                            )
+                        }
+                        getAllPosts()
+                        getCurrentCommunity(communityId)
+                    }
+
+                    is Result.Error -> {
+                        Napier.e("Error: ${result.message}")
+                        _state.update { it.copy(error = FeedError.NetworkError(result.message)) }
+                    }
+
+                    else -> Unit
+                }
+            }
+
+        }
+
+    }
+
+    private fun getCurrentCommunity(communityId: String) {
+        screenModelScope.launch(DispatcherIO) {
+            communityRepository.fetchCommunity(communityId).collect { result ->
+                when (result) {
+                    is Results.Success -> {
+                        _state.update {
+                            it.copy(
+                                currentCommunity = result.data
+                            )
+                        }
+                    }
+
+                    is Results.Failure -> {
+                        println("Error: ${result.error.userMessage}")
+                        _state.update {
+                            it.copy(
+                                error = FeedError.NetworkError(result.error.userMessage)
+                            )
+                        }
+                    }
+
+                    else -> Unit
+                }
+            }
         }
     }
 
@@ -55,9 +106,9 @@ class FeedScreenModel(
                                 )
                             }
                         }
-                        _state.update {
-                            it.copy(
-                                posts = sortedPosts,
+                        _state.update { oldState ->
+                            oldState.copy(
+                                posts = sortedPosts.filter { it.communityID == oldState.currentCommunity.id },
                                 isFeedLoaded = Result.Success
                             )
                         }
@@ -182,7 +233,7 @@ class FeedScreenModel(
 
     fun logout() {
         screenModelScope.launch {
-            authRepo.clearStorage()
+            authRepo.logout()
             _state.update { it.copy(isLoggedOut = true) }
         }
     }
@@ -190,6 +241,13 @@ class FeedScreenModel(
     fun resetState() {
         screenModelScope.launch {
             _state.update { FeedUiState() }
+        }
+    }
+
+    fun openAttachment(attachment: PostAttachment) {
+        screenModelScope.launch (DispatcherIO) {
+            val mimeType = MimeType.getMimeTypeFromFileName(attachment.name).mimeType
+            postRepo.openAttachment(attachment.url, mimeType)
         }
     }
 }

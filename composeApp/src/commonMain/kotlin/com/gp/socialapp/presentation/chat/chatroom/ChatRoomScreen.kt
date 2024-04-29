@@ -35,6 +35,7 @@ import com.gp.socialapp.presentation.chat.chatroom.components.ImagePreviewDialog
 import com.gp.socialapp.presentation.chat.chatroom.components.MessageInput
 import com.gp.socialapp.presentation.chat.chatroom.components.MessagesContent
 import com.gp.socialapp.presentation.chat.groupdetails.GroupDetailsScreen
+import com.gp.socialapp.util.AppConstants.BASE_URL
 import com.mohamedrejeb.calf.core.LocalPlatformContext
 import com.mohamedrejeb.calf.io.getName
 import com.mohamedrejeb.calf.io.readByteArray
@@ -228,7 +229,7 @@ data class ChatRoomScreen(
                             onDismissRequest = { isEditMessageDialogOpen = false })
                     }
                     if (isImagePreviewDialogOpen) {
-                        ImagePreviewDialog(imageURL = previewedImageURL,
+                        ImagePreviewDialog(imageURL = BASE_URL + previewedImageURL,
                             onDismissRequest = { isImagePreviewDialogOpen = false })
                     }
                 }

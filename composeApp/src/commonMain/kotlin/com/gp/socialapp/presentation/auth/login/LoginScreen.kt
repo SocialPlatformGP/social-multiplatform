@@ -2,6 +2,8 @@ package com.gp.socialapp.presentation.auth.login
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,7 +21,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -48,14 +49,33 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.gp.socialapp.presentation.auth.login.components.MyOAuthProvider
+import com.gp.socialapp.presentation.auth.login.components.OAuthProviderItem
+import com.gp.socialapp.presentation.auth.login.components.imagevectors.OAuthProviderIcons
+import com.gp.socialapp.presentation.auth.login.components.imagevectors.oauthprovidericons.Discord
+import com.gp.socialapp.presentation.auth.login.components.imagevectors.oauthprovidericons.Facebook
+import com.gp.socialapp.presentation.auth.login.components.imagevectors.oauthprovidericons.Github
+import com.gp.socialapp.presentation.auth.login.components.imagevectors.oauthprovidericons.Google
+import com.gp.socialapp.presentation.auth.login.components.imagevectors.oauthprovidericons.Linkedin
+import com.gp.socialapp.presentation.auth.login.components.imagevectors.oauthprovidericons.Microsoft
+import com.gp.socialapp.presentation.auth.login.components.imagevectors.oauthprovidericons.Slack
+import com.gp.socialapp.presentation.auth.login.components.imagevectors.oauthprovidericons.Twitter
 import com.gp.socialapp.presentation.auth.passwordreset.PasswordResetScreen
 import com.gp.socialapp.presentation.auth.signup.SignUpScreen
 import com.gp.socialapp.presentation.auth.util.AuthError.EmailError
 import com.gp.socialapp.presentation.auth.util.AuthError.PasswordError
 import com.gp.socialapp.presentation.auth.util.AuthError.ServerError
-import com.gp.socialapp.presentation.main.MainContainer
+import com.gp.socialapp.presentation.home.container.HomeContainer
+import com.gp.socialapp.util.getPlatform
 import io.github.jan.supabase.gotrue.providers.Azure
+import io.github.jan.supabase.gotrue.providers.Discord
+import io.github.jan.supabase.gotrue.providers.Facebook
+import io.github.jan.supabase.gotrue.providers.Github
 import io.github.jan.supabase.gotrue.providers.Google
+import io.github.jan.supabase.gotrue.providers.LinkedIn
+import io.github.jan.supabase.gotrue.providers.OAuthProvider
+import io.github.jan.supabase.gotrue.providers.Slack
+import io.github.jan.supabase.gotrue.providers.Twitter
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import socialmultiplatform.composeapp.generated.resources.Res
@@ -67,8 +87,6 @@ import socialmultiplatform.composeapp.generated.resources.login_str
 import socialmultiplatform.composeapp.generated.resources.or_login_with
 import socialmultiplatform.composeapp.generated.resources.password
 import socialmultiplatform.composeapp.generated.resources.show_password
-import socialmultiplatform.composeapp.generated.resources.sign_in_with_google
-import socialmultiplatform.composeapp.generated.resources.sign_in_with_microsoft
 import socialmultiplatform.composeapp.generated.resources.sign_up
 
 object LoginScreen : Screen {
@@ -77,26 +95,42 @@ object LoginScreen : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = navigator.rememberNavigatorScreenModel<LoginScreenModel>()
         val state by screenModel.uiState.collectAsState()
+        LifecycleEffect(
+            onStarted = { screenModel.init() },
+            onDisposed = { screenModel.dispose() },
+        )
+
         if (state.signedInUser != null) {
-            navigator.replaceAll(MainContainer(state.signedInUser!!))
+            navigator.replaceAll(HomeContainer())
         } else {
+            val providers = listOf(
+                MyOAuthProvider("Google", OAuthProviderIcons.Google, Google),
+                MyOAuthProvider("Microsoft", OAuthProviderIcons.Microsoft, Azure),
+                MyOAuthProvider("Facebook", OAuthProviderIcons.Facebook, Facebook),
+                MyOAuthProvider("Twitter", OAuthProviderIcons.Twitter, Twitter),
+                MyOAuthProvider("GitHub", OAuthProviderIcons.Github, Github),
+                MyOAuthProvider("Linkedin", OAuthProviderIcons.Linkedin, LinkedIn),
+                MyOAuthProvider("Discord", OAuthProviderIcons.Discord, Discord),
+                MyOAuthProvider("Slack", OAuthProviderIcons.Slack, Slack),
+            )
             LoginContent(
-            onSignInWithGoogle = { screenModel.signInWithOAuth(Google) },
+                oAuthProviders = providers,
+                onSignInWithOAuth = { provider -> screenModel.signInWithOAuth(provider) },
                 state = state,
                 navigateToSignUp = { navigator.push(SignUpScreen) },
                 navigateToForgotPassword = { navigator.push(PasswordResetScreen) },
                 onEmailChange = { screenModel.updateEmail(it) },
                 onPasswordChange = { screenModel.updatePassword(it) },
                 onSignIn = { screenModel.onSignIn() },
-                onSignInWithMicrosoft = { screenModel.signInWithOAuth(Azure) },
             )
         }
     }
 
+    @OptIn(ExperimentalLayoutApi::class)
     @Composable
     private fun LoginContent(
-        onSignInWithGoogle: () -> Unit,
-        onSignInWithMicrosoft: () -> Unit,
+        oAuthProviders: List<MyOAuthProvider>,
+        onSignInWithOAuth: (OAuthProvider) -> Unit,
         onSignIn: () -> Unit,
         state: LoginUiState,
         navigateToSignUp: () -> Unit,
@@ -107,6 +141,7 @@ object LoginScreen : Screen {
         var passwordVisible by remember { mutableStateOf(false) }
         val scope = rememberCoroutineScope()
         val snackbarHostState = remember { SnackbarHostState() }
+        val platform = getPlatform()
         Scaffold(
             snackbarHost = {
                 SnackbarHost(hostState = snackbarHostState)
@@ -222,43 +257,21 @@ object LoginScreen : Screen {
                         .wrapContentWidth(Alignment.CenterHorizontally),
                     fontSize = 16.sp,
                 )
-                OutlinedButton(
-                    onClick = { onSignInWithGoogle() },
+                FlowRow(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalArrangement = Arrangement.Center,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 4.dp)
-                        .height(50.dp),
-                    shape = RoundedCornerShape(8.dp),
+                        .padding(horizontal = 16.dp, vertical = 4.dp),
                 ) {
-//            Icon(
-//                painter = painterResource(resource = Res.drawable.google),
-//                contentDescription = null,
-//                tint = androidx.compose.ui.graphics.Color.Unspecified,
-//                modifier = Modifier.size(24.dp)
-//            )
-                    Text(
-                        text = stringResource(resource = Res.string.sign_in_with_google),
-                        fontSize = 18.sp,
-                    )
-                }
-                OutlinedButton(
-                    onClick = { onSignInWithMicrosoft() },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 4.dp)
-                        .height(50.dp),
-                    shape = RoundedCornerShape(8.dp),
-                ) {
-//            Icon(
-//                painter = painterResource(resource = Res.drawable.google),
-//                contentDescription = null,
-//                tint = androidx.compose.ui.graphics.Color.Unspecified,
-//                modifier = Modifier.size(24.dp)
-//            )
-                    Text(
-                        text = stringResource(resource = Res.string.sign_in_with_microsoft),
-                        fontSize = 18.sp,
-                    )
+                    oAuthProviders.forEach { provider ->
+                        OAuthProviderItem(
+                            modifier = Modifier.padding(4.dp),
+                            provider = provider,
+                            onClick = onSignInWithOAuth,
+                            isEnabled = true,
+                        )
+                    }
                 }
                 Row(
                     modifier = Modifier

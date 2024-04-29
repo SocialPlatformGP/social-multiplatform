@@ -1,36 +1,57 @@
 package com.gp.socialapp.data.auth.repository
 
-import com.eygraber.uri.Uri
 import com.gp.socialapp.data.auth.source.remote.UserRemoteDataSource
 import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.data.auth.source.remote.model.requests.GetUsersByIdsRequest
+import com.gp.socialapp.data.community.source.remote.model.Community
+import com.gp.socialapp.util.DataError
+import com.gp.socialapp.util.DataSuccess
 import com.gp.socialapp.util.Result
+import com.gp.socialapp.util.Results
+import kotlinx.coroutines.flow.Flow
 
 class UserRepositoryImpl(
     private val userRemoteSource: UserRemoteDataSource
 ) : UserRepository {
-    override suspend fun updateUserInfo(user: User, pfpByteArray: ByteArray): Result<Nothing>{
+    override suspend fun updateUserInfo(user: User, pfpByteArray: ByteArray): Result<Nothing> {
         return if (pfpByteArray.isNotEmpty()) {
+            println("Uploading profile picture")
             val result = userRemoteSource.uploadUserPfp(pfpByteArray, user.id)
-            if(result is Result.SuccessWithData) {
+            if (result is Result.SuccessWithData) {
                 userRemoteSource.updateUserInfo(user.copy(profilePictureURL = result.data))
             } else {
                 Result.Error("An error occurred while uploading the profile picture")
             }
         } else {
+            println("Updating user info and pfp is empty")
             userRemoteSource.updateUserInfo(user)
         }
     }
 
-    override fun createUser(user: User, pfpURI: Uri) = userRemoteSource.createUser(user, pfpURI)
-    override fun updateUser(user: User) = userRemoteSource.updateUser(user)
-    override fun deleteUser(user: User) = userRemoteSource.deleteUser(user)
-    override suspend fun fetchUser(email: String) = userRemoteSource.fetchUser(email)
-    override fun fetchUsers() = userRemoteSource.fetchUsers()
-    override fun getCurrentUserEmail() = userRemoteSource.getCurrentUserEmail()
-    override fun getUsersByIds(Ids: List<String>)
-        = userRemoteSource.getUsersByIds(GetUsersByIdsRequest(Ids))
 
-    override suspend fun createRemoteUser(user: User): Result<Nothing> = userRemoteSource.createRemoteUser(user)
+    override fun fetchUsers() = userRemoteSource.fetchUsers()
+    override fun getUsersByIds(Ids: List<String>) =
+        userRemoteSource.getUsersByIds(GetUsersByIdsRequest(Ids))
+
+    override suspend fun createRemoteUser(user: User): Results<DataSuccess.User, DataError.Network> =
+        userRemoteSource.createRemoteUser(user)
+
+    override fun getUserCommunities(userId: String): Flow<Results<List<Community>, DataError.Network>> =
+        userRemoteSource.getUserCommunities(userId)
+
+    override fun communityLogout(
+        id: String,
+        selectedCommunityId: String
+    ): Flow<Results<List<Community>, DataError.Network>> {
+        return userRemoteSource.communityLogout(id, selectedCommunityId)
+    }
+
+    override fun joinCommunity(
+        id: String,
+        code: String
+    ): Flow<Results<List<Community>, DataError.Network>> {
+        return userRemoteSource.joinCommunity(id, code)
+    }
+
 
 }

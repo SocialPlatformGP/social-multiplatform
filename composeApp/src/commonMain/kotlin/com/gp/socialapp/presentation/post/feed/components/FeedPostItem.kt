@@ -42,7 +42,8 @@ fun FeedPostItem(
             TopRow(
                 imageUrl = post.authorPfp,
                 userName = post.authorName,
-                publishedAt = Instant.fromEpochSeconds(post.createdAt).toLocalDateTime(TimeZone.UTC).toYYYYMMDD(),
+                publishedAt = Instant.fromEpochSeconds(post.createdAt).toLocalDateTime(TimeZone.UTC)
+                    .toYYYYMMDD(),
                 onEditPostClicked = { onPostEvent(PostEvent.OnPostEdited(post)) },
                 onDeletePostClicked = { onPostEvent(PostEvent.OnPostDeleted(post)) }
             )
@@ -76,10 +77,10 @@ fun FeedPostItem(
                 onCommentClicked = {
                     onPostEvent(PostEvent.OnCommentClicked(post.id))
                 },
-                filesCount = (if(post.attachments.firstOrNull()?.type == FilePickerFileType.ImageContentType) 0 else post.attachments.size),
+                filesCount = (post.attachments.filter { it.type != FilePickerFileType.ImageContentType }).size,
                 currentUserID = currentUserID,
                 onShowFilesClicked = { onPostEvent(PostEvent.OnViewFilesAttachmentClicked(post.attachments)) },
-                onShareClicked =  {onPostEvent(PostEvent.OnPostShareClicked(post))}
+                onShareClicked = { onPostEvent(PostEvent.OnPostShareClicked(post)) }
             )
         }
     }

@@ -1,4 +1,4 @@
-package com.gp.socialapp.presentation.main.userinfo
+package com.gp.socialapp.presentation.auth.userinfo
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -58,7 +58,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.presentation.auth.util.AuthError
-import com.gp.socialapp.presentation.main.MainContainer
+import com.gp.socialapp.presentation.home.container.HomeContainer
 import com.gp.socialapp.util.LocalDateTimeUtil.now
 import com.gp.socialapp.util.LocalDateTimeUtil.toDDMMYYYY
 import com.gp.socialapp.util.LocalDateTimeUtil.toLocalDateTime
@@ -95,7 +95,11 @@ data class UserInformationScreen(
         val state by screenModel.uiState.collectAsState()
         LifecycleEffect(
             onStarted = {
+                println("UserInformationScreen started")
                 screenModel.onScreenStart(signedInUser)
+            },
+            onDisposed = {
+                screenModel.onDispose()
             }
         )
         val scope = rememberCoroutineScope()
@@ -113,9 +117,11 @@ data class UserInformationScreen(
             }
         )
         if (state.createdState is Result.Success) {
-            navigator.replaceAll(MainContainer(state.signedInUser?: signedInUser))
+            navigator.replaceAll(HomeContainer())
         }
-        Scaffold { paddingValues ->
+        Scaffold(
+
+        ) { paddingValues ->
             UserInformationContent(
                 paddingValues = paddingValues,
                 state = state,
@@ -215,9 +221,9 @@ data class UserInformationScreen(
                         )
                     }
                 }
-                Row (
+                Row(
                     verticalAlignment = Alignment.CenterVertically
-                ){
+                ) {
                     OutlinedTextField(
                         value = state.firstName,
                         onValueChange = onFirstNameChange,

@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class MaterialFile(
+    val communityId: String = "",
     val name: String = "",
     val type: String = "",
     val url: String = "",

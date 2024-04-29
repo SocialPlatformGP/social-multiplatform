@@ -8,7 +8,6 @@ import com.gp.socialapp.data.post.source.remote.model.Post
 import com.gp.socialapp.data.post.source.remote.model.Post.Companion.toEntity
 import com.gp.socialapp.db.AppDatabase
 import com.gp.socialapp.db.PostQueries
-import com.gp.socialapp.db.Posts
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -28,7 +27,7 @@ class PostLocalDataSourceImpl(
                 author_name = authorName,
                 author_pfp = authorPfp,
                 author_id = authorID,
-                created_at = createdAt.toLong(),
+                created_at = createdAt,
                 votes = votes.toLong(),
                 downvotes = downvoted,
                 upvotes = upvoted,
@@ -37,7 +36,8 @@ class PostLocalDataSourceImpl(
                 tags = tags,
                 type = type,
                 attachments = attachments,
-                last_modified = lastModified.toLong()
+                last_modified = lastModified,
+                community_id = communityID
             )
         }
     }
@@ -103,29 +103,30 @@ class PostLocalDataSourceImpl(
     }
 
     override fun searchByTitle(title: String): Flow<List<Post>> {
-        return postQueries.searchByTitle(title).asFlow().mapToList(Dispatchers.Default).map { list ->
-            list.map {
-                PostEntity(
-                    replyCount = it.reply_count.toInt(),
-                    authorName = it.author_name,
-                    authorPfp = it.author_pfp,
-                    id = it.id,
-                    authorID = it.author_id,
-                    createdAt = it.created_at,
-                    title = it.title,
-                    body = it.body,
-                    votes = it.votes.toInt(),
-                    downvoted = it.downvotes,
-                    upvoted = it.upvotes,
-                    moderationStatus = it.moderation_status,
-                    editedStatus = it.edited_status.toInt(),
-                    tags = it.tags,
-                    type = it.type,
-                    attachments = it.attachments,
-                    lastModified = it.last_modified
-                ).toPost()
+        return postQueries.searchByTitle(title).asFlow().mapToList(Dispatchers.Default)
+            .map { list ->
+                list.map {
+                    PostEntity(
+                        replyCount = it.reply_count.toInt(),
+                        authorName = it.author_name,
+                        authorPfp = it.author_pfp,
+                        id = it.id,
+                        authorID = it.author_id,
+                        createdAt = it.created_at,
+                        title = it.title,
+                        body = it.body,
+                        votes = it.votes.toInt(),
+                        downvoted = it.downvotes,
+                        upvoted = it.upvotes,
+                        moderationStatus = it.moderation_status,
+                        editedStatus = it.edited_status.toInt(),
+                        tags = it.tags,
+                        type = it.type,
+                        attachments = it.attachments,
+                        lastModified = it.last_modified
+                    ).toPost()
+                }
             }
-        }
     }
 
     override fun searchByTag(tag: String): Flow<List<Post>> {

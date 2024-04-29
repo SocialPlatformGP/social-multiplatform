@@ -1,18 +1,24 @@
 package com.gp.socialapp.data.auth.repository
 
-import com.eygraber.uri.Uri
 import com.gp.socialapp.data.auth.source.remote.model.User
+import com.gp.socialapp.data.community.source.remote.model.Community
+import com.gp.socialapp.util.DataError
+import com.gp.socialapp.util.DataSuccess
 import com.gp.socialapp.util.Result
+import com.gp.socialapp.util.Results
 import kotlinx.coroutines.flow.Flow
 
 interface UserRepository {
     suspend fun updateUserInfo(user: User, pfpByteArray: ByteArray): Result<Nothing>
-    fun createUser(user: User, pfpURI: Uri): Flow<Result<Nothing>>
-    fun updateUser(user: User): Flow<Result<Nothing>>
-    fun deleteUser(user: User): Flow<Result<Nothing>>
-    suspend fun fetchUser(email: String): Result<User>
+
     fun fetchUsers(): Flow<Result<List<User>>>
-    fun getCurrentUserEmail(): String
-    fun getUsersByIds(Ids: List<String>): Flow<Result<List<User>>>
-    suspend fun createRemoteUser(user: User): Result<Nothing>
+    fun getUsersByIds(Ids: List<String>): Flow<Results<List<User>, DataError.Network>>
+    suspend fun createRemoteUser(user: User): Results<DataSuccess.User, DataError.Network>
+    fun getUserCommunities(userId: String): Flow<Results<List<Community>, DataError.Network>>
+    fun communityLogout(
+        id: String,
+        selectedCommunityId: String
+    ): Flow<Results<List<Community>, DataError.Network>>
+
+    fun joinCommunity(id: String, code: String): Flow<Results<List<Community>, DataError.Network>>
 }

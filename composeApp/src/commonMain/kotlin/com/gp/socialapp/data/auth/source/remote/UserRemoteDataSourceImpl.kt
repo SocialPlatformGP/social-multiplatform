@@ -1,10 +1,14 @@
 package com.gp.socialapp.data.auth.source.remote
 
-import com.eygraber.uri.Uri
 import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.data.auth.source.remote.model.requests.GetUsersByIdsRequest
+import com.gp.socialapp.data.community.source.remote.model.Community
+import com.gp.socialapp.data.community.source.remote.model.request.CommunityRequest
 import com.gp.socialapp.data.post.util.endPoint
+import com.gp.socialapp.util.DataError
+import com.gp.socialapp.util.DataSuccess
 import com.gp.socialapp.util.Result
+import com.gp.socialapp.util.Results
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.storage.storage
@@ -26,7 +30,7 @@ class UserRemoteDataSourceImpl(
         return try {
             supabaseClient.auth.updateUser {
                 phone = user.phoneNumber
-                data{
+                data {
                     put(UserData.FIRST_NAME.value, user.firstName)
                     put(UserData.LAST_NAME.value, user.lastName)
                     put(UserData.BIRTH_DATE.value, user.birthdate)
@@ -37,25 +41,11 @@ class UserRemoteDataSourceImpl(
             }
             Result.Success
         } catch (e: Exception) {
+            e.printStackTrace()
             Result.Error(e.message ?: "An unknown error occurred")
         }
     }
 
-    override fun createUser(user: User, pfpURI: Uri): Flow<Result<Nothing>> {
-        TODO("Not yet implemented")
-    }
-
-    override fun updateUser(user: User): Flow<Result<Nothing>> {
-        TODO("Not yet implemented")
-    }
-
-    override fun deleteUser(user: User): Flow<Result<Nothing>> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun fetchUser(email: String): Result<User> {
-        TODO("Not yet implemented")
-    }
 
     override fun fetchUsers(): Flow<Result<List<User>>> = flow {
         emit(Result.Loading)
@@ -70,33 +60,33 @@ class UserRemoteDataSourceImpl(
                 emit(Result.Error("An unknown error occurred ${response.status}"))
             }
         } catch (e: Exception) {
+            e.printStackTrace()
             emit(Result.Error(e.message ?: "An unknown error occurred"))
         }
     }
 
-    override fun getCurrentUserEmail(): String {
-        TODO("Not yet implemented")
-    }
 
-    override fun getUsersByIds(request: GetUsersByIdsRequest): Flow<Result<List<User>>> = flow {
-        println("Request: $request")
-        emit(Result.Loading)
-        try {
-            val response = httpClient.post {
-                endPoint("getUsersByIds")
-                setBody(request)
+    override fun getUsersByIds(request: GetUsersByIdsRequest): Flow<Results<List<User>, DataError.Network>> =
+        flow {
+            println("Request: $request")
+            emit(Results.Loading)
+            try {
+                val response = httpClient.post {
+                    endPoint("getUsersByIds")
+                    setBody(request)
+                }
+                if (response.status == HttpStatusCode.OK) {
+                    val users = response.body<List<User>>()
+                    emit(Results.Success(users))
+                } else {
+                    val error = response.body<DataError.Network>()
+                    emit(Results.Failure(error))
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                emit(Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN))
             }
-            if (response.status == HttpStatusCode.OK) {
-                val users = response.body<List<User>>()
-                println("Users: $users")
-                emit(Result.SuccessWithData(users))
-            } else {
-                emit(Result.Error("An unknown error occurred ${response.status.description}"))
-            }
-        } catch (e: Exception) {
-            emit(Result.Error(e.message ?: "An unknown error occurred"))
         }
-    }
 
     override suspend fun uploadUserPfp(pfpByteArray: ByteArray, userId: String): Result<String> {
         return try {
@@ -106,23 +96,102 @@ class UserRemoteDataSourceImpl(
             val url = supabaseClient.storage.from("avatars").publicUrl(path)
             Result.SuccessWithData(url)
         } catch (e: Exception) {
+            e.printStackTrace()
             Result.Error(e.message ?: "An unknown error occurred")
         }
     }
 
-    override suspend fun createRemoteUser(user: User): Result<Nothing> {
-        return try {
+    override suspend fun createRemoteUser(user: User): Results<DataSuccess.User, DataError.Network> =
+        try {
             val request = httpClient.post {
                 endPoint("createUser")
                 setBody(user)
             }
-            if(request.status == HttpStatusCode.OK) {
-                Result.Success
+            if (request.status == HttpStatusCode.OK) {
+                val message = request.body<DataSuccess.User>()
+                Results.Success(message)
             } else {
-                Result.Error("An unknown error occurred ${request.status.description}")
+                val error = request.body<DataError.Network>()
+                Results.Failure(error)
             }
         } catch (e: Exception) {
-            Result.Error(e.message ?: "An unknown error occurred")
+            e.printStackTrace()
+            Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN)
         }
-    }
+
+    override fun getUserCommunities(userId: String): Flow<Results<List<Community>, DataError.Network>> =
+        flow {
+            emit(Results.Loading)
+            try {
+                val response = httpClient.post {
+                    endPoint("getUserCommunities")
+                    setBody(userId)
+                }
+                if (response.status == HttpStatusCode.OK) {
+                    val communities = response.body<List<Community>>()
+                    emit(Results.Success(communities))
+                } else {
+                    val error = response.body<DataError.Network>()
+                    emit(Results.Failure(error))
+                }
+
+            } catch (e: Exception) {
+                emit(Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN))
+            }
+
+        }
+
+    override fun communityLogout(
+        id: String,
+        selectedCommunityId: String
+    ): Flow<Results<List<Community>, DataError.Network>> =
+        flow {
+            emit(Results.Loading)
+            val request = CommunityRequest.LogoutCommunity(id, selectedCommunityId)
+            try {
+                val response = httpClient.post {
+                    endPoint("communityLogout")
+                    setBody(request)
+                }
+                if (response.status == HttpStatusCode.OK) {
+                    val communities = response.body<List<Community>>()
+                    emit(Results.Success(communities))
+                } else {
+                    val error = response.body<DataError.Network>()
+                    emit(Results.Failure(error))
+                }
+
+            } catch (e: Exception) {
+                emit(Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN))
+            }
+        }
+
+    override fun joinCommunity(
+        id: String,
+        code: String
+    ): Flow<Results<List<Community>, DataError.Network>> =
+        flow {
+            emit(Results.Loading)
+            val request = CommunityRequest.JoinCommunity(id, code)
+            try {
+                println(request)
+                val response = httpClient.post {
+                    endPoint("/joinCommunity")
+                    setBody(request)
+                }
+                println(response)
+                if (response.status == HttpStatusCode.OK) {
+                    val communities = response.body<List<Community>>()
+                    emit(Results.Success(communities))
+                } else {
+                    val error = response.body<DataError.Network>()
+                    emit(Results.Failure(error))
+                }
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+                emit(Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN))
+            }
+        }
+
 }

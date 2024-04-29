@@ -15,10 +15,8 @@ sealed class PostEvent() {
     data class OnPostShareClicked(val post: Post) : PostEvent()
     object OnAddPost : PostEvent()
     data class OnTagClicked(val tag: Tag) : PostEvent()
-    data class OnAudioClicked(val file: PostAttachment) : PostEvent()
-    data class OnImageClicked(val file: PostAttachment) : PostEvent()
-    data class OnVideoClicked(val file: PostAttachment) : PostEvent()
-    data class OnDocumentClicked(val file: PostAttachment) : PostEvent()
+    data class OnAttachmentClicked(val attachment: PostAttachment) : PostEvent()
+    data class OnImageClicked(val image: PostAttachment) : PostEvent()
     data class OnCommentClicked(val postId: String) : PostEvent()
     data class OnCommentAdded(
         val text: String,
@@ -37,6 +35,7 @@ sealed class ReplyEvent {
     data class OnReplyClicked(val reply: Reply) : ReplyEvent()
     data class OnReplyDeleted(val reply: Reply) : ReplyEvent()
     data class OnReplyEdited(val reply: Reply) : ReplyEvent()
+    data class OnEditReply(val reply: Reply) : ReplyEvent()
     data class OnReplyUpVoted(val reply: Reply) : ReplyEvent()
     data class OnReplyDownVoted(val reply: Reply) : ReplyEvent()
     data class OnAddReply(val reply: Reply) : ReplyEvent()

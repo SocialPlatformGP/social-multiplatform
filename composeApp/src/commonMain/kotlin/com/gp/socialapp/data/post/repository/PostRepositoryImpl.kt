@@ -1,6 +1,7 @@
 package com.gp.socialapp.data.post.repository
 
-import com.gp.socialapp.data.auth.source.local.AuthKeyValueStorage
+import com.gp.socialapp.data.material.source.remote.MaterialRemoteDataSource
+import com.gp.socialapp.data.material.utils.FileManager
 import com.gp.socialapp.data.post.source.local.PostLocalDataSource
 import com.gp.socialapp.data.post.source.remote.PostRemoteDataSource
 import com.gp.socialapp.data.post.source.remote.model.Post
@@ -23,7 +24,8 @@ import kotlinx.datetime.toInstant
 class PostRepositoryImpl(
     private val postLocalSource: PostLocalDataSource,
     private val postRemoteSource: PostRemoteDataSource,
-    private val authStorage: AuthKeyValueStorage,
+    private val materialRemoteDataSource: MaterialRemoteDataSource,
+    private val fileManager: FileManager,
     private val settings: Settings
 ) : PostRepository {
     private var lastUpdated: Long
@@ -91,10 +93,11 @@ class PostRepositoryImpl(
                 println("getPosts: $lastUpdated repo *********************126")
 
                 getRemotePosts().collect {
+                    println(it)
+                    println("getPosts: $lastUpdated repo *********************127")
                     if (it is Results.Success && it.data.isNotEmpty()) {
                         println("getPosts: $lastUpdated repo *********************127")
-                        lastUpdated =
-                            LocalDateTime.now().toInstant(TimeZone.UTC).epochSeconds
+                        lastUpdated = LocalDateTime.now().toInstant(TimeZone.UTC).epochSeconds
                         it.data.forEach { post ->
                             insertLocalPost(post)
                         }
@@ -106,6 +109,7 @@ class PostRepositoryImpl(
 
             }
         } catch (e: Exception) {
+            e.printStackTrace()
             emit(Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN))
         }
     }
@@ -158,9 +162,13 @@ class PostRepositoryImpl(
         return postLocalSource.getPostById(id)
     }
 
-    override fun getAllTags() = postRemoteSource.getAllTags()
+    override fun getAllTags(communityId: String) = postRemoteSource.getAllTags(communityId)
 
-    override suspend fun insertTag(tag: Tag) = postRemoteSource.insertTag(tag)
+    override suspend fun insertTag(tag: Tag) {
+        println("insertTag: $tag")
+        postRemoteSource.insertTag(tag)
+    }
+
     override suspend fun getRecentSearches(): List<String> {
         return recentSearches.split("%69%").filter { it.isNotEmpty() }
     }
@@ -198,6 +206,28 @@ class PostRepositoryImpl(
             }
         } catch (e: Exception) {
             emit(Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN))
+        }
+    }
+
+    override suspend fun openAttachment(url: String, mimeType: String) {
+        try {
+            when (val data = materialRemoteDataSource.downloadFile(url)) {
+                is Results.Failure -> {
+                    println(data.error)
+                }
+
+                Results.Loading -> {
+                    //TODO
+                }
+
+                is Results.Success -> {
+                    val localPath =
+                        fileManager.saveFile(data.data.data, data.data.fileName, mimeType)
+                    fileManager.openFile(localPath, mimeType)
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 }

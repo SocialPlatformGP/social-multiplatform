@@ -13,13 +13,15 @@ interface MaterialRemoteDataSource {
     suspend fun createFolder(
         name: String,
         path: String,
+        communityId: String,
     ): Flow<Results<MaterialResponse.GetMaterialResponses, DataError.Network>>
 
     suspend fun createFile(
         name: String,
         type: String,
         path: String,
-        content: ByteArray
+        content: ByteArray,
+        communityId: String
     ): Flow<Results<MaterialResponse.GetMaterialResponses, DataError.Network>>
 
     suspend fun deleteFile(
@@ -29,6 +31,10 @@ interface MaterialRemoteDataSource {
 
     suspend fun deleteFolder(folderId: String): Flow<Results<MaterialResponse.GetMaterialResponses, DataError.Network>>
     suspend fun downloadFile(url: String): Results<MaterialResponse.DownloadFileResponse, DataError.Network>
+    fun renameFolder(
+        folderId: String,
+        newName: String
+    ): Flow<Results<MaterialResponse.GetMaterialResponses, DataError.Network>>
 
 }
 

@@ -28,24 +28,25 @@ class LoginScreenModel(
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState = _uiState.asStateFlow()
 
-    init {
-        val userId = authRepo.getCurrentLocalUserId()
-        if (userId.isNotBlank()) {
-            _uiState.update { it.copy(userId = userId) }
-            getSignedInUser()
-        }
+    fun init() {
+        getSignedInUser()
     }
 
     private fun getSignedInUser() {
         screenModelScope.launch(DispatcherIO) {
-            when (val result = authRepo.getSignedInUser()) {
-                is Result.SuccessWithData -> {
-                    _uiState.value = _uiState.value.copy(signedInUser = result.data)
+            authRepo.getSignedInUser().let { result ->
+                Napier.e("getSignedInUserAll: $result")
+                when (result) {
+                    is Result.SuccessWithData -> {
+                        _uiState.update { it.copy(signedInUser = result.data,userId = result.data.id,) }
+                    }
+
+                    is Result.Error -> {
+                        Napier.e("getSignedInUser: ${result.message}")
+                    }
+
+                    else -> Unit
                 }
-                is Result.Error -> {
-                    Napier.e("getSignedInUser: ${result.message}")
-                }
-                else -> Unit
             }
         }
     }
@@ -76,7 +77,6 @@ class LoginScreenModel(
                 authRepo.signInWithEmail(email, password).collect { result ->
                     when (result) {
                         is Result.SuccessWithData -> {
-                            authRepo.setLocalUserId(result.data.id)
                             _uiState.update {
                                 it.copy(
                                     userId = result.data.id,
@@ -112,7 +112,9 @@ class LoginScreenModel(
     }
 
     fun onLogOut() {
-        authRepo.clearStorage()
+        screenModelScope.launch {
+            authRepo.logout()
+        }
     }
 
     fun signInWithOAuth(provider: OAuthProvider) {
@@ -120,7 +122,7 @@ class LoginScreenModel(
             authRepo.signInWithOAuth(provider).collect { result ->
                 when (result) {
                     is Result.SuccessWithData -> {
-                        authRepo.setLocalUserId(result.data.id)
+                        Napier.e("signInWithOAutht: ${result.data}")
                         _uiState.update {
                             it.copy(
                                 userId = result.data.id,
@@ -131,18 +133,28 @@ class LoginScreenModel(
                     }
 
                     is Result.Error -> {
+                        Napier.e("signInWithOAutht: ${result.message}")
+
                         _uiState.update {
                             it.copy(error = ServerError(result.message))
                         }
                     }
 
                     is Result.Loading -> {
-                        Napier.d("signInWithOAuth: Loading")
+                        Napier.d("signInWithOAutht: Loading")
                     }
 
                     else -> Unit
                 }
             }
+        }
+    }
+
+    fun dispose() {
+        _uiState.update {
+            it.copy(
+                signedInUser = null,
+            )
         }
     }
 }

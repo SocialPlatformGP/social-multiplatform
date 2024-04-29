@@ -49,21 +49,22 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import cafe.adriel.voyager.core.lifecycle.LifecycleEffect
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
+import cafe.adriel.voyager.kodein.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.gp.socialapp.data.community.source.remote.model.UserId
+import com.gp.socialapp.data.community.source.remote.model.isAdmin
 import com.gp.socialapp.data.post.source.remote.model.Post
 import com.gp.socialapp.data.post.source.remote.model.PostAttachment
 import com.gp.socialapp.presentation.auth.login.LoginScreen
 import com.gp.socialapp.presentation.post.create.CreatePostScreen
 import com.gp.socialapp.presentation.post.feed.components.FeedPostItem
-import com.gp.socialapp.presentation.post.feed.components.FeedTopBar
 import com.gp.socialapp.presentation.post.feed.components.FilesBottomSheet
 import com.gp.socialapp.presentation.post.postDetails.PostDetailsScreen
 import com.gp.socialapp.presentation.post.search.SearchScreen
 import com.gp.socialapp.presentation.post.searchResult.SearchResultScreen
+import com.mohamedrejeb.calf.picker.FilePickerFileType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -72,23 +73,23 @@ import socialmultiplatform.composeapp.generated.resources.Res
 import socialmultiplatform.composeapp.generated.resources.general
 import socialmultiplatform.composeapp.generated.resources.spotlight
 
-object FeedScreen : Screen {
+data class FeedScreen(val communityId: String) : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
 
         val navigator = LocalNavigator.currentOrThrow
-        val screenModel = navigator.rememberNavigatorScreenModel<FeedScreenModel>()
-        LifecycleEffect(
-            onStarted = { screenModel.initScreen() }
-        )
+        val screenModel = rememberScreenModel<FeedScreenModel>()
+        LaunchedEffect(true)
+        { screenModel.initScreen(communityId) }
+        
         var currentAttachments by remember { mutableStateOf(emptyList<PostAttachment>()) }
         val scope = rememberCoroutineScope()
         val state by screenModel.state.collectAsState()
         var isFileBottomSheetOpen by remember { mutableStateOf(false) }
         val bottomSheetState = rememberModalBottomSheetState()
         if (state.isLoggedOut) {
-            navigator.push(LoginScreen)
+            navigator.replaceAll(LoginScreen)
             screenModel.resetState()
         }
         val tabItems = listOf(
@@ -104,7 +105,7 @@ object FeedScreen : Screen {
             onPostEvent = { action ->
                 when (action) {
                     is PostEvent.OnAddPost -> {
-                        navigator.push(CreatePostScreen(state.openedTabItem))
+                        navigator.push(CreatePostScreen(state.openedTabItem, communityId))
                     }
 
                     is PostEvent.OnPostClicked -> {
@@ -119,20 +120,8 @@ object FeedScreen : Screen {
                         navigator.push(SearchResultScreen(searchTag = action.tag, isTag = true))
                     }
 
-                    is PostEvent.OnAudioClicked -> {
-                        //todo navigate to audio player
-                    }
-
-                    is PostEvent.OnDocumentClicked -> {
-                        //todo navigate to document viewer
-                    }
-
-                    is PostEvent.OnImageClicked -> {
-                        //todo navigate to image viewer
-                    }
-
-                    is PostEvent.OnVideoClicked -> {
-                        //todo navigate to video player
+                    is PostEvent.OnAttachmentClicked -> {
+                        screenModel.openAttachment(action.attachment)
                     }
 
                     is PostEvent.OnPostUpVoted -> {
@@ -220,18 +209,21 @@ object FeedScreen : Screen {
                 SnackbarHost(hostState = snackbarHostState)
             },
             floatingActionButton = {
-                FloatingActionButton(
-                    onClick = { onPostEvent(PostEvent.OnAddPost) }
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Add,
-                        contentDescription = null
-                    )
-                }
+                if (!currentUserIsAdmin(
+                        state.currentUser.id,
+                        state.currentCommunity.members
+                    ) && selectedTabIndex == 1
+                )
+                else
+                    FloatingActionButton(
+                        onClick = { onPostEvent(PostEvent.OnAddPost) }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Add,
+                            contentDescription = null
+                        )
+                    }
             },
-            topBar = {
-                FeedTopBar(onNavigationAction)
-            }
         ) { paddingValues ->
             if (state.error !is FeedError.NoError) {
                 scope.launch {
@@ -244,7 +236,7 @@ object FeedScreen : Screen {
             }
             Column(
                 modifier = Modifier
-                    .padding(paddingValues)
+//                    .padding(paddingValues)
                     .fillMaxSize()
             ) {
                 TabRow(
@@ -315,7 +307,7 @@ object FeedScreen : Screen {
                 }
                 if (isFileBottomSheetOpen) {
                     FilesBottomSheet(
-                        attachments = currentAttachments,
+                        attachments = currentAttachments.filter { it.type != FilePickerFileType.ImageContentType },
                         onDismiss = onDismissBottomSheet,
                         onPostEvent = onPostEvent,
                         state = bottomSheetState,
@@ -328,6 +320,11 @@ object FeedScreen : Screen {
                 }
             }
         }
+    }
+
+    private fun currentUserIsAdmin(id: String, members: Map<UserId, isAdmin>): Boolean {
+        return members[id] == true
+
     }
 
     @Composable
