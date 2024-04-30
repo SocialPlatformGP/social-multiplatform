@@ -11,6 +11,7 @@ import com.gp.socialapp.util.AppConstants
 import com.gp.socialapp.util.DataError
 import com.gp.socialapp.util.LocalDateTimeUtil.now
 import com.gp.socialapp.util.Platform
+import com.gp.socialapp.util.Result
 import com.gp.socialapp.util.Results
 import com.gp.socialapp.util.getPlatform
 import com.russhwolf.settings.Settings
@@ -167,6 +168,10 @@ class PostRepositoryImpl(
     override suspend fun insertTag(tag: Tag) {
         println("insertTag: $tag")
         postRemoteSource.insertTag(tag)
+    }
+
+    override suspend fun getUserPosts(userId: String): Result<List<Post>> {
+        return postRemoteSource.getUserPosts(userId)
     }
 
     override suspend fun getRecentSearches(): List<String> {

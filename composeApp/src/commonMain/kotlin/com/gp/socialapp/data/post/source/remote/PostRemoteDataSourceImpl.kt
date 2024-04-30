@@ -9,6 +9,7 @@ import com.gp.socialapp.data.post.source.remote.model.PostRequest.UpvoteRequest
 import com.gp.socialapp.data.post.source.remote.model.Tag
 import com.gp.socialapp.data.post.util.endPoint
 import com.gp.socialapp.util.DataError
+import com.gp.socialapp.util.Result
 import com.gp.socialapp.util.Results
 import io.github.aakira.napier.Napier
 import io.ktor.client.HttpClient
@@ -89,6 +90,25 @@ class PostRemoteDataSourceImpl(
                 e.printStackTrace()
                 emit(emptyList())
             }
+        }
+    }
+
+    override suspend fun getUserPosts(userId: String): Result<List<Post>> {
+        return try {
+            val response = httpClient.post {
+                endPoint("getUserPosts")
+                setBody(userId)
+            }
+            if (response.status == HttpStatusCode.OK) {
+                val posts = response.body<List<Post>>()
+                Result.SuccessWithData(posts)
+            } else {
+                val error = response.body<DataError.Network>()
+                Result.Error(error.userMessage)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.Error(DataError.Network.NO_INTERNET_OR_SERVER_DOWN.userMessage)
         }
     }
 
