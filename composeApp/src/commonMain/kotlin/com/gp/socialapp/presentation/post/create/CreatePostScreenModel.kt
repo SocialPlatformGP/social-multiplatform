@@ -79,7 +79,7 @@ class CreatePostScreenModel(
                         type = uiState.value.currentTab.title,
                         authorName = currentUser.value.firstName + " " + currentUser.value.lastName,
                         authorPfp = currentUser.value.profilePictureURL,
-                        authorID = currentUser.value.email,
+                        authorID = currentUser.value.id,
                         attachments = files
                     )
                 ).collect { it ->

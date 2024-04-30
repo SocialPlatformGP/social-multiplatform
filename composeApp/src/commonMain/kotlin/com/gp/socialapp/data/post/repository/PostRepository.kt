@@ -3,6 +3,7 @@ package com.gp.socialapp.data.post.repository
 import com.gp.socialapp.data.post.source.remote.model.Post
 import com.gp.socialapp.data.post.source.remote.model.Tag
 import com.gp.socialapp.util.DataError
+import com.gp.socialapp.util.Result
 import com.gp.socialapp.util.Results
 import kotlinx.coroutines.flow.Flow
 
@@ -24,4 +25,5 @@ interface PostRepository {
     suspend fun addRecentSearch(search: String)
     fun searchByTag(tag: Tag): Flow<Results<List<Post>, DataError.Network>>
     suspend fun openAttachment(url: String, mimeType: String)
+    suspend fun getUserPosts(userId: String): Result<List<Post>>
 }

@@ -8,6 +8,7 @@ import com.gp.socialapp.data.post.source.remote.model.PostRequest.FetchRequest
 import com.gp.socialapp.data.post.source.remote.model.PostRequest.UpvoteRequest
 import com.gp.socialapp.data.post.source.remote.model.Tag
 import com.gp.socialapp.util.DataError
+import com.gp.socialapp.util.Result
 import com.gp.socialapp.util.Results
 import kotlinx.coroutines.flow.Flow
 
@@ -25,4 +26,5 @@ interface PostRemoteDataSource {
     fun fetchAllPosts(): Flow<Results<List<Post>, DataError.Network>>
     fun searchByTitle(title: String): Flow<Results<List<Post>, DataError.Network>>
     fun searchByTag(tag: String): Flow<Results<List<Post>, DataError.Network>>
+    suspend fun getUserPosts(userId: String): Result<List<Post>>
 }
