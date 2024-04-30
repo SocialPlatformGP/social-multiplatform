@@ -92,7 +92,7 @@ class CreatePrivateChatScreenModel(
         screenModelScope.launch (Dispatchers.Default) {
             state.update { oldState ->
                 oldState.copy(
-                    matchingUsers = oldState.allUsers.filter { (it.firstName+" "+it.lastName).contains(s, ignoreCase = true) }
+                    matchingUsers = oldState.allUsers.filter { (it.name).contains(s, ignoreCase = true) }
                 )
             }
         }

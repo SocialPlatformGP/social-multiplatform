@@ -31,8 +31,7 @@ class UserRemoteDataSourceImpl(
             supabaseClient.auth.updateUser {
                 phone = user.phoneNumber
                 data {
-                    put(UserData.FIRST_NAME.value, user.firstName)
-                    put(UserData.LAST_NAME.value, user.lastName)
+                    put(UserData.NAME.value, user.name)
                     put(UserData.BIRTH_DATE.value, user.birthdate)
                     put(UserData.PROFILE_PICTURE_URL.value, user.profilePictureURL)
                     put(UserData.BIO.value, user.bio)

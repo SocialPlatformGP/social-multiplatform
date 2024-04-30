@@ -22,8 +22,7 @@ object Validator {
     }
 
     object NameValidator {
-        //min age is 17
-        fun validateAll(name: String) = name.matches("^\\p{L}+\$".toRegex())
+        fun validateAll(name: String) = name.matches("^[\\p{L} ]+\\\$".toRegex())
     }
 
     object BirthDateValidator {

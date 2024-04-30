@@ -6,8 +6,7 @@ import com.gp.socialapp.data.auth.source.remote.model.User
 data class UserResponse(
     val id: String = "",
     val isAdmin: Boolean = false,
-    val firstName: String = "",
-    val lastName: String = "",
+    val name: String = "",
     val profilePictureURL: String = "",
     val email: String = "",
     val phoneNumber: String = "",
@@ -18,8 +17,7 @@ data class UserResponse(
     fun toUser() = User(
         id = id,
         isAdmin = isAdmin,
-        firstName = firstName,
-        lastName = lastName,
+        name = name,
         profilePictureURL = profilePictureURL,
         email = email,
         phoneNumber = phoneNumber,

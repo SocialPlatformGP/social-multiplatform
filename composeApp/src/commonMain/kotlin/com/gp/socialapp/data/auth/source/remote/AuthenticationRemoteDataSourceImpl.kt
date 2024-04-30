@@ -117,11 +117,8 @@ class AuthenticationRemoteDataSourceImpl(
                     ?: false
             val user = if (isUserDataComplete) {
                 val id = userInfo.id
-                val firstName =
-                    userInfo.userMetadata?.get(UserData.FIRST_NAME.value)?.jsonPrimitive?.contentOrNull
-                        ?: ""
-                val lastName =
-                    userInfo.userMetadata?.get(UserData.LAST_NAME.value)?.jsonPrimitive?.contentOrNull
+                val name =
+                    userInfo.userMetadata?.get(UserData.NAME.value)?.jsonPrimitive?.contentOrNull
                         ?: ""
                 val email = userInfo.email ?: ""
                 val pfpUrl =
@@ -140,8 +137,7 @@ class AuthenticationRemoteDataSourceImpl(
                         ?: false
                 User(
                     id = id,
-                    firstName = firstName,
-                    lastName = lastName,
+                    name = name,
                     profilePictureURL = pfpUrl,
                     email = email,
                     phoneNumber = phoneNumber,
@@ -183,8 +179,7 @@ class AuthenticationRemoteDataSourceImpl(
 }
 
 enum class UserData(val value: String) {
-    FIRST_NAME("first_name"),
-    LAST_NAME("last_name"),
+    NAME("name"),
     PROFILE_PICTURE_URL("profile_picture_url"),
     BIRTH_DATE("birth_date"),
     BIO("bio"),

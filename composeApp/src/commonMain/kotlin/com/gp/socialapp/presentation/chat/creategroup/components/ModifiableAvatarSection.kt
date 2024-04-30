@@ -36,7 +36,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
-fun GroupAvatarSection(
+fun ModifiableAvatarSection(
     avatarURL: String = "",
     avatarByteArray: ByteArray = byteArrayOf(),
     isModifiable: Boolean = false,

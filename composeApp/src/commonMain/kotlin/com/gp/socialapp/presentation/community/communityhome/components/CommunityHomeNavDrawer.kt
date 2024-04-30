@@ -72,9 +72,8 @@ fun CommunityHomeNavDrawer(
                                 .background(Color.Red)
                         ) {
                             Text(
-                                text = if (user.firstName.isNotBlank()) user.firstName[0].toString()
-                                    .uppercase() + user.lastName[0].toString()
-                                    .uppercase() else "Unknown",
+                                text = if(user.name.isNotBlank()) user.name[0].toString() else "u"
+                                    .uppercase(),
                                 fontSize = 24.sp,
                                 color = Color.White,
                                 modifier = Modifier.align(Alignment.Center)
@@ -82,7 +81,7 @@ fun CommunityHomeNavDrawer(
                         }
                     Spacer(modifier = Modifier.padding(8.dp))
                     Text(
-                        user.firstName + " " + user.lastName,
+                        user.name,
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
