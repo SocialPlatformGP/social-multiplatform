@@ -9,8 +9,7 @@ import kotlinx.datetime.LocalDateTime
 
 data class UserInformationUiState(
     val signedInUser: User? = null,
-    var firstName: String = "",
-    var lastName: String = "",
+    var name: String = "",
     var phoneNumber: String = "",
     var birthDate: LocalDateTime = LocalDateTime.now(),
     var bio: String = "",

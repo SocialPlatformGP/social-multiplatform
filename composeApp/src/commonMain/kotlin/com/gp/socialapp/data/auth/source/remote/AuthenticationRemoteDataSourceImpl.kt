@@ -1,6 +1,9 @@
 package com.gp.socialapp.data.auth.source.remote
 
+import com.gp.socialapp.data.auth.source.remote.model.PrivacyOptions
 import com.gp.socialapp.data.auth.source.remote.model.User
+import com.gp.socialapp.data.auth.source.remote.model.UserSettings
+import com.gp.socialapp.data.post.util.endPoint
 import com.gp.socialapp.util.Result
 import io.github.aakira.napier.Napier
 import io.github.jan.supabase.SupabaseClient
@@ -8,15 +11,21 @@ import io.github.jan.supabase.gotrue.SessionStatus
 import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.gotrue.providers.OAuthProvider
 import io.github.jan.supabase.gotrue.providers.builtin.Email
+import io.ktor.client.HttpClient
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.longOrNull
+import kotlinx.serialization.json.put
 
 
 class AuthenticationRemoteDataSourceImpl(
+    private val httpClient: HttpClient,
     private val supabaseClient: SupabaseClient
 ) : AuthenticationRemoteDataSource {
 
@@ -56,9 +65,24 @@ class AuthenticationRemoteDataSourceImpl(
         }
     }
 
+    private suspend fun deleteRemoteUser(userId: String): Result<Nothing> {
+        return try {
+            val response = httpClient.post {
+                endPoint("deleteUser")
+                setBody(userId)
+            }
+            if(response.status == HttpStatusCode.OK){
+                Result.Success
+            } else {
+                Result.Error("An unknown error occurred")
+            }
+        } catch(e: Exception){
+            e.printStackTrace()
+            Result.Error(e.message ?: "An unknown error occurred")
+        }
+    }
     override fun signInWithEmail(
-        email: String,
-        password: String
+        email: String, password: String
     ): Flow<Result<User>> = flow {
         emit(Result.Loading)
         try {
@@ -83,8 +107,7 @@ class AuthenticationRemoteDataSourceImpl(
     }
 
     override fun signUpWithEmail(
-        email: String,
-        password: String
+        email: String, password: String
     ): Flow<Result<User>> = flow {
         emit(Result.Loading)
         try {
@@ -117,11 +140,8 @@ class AuthenticationRemoteDataSourceImpl(
                     ?: false
             val user = if (isUserDataComplete) {
                 val id = userInfo.id
-                val firstName =
-                    userInfo.userMetadata?.get(UserData.FIRST_NAME.value)?.jsonPrimitive?.contentOrNull
-                        ?: ""
-                val lastName =
-                    userInfo.userMetadata?.get(UserData.LAST_NAME.value)?.jsonPrimitive?.contentOrNull
+                val name =
+                    userInfo.userMetadata?.get(UserData.NAME.value)?.jsonPrimitive?.contentOrNull
                         ?: ""
                 val email = userInfo.email ?: ""
                 val pfpUrl =
@@ -140,8 +160,7 @@ class AuthenticationRemoteDataSourceImpl(
                         ?: false
                 User(
                     id = id,
-                    firstName = firstName,
-                    lastName = lastName,
+                    name = name,
                     profilePictureURL = pfpUrl,
                     email = email,
                     phoneNumber = phoneNumber,
@@ -155,14 +174,121 @@ class AuthenticationRemoteDataSourceImpl(
                 val id = userInfo.id
                 val email = userInfo.email ?: ""
                 User(
-                    id = id,
-                    email = email,
-                    isDataComplete = false
+                    id = id, email = email, isDataComplete = false
                 )
             }
             Result.SuccessWithData(user)
         } else {
             Result.Error("User not found")
+        }
+    }
+
+    override suspend fun getUserSettings(): Result<UserSettings> {
+        val userInfo = supabaseClient.auth.sessionManager.loadSession()?.user
+        return if (userInfo != null) {
+            println("User Info: ${userInfo.userMetadata}")
+            val isUserDataComplete =
+                userInfo.userMetadata?.get("isUserDataComplete")?.jsonPrimitive?.booleanOrNull
+                    ?: false
+            val user = if (isUserDataComplete) {
+                val id = userInfo.id
+                val allowMessagesFrom =
+                    userInfo.userMetadata?.get(UserData.ALLOW_MESSAGES_FROM.value)?.jsonPrimitive?.contentOrNull
+                        ?: PrivacyOptions.EVERYONE.value
+                val whoCanAddToGroups =
+                    userInfo.userMetadata?.get(UserData.WHO_CAN_ADD_TO_GROUPS.value)?.jsonPrimitive?.contentOrNull
+                        ?: PrivacyOptions.EVERYONE.value
+                val isNotificationsAllowed =
+                    userInfo.userMetadata?.get(UserData.ALLOW_NOTIFICATIONS.value)?.jsonPrimitive?.booleanOrNull
+                        ?: true
+                val isPostNotificationsAllowed =
+                    userInfo.userMetadata?.get(UserData.ALLOW_POST_NOTIFICATIONS.value)?.jsonPrimitive?.booleanOrNull
+                        ?: true
+                val isChatNotificationsAllowed =
+                    userInfo.userMetadata?.get(UserData.ALLOW_CHAT_NOTIFICATIONS.value)?.jsonPrimitive?.booleanOrNull
+                        ?: true
+                val isAssignmentsNotificationsAllowed =
+                    userInfo.userMetadata?.get(UserData.ALLOW_ASSIGNMENTS_NOTIFICATIONS.value)?.jsonPrimitive?.booleanOrNull
+                        ?: true
+                val isCalendarNotificationsAllowed =
+                    userInfo.userMetadata?.get(UserData.ALLOW_CALENDAR_NOTIFICATIONS.value)?.jsonPrimitive?.booleanOrNull
+                        ?: true
+                UserSettings(
+                    userId = id,
+                    allowMessagesFrom = allowMessagesFrom,
+                    whoCanAddToGroups = whoCanAddToGroups,
+                    isNotificationsAllowed = isNotificationsAllowed,
+                    isPostNotificationsAllowed = isPostNotificationsAllowed,
+                    isChatNotificationsAllowed = isChatNotificationsAllowed,
+                    isAssignmentsNotificationsAllowed = isAssignmentsNotificationsAllowed,
+                    isCalendarNotificationsAllowed = isCalendarNotificationsAllowed
+                )
+            } else {
+                UserSettings()
+            }
+            Result.SuccessWithData(user)
+        } else {
+            Result.Error("User not found")
+        }
+    }
+
+    override suspend fun changePassword(oldPassword: String, newPassword: String): Result<Nothing> {
+        return try {
+//            val user = supabaseClient.auth.retrieveUserForCurrentSession(updateSession = true)
+//            TODO("Check if old password is correct")
+            supabaseClient.auth.updateUser {
+                password = newPassword
+            }
+            Result.Success
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.Error(e.message ?: "Null")
+        }
+    }
+
+    override suspend fun changeEmail(email: String): Result<Nothing> {
+        return try {
+            supabaseClient.auth.updateUser {
+                this.email = email
+            }
+            Result.Success
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.Error(e.message ?: "Null")
+        }
+    }
+
+    override suspend fun updateStringRemoteUserSetting(
+        tag: String,
+        value: String
+    ): Result<Nothing> {
+        return try {
+            supabaseClient.auth.updateUser {
+                data{
+                    put(tag, value)
+                }
+            }
+            Result.Success
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.Error(e.message ?: "Null")
+        }
+    }
+
+    override suspend fun updateBooleanRemoteUserSetting(
+        tag: String,
+        value: Boolean
+    ): Result<Nothing> {
+        return try {
+            supabaseClient.auth.updateUser {
+                data{
+                    put(tag, value)
+                }
+            }
+            Result.Success
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.Error(e.message ?: "Null")
         }
     }
 
@@ -176,6 +302,16 @@ class AuthenticationRemoteDataSourceImpl(
         }
     }
 
+    override suspend fun deleteAccount(userId: String): Result<Nothing> {
+        return try {
+            supabaseClient.auth.admin.deleteUser(userId)
+            deleteRemoteUser(userId)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.Error(e.message ?: "Null")
+        }
+    }
+
 
     override fun sendPasswordResetEmail(email: String): Flow<Result<Nothing>> {
         TODO("Not yet implemented")
@@ -183,11 +319,14 @@ class AuthenticationRemoteDataSourceImpl(
 }
 
 enum class UserData(val value: String) {
-    FIRST_NAME("first_name"),
-    LAST_NAME("last_name"),
-    PROFILE_PICTURE_URL("profile_picture_url"),
-    BIRTH_DATE("birth_date"),
-    BIO("bio"),
-    IS_ADMIN("isAdmin"),
-    IS_DATA_COMPLETE("isUserDataComplete")
+    NAME("name"), PROFILE_PICTURE_URL("profile_picture_url"), BIRTH_DATE("birth_date"), BIO("bio"), IS_ADMIN(
+        "isAdmin"
+    ),
+    IS_DATA_COMPLETE("isUserDataComplete"), ALLOW_MESSAGES_FROM("allowMessagesFrom"), WHO_CAN_ADD_TO_GROUPS(
+        "whoCanAddToGroups"
+    ),
+    ALLOW_NOTIFICATIONS("allowNotifications"), ALLOW_CHAT_NOTIFICATIONS("allowChatNotifications"), ALLOW_CALENDAR_NOTIFICATIONS(
+        "allowCalendarNotifications"
+    ),
+    ALLOW_ASSIGNMENTS_NOTIFICATIONS("allowAssignmentsNotifications"), ALLOW_POST_NOTIFICATIONS("allowPostNotifications"),
 }

@@ -52,7 +52,7 @@ fun CommunityMemberItem(
         ) {
             Column {
                 Text(
-                    text = user.firstName + " " + user.lastName,
+                    text = user.name,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     fontSize = 20.sp,

@@ -52,6 +52,7 @@ import com.gp.socialapp.presentation.auth.login.LoginScreen
 import com.gp.socialapp.presentation.auth.userinfo.UserInformationScreen
 import com.gp.socialapp.presentation.home.components.HomeTopBar
 import com.gp.socialapp.presentation.home.screen.HomeUiAction
+import com.gp.socialapp.presentation.settings.MainSettingsScreen
 import com.seiko.imageloader.ui.AutoSizeImage
 import kotlinx.coroutines.launch
 
@@ -100,9 +101,8 @@ data class HomeContainer(
                                     .background(Color.Red)
                             ) {
                                 Text(
-                                    text = if (state.currentUser.firstName.isNotBlank()) state.currentUser.firstName[0].toString()
-                                        .uppercase() + state.currentUser.lastName[0].toString()
-                                        .uppercase() else "Unknown",
+                                    text = if(state.currentUser.name.isNotBlank()) state.currentUser.name[0].toString() else "u"
+                                        .uppercase(),
                                     fontSize = 24.sp,
                                     color = Color.White,
                                     modifier = Modifier.align(Alignment.Center)
@@ -110,7 +110,7 @@ data class HomeContainer(
                             }
                         Spacer(modifier = Modifier.padding(8.dp))
                         Text(
-                            state.currentUser.firstName + " " + state.currentUser.lastName,
+                            state.currentUser.name,
                             fontSize = 24.sp,
                             fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
                             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
@@ -159,7 +159,7 @@ data class HomeContainer(
 
                             Button(
                                 onClick = {
-
+                                    navigator.push(MainSettingsScreen)
                                 },
                                 modifier = Modifier.weight(1f).padding(8.dp)
 

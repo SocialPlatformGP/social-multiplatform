@@ -125,118 +125,119 @@ data class HomeScreen(
                 }
             })
     }
-}
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun HomeScreenContent(
+        state: HomeUiState, onAction: (HomeUiAction) -> Unit
+    ) {
+        val scope = rememberCoroutineScope()
+        val sheetState = rememberModalBottomSheetState()
+        var showBottomSheet by remember { mutableStateOf(false) }
+        var joinCommunityDialogState by remember { mutableStateOf(false) }
+        var confirmLogoutDialogState by remember { mutableStateOf(false) }
+        var communityId by remember { mutableStateOf("") }
+        var clickedCommunity by remember { mutableStateOf(Community()) }
+        var newOnAction: (HomeUiAction) -> Unit = {
+            when (it) {
+                is HomeUiAction.OnCommunityLogout -> {
+                    confirmLogoutDialogState = true
+                    communityId = it.id
+                }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun HomeScreenContent(
-    state: HomeUiState, onAction: (HomeUiAction) -> Unit
-) {
-    val scope = rememberCoroutineScope()
-    val sheetState = rememberModalBottomSheetState()
-    var showBottomSheet by remember { mutableStateOf(false) }
-    var joinCommunityDialogState by remember { mutableStateOf(false) }
-    var confirmLogoutDialogState by remember { mutableStateOf(false) }
-    var communityId by remember { mutableStateOf("") }
-    var clickedCommunity by remember { mutableStateOf(Community()) }
-    var newOnAction: (HomeUiAction) -> Unit = {
-        when (it) {
-            is HomeUiAction.OnCommunityLogout -> {
-                confirmLogoutDialogState = true
-                communityId = it.id
+                is HomeUiAction.OnOptionsMenuClicked -> {
+                    clickedCommunity = it.community
+                    showBottomSheet = true
+                    scope.launch { sheetState.show() }
+                }
+
+                else -> onAction(it)
             }
-
-            is HomeUiAction.OnOptionsMenuClicked -> {
-                clickedCommunity = it.community
-                showBottomSheet = true
-                scope.launch { sheetState.show() }
-            }
-
-            else -> onAction(it)
         }
-    }
-    val options = if (clickedCommunity.members.getOrElse(state.user.id) { false }) {
-        listOf(
-            OptionItem("Share Join Code") {
-                newOnAction(HomeUiAction.OnShareJoinCodeClicked(clickedCommunity.code))
-            },
-            OptionItem("Manage Members") {
-                newOnAction(HomeUiAction.OnManageMembersClicked(clickedCommunity.id))
-            },
-            OptionItem("Edit Community") {
-                newOnAction(HomeUiAction.OnEditCommunityClicked(clickedCommunity))
-            },
-            OptionItem("Leave Community") {
-                newOnAction(HomeUiAction.OnCommunityLogout(clickedCommunity.id))
-            },
-            OptionItem("Delete Community") {
-                newOnAction(HomeUiAction.OnDeleteCommunityClicked(clickedCommunity.id))
-            }
-        )
-    } else {
-        listOf(
-            OptionItem("Share Join Code") {
-                newOnAction(HomeUiAction.OnShareJoinCodeClicked(clickedCommunity.code))
-            },
-            OptionItem("View Members") {
-                newOnAction(HomeUiAction.OnViewMembersClicked(clickedCommunity.id))
-            },
-            OptionItem("Leave Community") {
-                newOnAction(HomeUiAction.OnCommunityLogout(clickedCommunity.id))
-            }
-        )
-    }
-    var fabState = remember { mutableStateOf(false) }
-    Scaffold(
-        floatingActionButton = {
-            if (!fabState.value) SingleFab(
-                fabState, Icons.Default.Add
+        val options = if (clickedCommunity.members.getOrElse(state.user.id) { false }) {
+            listOf(
+                OptionItem("Share Join Code") {
+                    newOnAction(HomeUiAction.OnShareJoinCodeClicked(clickedCommunity.code))
+                },
+                OptionItem("Manage Members") {
+                    newOnAction(HomeUiAction.OnManageMembersClicked(clickedCommunity.id))
+                },
+                OptionItem("Edit Community") {
+                    newOnAction(HomeUiAction.OnEditCommunityClicked(clickedCommunity))
+                },
+                OptionItem("Leave Community") {
+                    newOnAction(HomeUiAction.OnCommunityLogout(clickedCommunity.id))
+                },
+                OptionItem("Delete Community") {
+                    newOnAction(HomeUiAction.OnDeleteCommunityClicked(clickedCommunity.id))
+                }
             )
-            else {
-                HomeFab(
-                    fabState,
-                    onCreateCommunityClicked = {
-                        newOnAction(HomeUiAction.OnCreateCommunityClicked)
-                    },
-                    onJoinCommunityClicked = {
-                        joinCommunityDialogState = true
-                    }
-                )
-            }
-        }) { padding ->
-        if (showBottomSheet) {
-            CommunityOptionsBottomSheet(
-                sheetState = sheetState,
-                options = options,
-                onDismiss = {
-                    scope.launch { sheetState.hide() }.invokeOnCompletion {
-                        if (!sheetState.isVisible) {
-                            showBottomSheet = false
-                        }
-                    }
+        } else {
+            listOf(
+                OptionItem("Share Join Code") {
+                    newOnAction(HomeUiAction.OnShareJoinCodeClicked(clickedCommunity.code))
+                },
+                OptionItem("View Members") {
+                    newOnAction(HomeUiAction.OnViewMembersClicked(clickedCommunity.id))
+                },
+                OptionItem("Leave Community") {
+                    newOnAction(HomeUiAction.OnCommunityLogout(clickedCommunity.id))
                 }
             )
         }
-        if (joinCommunityDialogState) {
-            JoinCommunityDialog(onDismiss = {
-                joinCommunityDialogState = false
-            }, onJoin = {
-                joinCommunityDialogState = false
-                onAction(HomeUiAction.OnJoinCommunityClicked(it))
-            })
+        var fabState = remember { mutableStateOf(false) }
+        Scaffold(
+            floatingActionButton = {
+                if (!fabState.value) SingleFab(
+                    fabState, Icons.Default.Add
+                )
+                else {
+                    HomeFab(
+                        fabState,
+                        onCreateCommunityClicked = {
+                            newOnAction(HomeUiAction.OnCreateCommunityClicked)
+                        },
+                        onJoinCommunityClicked = {
+                            joinCommunityDialogState = true
+                        }
+                    )
+                }
+            }) { padding ->
+            if (showBottomSheet) {
+                CommunityOptionsBottomSheet(
+                    sheetState = sheetState,
+                    options = options,
+                    onDismiss = {
+                        scope.launch { sheetState.hide() }.invokeOnCompletion {
+                            if (!sheetState.isVisible) {
+                                showBottomSheet = false
+                            }
+                        }
+                    }
+                )
+            }
+            if (joinCommunityDialogState) {
+                JoinCommunityDialog(onDismiss = {
+                    joinCommunityDialogState = false
+                }, onJoin = {
+                    joinCommunityDialogState = false
+                    onAction(HomeUiAction.OnJoinCommunityClicked(it))
+                })
+            }
+            if (confirmLogoutDialogState) {
+                ConfirmLogoutDialog(onDismiss = {
+                    confirmLogoutDialogState = false
+                }, onConfirm = {
+                    onAction(HomeUiAction.OnCommunityLogout(communityId))
+                    confirmLogoutDialogState = false
+                })
+            }
+            HomeContent(modifier = Modifier.padding(padding),
+                communities = state.communities,
+                action = newOnAction
+            )
         }
-        if (confirmLogoutDialogState) {
-            ConfirmLogoutDialog(onDismiss = {
-                confirmLogoutDialogState = false
-            }, onConfirm = {
-                onAction(HomeUiAction.OnCommunityLogout(communityId))
-                confirmLogoutDialogState = false
-            })
-        }
-        HomeContent(modifier = Modifier.padding(padding),
-            communities = state.communities,
-            action = newOnAction
-        )
     }
 }
+
+
 

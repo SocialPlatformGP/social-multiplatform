@@ -18,6 +18,11 @@ class AuthKeyValueStorageImpl(
         set(value) {
             settings[AppConstants.StorageKeys.USER_ID.key] = value
         }
+    override var theme: String?
+        get() = settings.getString(AppConstants.StorageKeys.APP_THEME.key, "System Default")
+        set(value) {
+            settings[AppConstants.StorageKeys.APP_THEME.key] = value
+        }
 
     override fun cleanStorage() {
         settings.clear()

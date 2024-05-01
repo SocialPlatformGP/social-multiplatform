@@ -1,5 +1,6 @@
 package com.gp.socialapp.presentation.auth.login
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -66,6 +67,8 @@ import com.gp.socialapp.presentation.auth.util.AuthError.EmailError
 import com.gp.socialapp.presentation.auth.util.AuthError.PasswordError
 import com.gp.socialapp.presentation.auth.util.AuthError.ServerError
 import com.gp.socialapp.presentation.home.container.HomeContainer
+import com.gp.socialapp.presentation.settings.components.AppThemeOptions
+import com.gp.socialapp.theme.LocalThemeIsDark
 import com.gp.socialapp.util.getPlatform
 import io.github.jan.supabase.gotrue.providers.Azure
 import io.github.jan.supabase.gotrue.providers.Discord
@@ -95,6 +98,21 @@ object LoginScreen : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = navigator.rememberNavigatorScreenModel<LoginScreenModel>()
         val state by screenModel.uiState.collectAsState()
+        var isDark by LocalThemeIsDark.current
+        val isSystemInDarkTheme = isSystemInDarkTheme()
+        isDark = when (state.theme) {
+            AppThemeOptions.LIGHT.value -> {
+                false
+            }
+
+            AppThemeOptions.DARK.value -> {
+                true
+            }
+
+            else -> {
+                isSystemInDarkTheme
+            }
+        }
         LifecycleEffect(
             onStarted = { screenModel.init() },
             onDisposed = { screenModel.dispose() },
@@ -141,6 +159,8 @@ object LoginScreen : Screen {
         var passwordVisible by remember { mutableStateOf(false) }
         val scope = rememberCoroutineScope()
         val snackbarHostState = remember { SnackbarHostState() }
+        var password by remember { mutableStateOf("") }
+        var email by remember { mutableStateOf("") }
         val platform = getPlatform()
         Scaffold(
             snackbarHost = {
@@ -156,25 +176,22 @@ object LoginScreen : Screen {
                 }
             }
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(it),
+                modifier = Modifier.fillMaxSize().padding(it),
                 verticalArrangement = Arrangement.Center,
             ) {
 //            Image(painter = painterResource(resource = Res.drawable.login), contentDescription = null)
                 Text(
-                    modifier = Modifier
-                        .fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth()
                         .wrapContentWidth(Alignment.CenterHorizontally),
                     fontSize = 42.sp,
                     text = stringResource(resource = Res.string.login_str),
                 )
-                OutlinedTextField(
-                    value = state.email,
-                    onValueChange = { onEmailChange(it) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                OutlinedTextField(value = email,
+                    onValueChange = {
+                        email = it
+                        onEmailChange(it)
+                    },
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
                     label = { Text(text = stringResource(Res.string.email)) },
                     leadingIcon = { Icon(Icons.Filled.Email, contentDescription = null) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
@@ -188,21 +205,19 @@ object LoginScreen : Screen {
                                 modifier = Modifier.padding(start = 16.dp),
                             )
                         }
-                    }
-                )
-                OutlinedTextField(
-                    value = state.password,
-                    onValueChange = { onPasswordChange(it) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 4.dp),
+                    })
+                OutlinedTextField(value = password,
+                    onValueChange = {
+                        password = it
+                        onPasswordChange(it)
+                    },
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
                     label = { Text(text = stringResource(Res.string.password)) },
                     leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = null) },
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     trailingIcon = {
-                        val image = if (passwordVisible)
-                            Icons.Filled.Visibility
+                        val image = if (passwordVisible) Icons.Filled.Visibility
                         else Icons.Filled.VisibilityOff
                         val description =
                             stringResource(if (passwordVisible) Res.string.hide_password else Res.string.show_password)
@@ -220,13 +235,11 @@ object LoginScreen : Screen {
                                 modifier = Modifier.padding(start = 16.dp),
                             )
                         }
-                    }
-                )
+                    })
                 TextButton(
                     onClick = navigateToForgotPassword,
                     enabled = false,
-                    modifier = Modifier
-                        .padding(start = 16.dp),
+                    modifier = Modifier.padding(start = 16.dp),
                 ) {
                     Text(
                         text = stringResource(resource = Res.string.forgot_password),
@@ -237,9 +250,7 @@ object LoginScreen : Screen {
                 }
                 Button(
                     onClick = onSignIn,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 4.dp)
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp)
                         .height(50.dp),
                     shape = RoundedCornerShape(8.dp),
                 ) {
@@ -251,18 +262,14 @@ object LoginScreen : Screen {
                 }
                 Text(
                     text = stringResource(Res.string.or_login_with),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 4.dp)
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp)
                         .wrapContentWidth(Alignment.CenterHorizontally),
                     fontSize = 16.sp,
                 )
                 FlowRow(
                     horizontalArrangement = Arrangement.Center,
                     verticalArrangement = Arrangement.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 4.dp),
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
                 ) {
                     oAuthProviders.forEach { provider ->
                         OAuthProviderItem(
@@ -274,8 +281,7 @@ object LoginScreen : Screen {
                     }
                 }
                 Row(
-                    modifier = Modifier
-                        .padding(start = 16.dp),
+                    modifier = Modifier.padding(start = 16.dp),
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {

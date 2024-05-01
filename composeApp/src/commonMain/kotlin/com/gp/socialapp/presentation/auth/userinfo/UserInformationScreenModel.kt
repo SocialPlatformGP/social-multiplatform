@@ -18,8 +18,7 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDateTime
 import org.jetbrains.compose.resources.getString
 import socialmultiplatform.composeapp.generated.resources.Res
-import socialmultiplatform.composeapp.generated.resources.invalid_first_name
-import socialmultiplatform.composeapp.generated.resources.invalid_last_name
+import socialmultiplatform.composeapp.generated.resources.invalid_name
 import socialmultiplatform.composeapp.generated.resources.invalid_phone_number
 import socialmultiplatform.composeapp.generated.resources.user_must_be_at_least_18_years_old
 
@@ -31,18 +30,9 @@ class UserInformationScreenModel(
     val uiState = _uiState.asStateFlow()
     fun onCompleteAccount() {
         with(_uiState.value) {
-            if (!Validator.NameValidator.validateAll(firstName)) {
+            if (!Validator.NameValidator.validateAll(name)) {
                 screenModelScope.launch {
-                    val error = AuthError.FirstNameError(getString(Res.string.invalid_first_name))
-                    _uiState.value = _uiState.value.copy(error = error)
-                }
-                return
-            } else {
-                _uiState.value = _uiState.value.copy(error = AuthError.NoError)
-            }
-            if (!Validator.NameValidator.validateAll(lastName)) {
-                screenModelScope.launch {
-                    val error = AuthError.LastNameError(getString(Res.string.invalid_last_name))
+                    val error = AuthError.FirstNameError(getString(Res.string.invalid_name))
                     _uiState.value = _uiState.value.copy(error = error)
                 }
                 return
@@ -75,8 +65,7 @@ class UserInformationScreenModel(
                 val user = User(
                     id = signedInUser?.id ?: "",
                     email = signedInUser?.email ?: "",
-                    firstName = firstName,
-                    lastName = lastName,
+                    name = name,
                     phoneNumber = phoneNumber,
                     birthdate = birthDate.toMillis(),
                     bio = bio,
@@ -125,12 +114,8 @@ class UserInformationScreenModel(
         }
     }
 
-    fun onFirstNameChange(firstName: String) {
-        _uiState.update { it.copy(firstName = firstName) }
-    }
-
-    fun onLastNameChange(lastName: String) {
-        _uiState.update { it.copy(lastName = lastName) }
+    fun onNameChange(name: String) {
+        _uiState.update { it.copy(name = name) }
     }
 
     fun onPhoneNumberChange(phoneNumber: String) {

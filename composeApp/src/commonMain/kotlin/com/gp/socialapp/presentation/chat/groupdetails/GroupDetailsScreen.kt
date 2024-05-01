@@ -26,18 +26,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.lifecycle.LifecycleEffect
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.core.stack.popUntil
-import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
 import cafe.adriel.voyager.kodein.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.presentation.chat.addmembers.AddMembersScreen
 import com.gp.socialapp.presentation.chat.chatroom.ChatRoomScreen
-import com.gp.socialapp.presentation.chat.creategroup.components.GroupAvatarSection
+import com.gp.socialapp.presentation.chat.creategroup.components.ModifiableAvatarSection
 import com.gp.socialapp.presentation.chat.groupdetails.components.GroupDetailsNameSection
 import com.gp.socialapp.presentation.chat.groupdetails.components.GroupMembersSection
-import com.gp.socialapp.presentation.chat.groupdetails.components.RemoveMemberAlertDialog
+import com.gp.socialapp.presentation.chat.groupdetails.components.ConfirmActionAlertDialog
 import com.gp.socialapp.presentation.chat.groupdetails.components.UserClickedDialog
 import com.gp.socialapp.presentation.chat.home.ChatHomeScreen
 import org.jetbrains.compose.resources.stringResource
@@ -151,7 +149,7 @@ data class GroupDetailsScreen(
                         .fillMaxSize()
                         .padding(16.dp)
                 ) {
-                    GroupAvatarSection(
+                    ModifiableAvatarSection(
                         avatarURL = avatarURL,
                         isModifiable = isAdmin,
                         onImagePicked = { array ->
@@ -178,7 +176,7 @@ data class GroupDetailsScreen(
                     )
                 }
                 if (isRemoveMemberDialogOpen) {
-                    RemoveMemberAlertDialog(
+                    ConfirmActionAlertDialog(
                         onDismissRequest = { isRemoveMemberDialogOpen = false },
                         onConfirmation = {
                             onAction(GroupDetailsAction.OnRemoveMember(clickedUserId))

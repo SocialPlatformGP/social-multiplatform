@@ -103,6 +103,7 @@ data class ChatRoomScreen(
         scope: CoroutineScope = rememberCoroutineScope(),
     ) {
         val scrollState = rememberLazyListState()
+        val type = FilePickerFileType.Image
         val context = LocalPlatformContext.current
         var isImagePreviewDialogOpen by rememberSaveable { mutableStateOf(false) }
         var previewedImageURL by rememberSaveable { mutableStateOf("") }

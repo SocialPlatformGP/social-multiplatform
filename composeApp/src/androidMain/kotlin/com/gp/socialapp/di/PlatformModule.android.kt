@@ -23,6 +23,7 @@ import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.gotrue.ExternalAuthAction
 import io.github.jan.supabase.gotrue.FlowType
+import io.github.jan.supabase.gotrue.handleDeeplinks
 import io.realm.kotlin.Configuration
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
@@ -71,4 +72,11 @@ actual val platformModule = DI.Module("platformModule") {
 interface HandleDeepLink {
     fun handleDeepLink(intent: Intent)
 
+}
+class HandleDeepLinkImpl(
+    private val suba: SupabaseClient
+) : HandleDeepLink {
+    override fun handleDeepLink(intent: Intent) {
+        suba.handleDeeplinks(intent)
+    }
 }

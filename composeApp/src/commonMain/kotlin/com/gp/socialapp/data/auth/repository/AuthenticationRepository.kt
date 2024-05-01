@@ -1,6 +1,7 @@
 package com.gp.socialapp.data.auth.repository
 
 import com.gp.socialapp.data.auth.source.remote.model.User
+import com.gp.socialapp.data.auth.source.remote.model.UserSettings
 import com.gp.socialapp.util.Result
 import io.github.jan.supabase.gotrue.providers.OAuthProvider
 import kotlinx.coroutines.flow.Flow
@@ -13,4 +14,6 @@ interface AuthenticationRepository {
     fun signUpWithEmail(email: String, password: String): Flow<Result<User>>
     suspend fun getSignedInUser(): Result<User>
     suspend fun logout(): Result<Nothing>
+    suspend fun deleteAccount(userId: String): Result<Nothing>
+
 }
