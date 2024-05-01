@@ -120,6 +120,7 @@ class SettingsScreenModel(
         screenModelScope.launch (DispatcherIO) {
             userRepo.changePassword(oldPassword, newPassword).onSuccess {
                 println("Password changed successfully")
+                getSignedInUser()
                 Napier.d("Password changed successfully")
             }.onFailure {
                 println("Error changing password: $it")
@@ -130,8 +131,9 @@ class SettingsScreenModel(
 
     private fun updateEmail(email: String) {
         screenModelScope.launch(DispatcherIO){
-            userRepo.changeEmail(email).onSuccess {
+            userRepo.changeEmail(_uiState.value.currentUser.id, email).onSuccess {
                 println("Email changed successfully")
+                getSignedInUser()
                 Napier.d("Email changed successfully")
             }.onFailure {
                 println("Error changing email: $it")
@@ -141,8 +143,10 @@ class SettingsScreenModel(
     }
     private fun updateStringRemoteUserSetting(tag: String, value: String){
         screenModelScope.launch(DispatcherIO){
-            userRepo.updateStringRemoteUserSetting(tag, value).onSuccess {
+            userRepo.updateStringRemoteUserSetting(_uiState.value.currentUser.id, tag, value).onSuccess {
                 println("User setting updated successfully")
+                getSignedInUser()
+                getUserSettings()
                 Napier.d("User setting updated successfully")
             }.onFailure {
                 println("Error updating user setting: $it")
@@ -152,8 +156,9 @@ class SettingsScreenModel(
     }
     private fun updateBooleanRemoteUserSetting(tag: String, value: Boolean){
         screenModelScope.launch(DispatcherIO){
-            userRepo.updateBooleanRemoteUserSetting(tag, value).onSuccess {
+            userRepo.updateBooleanRemoteUserSetting(_uiState.value.currentUser.id, tag, value).onSuccess {
                 println("User setting updated successfully")
+                getUserSettings()
                 Napier.d("User setting updated successfully")
             }.onFailure {
                 println("Error updating user setting: $it")
@@ -193,6 +198,7 @@ class SettingsScreenModel(
     private fun updateTheme(theme: String) {
         screenModelScope.launch {
             userRepo.setTheme(theme)
+            getUserSettings()
         }
     }
 
@@ -207,6 +213,7 @@ class SettingsScreenModel(
     private fun updateAvatar(avatarByteArray: ByteArray) {
         screenModelScope.launch (DispatcherIO) {
             userRepo.updateUserAvatar(avatarByteArray, _uiState.value.currentUser.id).onSuccess {
+                getSignedInUser()
                 println("Avatar updated successfully")
                 Napier.d("Avatar updated successfully")
             }.onFailure {
@@ -218,7 +225,8 @@ class SettingsScreenModel(
 
     private fun updatePhoneNumber(phoneNumber: String) {
         screenModelScope.launch (DispatcherIO) {
-            userRepo.updatePhoneNumber(phoneNumber).onSuccess {
+            userRepo.updatePhoneNumber(_uiState.value.currentUser.id, phoneNumber).onSuccess {
+                getSignedInUser()
                 println("Phone number updated successfully")
                 Napier.d("Phone number updated successfully")
             }.onFailure {
@@ -230,7 +238,8 @@ class SettingsScreenModel(
 
     private fun updateName(name: String) {
         screenModelScope.launch (DispatcherIO) {
-            userRepo.updateName(name).onSuccess {
+            userRepo.updateName(_uiState.value.currentUser.id, name).onSuccess {
+                getSignedInUser()
                 println("Name updated successfully")
                 Napier.d("Name updated successfully")
             }.onFailure {
@@ -242,7 +251,8 @@ class SettingsScreenModel(
 
     private fun updateBio(bio: String) {
         screenModelScope.launch (DispatcherIO) {
-            userRepo.updateStringRemoteUserSetting(UserData.BIO.value, bio).onSuccess {
+            userRepo.updateStringRemoteUserSetting(_uiState.value.currentUser.id, UserData.BIO.value, bio).onSuccess {
+                getSignedInUser()
                 println("Bio updated successfully")
                 Napier.d("Bio updated successfully")
             }.onFailure {

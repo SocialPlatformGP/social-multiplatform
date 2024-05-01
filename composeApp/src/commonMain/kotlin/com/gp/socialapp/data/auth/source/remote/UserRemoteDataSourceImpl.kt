@@ -4,6 +4,8 @@ import com.gp.socialapp.data.auth.source.remote.model.PrivacyOptions
 import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.data.auth.source.remote.model.UserSettings
 import com.gp.socialapp.data.auth.source.remote.model.requests.GetUsersByIdsRequest
+import com.gp.socialapp.data.auth.source.remote.model.requests.UpdateUserEndpoint
+import com.gp.socialapp.data.auth.source.remote.model.requests.UpdateUserRequest
 import com.gp.socialapp.data.community.source.remote.model.Community
 import com.gp.socialapp.data.community.source.remote.model.request.CommunityRequest
 import com.gp.socialapp.data.post.util.endPoint
@@ -50,26 +52,32 @@ class UserRemoteDataSourceImpl(
         }
     }
 
-    override suspend fun updatePhoneNumber(phoneNumber: String): Result<Nothing> {
+    override suspend fun updatePhoneNumber(userId: String, phoneNumber: String): Result<Nothing> {
         return try {
             supabaseClient.auth.updateUser {
                 this.phone = phoneNumber
             }
-            Result.Success
+            updateRemoteUser(
+                UpdateUserRequest.UpdatePhoneNumber(userId, phoneNumber),
+                UpdateUserEndpoint.UpdatePhoneNumber
+            )
         } catch (e: Exception) {
             e.printStackTrace()
             Result.Error(e.message ?: "Null")
         }
     }
 
-    override suspend fun updateName(name: String): Result<Nothing> {
+    override suspend fun updateName(userId: String, name: String): Result<Nothing> {
         return try {
             supabaseClient.auth.updateUser {
                 data {
                     put(UserData.NAME.value, name)
                 }
             }
-            Result.Success
+            updateRemoteUser(
+                UpdateUserRequest.UpdateName(userId, name),
+                UpdateUserEndpoint.UpdateName
+            )
         } catch (e: Exception) {
             e.printStackTrace()
             Result.Error(e.message ?: "Null")
@@ -140,7 +148,10 @@ class UserRemoteDataSourceImpl(
                             put(UserData.PROFILE_PICTURE_URL.value, result.data)
                         }
                     }
-                    Result.Success
+                    updateRemoteUser(
+                        UpdateUserRequest.UpdateAvatarUrl(userId, result.data),
+                        UpdateUserEndpoint.UpdateAvatarUrl
+                    )
                 } else {
                     Result.Error("An error occurred while uploading the profile picture")
                 }
@@ -213,12 +224,15 @@ class UserRemoteDataSourceImpl(
         }
     }
 
-    override suspend fun changeEmail(email: String): Result<Nothing> {
+    override suspend fun changeEmail(userId: String, email: String): Result<Nothing> {
         return try {
             supabaseClient.auth.updateUser {
                 this.email = email
             }
-            Result.Success
+            updateRemoteUser(
+                UpdateUserRequest.UpdateEmail(userId, email),
+                UpdateUserEndpoint.UpdateEmail
+            )
         } catch (e: Exception) {
             e.printStackTrace()
             Result.Error(e.message ?: "Null")
@@ -226,6 +240,7 @@ class UserRemoteDataSourceImpl(
     }
 
     override suspend fun updateStringRemoteUserSetting(
+        userId: String,
         tag: String,
         value: String
     ): Result<Nothing> {
@@ -235,7 +250,20 @@ class UserRemoteDataSourceImpl(
                     put(tag, value)
                 }
             }
-            Result.Success
+            val request = when(tag){
+                UserData.ALLOW_MESSAGES_FROM.value -> UpdateUserRequest.UpdateAllowMessagesFrom(userId, value)
+                UserData.WHO_CAN_ADD_TO_GROUPS.value -> UpdateUserRequest.UpdateWhoCanAddToGroups(userId, value)
+                else -> return Result.Error("Invalid tag")
+            }
+            val endpoint = when(tag){
+                UserData.ALLOW_MESSAGES_FROM.value -> UpdateUserEndpoint.UpdateAllowMessagesFrom
+                UserData.WHO_CAN_ADD_TO_GROUPS.value -> UpdateUserEndpoint.UpdateWhoCanAddToGroups
+                else -> return Result.Error("Invalid tag")
+            }
+            updateRemoteUser(
+                request,
+                endpoint
+            )
         } catch (e: Exception) {
             e.printStackTrace()
             Result.Error(e.message ?: "Null")
@@ -243,6 +271,7 @@ class UserRemoteDataSourceImpl(
     }
 
     override suspend fun updateBooleanRemoteUserSetting(
+        userId: String,
         tag: String,
         value: Boolean
     ): Result<Nothing> {
@@ -252,6 +281,26 @@ class UserRemoteDataSourceImpl(
                     put(tag, value)
                 }
             }
+            val request = when(tag){
+                UserData.ALLOW_NOTIFICATIONS.value -> UpdateUserRequest.UpdateIsNotificationsAllowed(userId, value)
+                UserData.ALLOW_POST_NOTIFICATIONS.value -> UpdateUserRequest.UpdateIsPostNotificationsAllowed(userId, value)
+                UserData.ALLOW_CHAT_NOTIFICATIONS.value -> UpdateUserRequest.UpdateIsChatNotificationsAllowed(userId, value)
+                UserData.ALLOW_ASSIGNMENTS_NOTIFICATIONS.value -> UpdateUserRequest.UpdateIsAssignmentsNotificationsAllowed(userId, value)
+                UserData.ALLOW_CALENDAR_NOTIFICATIONS.value -> UpdateUserRequest.UpdateIsCalendarNotificationsAllowed(userId, value)
+                else -> return Result.Error("Invalid tag")
+            }
+            val endpoint = when(tag){
+                UserData.ALLOW_NOTIFICATIONS.value -> UpdateUserEndpoint.UpdateIsNotificationsAllowed
+                UserData.ALLOW_POST_NOTIFICATIONS.value -> UpdateUserEndpoint.UpdateIsPostNotificationsAllowed
+                UserData.ALLOW_CHAT_NOTIFICATIONS.value -> UpdateUserEndpoint.UpdateIsChatNotificationsAllowed
+                UserData.ALLOW_ASSIGNMENTS_NOTIFICATIONS.value -> UpdateUserEndpoint.UpdateIsAssignmentsNotificationsAllowed
+                UserData.ALLOW_CALENDAR_NOTIFICATIONS.value -> UpdateUserEndpoint.UpdateIsCalendarNotificationsAllowed
+                else -> return Result.Error("Invalid tag")
+            }
+            updateRemoteUser(
+                request,
+                endpoint
+            )
             Result.Success
         } catch (e: Exception) {
             e.printStackTrace()
@@ -323,7 +372,22 @@ class UserRemoteDataSourceImpl(
                 emit(Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN))
             }
         }
-
+    private suspend fun updateRemoteUser(request: UpdateUserRequest, endpoint: UpdateUserEndpoint) : Result<Nothing>{
+        return try{
+            val response = httpClient.post {
+                endPoint(endpoint.route)
+                setBody(request)
+            }
+            if(response.status == HttpStatusCode.OK){
+                Result.Success
+            } else {
+                Result.Error("An unknown error occurred")
+            }
+        } catch(e: Exception){
+            e.printStackTrace()
+            Result.Error(e.message ?: "An unknown error occurred")
+        }
+    }
     override fun joinCommunity(
         id: String,
         code: String

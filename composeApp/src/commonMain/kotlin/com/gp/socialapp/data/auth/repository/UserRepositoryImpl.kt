@@ -31,12 +31,12 @@ class UserRepositoryImpl(
         }
     }
 
-    override suspend fun updatePhoneNumber(phoneNumber: String): Result<Nothing> {
-        return userRemoteSource.updatePhoneNumber(phoneNumber)
+    override suspend fun updatePhoneNumber(userId: String, phoneNumber: String): Result<Nothing> {
+        return userRemoteSource.updatePhoneNumber(userId, phoneNumber)
     }
 
-    override suspend fun updateName(name: String): Result<Nothing> {
-        return userRemoteSource.updateName(name)
+    override suspend fun updateName(userId: String, name: String): Result<Nothing> {
+        return userRemoteSource.updateName(userId, name)
     }
 
     override suspend fun getUserSettings(): Result<UserSettings> {
@@ -52,22 +52,24 @@ class UserRepositoryImpl(
         return userRemoteSource.changePassword(oldPassword, newPassword)
     }
 
-    override suspend fun changeEmail(email: String): Result<Nothing> {
-        return userRemoteSource.changeEmail(email)
+    override suspend fun changeEmail(userId: String, email: String): Result<Nothing> {
+        return userRemoteSource.changeEmail(userId, email)
     }
 
     override suspend fun updateStringRemoteUserSetting(
+        userId: String,
         tag: String,
         value: String
     ): Result<Nothing> {
-        return  userRemoteSource.updateStringRemoteUserSetting(tag, value)
+        return  userRemoteSource.updateStringRemoteUserSetting(userId, tag, value)
     }
 
     override suspend fun updateBooleanRemoteUserSetting(
+        userId: String,
         tag: String,
         value: Boolean
     ): Result<Nothing> {
-        return userRemoteSource.updateBooleanRemoteUserSetting(tag, value)
+        return userRemoteSource.updateBooleanRemoteUserSetting(userId, tag, value)
     }
 
     override suspend fun updateUserAvatar(avatarByteArray: ByteArray, userId: String): Result<Nothing> {

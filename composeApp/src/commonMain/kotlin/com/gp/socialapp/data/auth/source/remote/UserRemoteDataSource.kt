@@ -12,13 +12,13 @@ import kotlinx.coroutines.flow.Flow
 
 interface UserRemoteDataSource {
     suspend fun updateUserInfo(user: User): Result<Nothing>
-    suspend fun updatePhoneNumber(phoneNumber: String): Result<Nothing>
-    suspend fun updateName(name: String): Result<Nothing>
+    suspend fun updatePhoneNumber(userId: String, phoneNumber: String): Result<Nothing>
+    suspend fun updateName(userId: String, name: String): Result<Nothing>
     suspend fun getUserSettings(): Result<UserSettings>
     suspend fun changePassword(oldPassword: String, newPassword: String): Result<Nothing>
-    suspend fun changeEmail(email: String): Result<Nothing>
-    suspend fun updateStringRemoteUserSetting(tag: String, value: String): Result<Nothing>
-    suspend fun updateBooleanRemoteUserSetting(tag: String, value: Boolean): Result<Nothing>
+    suspend fun changeEmail(userId: String, email: String): Result<Nothing>
+    suspend fun updateStringRemoteUserSetting(userId: String, tag: String, value: String): Result<Nothing>
+    suspend fun updateBooleanRemoteUserSetting(userId: String, tag: String, value: Boolean): Result<Nothing>
     fun fetchUsers(): Flow<Result<List<User>>>
     fun getUsersByIds(request: GetUsersByIdsRequest): Flow<Results<List<User>, DataError.Network>>
     suspend fun uploadUserPfp(pfpByteArray: ByteArray, userId: String): Result<String>

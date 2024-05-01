@@ -3,6 +3,7 @@ package com.gp.socialapp.data.auth.source.remote
 import com.gp.socialapp.data.auth.source.remote.model.PrivacyOptions
 import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.data.auth.source.remote.model.UserSettings
+import com.gp.socialapp.data.post.util.endPoint
 import com.gp.socialapp.util.Result
 import io.github.aakira.napier.Napier
 import io.github.jan.supabase.SupabaseClient
@@ -10,6 +11,10 @@ import io.github.jan.supabase.gotrue.SessionStatus
 import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.gotrue.providers.OAuthProvider
 import io.github.jan.supabase.gotrue.providers.builtin.Email
+import io.ktor.client.HttpClient
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.json.booleanOrNull
@@ -20,6 +25,7 @@ import kotlinx.serialization.json.put
 
 
 class AuthenticationRemoteDataSourceImpl(
+    private val httpClient: HttpClient,
     private val supabaseClient: SupabaseClient
 ) : AuthenticationRemoteDataSource {
 
@@ -59,6 +65,22 @@ class AuthenticationRemoteDataSourceImpl(
         }
     }
 
+    private suspend fun deleteRemoteUser(userId: String): Result<Nothing> {
+        return try {
+            val response = httpClient.post {
+                endPoint("deleteUser")
+                setBody(userId)
+            }
+            if(response.status == HttpStatusCode.OK){
+                Result.Success
+            } else {
+                Result.Error("An unknown error occurred")
+            }
+        } catch(e: Exception){
+            e.printStackTrace()
+            Result.Error(e.message ?: "An unknown error occurred")
+        }
+    }
     override fun signInWithEmail(
         email: String, password: String
     ): Flow<Result<User>> = flow {
@@ -283,7 +305,7 @@ class AuthenticationRemoteDataSourceImpl(
     override suspend fun deleteAccount(userId: String): Result<Nothing> {
         return try {
             supabaseClient.auth.admin.deleteUser(userId)
-            Result.Success
+            deleteRemoteUser(userId)
         } catch (e: Exception) {
             e.printStackTrace()
             Result.Error(e.message ?: "Null")
