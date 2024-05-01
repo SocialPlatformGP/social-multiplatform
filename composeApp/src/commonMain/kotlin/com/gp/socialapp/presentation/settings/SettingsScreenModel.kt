@@ -20,7 +20,7 @@ class SettingsScreenModel(
 ): ScreenModel {
     private val _uiState = MutableStateFlow(SettingsUiState())
     val state = _uiState.asStateFlow()
-    init {
+    fun init() {
         getUserSettings()
         getSignedInUser()
     }

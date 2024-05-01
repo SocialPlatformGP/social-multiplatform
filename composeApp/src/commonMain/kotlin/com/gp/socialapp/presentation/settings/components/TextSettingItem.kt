@@ -108,7 +108,7 @@ private fun TextEditDialog(
     onDismiss: () -> Unit
 ) {
     var currentInput by remember { mutableStateOf(storedValue) }
-    var isValid by remember { mutableStateOf(onCheck(storedValue)) }
+    var isValid by remember { mutableStateOf(true) }
 
     Surface (
         shape = RoundedCornerShape(8.dp),

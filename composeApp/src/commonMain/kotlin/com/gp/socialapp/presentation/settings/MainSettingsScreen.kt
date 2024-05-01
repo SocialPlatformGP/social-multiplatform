@@ -26,6 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.core.lifecycle.LifecycleEffect
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
 import cafe.adriel.voyager.kodein.rememberScreenModel
@@ -45,6 +46,14 @@ object MainSettingsScreen : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = rememberScreenModel<SettingsScreenModel>()
+        LifecycleEffect (
+            onStarted = {
+                screenModel.init()
+            },
+            onDisposed = {
+                screenModel.onDispose()
+            }
+        )
         val state by screenModel.state.collectAsState()
         if(state.isUserDeleted) {
             navigator.replaceAll(LoginScreen)
@@ -68,7 +77,7 @@ object MainSettingsScreen : Screen {
         Scaffold(modifier = modifier, topBar = {
             TopAppBar(title = {
                 Text(
-                    text = "Settings", style = MaterialTheme.typography.titleMedium
+                    text = "Settings", style = MaterialTheme.typography.headlineSmall
                 )
             }, navigationIcon = {
                 IconButton(onClick = { onBackPressed() }) {

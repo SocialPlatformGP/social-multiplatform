@@ -32,7 +32,7 @@ import org.kodein.di.singleton
 
 val screenModelModuleK = DI.Module("screenModelModule") {
     bind<CreatePostScreenModel>() with singleton { CreatePostScreenModel(instance(), instance()) }
-    bind<LoginScreenModel>() with singleton { LoginScreenModel(instance()) }
+    bind<LoginScreenModel>() with singleton { LoginScreenModel(instance(), instance()) }
     bind<PasswordResetScreenModel>() with singleton { PasswordResetScreenModel(instance()) }
     bind<SignUpScreenModel>() with singleton { SignUpScreenModel(instance()) }
     bind<UserInformationScreenModel>() with singleton {
@@ -120,6 +120,6 @@ val screenModelModuleK = DI.Module("screenModelModule") {
             instance(),
         )
     }
-    bind<SettingsScreenModel>() with singleton { SettingsScreenModel(instance()) }
+    bind<SettingsScreenModel>() with singleton { SettingsScreenModel(instance(), instance()) }
 }
 

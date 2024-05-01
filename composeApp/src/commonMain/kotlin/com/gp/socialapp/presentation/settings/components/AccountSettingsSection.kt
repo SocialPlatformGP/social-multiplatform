@@ -34,9 +34,9 @@ fun AccountSettingsSection(
                 isModifiable = true,
                 onImagePicked = { newAvatar ->
                     onAction(SettingsAction.AccountSettingsAction.UpdateAvatar(newAvatar))
-                }
+                },
+                modifier = Modifier.padding(vertical = 8.dp)
             )
-            Spacer(Modifier.size(8.dp))
             TextSettingItem(title = "Name", value = currentUser.name, onSave = { newName ->
                 onAction(SettingsAction.AccountSettingsAction.UpdateName(newName))
             }, onCheck = { newName ->
