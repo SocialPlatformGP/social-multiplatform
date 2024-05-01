@@ -62,7 +62,8 @@ class PostLocalDataSourceImpl(
                     tags = it.tags,
                     type = it.type,
                     attachments = it.attachments,
-                    lastModified = it.last_modified
+                    lastModified = it.last_modified,
+                    communityID = it.community_id
                 ).toPost()
             }
         }
@@ -88,7 +89,8 @@ class PostLocalDataSourceImpl(
                     tags = posts.tags,
                     type = posts.type,
                     attachments = posts.attachments,
-                    lastModified = posts.last_modified
+                    lastModified = posts.last_modified,
+                    communityID = posts.community_id
                 ).toPost()
             }.first()
         }
@@ -123,7 +125,8 @@ class PostLocalDataSourceImpl(
                         tags = it.tags,
                         type = it.type,
                         attachments = it.attachments,
-                        lastModified = it.last_modified
+                        lastModified = it.last_modified,
+                        communityID = it.community_id
                     ).toPost()
                 }
             }
@@ -149,7 +152,8 @@ class PostLocalDataSourceImpl(
                     tags = it.tags,
                     type = it.type,
                     attachments = it.attachments,
-                    lastModified = it.last_modified
+                    lastModified = it.last_modified,
+                    communityID = it.community_id
                 ).toPost()
             }
         }
