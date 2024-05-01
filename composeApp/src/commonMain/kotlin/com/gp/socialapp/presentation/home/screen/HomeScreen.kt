@@ -33,8 +33,9 @@ import com.gp.socialapp.presentation.home.components.HomeContent
 import com.gp.socialapp.presentation.home.components.HomeFab
 import com.gp.socialapp.presentation.home.components.JoinCommunityDialog
 import com.gp.socialapp.presentation.home.components.OptionItem
+import com.gp.socialapp.util.copyToClipboard
+import com.mohamedrejeb.calf.core.LocalPlatformContext
 import kotlinx.coroutines.launch
-import org.jetbrains.skiko.ClipboardManager
 
 data class HomeScreen(
     val onBottomBarVisibilityChanged: (Boolean) -> Unit,
@@ -44,6 +45,7 @@ data class HomeScreen(
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = navigator.rememberNavigatorScreenModel<HomeScreenModel>()
         val state by screenModel.uiState.collectAsState()
+        val context = LocalPlatformContext.current
         LifecycleEffect(
             onStarted = {
                 onBottomBarVisibilityChanged(true)
@@ -108,8 +110,7 @@ data class HomeScreen(
                     }
 
                     is HomeUiAction.OnShareJoinCodeClicked -> {
-                        val clipboardManager = ClipboardManager()
-                        clipboardManager.setText(it.code)
+                        context.copyToClipboard(it.code)
                     }
 
                     is HomeUiAction.OnViewMembersClicked -> {
@@ -125,6 +126,7 @@ data class HomeScreen(
                 }
             })
     }
+
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun HomeScreenContent(
@@ -231,7 +233,8 @@ data class HomeScreen(
                     confirmLogoutDialogState = false
                 })
             }
-            HomeContent(modifier = Modifier.padding(padding),
+            HomeContent(
+                modifier = Modifier.padding(padding),
                 communities = state.communities,
                 action = newOnAction
             )
