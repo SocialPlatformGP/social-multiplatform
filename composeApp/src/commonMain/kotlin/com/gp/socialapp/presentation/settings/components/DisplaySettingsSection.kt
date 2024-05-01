@@ -27,7 +27,7 @@ fun DisplaySettingsContent(
     onAction: (SettingsAction.DisplaySettingsAction) -> Unit,
 ) {
     Column(
-        modifier = Modifier.padding(16.dp).verticalScroll(rememberScrollState())
+        modifier = Modifier.padding(16.dp)
     ) {
         var isDark by LocalThemeIsDark.current
         val isSystemInDarkTheme = isSystemInDarkTheme()
@@ -37,7 +37,7 @@ fun DisplaySettingsContent(
             ListSettingItem(
                 title = "Theme",
                 icon = Icons.Default.Brightness4,
-                value = currentUserSettings.theme.value,
+                value = currentUserSettings.theme,
                 items = AppThemeOptions.entries.map { entry -> entry.value },
                 onSave = { value ->
                     onAction(SettingsAction.DisplaySettingsAction.UpdateTheme(value))

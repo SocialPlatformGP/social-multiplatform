@@ -1,6 +1,8 @@
 package com.gp.socialapp.data.auth.source.remote
 
+import com.gp.socialapp.data.auth.source.remote.model.PrivacyOptions
 import com.gp.socialapp.data.auth.source.remote.model.User
+import com.gp.socialapp.data.auth.source.remote.model.UserSettings
 import com.gp.socialapp.util.Result
 import io.github.aakira.napier.Napier
 import io.github.jan.supabase.SupabaseClient
@@ -14,6 +16,7 @@ import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.longOrNull
+import kotlinx.serialization.json.put
 
 
 class AuthenticationRemoteDataSourceImpl(
@@ -57,8 +60,7 @@ class AuthenticationRemoteDataSourceImpl(
     }
 
     override fun signInWithEmail(
-        email: String,
-        password: String
+        email: String, password: String
     ): Flow<Result<User>> = flow {
         emit(Result.Loading)
         try {
@@ -83,8 +85,7 @@ class AuthenticationRemoteDataSourceImpl(
     }
 
     override fun signUpWithEmail(
-        email: String,
-        password: String
+        email: String, password: String
     ): Flow<Result<User>> = flow {
         emit(Result.Loading)
         try {
@@ -151,9 +152,7 @@ class AuthenticationRemoteDataSourceImpl(
                 val id = userInfo.id
                 val email = userInfo.email ?: ""
                 User(
-                    id = id,
-                    email = email,
-                    isDataComplete = false
+                    id = id, email = email, isDataComplete = false
                 )
             }
             Result.SuccessWithData(user)
@@ -162,9 +161,128 @@ class AuthenticationRemoteDataSourceImpl(
         }
     }
 
+    override suspend fun getUserSettings(): Result<UserSettings> {
+        val userInfo = supabaseClient.auth.sessionManager.loadSession()?.user
+        return if (userInfo != null) {
+            println("User Info: ${userInfo.userMetadata}")
+            val isUserDataComplete =
+                userInfo.userMetadata?.get("isUserDataComplete")?.jsonPrimitive?.booleanOrNull
+                    ?: false
+            val user = if (isUserDataComplete) {
+                val id = userInfo.id
+                val allowMessagesFrom =
+                    userInfo.userMetadata?.get(UserData.ALLOW_MESSAGES_FROM.value)?.jsonPrimitive?.contentOrNull
+                        ?: PrivacyOptions.EVERYONE.value
+                val whoCanAddToGroups =
+                    userInfo.userMetadata?.get(UserData.WHO_CAN_ADD_TO_GROUPS.value)?.jsonPrimitive?.contentOrNull
+                        ?: PrivacyOptions.EVERYONE.value
+                val isNotificationsAllowed =
+                    userInfo.userMetadata?.get(UserData.ALLOW_NOTIFICATIONS.value)?.jsonPrimitive?.booleanOrNull
+                        ?: true
+                val isPostNotificationsAllowed =
+                    userInfo.userMetadata?.get(UserData.ALLOW_POST_NOTIFICATIONS.value)?.jsonPrimitive?.booleanOrNull
+                        ?: true
+                val isChatNotificationsAllowed =
+                    userInfo.userMetadata?.get(UserData.ALLOW_CHAT_NOTIFICATIONS.value)?.jsonPrimitive?.booleanOrNull
+                        ?: true
+                val isAssignmentsNotificationsAllowed =
+                    userInfo.userMetadata?.get(UserData.ALLOW_ASSIGNMENTS_NOTIFICATIONS.value)?.jsonPrimitive?.booleanOrNull
+                        ?: true
+                val isCalendarNotificationsAllowed =
+                    userInfo.userMetadata?.get(UserData.ALLOW_CALENDAR_NOTIFICATIONS.value)?.jsonPrimitive?.booleanOrNull
+                        ?: true
+                UserSettings(
+                    userId = id,
+                    allowMessagesFrom = allowMessagesFrom,
+                    whoCanAddToGroups = whoCanAddToGroups,
+                    isNotificationsAllowed = isNotificationsAllowed,
+                    isPostNotificationsAllowed = isPostNotificationsAllowed,
+                    isChatNotificationsAllowed = isChatNotificationsAllowed,
+                    isAssignmentsNotificationsAllowed = isAssignmentsNotificationsAllowed,
+                    isCalendarNotificationsAllowed = isCalendarNotificationsAllowed
+                )
+            } else {
+                UserSettings()
+            }
+            Result.SuccessWithData(user)
+        } else {
+            Result.Error("User not found")
+        }
+    }
+
+    override suspend fun changePassword(oldPassword: String, newPassword: String): Result<Nothing> {
+        return try {
+//            val user = supabaseClient.auth.retrieveUserForCurrentSession(updateSession = true)
+//            TODO("Check if old password is correct")
+            supabaseClient.auth.updateUser {
+                password = newPassword
+            }
+            Result.Success
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.Error(e.message ?: "Null")
+        }
+    }
+
+    override suspend fun changeEmail(email: String): Result<Nothing> {
+        return try {
+            supabaseClient.auth.updateUser {
+                this.email = email
+            }
+            Result.Success
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.Error(e.message ?: "Null")
+        }
+    }
+
+    override suspend fun updateStringRemoteUserSetting(
+        tag: String,
+        value: String
+    ): Result<Nothing> {
+        return try {
+            supabaseClient.auth.updateUser {
+                data{
+                    put(tag, value)
+                }
+            }
+            Result.Success
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.Error(e.message ?: "Null")
+        }
+    }
+
+    override suspend fun updateBooleanRemoteUserSetting(
+        tag: String,
+        value: Boolean
+    ): Result<Nothing> {
+        return try {
+            supabaseClient.auth.updateUser {
+                data{
+                    put(tag, value)
+                }
+            }
+            Result.Success
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.Error(e.message ?: "Null")
+        }
+    }
+
     override suspend fun logout(): Result<Nothing> {
         return try {
             supabaseClient.auth.signOut()
+            Result.Success
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.Error(e.message ?: "Null")
+        }
+    }
+
+    override suspend fun deleteAccount(userId: String): Result<Nothing> {
+        return try {
+            supabaseClient.auth.admin.deleteUser(userId)
             Result.Success
         } catch (e: Exception) {
             e.printStackTrace()
@@ -179,10 +297,14 @@ class AuthenticationRemoteDataSourceImpl(
 }
 
 enum class UserData(val value: String) {
-    NAME("name"),
-    PROFILE_PICTURE_URL("profile_picture_url"),
-    BIRTH_DATE("birth_date"),
-    BIO("bio"),
-    IS_ADMIN("isAdmin"),
-    IS_DATA_COMPLETE("isUserDataComplete")
+    NAME("name"), PROFILE_PICTURE_URL("profile_picture_url"), BIRTH_DATE("birth_date"), BIO("bio"), IS_ADMIN(
+        "isAdmin"
+    ),
+    IS_DATA_COMPLETE("isUserDataComplete"), ALLOW_MESSAGES_FROM("allowMessagesFrom"), WHO_CAN_ADD_TO_GROUPS(
+        "whoCanAddToGroups"
+    ),
+    ALLOW_NOTIFICATIONS("allowNotifications"), ALLOW_CHAT_NOTIFICATIONS("allowChatNotifications"), ALLOW_CALENDAR_NOTIFICATIONS(
+        "allowCalendarNotifications"
+    ),
+    ALLOW_ASSIGNMENTS_NOTIFICATIONS("allowAssignmentsNotifications"), ALLOW_POST_NOTIFICATIONS("allowPostNotifications"),
 }

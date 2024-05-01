@@ -10,5 +10,6 @@ data class LoginUiState(
     var error: AuthError = AuthError.NoError,
     var signedInUser: User? = null,
     var userId: String = "",
+    val theme: String = "System Default",
     var isDone: Boolean = false,
 )

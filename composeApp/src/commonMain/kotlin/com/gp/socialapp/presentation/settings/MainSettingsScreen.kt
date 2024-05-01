@@ -28,10 +28,12 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
+import cafe.adriel.voyager.kodein.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.data.auth.source.remote.model.UserSettings
+import com.gp.socialapp.presentation.auth.login.LoginScreen
 import com.gp.socialapp.presentation.settings.components.AccountSettingsSection
 import com.gp.socialapp.presentation.settings.components.DisplaySettingsContent
 import com.gp.socialapp.presentation.settings.components.NotificationsSettingsSection
@@ -42,12 +44,16 @@ object MainSettingsScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val screenModel = navigator.rememberNavigatorScreenModel<SettingsScreenModel>()
+        val screenModel = rememberScreenModel<SettingsScreenModel>()
         val state by screenModel.state.collectAsState()
-        MainSettingsContent(onBackPressed = { navigator.pop() },
-            currentUser = state.currentUser,
-            currentUserSettings = state.currentUserSettings,
-            onAction = { action -> screenModel.onAction(action) })
+        if(state.isUserDeleted) {
+            navigator.replaceAll(LoginScreen)
+        } else {
+            MainSettingsContent(onBackPressed = { navigator.pop() },
+                currentUser = state.currentUser,
+                currentUserSettings = state.currentUserSettings,
+                onAction = { action -> screenModel.onAction(action) })
+        }
     }
 
     @OptIn(ExperimentalMaterial3Api::class)

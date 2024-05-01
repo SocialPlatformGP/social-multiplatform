@@ -196,8 +196,8 @@ private fun PasswordEditDialog(
             OutlinedTextField(
                 value = retypePassword,
                 onValueChange = {
-                    isRetypePasswordValid = newPassword == retypePassword
                     retypePassword = it
+                    isRetypePasswordValid = newPassword == retypePassword
                 },
                 label = { Text(text = stringResource(Res.string.retype_password)) },
                 modifier = Modifier

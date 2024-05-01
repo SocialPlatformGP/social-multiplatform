@@ -24,7 +24,7 @@ fun AccountSettingsSection(
 ) {
 
     Column(
-        modifier = Modifier.padding(16.dp).verticalScroll(rememberScrollState())
+        modifier = Modifier.padding(16.dp)
     ) {
         SettingsGroup(
             title = "Account Information"

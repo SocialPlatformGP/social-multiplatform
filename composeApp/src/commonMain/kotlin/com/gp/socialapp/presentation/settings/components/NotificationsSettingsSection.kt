@@ -25,7 +25,7 @@ fun NotificationsSettingsSection(
     onAction: (SettingsAction) -> Unit,
 ) {
     Column(
-        modifier = Modifier.padding(16.dp).verticalScroll(rememberScrollState())
+        modifier = Modifier.padding(16.dp)
     ) {
         SettingsGroup(
             title = "Notifications",

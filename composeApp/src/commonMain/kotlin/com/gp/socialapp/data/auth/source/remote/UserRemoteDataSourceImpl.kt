@@ -1,6 +1,8 @@
 package com.gp.socialapp.data.auth.source.remote
 
+import com.gp.socialapp.data.auth.source.remote.model.PrivacyOptions
 import com.gp.socialapp.data.auth.source.remote.model.User
+import com.gp.socialapp.data.auth.source.remote.model.UserSettings
 import com.gp.socialapp.data.auth.source.remote.model.requests.GetUsersByIdsRequest
 import com.gp.socialapp.data.community.source.remote.model.Community
 import com.gp.socialapp.data.community.source.remote.model.request.CommunityRequest
@@ -20,6 +22,9 @@ import io.ktor.client.request.setBody
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 
 class UserRemoteDataSourceImpl(
@@ -42,6 +47,32 @@ class UserRemoteDataSourceImpl(
         } catch (e: Exception) {
             e.printStackTrace()
             Result.Error(e.message ?: "An unknown error occurred")
+        }
+    }
+
+    override suspend fun updatePhoneNumber(phoneNumber: String): Result<Nothing> {
+        return try {
+            supabaseClient.auth.updateUser {
+                this.phone = phoneNumber
+            }
+            Result.Success
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.Error(e.message ?: "Null")
+        }
+    }
+
+    override suspend fun updateName(name: String): Result<Nothing> {
+        return try {
+            supabaseClient.auth.updateUser {
+                data {
+                    put(UserData.NAME.value, name)
+                }
+            }
+            Result.Success
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.Error(e.message ?: "Null")
         }
     }
 
@@ -97,6 +128,134 @@ class UserRemoteDataSourceImpl(
         } catch (e: Exception) {
             e.printStackTrace()
             Result.Error(e.message ?: "An unknown error occurred")
+        }
+    }
+
+    override suspend fun updateUserAvatar(avatarByteArray: ByteArray, userId: String): Result<Nothing> {
+        return try{
+            uploadUserPfp(avatarByteArray, userId).let { result ->
+                if (result is Result.SuccessWithData) {
+                    supabaseClient.auth.updateUser {
+                        data {
+                            put(UserData.PROFILE_PICTURE_URL.value, result.data)
+                        }
+                    }
+                    Result.Success
+                } else {
+                    Result.Error("An error occurred while uploading the profile picture")
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.Error(e.message ?: "An unknown error occurred")
+        }
+    }
+    override suspend fun getUserSettings(): Result<UserSettings> {
+        val userInfo = supabaseClient.auth.sessionManager.loadSession()?.user
+        return if (userInfo != null) {
+            println("User Info: ${userInfo.userMetadata}")
+            val isUserDataComplete =
+                userInfo.userMetadata?.get("isUserDataComplete")?.jsonPrimitive?.booleanOrNull
+                    ?: false
+            val user = if (isUserDataComplete) {
+                val id = userInfo.id
+                val allowMessagesFrom =
+                    userInfo.userMetadata?.get(UserData.ALLOW_MESSAGES_FROM.value)?.jsonPrimitive?.contentOrNull
+                        ?: PrivacyOptions.EVERYONE.value
+                val whoCanAddToGroups =
+                    userInfo.userMetadata?.get(UserData.WHO_CAN_ADD_TO_GROUPS.value)?.jsonPrimitive?.contentOrNull
+                        ?: PrivacyOptions.EVERYONE.value
+                val isNotificationsAllowed =
+                    userInfo.userMetadata?.get(UserData.ALLOW_NOTIFICATIONS.value)?.jsonPrimitive?.booleanOrNull
+                        ?: true
+                val isPostNotificationsAllowed =
+                    userInfo.userMetadata?.get(UserData.ALLOW_POST_NOTIFICATIONS.value)?.jsonPrimitive?.booleanOrNull
+                        ?: true
+                val isChatNotificationsAllowed =
+                    userInfo.userMetadata?.get(UserData.ALLOW_CHAT_NOTIFICATIONS.value)?.jsonPrimitive?.booleanOrNull
+                        ?: true
+                val isAssignmentsNotificationsAllowed =
+                    userInfo.userMetadata?.get(UserData.ALLOW_ASSIGNMENTS_NOTIFICATIONS.value)?.jsonPrimitive?.booleanOrNull
+                        ?: true
+                val isCalendarNotificationsAllowed =
+                    userInfo.userMetadata?.get(UserData.ALLOW_CALENDAR_NOTIFICATIONS.value)?.jsonPrimitive?.booleanOrNull
+                        ?: true
+                UserSettings(
+                    userId = id,
+                    allowMessagesFrom = allowMessagesFrom,
+                    whoCanAddToGroups = whoCanAddToGroups,
+                    isNotificationsAllowed = isNotificationsAllowed,
+                    isPostNotificationsAllowed = isPostNotificationsAllowed,
+                    isChatNotificationsAllowed = isChatNotificationsAllowed,
+                    isAssignmentsNotificationsAllowed = isAssignmentsNotificationsAllowed,
+                    isCalendarNotificationsAllowed = isCalendarNotificationsAllowed
+                )
+            } else {
+                UserSettings()
+            }
+            Result.SuccessWithData(user)
+        } else {
+            Result.Error("User not found")
+        }
+    }
+
+    override suspend fun changePassword(oldPassword: String, newPassword: String): Result<Nothing> {
+        return try {
+//            val user = supabaseClient.auth.retrieveUserForCurrentSession(updateSession = true)
+//            TODO("Check if old password is correct")
+            supabaseClient.auth.updateUser {
+                password = newPassword
+            }
+            Result.Success
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.Error(e.message ?: "Null")
+        }
+    }
+
+    override suspend fun changeEmail(email: String): Result<Nothing> {
+        return try {
+            supabaseClient.auth.updateUser {
+                this.email = email
+            }
+            Result.Success
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.Error(e.message ?: "Null")
+        }
+    }
+
+    override suspend fun updateStringRemoteUserSetting(
+        tag: String,
+        value: String
+    ): Result<Nothing> {
+        return try {
+            supabaseClient.auth.updateUser {
+                data{
+                    put(tag, value)
+                }
+            }
+            Result.Success
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.Error(e.message ?: "Null")
+        }
+    }
+
+    override suspend fun updateBooleanRemoteUserSetting(
+        tag: String,
+        value: Boolean
+    ): Result<Nothing> {
+        return try {
+            supabaseClient.auth.updateUser {
+                data{
+                    put(tag, value)
+                }
+            }
+            Result.Success
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.Error(e.message ?: "Null")
         }
     }
 

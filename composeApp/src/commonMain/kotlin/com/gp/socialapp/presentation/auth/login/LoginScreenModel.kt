@@ -3,6 +3,7 @@ package com.gp.socialapp.presentation.auth.login
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.gp.socialapp.data.auth.repository.AuthenticationRepository
+import com.gp.socialapp.data.auth.repository.UserRepository
 import com.gp.socialapp.presentation.auth.util.AuthError.EmailError
 import com.gp.socialapp.presentation.auth.util.AuthError.NoError
 import com.gp.socialapp.presentation.auth.util.AuthError.PasswordError
@@ -23,13 +24,32 @@ import socialmultiplatform.composeapp.generated.resources.invalid_password
 
 class LoginScreenModel(
     private val authRepo: AuthenticationRepository,
-
+    private val userRepo: UserRepository,
     ) : ScreenModel {
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState = _uiState.asStateFlow()
 
     fun init() {
+        getTheme()
         getSignedInUser()
+    }
+
+    private fun getTheme() {
+        screenModelScope.launch {
+            userRepo.getTheme().let { result ->
+                when (result) {
+                    is Result.SuccessWithData -> {
+                        _uiState.update { it.copy(theme = result.data) }
+                    }
+
+                    is Result.Error -> {
+                        Napier.e("getTheme: ${result.message}")
+                    }
+
+                    else -> Unit
+                }
+            }
+        }
     }
 
     private fun getSignedInUser() {

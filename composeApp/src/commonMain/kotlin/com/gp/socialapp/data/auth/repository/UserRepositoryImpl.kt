@@ -1,7 +1,9 @@
 package com.gp.socialapp.data.auth.repository
 
+import com.gp.socialapp.data.auth.source.local.AuthKeyValueStorage
 import com.gp.socialapp.data.auth.source.remote.UserRemoteDataSource
 import com.gp.socialapp.data.auth.source.remote.model.User
+import com.gp.socialapp.data.auth.source.remote.model.UserSettings
 import com.gp.socialapp.data.auth.source.remote.model.requests.GetUsersByIdsRequest
 import com.gp.socialapp.data.community.source.remote.model.Community
 import com.gp.socialapp.util.DataError
@@ -11,7 +13,8 @@ import com.gp.socialapp.util.Results
 import kotlinx.coroutines.flow.Flow
 
 class UserRepositoryImpl(
-    private val userRemoteSource: UserRemoteDataSource
+    private val userRemoteSource: UserRemoteDataSource,
+    private val localKeyValueStorage: AuthKeyValueStorage
 ) : UserRepository {
     override suspend fun updateUserInfo(user: User, pfpByteArray: ByteArray): Result<Nothing> {
         return if (pfpByteArray.isNotEmpty()) {
@@ -26,6 +29,49 @@ class UserRepositoryImpl(
             println("Updating user info and pfp is empty")
             userRemoteSource.updateUserInfo(user)
         }
+    }
+
+    override suspend fun updatePhoneNumber(phoneNumber: String): Result<Nothing> {
+        return userRemoteSource.updatePhoneNumber(phoneNumber)
+    }
+
+    override suspend fun updateName(name: String): Result<Nothing> {
+        return userRemoteSource.updateName(name)
+    }
+
+    override suspend fun getUserSettings(): Result<UserSettings> {
+        return userRemoteSource.getUserSettings().let { result ->
+            if (result is Result.SuccessWithData)
+                Result.SuccessWithData(result.data.copy(theme = localKeyValueStorage.theme ?: "System Default"))
+            else
+                result
+        }
+    }
+
+    override suspend fun changePassword(oldPassword: String, newPassword: String): Result<Nothing> {
+        return userRemoteSource.changePassword(oldPassword, newPassword)
+    }
+
+    override suspend fun changeEmail(email: String): Result<Nothing> {
+        return userRemoteSource.changeEmail(email)
+    }
+
+    override suspend fun updateStringRemoteUserSetting(
+        tag: String,
+        value: String
+    ): Result<Nothing> {
+        return  userRemoteSource.updateStringRemoteUserSetting(tag, value)
+    }
+
+    override suspend fun updateBooleanRemoteUserSetting(
+        tag: String,
+        value: Boolean
+    ): Result<Nothing> {
+        return userRemoteSource.updateBooleanRemoteUserSetting(tag, value)
+    }
+
+    override suspend fun updateUserAvatar(avatarByteArray: ByteArray, userId: String): Result<Nothing> {
+        return userRemoteSource.updateUserAvatar(avatarByteArray, userId)
     }
 
 
@@ -52,6 +98,15 @@ class UserRepositoryImpl(
     ): Flow<Results<List<Community>, DataError.Network>> {
         return userRemoteSource.joinCommunity(id, code)
     }
-
+    override suspend fun getTheme(): Result<String> {
+        return try{
+            Result.SuccessWithData(localKeyValueStorage.theme ?: "System Default")
+        } catch (e: Exception){
+            Result.Error(e.message ?: "Error getting theme")
+        }
+    }
+    override suspend fun setTheme(theme: String) {
+        localKeyValueStorage.theme = theme
+    }
 
 }
