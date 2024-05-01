@@ -1,8 +1,9 @@
 package com.gp.socialapp.presentation.settings
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Lock
@@ -29,7 +30,13 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.gp.socialapp.presentation.settings.components.SettingsTabItem
+import com.gp.socialapp.data.auth.source.remote.model.User
+import com.gp.socialapp.data.auth.source.remote.model.UserSettings
+import com.gp.socialapp.presentation.settings.components.AccountSettingsSection
+import com.gp.socialapp.presentation.settings.components.DisplaySettingsContent
+import com.gp.socialapp.presentation.settings.components.NotificationsSettingsSection
+import com.gp.socialapp.presentation.settings.components.PrivacySettingsSection
+import com.gp.socialapp.presentation.settings.components.SecuritySettingsSection
 
 object MainSettingsScreen : Screen {
     @Composable
@@ -37,72 +44,60 @@ object MainSettingsScreen : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = navigator.rememberNavigatorScreenModel<SettingsScreenModel>()
         val state by screenModel.state.collectAsState()
-        MainSettingsContent(
-            onBackPressed = { navigator.pop() },
-            onSettingsTabClick = { tab ->
-                when (tab) {
-                    SettingsTab.ACCOUNT -> navigator.push(AccountSettingsScreen)
-                    SettingsTab.SIGN_IN_SECURITY -> navigator.push(SecuritySettingsScreen)
-                    SettingsTab.PRIVACY_SAFETY -> navigator.push(PrivacySettingsScreen)
-                    SettingsTab.NOTIFICATIONS -> navigator.push(NotificationsSettingsScreen)
-                    SettingsTab.ACCESSIBILITY_DISPLAY_LANGUAGES -> navigator.push(DisplaySettingsScreen)
-                    SettingsTab.ADDITIONAL_RESOURCES -> navigator.push(AdditionalResourcesScreen)
-                }
-            }
-        )
+        MainSettingsContent(onBackPressed = { navigator.pop() },
+            currentUser = state.currentUser,
+            currentUserSettings = state.currentUserSettings,
+            onAction = { action -> screenModel.onAction(action) })
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     private fun MainSettingsContent(
         modifier: Modifier = Modifier,
-        onSettingsTabClick: (SettingsTab) -> Unit,
+        currentUser: User,
+        currentUserSettings: UserSettings,
+        onAction: (SettingsAction) -> Unit,
         onBackPressed: () -> Unit
     ) {
-        Scaffold(
-            modifier = modifier,
-            topBar = {
-                TopAppBar(
-                    title = {
-                        Text(
-                            text = "Settings",
-                            style = MaterialTheme.typography.titleMedium
-                        )
-                    },
-                    navigationIcon = {
-                        IconButton(onClick = { onBackPressed() }){
-                            Icon(
-                                imageVector = Icons.Default.ArrowBackIosNew,
-                                contentDescription = "Back"
-                            )
-                        }
-                    }
+        Scaffold(modifier = modifier, topBar = {
+            TopAppBar(title = {
+                Text(
+                    text = "Settings", style = MaterialTheme.typography.titleMedium
                 )
-                HorizontalDivider()
-            }
-        ) {
-            LazyColumn(
-                modifier = Modifier
-                    .padding(it)
-                    .padding(16.dp)
-            ) {
-                items(SettingsTab.entries) { tab ->
-                    SettingsTabItem(
-                        title = tab.title,
-                        description = tab.description,
-                        icon = tab.icon,
-                        onClick = { onSettingsTabClick(tab) }
+            }, navigationIcon = {
+                IconButton(onClick = { onBackPressed() }) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBackIosNew, contentDescription = "Back"
                     )
                 }
+            })
+            HorizontalDivider()
+        }) {
+            Column(
+                modifier = Modifier.padding(it).padding(16.dp).verticalScroll(rememberScrollState())
+            ) {
+                AccountSettingsSection(
+                    currentUser = currentUser, onAction = onAction
+                )
+                SecuritySettingsSection(
+                    currentUser = currentUser,
+                    currentUserSettings = currentUserSettings,
+                    onAction = onAction
+                )
+                PrivacySettingsSection(
+                    currentUser = currentUser,
+                    currentUserSettings = currentUserSettings,
+                    onAction = onAction
+                )
+                NotificationsSettingsSection(
+                    currentUser = currentUser,
+                    currentUserSettings = currentUserSettings,
+                    onAction = onAction
+                )
+                DisplaySettingsContent(
+                    currentUserSettings = currentUserSettings, onAction = onAction
+                )
             }
         }
     }
-}
-enum class SettingsTab(val title: String, val icon: ImageVector, val description: String,) {
-    ACCOUNT("Your account", Icons.Default.ManageAccounts, "See and manage information about your account."),
-    SIGN_IN_SECURITY("Sign-in & security", Icons.Default.Lock, "Manage your sign-in & security settings."),
-    PRIVACY_SAFETY("Privacy & safety", Icons.Default.Security, "Manage you privacy and safety settings."),
-    NOTIFICATIONS("Notifications", Icons.Default.NotificationsActive, "Manage your notification settings."),
-    ACCESSIBILITY_DISPLAY_LANGUAGES("Display and languages", Icons.Default.SettingsAccessibility, "Manage how EduLink content is displayed to you."),
-    ADDITIONAL_RESOURCES("Additional Resources", Icons.Default.MoreHoriz, "See other resources about EduLink.")
 }
