@@ -14,9 +14,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.gp.socialapp.data.post.source.remote.model.Post
+import com.gp.socialapp.presentation.material.utils.MimeType
 import com.gp.socialapp.presentation.post.feed.PostEvent
 import com.gp.socialapp.util.LocalDateTimeUtil.toYYYYMMDD
-import com.mohamedrejeb.calf.picker.FilePickerFileType
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -77,7 +77,7 @@ fun FeedPostItem(
                 onCommentClicked = {
                     onPostEvent(PostEvent.OnCommentClicked(post.id))
                 },
-                filesCount = (post.attachments.filter { it.type != FilePickerFileType.ImageContentType }).size,
+                filesCount = (post.attachments.filter { MimeType.getMimeTypeFromFileName(it.name) !is MimeType.Image }).size,
                 currentUserID = currentUserID,
                 onShowFilesClicked = { onPostEvent(PostEvent.OnViewFilesAttachmentClicked(post.attachments)) },
                 onShareClicked = { onPostEvent(PostEvent.OnPostShareClicked(post)) }

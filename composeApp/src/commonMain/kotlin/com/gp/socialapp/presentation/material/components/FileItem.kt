@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gp.socialapp.data.material.model.MaterialFile
 import com.gp.socialapp.presentation.material.MaterialAction
-import com.gp.socialapp.presentation.material.utils.MimeType
+import com.gp.socialapp.presentation.material.utils.MimeType.Companion.getMimeTypeFromFileName
 import com.gp.socialapp.presentation.material.utils.getFileImageVector
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -43,7 +43,7 @@ fun FileItem(
         ) {
             Image(
                 imageVector = getFileImageVector(
-                    MimeType.getMimeTypeFromFileName(
+                    getMimeTypeFromFileName(
                         file.name
                     )
                 ),

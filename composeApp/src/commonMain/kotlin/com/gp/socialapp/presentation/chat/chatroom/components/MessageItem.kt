@@ -30,8 +30,8 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.gp.socialapp.data.chat.model.Message
 import com.gp.socialapp.data.chat.model.MessageAttachment
+import com.gp.socialapp.presentation.material.utils.MimeType
 import com.gp.socialapp.util.LocalDateTimeUtil.toHHMMTimestamp
-import com.mohamedrejeb.calf.picker.FilePickerFileType
 
 @Composable
 fun MessageItem(
@@ -93,7 +93,7 @@ fun MessageItem(
                     MessageUserName(name = message.senderName,
                         onUserClick = { onUserClicked(message.senderId) })
                 }
-                if (message.content.isBlank() && message.attachment.type == FilePickerFileType.ImageContentType) {
+                if (message.content.isBlank() && MimeType.getMimeTypeFromFileName(message.attachment.name) is MimeType.Image) {
                     val imageURL = message.attachment.url
                     ImageMessageWithTimestamp(
                         imageURL = imageURL,

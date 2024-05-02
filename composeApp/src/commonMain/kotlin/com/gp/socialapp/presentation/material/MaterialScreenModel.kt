@@ -6,7 +6,10 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import com.gp.socialapp.data.material.model.MaterialFolder
 import com.gp.socialapp.data.material.model.responses.MaterialResponse
 import com.gp.socialapp.data.material.repository.MaterialRepository
+
 import com.gp.socialapp.presentation.material.utils.MimeType
+import com.gp.socialapp.presentation.material.utils.MimeType.Companion.getFullMimeType
+import com.gp.socialapp.presentation.material.utils.MimeType.Companion.getMimeTypeFromFileName
 import com.gp.socialapp.util.DataError
 import com.gp.socialapp.util.DispatcherIO
 import com.gp.socialapp.util.Results
@@ -115,7 +118,8 @@ class MaterialScreenModel(
 
     private fun downloadFile(url: String, mimeType: MimeType) {
         screenModelScope.launch(DispatcherIO) {
-            materialRepo.downloadFile(url, mimeType.mimeType)
+            val fullMimeType = getFullMimeType(mimeType)
+            materialRepo.downloadFile(url, fullMimeType)
         }
     }
 
@@ -129,7 +133,7 @@ class MaterialScreenModel(
             is MaterialAction.OnFolderClicked -> openFolder(event.folder)
             is MaterialAction.OnDeleteFileClicked -> deleteFile(event.fileId)
             is MaterialAction.OnDownloadFileClicked -> downloadFile(
-                event.url, MimeType.getMimeTypeFromFileName(event.fileName)
+                event.url, getMimeTypeFromFileName(event.fileName)
             )
 
             is MaterialAction.OnRenameFolderClicked -> renameFolder(
@@ -138,7 +142,7 @@ class MaterialScreenModel(
             )
 
             is MaterialAction.OnFileClicked -> openFile(
-                event.fileId, event.url, MimeType.getMimeTypeFromFileName(event.fileName)
+                event.fileId, event.url, getMimeTypeFromFileName(event.fileName)
             )
 
             is MaterialAction.OnShareLinkClicked -> shareLink(event.url)
@@ -190,7 +194,8 @@ class MaterialScreenModel(
 
     private fun openFile(fileId: String, url: String, mimeType: MimeType) {
         screenModelScope.launch {
-            materialRepo.openFile(fileId, url, mimeType.mimeType)
+            val fullMimeType = getFullMimeType(mimeType)
+            materialRepo.openFile(fileId, url, fullMimeType)
         }
     }
 

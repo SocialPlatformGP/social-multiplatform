@@ -1,6 +1,5 @@
 package com.gp.socialapp.presentation.material.utils
 
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.gp.socialapp.presentation.material.components.imageVectors.MaterialIcon
 import com.gp.socialapp.presentation.material.components.imageVectors.materialicon.Ai
@@ -32,39 +31,39 @@ import com.gp.socialapp.presentation.material.components.imageVectors.materialic
 import com.gp.socialapp.presentation.material.components.imageVectors.materialicon.Xsl
 import com.gp.socialapp.presentation.material.components.imageVectors.materialicon.Zip
 
-@Composable
+
 fun getFileImageVector(type: MimeType): ImageVector {
     return when (type) {
-        MimeType.AI -> MaterialIcon.Ai
-        MimeType.AVI -> MaterialIcon.Avi
-        MimeType.BMP -> MaterialIcon.Bmp
-        MimeType.CSV -> MaterialIcon.Csv
-        MimeType.DOC -> MaterialIcon.Doc
-        MimeType.DOCX -> MaterialIcon.Docx
-        MimeType.EPS -> MaterialIcon.Eps
-        MimeType.EXE -> MaterialIcon.Exe
-        MimeType.GIF -> MaterialIcon.Giff
-        MimeType.HTML -> MaterialIcon.Html
-        MimeType.JPG -> MaterialIcon.Jpg
-        MimeType.JPEG -> MaterialIcon.Jpg
-        MimeType.MOV -> MaterialIcon.Mov
-        MimeType.MP3 -> MaterialIcon.Mp3
-        MimeType.MP4 -> MaterialIcon.Mp4
-        MimeType.MPEG -> MaterialIcon.Mpeg
-        MimeType.PDF -> MaterialIcon.Pdf
-        MimeType.PNG -> MaterialIcon.Png
-        MimeType.PPT -> MaterialIcon.Ppt
-        MimeType.PPTX -> MaterialIcon.Ppt
-        MimeType.PSD -> MaterialIcon.Psd
-        MimeType.RAR -> MaterialIcon.Rar
-        MimeType.SVG -> MaterialIcon.Svg
-        MimeType.TIFF -> MaterialIcon.Tiff
-        MimeType.TXT -> MaterialIcon.Txt
-        MimeType.WAV -> MaterialIcon.Wav
-        MimeType.XML -> MaterialIcon.Xml
-        MimeType.ZIP -> MaterialIcon.Zip
-        MimeType.XLS -> MaterialIcon.Xsl
-        MimeType.XLSX -> MaterialIcon.Xsl
+        MimeType.Text.CSV -> MaterialIcon.Csv
+        MimeType.Text.HTML -> MaterialIcon.Html
+        MimeType.Image.BMP -> MaterialIcon.Bmp
+        MimeType.Image.GIF -> MaterialIcon.Giff
+        MimeType.Image.JPG -> MaterialIcon.Jpg
+        MimeType.Image.JPEG -> MaterialIcon.Jpg
+        MimeType.Image.PNG -> MaterialIcon.Png
+        MimeType.Image.PSD -> MaterialIcon.Psd
+        MimeType.Image.SVG -> MaterialIcon.Svg
+        MimeType.Image.TIFF -> MaterialIcon.Tiff
+        MimeType.Video.AVI -> MaterialIcon.Avi
+        MimeType.Video.MOV -> MaterialIcon.Mov
+        MimeType.Video.MP4 -> MaterialIcon.Mp4
+        MimeType.Video.MPEG -> MaterialIcon.Mpeg
+        MimeType.Audio.MP3 -> MaterialIcon.Mp3
+        MimeType.Audio.WAV -> MaterialIcon.Wav
+        MimeType.Application.AI -> MaterialIcon.Ai
+        MimeType.Application.DOC -> MaterialIcon.Doc
+        MimeType.Application.DOCX -> MaterialIcon.Docx
+        MimeType.Application.EPS -> MaterialIcon.Eps
+        MimeType.Application.EXE -> MaterialIcon.Exe
+        MimeType.Application.PDF -> MaterialIcon.Pdf
+        MimeType.Application.PPT -> MaterialIcon.Ppt
+        MimeType.Application.PPTX -> MaterialIcon.Ppt
+        MimeType.Application.RAR -> MaterialIcon.Rar
+        MimeType.Application.TXT -> MaterialIcon.Txt
+        MimeType.Application.XML -> MaterialIcon.Xml
+        MimeType.Application.ZIP -> MaterialIcon.Zip
+        MimeType.Application.XLS -> MaterialIcon.Xsl
+        MimeType.Application.XLSX -> MaterialIcon.Xsl
         else -> MaterialIcon.File
     }
 }

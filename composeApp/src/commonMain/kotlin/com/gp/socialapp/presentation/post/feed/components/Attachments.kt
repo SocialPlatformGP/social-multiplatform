@@ -3,8 +3,8 @@ package com.gp.socialapp.presentation.post.feed.components
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.Dp
 import com.gp.socialapp.data.post.source.remote.model.PostAttachment
+import com.gp.socialapp.presentation.material.utils.MimeType
 import com.gp.socialapp.presentation.post.feed.PostEvent
-import com.mohamedrejeb.calf.picker.FilePickerFileType
 
 @Composable
 fun Attachments(
@@ -13,7 +13,7 @@ fun Attachments(
     onPostEvent: (PostEvent) -> Unit
 ) {
     val images = attachments.filter {
-        it.type == FilePickerFileType.ImageContentType
+        MimeType.getMimeTypeFromFileName(it.name) is MimeType.Image
     }
     images.forEach { _ ->
         ImagePager(
