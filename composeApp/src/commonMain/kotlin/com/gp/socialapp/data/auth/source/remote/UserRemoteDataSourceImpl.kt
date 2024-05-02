@@ -139,8 +139,11 @@ class UserRemoteDataSourceImpl(
         }
     }
 
-    override suspend fun updateUserAvatar(avatarByteArray: ByteArray, userId: String): Result<Nothing> {
-        return try{
+    override suspend fun updateUserAvatar(
+        avatarByteArray: ByteArray,
+        userId: String
+    ): Result<Nothing> {
+        return try {
             uploadUserPfp(avatarByteArray, userId).let { result ->
                 if (result is Result.SuccessWithData) {
                     supabaseClient.auth.updateUser {
@@ -161,6 +164,7 @@ class UserRemoteDataSourceImpl(
             Result.Error(e.message ?: "An unknown error occurred")
         }
     }
+
     override suspend fun getUserSettings(): Result<UserSettings> {
         val userInfo = supabaseClient.auth.sessionManager.loadSession()?.user
         return if (userInfo != null) {
@@ -246,16 +250,24 @@ class UserRemoteDataSourceImpl(
     ): Result<Nothing> {
         return try {
             supabaseClient.auth.updateUser {
-                data{
+                data {
                     put(tag, value)
                 }
             }
-            val request = when(tag){
-                UserData.ALLOW_MESSAGES_FROM.value -> UpdateUserRequest.UpdateAllowMessagesFrom(userId, value)
-                UserData.WHO_CAN_ADD_TO_GROUPS.value -> UpdateUserRequest.UpdateWhoCanAddToGroups(userId, value)
+            val request = when (tag) {
+                UserData.ALLOW_MESSAGES_FROM.value -> UpdateUserRequest.UpdateAllowMessagesFrom(
+                    userId,
+                    value
+                )
+
+                UserData.WHO_CAN_ADD_TO_GROUPS.value -> UpdateUserRequest.UpdateWhoCanAddToGroups(
+                    userId,
+                    value
+                )
+
                 else -> return Result.Error("Invalid tag")
             }
-            val endpoint = when(tag){
+            val endpoint = when (tag) {
                 UserData.ALLOW_MESSAGES_FROM.value -> UpdateUserEndpoint.UpdateAllowMessagesFrom
                 UserData.WHO_CAN_ADD_TO_GROUPS.value -> UpdateUserEndpoint.UpdateWhoCanAddToGroups
                 else -> return Result.Error("Invalid tag")
@@ -277,19 +289,39 @@ class UserRemoteDataSourceImpl(
     ): Result<Nothing> {
         return try {
             supabaseClient.auth.updateUser {
-                data{
+                data {
                     put(tag, value)
                 }
             }
-            val request = when(tag){
-                UserData.ALLOW_NOTIFICATIONS.value -> UpdateUserRequest.UpdateIsNotificationsAllowed(userId, value)
-                UserData.ALLOW_POST_NOTIFICATIONS.value -> UpdateUserRequest.UpdateIsPostNotificationsAllowed(userId, value)
-                UserData.ALLOW_CHAT_NOTIFICATIONS.value -> UpdateUserRequest.UpdateIsChatNotificationsAllowed(userId, value)
-                UserData.ALLOW_ASSIGNMENTS_NOTIFICATIONS.value -> UpdateUserRequest.UpdateIsAssignmentsNotificationsAllowed(userId, value)
-                UserData.ALLOW_CALENDAR_NOTIFICATIONS.value -> UpdateUserRequest.UpdateIsCalendarNotificationsAllowed(userId, value)
+            val request = when (tag) {
+                UserData.ALLOW_NOTIFICATIONS.value -> UpdateUserRequest.UpdateIsNotificationsAllowed(
+                    userId,
+                    value
+                )
+
+                UserData.ALLOW_POST_NOTIFICATIONS.value -> UpdateUserRequest.UpdateIsPostNotificationsAllowed(
+                    userId,
+                    value
+                )
+
+                UserData.ALLOW_CHAT_NOTIFICATIONS.value -> UpdateUserRequest.UpdateIsChatNotificationsAllowed(
+                    userId,
+                    value
+                )
+
+                UserData.ALLOW_ASSIGNMENTS_NOTIFICATIONS.value -> UpdateUserRequest.UpdateIsAssignmentsNotificationsAllowed(
+                    userId,
+                    value
+                )
+
+                UserData.ALLOW_CALENDAR_NOTIFICATIONS.value -> UpdateUserRequest.UpdateIsCalendarNotificationsAllowed(
+                    userId,
+                    value
+                )
+
                 else -> return Result.Error("Invalid tag")
             }
-            val endpoint = when(tag){
+            val endpoint = when (tag) {
                 UserData.ALLOW_NOTIFICATIONS.value -> UpdateUserEndpoint.UpdateIsNotificationsAllowed
                 UserData.ALLOW_POST_NOTIFICATIONS.value -> UpdateUserEndpoint.UpdateIsPostNotificationsAllowed
                 UserData.ALLOW_CHAT_NOTIFICATIONS.value -> UpdateUserEndpoint.UpdateIsChatNotificationsAllowed
@@ -372,22 +404,27 @@ class UserRemoteDataSourceImpl(
                 emit(Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN))
             }
         }
-    private suspend fun updateRemoteUser(request: UpdateUserRequest, endpoint: UpdateUserEndpoint) : Result<Nothing>{
-        return try{
+
+    private suspend fun updateRemoteUser(
+        request: UpdateUserRequest,
+        endpoint: UpdateUserEndpoint
+    ): Result<Nothing> {
+        return try {
             val response = httpClient.post {
                 endPoint(endpoint.route)
                 setBody(request)
             }
-            if(response.status == HttpStatusCode.OK){
+            if (response.status == HttpStatusCode.OK) {
                 Result.Success
             } else {
                 Result.Error("An unknown error occurred")
             }
-        } catch(e: Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
             Result.Error(e.message ?: "An unknown error occurred")
         }
     }
+
     override fun joinCommunity(
         id: String,
         code: String

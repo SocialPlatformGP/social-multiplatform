@@ -163,7 +163,7 @@ fun UserProfileContent(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = state.user.firstName + " " + state.user.lastName, //replace with user name
+                        text = state.user.name + " " + state.user.name, //replace with user name
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
                         textAlign = androidx.compose.ui.text.style.TextAlign.Start,
