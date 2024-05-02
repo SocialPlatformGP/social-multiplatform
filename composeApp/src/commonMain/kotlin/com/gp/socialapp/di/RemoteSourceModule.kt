@@ -1,5 +1,7 @@
 package com.gp.socialapp.di
 
+import com.gp.socialapp.data.assignment.source.remote.AssignmentRemoteDataSource
+import com.gp.socialapp.data.assignment.source.remote.AssignmentRemoteDataSourceImpl
 import com.gp.socialapp.data.auth.source.remote.AuthenticationRemoteDataSource
 import com.gp.socialapp.data.auth.source.remote.AuthenticationRemoteDataSourceImpl
 import com.gp.socialapp.data.auth.source.remote.UserRemoteDataSource
@@ -57,6 +59,7 @@ val remoteDataSourceModuleK = DI.Module("remoteDataSourceModule") {
     bind<UserRemoteDataSource>() with singleton { UserRemoteDataSourceImpl(instance(), instance()) }
     bind<CommunityRemoteDataSource>() with singleton { CommunityRemoteDataSourceImpl(instance()) }
     bind<SocketService>() with singleton { SocketServiceImpl(instance()) }
+    bind<AssignmentRemoteDataSource>() with singleton { AssignmentRemoteDataSourceImpl() }
     bind<HttpClient>() with singleton {
         HttpClient {
             install(ContentNegotiation) {

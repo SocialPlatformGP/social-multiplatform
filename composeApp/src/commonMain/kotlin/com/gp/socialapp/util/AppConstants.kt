@@ -5,13 +5,12 @@ object AppConstants {
         USER_TOKEN,
         USER_ID,
         POST_LAST_UPDATED,
-        APP_THEME,
-        RECENT_SEARCHES;
-
+        RECENT_SEARCHES,
+        APP_THEME;
         val key get() = this.name
     }
 
     val DB_NAME = "edulink.db"
-    const val BASE_URL = "http://192.168.1.4:8080/"
-    const val SOCKET_URL = "ws://192.168.1.4:8080/"
+    const val BASE_URL = "http://192.168.1.7:8080/"
+    const val SOCKET_URL = "ws://192.168.1.7:8080/"
 }

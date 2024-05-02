@@ -1,5 +1,7 @@
 package com.gp.socialapp.di
 
+import com.gp.socialapp.data.assignment.repository.AssignmentRepository
+import com.gp.socialapp.data.assignment.repository.AssignmentRepositoryImpl
 import com.gp.socialapp.data.auth.repository.AuthenticationRepository
 import com.gp.socialapp.data.auth.repository.AuthenticationRepositoryImpl
 import com.gp.socialapp.data.auth.repository.UserRepository
@@ -51,6 +53,7 @@ val repositoryModuleK = DI.Module("repositoryModule") {
     bind<MessageRepository>() with singleton { MessageRepositoryImpl(instance(), instance(), instance(), instance()) }
     bind<RecentRoomRepository>() with singleton { RecentRoomRepositoryImpl(instance(), instance()) }
     bind<RoomRepository>() with singleton { RoomRepositoryImpl(instance()) }
+    bind<AssignmentRepository>() with singleton { AssignmentRepositoryImpl() }
 }
 
 
