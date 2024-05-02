@@ -1,5 +1,4 @@
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -23,7 +22,6 @@ import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gp.socialapp.data.post.source.remote.model.Post
-import com.gp.socialapp.data.post.source.remote.model.Tag
 import com.gp.socialapp.presentation.post.create.component.BottomOptionRow
 import com.gp.socialapp.presentation.post.create.component.CreatePostTopBar
 import com.gp.socialapp.presentation.post.create.component.FilesRow
@@ -71,10 +69,9 @@ class EditPostScreen(val post: Post) : Screen {
             )
         }
     }
-
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun EditPostContent(
     action: (EditPostAction) -> Unit,
@@ -89,36 +86,10 @@ private fun EditPostContent(
     )
     var existingTagsDialogState by remember { mutableStateOf(false) }
     var newTagDialogState by remember { mutableStateOf(false) }
-    var selectedTags: List<Tag> by remember { mutableStateOf(emptyList()) }
     val context = LocalPlatformContext.current
-    val imagePicker = rememberFilePickerLauncher(
-        type = FilePickerFileType.Image,
-        selectionMode = FilePickerSelectionMode.Multiple,
-        onResult = { files ->
-            uploadPostFiles(
-                scope,
-                files,
-                context,
-                { action(EditPostAction.OnFileAdded(it)) },
-                FilePickerFileType.ImageContentType
-            )
-        }
-    )
-    val videoPicker = rememberFilePickerLauncher(
-        type = FilePickerFileType.Video,
-        selectionMode = FilePickerSelectionMode.Multiple,
-        onResult = { files ->
-            uploadPostFiles(
-                scope,
-                files,
-                context,
-                { action(EditPostAction.OnFileAdded(it)) },
-                FilePickerFileType.VideoContentType
-            )
-        }
-    )
+    var pickedFileType: FilePickerFileType by remember { mutableStateOf(FilePickerFileType.All) }
     val filePicker = rememberFilePickerLauncher(
-        type = FilePickerFileType.All,
+        type = pickedFileType,
         selectionMode = FilePickerSelectionMode.Multiple,
         onResult = { files ->
             uploadPostFiles(
@@ -126,8 +97,8 @@ private fun EditPostContent(
                 files,
                 context,
                 { action(EditPostAction.OnFileAdded(it)) },
-                FilePickerFileType.AllContentType
             )
+            pickedFileType = FilePickerFileType.All
         }
     )
     Scaffold(
@@ -184,7 +155,8 @@ private fun EditPostContent(
                     filePicker.launch()
                 },
                 onAddImageClicked = {
-                    imagePicker.launch()
+                    pickedFileType = FilePickerFileType.Image
+                    filePicker.launch()
                 },
                 onAddTagClicked = {
                     scope.launch { bottomSheetState.show() }.invokeOnCompletion {
@@ -194,7 +166,8 @@ private fun EditPostContent(
                     }
                 },
                 onAddVideoClicked = {
-                    videoPicker.launch()
+                    pickedFileType = FilePickerFileType.Video
+                    filePicker.launch()
                 },
                 pickedFileType = state.postAttachments.firstOrNull()?.type ?: ""
             )

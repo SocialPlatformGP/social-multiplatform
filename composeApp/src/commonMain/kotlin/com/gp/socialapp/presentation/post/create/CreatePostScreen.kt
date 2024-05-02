@@ -25,6 +25,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gp.socialapp.data.post.source.remote.model.PostAttachment
 import com.gp.socialapp.data.post.source.remote.model.Tag
+import com.gp.socialapp.presentation.material.utils.MimeType
 import com.gp.socialapp.presentation.post.create.component.BottomOptionRow
 import com.gp.socialapp.presentation.post.create.component.CreatePostTopBar
 import com.gp.socialapp.presentation.post.create.component.FilesRow
@@ -108,38 +109,12 @@ data class CreatePostScreen(val openedFeedTab: FeedTab, val communityId: String)
         )
         var existingTagsDialogState by remember { mutableStateOf(false) }
         var newTagDialogState by remember { mutableStateOf(false) }
-        var selectedTags: List<Tag> by remember { mutableStateOf(emptyList()) }
         var title by remember { mutableStateOf("") }
         var body by remember { mutableStateOf("") }
         val context = LocalPlatformContext.current
-        val imagePicker = rememberFilePickerLauncher(
-            type = FilePickerFileType.Image,
-            selectionMode = FilePickerSelectionMode.Multiple,
-            onResult = { files ->
-                uploadPostFiles(
-                    scope,
-                    files,
-                    context,
-                    onAddFile,
-                    FilePickerFileType.ImageContentType
-                )
-            }
-        )
-        val videoPicker = rememberFilePickerLauncher(
-            type = FilePickerFileType.Video,
-            selectionMode = FilePickerSelectionMode.Multiple,
-            onResult = { files ->
-                uploadPostFiles(
-                    scope,
-                    files,
-                    context,
-                    onAddFile,
-                    FilePickerFileType.VideoContentType
-                )
-            }
-        )
+        var pickedFileTypes: FilePickerFileType by remember { mutableStateOf(FilePickerFileType.All) }
         val filePicker = rememberFilePickerLauncher(
-            type = FilePickerFileType.All,
+            type = pickedFileTypes,
             selectionMode = FilePickerSelectionMode.Multiple,
             onResult = { files ->
                 uploadPostFiles(
@@ -147,8 +122,8 @@ data class CreatePostScreen(val openedFeedTab: FeedTab, val communityId: String)
                     files,
                     context,
                     onAddFile,
-                    FilePickerFileType.AllContentType
                 )
+                pickedFileTypes = FilePickerFileType.All
             }
         )
         Scaffold(
@@ -205,7 +180,8 @@ data class CreatePostScreen(val openedFeedTab: FeedTab, val communityId: String)
                         filePicker.launch()
                     },
                     onAddImageClicked = {
-                        imagePicker.launch()
+                        pickedFileTypes = FilePickerFileType.Image
+                        filePicker.launch()
                     },
                     onAddTagClicked = {
                         scope.launch { bottomSheetState.show() }.invokeOnCompletion {
@@ -215,7 +191,8 @@ data class CreatePostScreen(val openedFeedTab: FeedTab, val communityId: String)
                         }
                     },
                     onAddVideoClicked = {
-                        videoPicker.launch()
+                        pickedFileTypes = FilePickerFileType.Video
+                        filePicker.launch()
                     },
                     pickedFileType = state.files.firstOrNull()?.type ?: ""
                 )
@@ -263,16 +240,17 @@ fun uploadPostFiles(
     files: List<KmpFile>,
     context: PlatformContext,
     onAddFile: (PostAttachment) -> Unit,
-    type: String
 ) {
     scope.launch {
         files.forEach { file ->
             val image = file.readByteArray(context)
+            val type = MimeType.getMimeTypeFromFileName(file.getName(context) ?: "")
+            val extension = MimeType.getExtensionFromMimeType(type)
             onAddFile(
                 PostAttachment(
                     file = image,
                     name = file.getName(context) ?: "",
-                    type = type,
+                    type = extension,
                     size = image.size.toLong()
                 )
             )

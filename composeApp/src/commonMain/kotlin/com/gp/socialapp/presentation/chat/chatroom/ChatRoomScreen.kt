@@ -35,6 +35,7 @@ import com.gp.socialapp.presentation.chat.chatroom.components.ImagePreviewDialog
 import com.gp.socialapp.presentation.chat.chatroom.components.MessageInput
 import com.gp.socialapp.presentation.chat.chatroom.components.MessagesContent
 import com.gp.socialapp.presentation.chat.groupdetails.GroupDetailsScreen
+import com.gp.socialapp.presentation.material.utils.MimeType
 import com.gp.socialapp.util.AppConstants.BASE_URL
 import com.mohamedrejeb.calf.core.LocalPlatformContext
 import com.mohamedrejeb.calf.io.getName
@@ -118,18 +119,9 @@ data class ChatRoomScreen(
                     files.firstOrNull()?.let { file ->
                         val bytearray = file.readByteArray(context)
                         val name = file.getName(context) ?: ""
-                        val type = when (pickedFileType) {
-                            FilePickerFileType.Image -> FilePickerFileType.ImageContentType
-                            FilePickerFileType.Video -> FilePickerFileType.VideoContentType
-                            FilePickerFileType.Audio -> FilePickerFileType.AudioContentType
-                            FilePickerFileType.Pdf -> FilePickerFileType.PdfContentType
-                            FilePickerFileType.Word -> FilePickerFileType.WordDocumentContentType
-                            FilePickerFileType.Spreadsheet -> FilePickerFileType.ExcelSpreadsheetContentType
-                            FilePickerFileType.Presentation -> FilePickerFileType.PowerPointPresentationContentType
-                            FilePickerFileType.Text -> FilePickerFileType.TextContentType
-                            else -> FilePickerFileType.AllContentType
-                        }
-                        onAction(ChatRoomAction.OnAttachmentPicked(bytearray, name, type))
+                        val type = MimeType.getMimeTypeFromFileName(name)
+                        val extension = MimeType.getExtensionFromMimeType(type)
+                        onAction(ChatRoomAction.OnAttachmentPicked(bytearray, name, extension))
                         pickedFileType = FilePickerFileType.All
                     }
                 }

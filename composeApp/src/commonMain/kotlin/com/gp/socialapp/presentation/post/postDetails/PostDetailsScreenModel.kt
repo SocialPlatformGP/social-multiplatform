@@ -5,11 +5,11 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import com.gp.socialapp.data.auth.repository.AuthenticationRepository
 import com.gp.socialapp.data.post.repository.PostRepository
 import com.gp.socialapp.data.post.repository.ReplyRepository
-import com.gp.socialapp.presentation.material.utils.MimeType
 import com.gp.socialapp.data.post.source.remote.model.Post
 import com.gp.socialapp.data.post.source.remote.model.PostAttachment
 import com.gp.socialapp.data.post.source.remote.model.Reply
 import com.gp.socialapp.data.post.util.ToNestedReplies.toNestedReplies
+import com.gp.socialapp.presentation.material.utils.MimeType
 import com.gp.socialapp.presentation.post.feed.PostEvent
 import com.gp.socialapp.presentation.post.feed.ReplyEvent
 import com.gp.socialapp.util.DispatcherIO
@@ -30,15 +30,17 @@ class PostDetailsScreenModel(
     val uiState = _uiState.asStateFlow()
     fun initScreenModel(post: Post) {
         screenModelScope.launch(DispatcherIO) {
-            authRepo.getSignedInUser().let{ result ->
-                when(result){
+            authRepo.getSignedInUser().let { result ->
+                when (result) {
                     is Result.SuccessWithData -> {
                         _uiState.update { it.copy(post = post, currentUserId = result.data.id) }
                     }
+
                     is Result.Error -> {
                         Napier.e("Error: ${result.message}")
                         //TODO Handle error
                     }
+
                     else -> Unit
                 }
             }
@@ -363,17 +365,20 @@ class PostDetailsScreenModel(
                 println("reply in screen model: $reply")
                 insertReply(reply)
             }
+
             is PostEvent.OnAttachmentClicked -> {
                 openAttachment(event.attachment)
             }
+
             else -> {}
         }
     }
 
     private fun openAttachment(attachment: PostAttachment) {
-        screenModelScope.launch (DispatcherIO){
-            val mimeType = MimeType.getMimeTypeFromFileName(attachment.name).mimeType
-            postRepo.openAttachment(attachment.url, mimeType)
+        screenModelScope.launch(DispatcherIO) {
+            val mimeType = MimeType.getMimeTypeFromFileName(attachment.name)
+            val fullMimeType = MimeType.getFullMimeType(mimeType)
+            postRepo.openAttachment(attachment.url, fullMimeType)
         }
     }
 
@@ -397,6 +402,7 @@ class PostDetailsScreenModel(
             is ReplyEvent.OnReplyReported -> {
                 reportReply(event.reply)
             }
+
             is ReplyEvent.OnReplyEdited -> {
                 updateReply(event.reply)
             }

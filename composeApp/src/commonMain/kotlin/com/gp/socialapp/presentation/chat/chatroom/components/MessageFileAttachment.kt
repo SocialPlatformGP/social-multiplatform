@@ -26,6 +26,7 @@ import com.gp.socialapp.presentation.chat.chatroom.components.imagevectors.filet
 import com.gp.socialapp.presentation.chat.chatroom.components.imagevectors.filetypeicons.Text
 import com.gp.socialapp.presentation.chat.chatroom.components.imagevectors.filetypeicons.Video
 import com.gp.socialapp.presentation.chat.chatroom.components.imagevectors.filetypeicons.Word
+import com.gp.socialapp.presentation.material.utils.MimeType
 import com.mohamedrejeb.calf.picker.FilePickerFileType
 
 @Composable
@@ -40,11 +41,14 @@ fun MessageFileAttachment(
         color = Color(0f, 0f, 0f, 0.15f),
         shape = RoundedCornerShape(20.dp, 20.dp, 20.dp, 20.dp),
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically,
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
             modifier = modifier.clickable { onFileClicked() }.padding(8.dp)
         ) {
             Icon(
-                imageVector = getFileImageVector(fileType),
+                imageVector = com.gp.socialapp.presentation.material.utils.getFileImageVector(
+                    MimeType.getMimeTypeFromFileName(fileName)
+                ),
                 contentDescription = null,
                 tint = Color.Unspecified,
                 modifier = Modifier.size(32.dp)

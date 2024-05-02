@@ -58,13 +58,13 @@ import com.gp.socialapp.data.community.source.remote.model.isAdmin
 import com.gp.socialapp.data.post.source.remote.model.Post
 import com.gp.socialapp.data.post.source.remote.model.PostAttachment
 import com.gp.socialapp.presentation.auth.login.LoginScreen
+import com.gp.socialapp.presentation.material.utils.MimeType
 import com.gp.socialapp.presentation.post.create.CreatePostScreen
 import com.gp.socialapp.presentation.post.feed.components.FeedPostItem
 import com.gp.socialapp.presentation.post.feed.components.FilesBottomSheet
 import com.gp.socialapp.presentation.post.postDetails.PostDetailsScreen
 import com.gp.socialapp.presentation.post.search.SearchScreen
 import com.gp.socialapp.presentation.post.searchResult.SearchResultScreen
-import com.mohamedrejeb.calf.picker.FilePickerFileType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -82,7 +82,7 @@ data class FeedScreen(val communityId: String) : Screen {
         val screenModel = rememberScreenModel<FeedScreenModel>()
         LaunchedEffect(true)
         { screenModel.initScreen(communityId) }
-        
+
         var currentAttachments by remember { mutableStateOf(emptyList<PostAttachment>()) }
         val scope = rememberCoroutineScope()
         val state by screenModel.state.collectAsState()
@@ -307,7 +307,11 @@ data class FeedScreen(val communityId: String) : Screen {
                 }
                 if (isFileBottomSheetOpen) {
                     FilesBottomSheet(
-                        attachments = currentAttachments.filter { it.type != FilePickerFileType.ImageContentType },
+                        attachments = currentAttachments.filter {
+                            MimeType.getMimeTypeFromFileName(
+                                it.name
+                            ) !is MimeType.Image
+                        },
                         onDismiss = onDismissBottomSheet,
                         onPostEvent = onPostEvent,
                         state = bottomSheetState,

@@ -6,7 +6,9 @@ import com.gp.socialapp.data.auth.repository.AuthenticationRepository
 import com.gp.socialapp.data.chat.model.MessageAttachment
 import com.gp.socialapp.data.chat.repository.MessageRepository
 import com.gp.socialapp.data.chat.repository.RoomRepository
-import com.gp.socialapp.presentation.material.utils.MimeType
+
+import com.gp.socialapp.presentation.material.utils.MimeType.Companion.getExtensionFromMimeType
+import com.gp.socialapp.presentation.material.utils.MimeType.Companion.getMimeTypeFromFileName
 import com.gp.socialapp.util.DispatcherIO
 import com.gp.socialapp.util.Result
 import kotlinx.coroutines.Job
@@ -73,14 +75,16 @@ class ChatRoomScreenModel(
 
     private fun getCurrentUserId() {
         screenModelScope.launch(DispatcherIO) {
-            authRepo.getSignedInUser().let{
-                when(it) {
+            authRepo.getSignedInUser().let {
+                when (it) {
                     is Result.SuccessWithData -> {
                         updateCurrentUserId(it.data.id)
                     }
+
                     is Result.Error -> {
                         //TODO handle error
                     }
+
                     else -> Unit
                 }
             }
@@ -171,9 +175,10 @@ class ChatRoomScreenModel(
     }
 
     private fun openAttachment(attachment: MessageAttachment) {
-        screenModelScope.launch (DispatcherIO) {
-            val mimeType = MimeType.getMimeTypeFromFileName(attachment.name).mimeType
-            messageRepo.openAttachment(attachment.url, mimeType)
+        screenModelScope.launch(DispatcherIO) {
+            val mimeType = getMimeTypeFromFileName(attachment.name)
+            val extension = getExtensionFromMimeType(mimeType)
+            messageRepo.openAttachment(attachment.url, extension)
         }
     }
 }
