@@ -13,6 +13,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.gp.socialapp.data.post.source.remote.model.PostAttachment
 import com.gp.socialapp.presentation.material.utils.MimeType
@@ -44,6 +45,7 @@ fun FilesRow(
                         )
 
                         else -> Icon(
+                            tint = Color.Unspecified,
                             imageVector = getFileImageVector(mimeType),
                             contentDescription = null,
                             modifier = Modifier.fillMaxSize(0.5f).align(Alignment.Center)
@@ -59,6 +61,7 @@ fun FilesRow(
                     )
                 } else {
                     Icon(
+                        tint = Color.Unspecified,
                         imageVector = getFileImageVector(mimeType),
                         contentDescription = null,
                         modifier = Modifier.fillMaxSize(0.5f).align(Alignment.Center)

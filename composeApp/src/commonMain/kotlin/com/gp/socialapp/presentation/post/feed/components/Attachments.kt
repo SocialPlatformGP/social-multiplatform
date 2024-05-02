@@ -15,19 +15,18 @@ fun Attachments(
     val images = attachments.filter {
         MimeType.getMimeTypeFromFileName(it.name) is MimeType.Image
     }
-    images.forEach { _ ->
-        ImagePager(
-            pageCount = images.size,
-            images = images,
-            width = width,
-            onImageClicked = { selectedImage ->
-                onPostEvent(
-                    PostEvent.OnImageClicked(
-                        selectedImage
-                    )
+    ImagePager(
+        pageCount = images.size,
+        images = images,
+        width = width,
+        onImageClicked = { selectedImage ->
+            onPostEvent(
+                PostEvent.OnImageClicked(
+                    selectedImage
                 )
-            },
-        )
-    }
+            )
+        },
+    )
+
 
 }
