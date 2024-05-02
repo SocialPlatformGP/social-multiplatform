@@ -135,6 +135,7 @@ class CreateAssignmentScreenModel(
 
     private fun updateDueDate(dueDate: Long) {
         _uiState.update {
+            println("Due date: $dueDate")
             it.copy(dueDate = dueDate)
         }
     }

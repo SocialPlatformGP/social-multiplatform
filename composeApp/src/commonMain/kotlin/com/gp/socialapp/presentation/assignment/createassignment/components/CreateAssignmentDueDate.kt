@@ -117,27 +117,27 @@ fun CreateAssignmentDueDate(
                 readOnly = true,
                 enabled = false
             )
-            OutlinedTextField(
-                value = formattedTime,
-                onValueChange = {},
-                label = { Text(text = stringResource(Res.string.date_of_birth)) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 4.dp)
-                    .clickable {
-                        isTimeDialogOpen = true
-                    },
-
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Filled.Schedule,
-                        contentDescription = null,
-                    )
-                },
-                maxLines = 1,
-                readOnly = true,
-                enabled = false
-            )
+//            OutlinedTextField(
+//                value = formattedTime,
+//                onValueChange = {},
+//                label = { Text(text = "Time") },
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .padding(top = 4.dp)
+//                    .clickable {
+//                        isTimeDialogOpen = true
+//                    },
+//
+//                leadingIcon = {
+//                    Icon(
+//                        imageVector = Icons.Filled.Schedule,
+//                        contentDescription = null,
+//                    )
+//                },
+//                maxLines = 1,
+//                readOnly = true,
+//                enabled = false
+//            )
             if (isDateDialogOpen) {
                 val confirmEnabled = remember {
                     derivedStateOf { datePickerState.selectedDateMillis != null }
@@ -170,19 +170,20 @@ fun CreateAssignmentDueDate(
                 ) {
                     DatePicker(state = datePickerState)
                 }
-            } else if (isTimeDialogOpen) {
-                TimePickerDialog(
-                    onCancel = { isTimeDialogOpen = false },
-                    onConfirm = {
-                        isTimeDialogOpen = false
-                        val extraMillis =
-                            timePickerState.hour * 60 * 60 * 1000 + timePickerState.minute * 60 * 1000
-                        onDueDateChanged(pickedDateMillis + extraMillis)
-                    },
-                ) {
-                    TimePicker(state = timePickerState)
-                }
             }
+//            else if (isTimeDialogOpen) {
+//                TimePickerDialog(
+//                    onCancel = { isTimeDialogOpen = false },
+//                    onConfirm = {
+//                        isTimeDialogOpen = false
+//                        val extraMillis =
+//                            timePickerState.hour * 60 * 60 * 1000 + timePickerState.minute * 60 * 1000
+//                        onDueDateChanged(pickedDateMillis + extraMillis)
+//                    },
+//                ) {
+//                    TimePicker(state = timePickerState)
+//                }
+//            }
         }
     }
 }

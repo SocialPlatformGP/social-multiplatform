@@ -59,7 +59,7 @@ val remoteDataSourceModuleK = DI.Module("remoteDataSourceModule") {
     bind<UserRemoteDataSource>() with singleton { UserRemoteDataSourceImpl(instance(), instance()) }
     bind<CommunityRemoteDataSource>() with singleton { CommunityRemoteDataSourceImpl(instance()) }
     bind<SocketService>() with singleton { SocketServiceImpl(instance()) }
-    bind<AssignmentRemoteDataSource>() with singleton { AssignmentRemoteDataSourceImpl() }
+    bind<AssignmentRemoteDataSource>() with singleton { AssignmentRemoteDataSourceImpl(instance()) }
     bind<HttpClient>() with singleton {
         HttpClient {
             install(ContentNegotiation) {
