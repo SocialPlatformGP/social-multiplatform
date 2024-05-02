@@ -32,6 +32,7 @@ import com.gp.socialapp.presentation.community.communityhome.components.Communit
 import com.gp.socialapp.presentation.community.communityhome.components.MainTopBar
 import com.gp.socialapp.presentation.home.container.HomeContainer
 import com.gp.socialapp.presentation.post.search.SearchScreen
+import com.gp.socialapp.presentation.settings.MainSettingsScreen
 import kotlinx.coroutines.launch
 
 
@@ -61,6 +62,7 @@ data class CommunityHomeContainer(
             userCommunities = state.userCommunities,
             onNavigateToHome = { navigator.replaceAll(HomeContainer()) },
             onNavigateToSearch = { navigator.push(SearchScreen) },
+            onNavigateToSettings = { navigator.push(MainSettingsScreen) },
             onLogout = { screenModel.logout() }
         )
 
@@ -72,6 +74,7 @@ data class CommunityHomeContainer(
         currentUser: User,
         userCommunities: List<Community>,
         onNavigateToHome: () -> Unit,
+        onNavigateToSettings: () -> Unit,
         onNavigateToSearch: () -> Unit,
         onLogout: () -> Unit,
     ) {
@@ -91,7 +94,7 @@ data class CommunityHomeContainer(
             communityId = communityId,
             communities = userCommunities,
             onNavigateToHome = onNavigateToHome,
-            onNavigateToSettings = { /*TODO*/ },
+            onNavigateToSettings = onNavigateToSettings,
             onLogout = onLogout
         ) {
             TabNavigator(defaultTab) { tabNavigator ->

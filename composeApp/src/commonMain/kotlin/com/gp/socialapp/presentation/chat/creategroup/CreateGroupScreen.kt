@@ -35,7 +35,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.presentation.chat.chatroom.ChatRoomScreen
 import com.gp.socialapp.presentation.chat.creategroup.components.ChooseGroupMembersSection
-import com.gp.socialapp.presentation.chat.creategroup.components.GroupAvatarSection
+import com.gp.socialapp.presentation.chat.creategroup.components.ModifiableAvatarSection
 import com.gp.socialapp.presentation.chat.creategroup.components.GroupNameSection
 
 object CreateGroupScreen : Screen {
@@ -122,7 +122,7 @@ object CreateGroupScreen : Screen {
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = modifier.fillMaxWidth()
                     ) {
-                        GroupAvatarSection(
+                        ModifiableAvatarSection(
                             avatarByteArray = avatarByteArray,
                             isModifiable = true,
                             onImagePicked = { array ->

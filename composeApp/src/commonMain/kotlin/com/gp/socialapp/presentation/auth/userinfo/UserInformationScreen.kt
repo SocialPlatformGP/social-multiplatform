@@ -6,7 +6,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -80,8 +79,7 @@ import socialmultiplatform.composeapp.generated.resources.cancel
 import socialmultiplatform.composeapp.generated.resources.complete_profile
 import socialmultiplatform.composeapp.generated.resources.complete_your_profile
 import socialmultiplatform.composeapp.generated.resources.date_of_birth
-import socialmultiplatform.composeapp.generated.resources.first_name
-import socialmultiplatform.composeapp.generated.resources.last_name
+import socialmultiplatform.composeapp.generated.resources.name
 import socialmultiplatform.composeapp.generated.resources.phone_number
 import socialmultiplatform.composeapp.generated.resources.select
 
@@ -119,14 +117,11 @@ data class UserInformationScreen(
         if (state.createdState is Result.Success) {
             navigator.replaceAll(HomeContainer())
         }
-        Scaffold(
-
-        ) { paddingValues ->
+        Scaffold { paddingValues ->
             UserInformationContent(
                 paddingValues = paddingValues,
                 state = state,
-                onFirstNameChange = { screenModel.onFirstNameChange(it) },
-                onLastNameChange = { screenModel.onLastNameChange(it) },
+                onNameChange = { screenModel.onNameChange(it) },
                 onProfileImageClicked = { pickerLauncher.launch() },
                 onPhoneNumberChange = { screenModel.onPhoneNumberChange(it) },
                 onBioChange = { screenModel.onBioChange(it) },
@@ -141,8 +136,7 @@ data class UserInformationScreen(
     private fun UserInformationContent(
         paddingValues: PaddingValues,
         state: UserInformationUiState,
-        onFirstNameChange: (String) -> Unit = {},
-        onLastNameChange: (String) -> Unit = {},
+        onNameChange: (String) -> Unit = {},
         onProfileImageClicked: () -> Unit = {},
         onPhoneNumberChange: (String) -> Unit = {},
         onDateOfBirthChange: (LocalDateTime) -> Unit = {},
@@ -221,47 +215,25 @@ data class UserInformationScreen(
                         )
                     }
                 }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    OutlinedTextField(
-                        value = state.firstName,
-                        onValueChange = onFirstNameChange,
-                        label = { Text(text = stringResource(Res.string.first_name)) },
-                        isError = state.error is AuthError.FirstNameError,
-                        supportingText = {
-                            if (state.error is AuthError.FirstNameError) {
-                                Text(
-                                    text = (state.error as AuthError.FirstNameError).message,
-                                    color = MaterialTheme.colorScheme.error,
-                                    fontSize = 12.sp
-                                )
-                            }
+                OutlinedTextField(
+                    value = state.name,
+                    onValueChange = onNameChange,
+                    label = { Text(text = stringResource(Res.string.name)) },
+                    isError = state.error is AuthError.FirstNameError,
+                    supportingText = {
+                        if (state.error is AuthError.FirstNameError) {
+                            Text(
+                                text = (state.error as AuthError.FirstNameError).message,
+                                color = MaterialTheme.colorScheme.error,
+                                fontSize = 12.sp
+                            )
+                        }
 
-                        },
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(top = 8.dp, end = 4.dp),
-                    )
-                    OutlinedTextField(
-                        value = state.lastName,
-                        onValueChange = onLastNameChange,
-                        label = { Text(text = stringResource(Res.string.last_name)) },
-                        isError = state.error is AuthError.LastNameError,
-                        supportingText = {
-                            if (state.error is AuthError.LastNameError) {
-                                Text(
-                                    text = (state.error as AuthError.LastNameError).message,
-                                    color = MaterialTheme.colorScheme.error,
-                                    fontSize = 12.sp
-                                )
-                            }
-                        },
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(start = 4.dp),
-                    )
-                }
+                    },
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(top = 8.dp, end = 4.dp),
+                )
                 OutlinedTextField(
                     value = state.phoneNumber,
                     onValueChange = onPhoneNumberChange,
@@ -288,7 +260,7 @@ data class UserInformationScreen(
                 )
                 Box {
                     OutlinedTextField(
-                        value = state.birthDate.let { if (it == LocalDateTime.now()) "" else pickedDate.toDDMMYYYY() },
+                        value = formattedDate,
                         onValueChange = {},
                         label = { Text(text = stringResource(Res.string.date_of_birth)) },
                         modifier = Modifier

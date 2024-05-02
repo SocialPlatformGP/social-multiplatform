@@ -61,7 +61,7 @@ fun GroupMemberItem(
         ) {
             Column {
                 Text(
-                    text = selectableUser.user.firstName + " " + selectableUser.user.lastName,
+                    text = selectableUser.user.name,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     fontSize = 20.sp,

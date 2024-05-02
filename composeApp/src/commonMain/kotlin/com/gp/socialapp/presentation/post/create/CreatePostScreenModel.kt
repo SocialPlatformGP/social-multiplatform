@@ -77,7 +77,7 @@ class CreatePostScreenModel(
                         body = body,
                         tags = tags,
                         type = uiState.value.currentTab.title,
-                        authorName = currentUser.value.firstName + " " + currentUser.value.lastName,
+                        authorName = currentUser.value.name,
                         authorPfp = currentUser.value.profilePictureURL,
                         authorID = currentUser.value.id,
                         attachments = files

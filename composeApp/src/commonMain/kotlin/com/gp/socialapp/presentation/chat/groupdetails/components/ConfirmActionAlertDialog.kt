@@ -6,14 +6,19 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 
 @Composable
-fun RemoveMemberAlertDialog(
+fun ConfirmActionAlertDialog(
     onDismissRequest: () -> Unit,
     onConfirmation: () -> Unit,
     dialogTitle: String,
+    dialogText: String = "",
 ) {
     AlertDialog(
         title = {
             Text(text = dialogTitle)
+        },
+        text = {
+            if(dialogText.isNotEmpty())
+                Text(text = dialogText)
         },
         onDismissRequest = {
             onDismissRequest()

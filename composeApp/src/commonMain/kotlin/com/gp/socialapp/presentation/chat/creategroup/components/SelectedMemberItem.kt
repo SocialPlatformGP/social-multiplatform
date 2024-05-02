@@ -56,7 +56,7 @@ fun SelectedMemberItem(
             }
         }
         Text(
-            text = user.firstName,
+            text = user.name,
             modifier = Modifier.paddingFromBaseline(top = 24.dp, bottom = 8.dp),
             style = MaterialTheme.typography.bodySmall
         )

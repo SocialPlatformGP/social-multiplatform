@@ -16,7 +16,7 @@
     <string name="retype_password">Retype Password</string>
     <string name="already_have_an_account">Already have an account?</string>
     <string name="complete_your_profile">Complete your profile</string>
-    <string name="first_name">First Name</string>
+    <string name="name">Name</string>
     <string name="last_name">Last Name</string>
     <string name="phone_number">Phone Number</string>
     <string name="date_of_birth">Date of Birth</string>
@@ -30,7 +30,7 @@
     <string name="cancel">Cancel</string>
     <string name="create_post">Create Post</string>
     <string name="edit_post">Edit Post</string>
-    <string name="invalid_first_name">Invalid First Name</string>
+    <string name="invalid_name">Invalid Name</string>
     <string name="invalid_last_name">Invalid Last Name</string>
     <string name="invalid_phone_number">Invalid Phone Number</string>
     <string name="user_must_be_at_least_18_years_old">User must be at least 18 years old.</string>
@@ -54,4 +54,7 @@
     <string name="confirm_member_removal">Are you sure you want to remove this user from the group?</string>
     <string name="add_selected_members">Add selected members</string>
     <string name="sign_in_with_microsoft">Sign in with Microsoft</string>
+    <string name = "old_password">Old Password</string>
+    <string name = "new_password">New Password</string>
+    <string name = "change_password">Change Password</string>
 </resources>

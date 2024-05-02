@@ -9,7 +9,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.gp.socialapp.di.HandleDeepLink
 import com.gp.socialapp.di.platformModule
 import com.gp.socialapp.presentation.app.App
-import com.gp.socialapp.presentation.userprofile.UserProfileContent
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
 import org.kodein.di.DI
@@ -44,7 +43,7 @@ class AppActivity : ComponentActivity() {
 @Preview
 @Composable
 fun PreviewApp() {
-    UserProfileContent()
+
 }
 
 
