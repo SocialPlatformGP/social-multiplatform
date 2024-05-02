@@ -1,6 +1,7 @@
 package com.gp.socialapp.data.assignment.source.remote
 
 import com.gp.socialapp.data.assignment.model.Assignment
+import com.gp.socialapp.data.assignment.source.remote.model.request.AssignmentRequest
 import com.gp.socialapp.data.post.util.endPoint
 import io.ktor.client.HttpClient
 import com.gp.socialapp.util.Result
@@ -12,11 +13,11 @@ import io.ktor.http.HttpStatusCode
 class AssignmentRemoteDataSourceImpl(
     private val httpClient: HttpClient,
 ): AssignmentRemoteDataSource {
-    override suspend fun createAssignment(assignment: Assignment): Result<String> {
+    override suspend fun createAssignment(request: AssignmentRequest.CreateRequest): Result<String> {
         return try{
             val response = httpClient.post {
                 endPoint("createAssignment")
-                setBody(assignment)
+                setBody(request)
             }
             if(response.status == HttpStatusCode.OK){
                 val assignmentId = response.body<String>()

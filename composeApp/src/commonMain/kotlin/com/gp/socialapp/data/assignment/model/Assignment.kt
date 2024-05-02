@@ -13,5 +13,5 @@ data class Assignment(
     val acceptLateSubmissions: Boolean = false,
     val createdAt: Long = 0,
     val creatorId: String = "",
-    val communityId: String,
+    val communityId: String = "",
 )
