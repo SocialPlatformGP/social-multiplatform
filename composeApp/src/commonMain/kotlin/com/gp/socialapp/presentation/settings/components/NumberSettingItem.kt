@@ -123,7 +123,8 @@ private fun TextEditNumberDialog(
             Text(title)
             Spacer(modifier = Modifier.height(8.dp))
             TextField(
-                currentInput,
+                modifier = Modifier.fillMaxWidth(),
+                value = currentInput,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 onValueChange = {
                     val filteredText = inputFilter(it)

@@ -336,6 +336,7 @@ data class UserInformationScreen(
                                     isDateDialogOpen = false
                                     val date = datePickerState.selectedDateMillis?.toLocalDateTime()
                                         ?: LocalDateTime.now()
+                                    pickedDate = date
                                     onDateOfBirthChange(date)
                                 },
                                 enabled = confirmEnabled.value
