@@ -23,7 +23,6 @@ import com.gp.socialapp.presentation.post.feed.FeedScreenModel
 import com.gp.socialapp.presentation.post.postDetails.PostDetailsScreenModel
 import com.gp.socialapp.presentation.post.search.SearchScreenModel
 import com.gp.socialapp.presentation.post.searchResult.SearchResultScreenModel
-import com.gp.socialapp.presentation.settings.SettingsScreenModel
 import org.kodein.di.DI
 import org.kodein.di.bind
 import org.kodein.di.instance
@@ -118,6 +117,13 @@ val screenModelModuleK = DI.Module("screenModelModule") {
     bind<HomeContainerScreenModel>() with singleton {
         HomeContainerScreenModel(
             instance(),
+        )
+    }
+    bind<UserProfileScreenModel>() with singleton {
+        UserProfileScreenModel(
+            instance(),
+            instance(),
+            instance()
         )
     }
     bind<SettingsScreenModel>() with singleton { SettingsScreenModel(instance(), instance()) }
