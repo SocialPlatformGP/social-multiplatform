@@ -110,8 +110,9 @@ class EditPostScreenModel(
 
     fun onRemoveFile(file: PostAttachment) {
         screenModelScope.launch(Dispatchers.Default) {
-            val newFiles =
-                uiState.value.postAttachments.filter { !it.file.contentEquals(file.file) }
+            val newFiles = uiState.value.postAttachments.toMutableList().apply {
+                remove(file)
+            }
             _uiState.value = uiState.value.copy(postAttachments = newFiles)
         }
     }
