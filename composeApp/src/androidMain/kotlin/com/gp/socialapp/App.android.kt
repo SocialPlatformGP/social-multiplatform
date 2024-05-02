@@ -1,11 +1,13 @@
 package com.gp.socialapp
 
 import android.app.Application
+import android.content.ClipboardManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.content.ContextCompat
 import com.gp.socialapp.di.HandleDeepLink
 import com.gp.socialapp.di.platformModule
 import com.gp.socialapp.presentation.app.App
@@ -33,10 +35,14 @@ class AppActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         val di = DI.lazy { import(platformModule) }.di
         val deep: HandleDeepLink by di.instance()
+        val clipboardManager = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
         deep.handleDeepLink(intent)
         setContent {
             App()
         }
+    }
+    companion object {
+        const val TAG = "AppActivity"
     }
 }
 
