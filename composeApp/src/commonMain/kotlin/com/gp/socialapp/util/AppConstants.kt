@@ -5,6 +5,7 @@ object AppConstants {
         USER_TOKEN,
         USER_ID,
         POST_LAST_UPDATED,
+        APP_THEME,
         RECENT_SEARCHES;
 
         val key get() = this.name

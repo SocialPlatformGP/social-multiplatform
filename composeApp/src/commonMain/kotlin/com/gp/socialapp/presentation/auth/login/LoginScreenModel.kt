@@ -9,6 +9,7 @@ import com.gp.socialapp.presentation.auth.util.AuthError.NoError
 import com.gp.socialapp.presentation.auth.util.AuthError.PasswordError
 import com.gp.socialapp.presentation.auth.util.AuthError.ServerError
 import com.gp.socialapp.presentation.auth.util.Validator
+import com.gp.socialapp.presentation.settings.components.AppThemeOptions
 import com.gp.socialapp.util.DispatcherIO
 import com.gp.socialapp.util.Result
 import io.github.aakira.napier.Napier
@@ -25,13 +26,14 @@ import socialmultiplatform.composeapp.generated.resources.invalid_password
 class LoginScreenModel(
     private val authRepo: AuthenticationRepository,
     private val userRepo: UserRepository,
-    ) : ScreenModel {
+) : ScreenModel {
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState = _uiState.asStateFlow()
 
     fun init() {
         getTheme()
         getSignedInUser()
+        println("LoginScreenModel init called " + AppThemeOptions.SYSTEM_DEFAULT.value)
     }
 
     private fun getTheme() {
@@ -58,7 +60,12 @@ class LoginScreenModel(
                 Napier.e("getSignedInUserAll: $result")
                 when (result) {
                     is Result.SuccessWithData -> {
-                        _uiState.update { it.copy(signedInUser = result.data,userId = result.data.id,) }
+                        _uiState.update {
+                            it.copy(
+                                signedInUser = result.data,
+                                userId = result.data.id,
+                            )
+                        }
                     }
 
                     is Result.Error -> {

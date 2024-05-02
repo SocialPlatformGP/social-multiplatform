@@ -16,6 +16,7 @@ data class UserSettings(
     val isCalendarNotificationsAllowed: Boolean = true,
 )
 
+@Serializable
 enum class PrivacyOptions(val value: String) {
     EVERYONE("Everyone"),
     NO_ONE("No one"),
