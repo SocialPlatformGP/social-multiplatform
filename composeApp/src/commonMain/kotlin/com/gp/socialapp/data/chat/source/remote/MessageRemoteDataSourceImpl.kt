@@ -80,6 +80,22 @@ class MessageRemoteDataSourceImpl(
         }
     }
 
+    override suspend fun reportMessage(request: MessageRequest.ReportMessage): Result<Nothing> {
+        return try {
+            val response = httpClient.post {
+                endPoint("reportMessage")
+                setBody(request)
+            }
+            if (response.status == HttpStatusCode.OK) {
+                Result.Success
+            } else {
+                Result.Error("An error occurred: ${response.status.description}")
+            }
+        } catch (e: Exception) {
+            Result.Error("An error occurred: ${e.message}")
+        }
+    }
+
     override suspend fun closeSocket() {
         socketService.closeSocket()
     }

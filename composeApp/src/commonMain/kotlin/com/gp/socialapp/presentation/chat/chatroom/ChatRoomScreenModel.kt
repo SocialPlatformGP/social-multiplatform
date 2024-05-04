@@ -170,7 +170,28 @@ class ChatRoomScreenModel(
                 _uiState.update { it.copy(currentAttachment = MessageAttachment()) }
             }
 
+            is ChatRoomAction.OnReportMessage -> {
+                reportMessage(action.messageId)
+            }
             else -> Unit
+        }
+    }
+
+    private fun reportMessage(messageId: String) {
+        screenModelScope.launch(DispatcherIO) {
+            messageRepo.reportMessage(messageId, roomId, _uiState.value.currentUserId).let{
+                when (it) {
+                    is Result.Success -> {
+                        println("message reported")
+                    }
+
+                    is Result.Error -> {
+                        println("message not reported")
+                    }
+
+                    else -> Unit
+                }
+            }
         }
     }
 

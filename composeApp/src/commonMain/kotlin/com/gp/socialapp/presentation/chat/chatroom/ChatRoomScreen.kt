@@ -177,6 +177,9 @@ data class ChatRoomScreen(
                                         DropDownItem.DELETE -> {
                                             onAction(ChatRoomAction.OnDeleteMessage(action.messageId))
                                         }
+                                        DropDownItem.REPORT -> {
+                                            onAction(ChatRoomAction.OnReportMessage(action.messageId))
+                                        }
                                     }
                                 }
 

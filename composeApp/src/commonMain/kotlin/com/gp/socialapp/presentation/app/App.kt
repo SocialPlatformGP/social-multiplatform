@@ -13,7 +13,7 @@ internal fun App() =
     withDI(appModuleK) {
         AppTheme {
             Navigator(
-                CreateAssignmentScreen("communityId"),
+                LoginScreen
             )
         }
     }
