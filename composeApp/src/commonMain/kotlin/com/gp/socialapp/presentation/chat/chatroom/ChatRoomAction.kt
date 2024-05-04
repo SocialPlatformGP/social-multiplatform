@@ -27,4 +27,5 @@ sealed interface ChatRoomAction {
     data class OnChatHeaderClicked(val roomId: String, val isPrivate: Boolean) : ChatRoomAction
     data object OnBackPressed : ChatRoomAction
     data class OnDeleteMessage(val messageId: String) : ChatRoomAction
+    data class OnReportMessage(val messageId: String) : ChatRoomAction
 }

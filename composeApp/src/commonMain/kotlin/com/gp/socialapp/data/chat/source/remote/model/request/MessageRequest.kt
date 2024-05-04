@@ -25,10 +25,16 @@ sealed class MessageRequest {
         val messageId: String,
         val roomId: String,
         val updatedContent: String
-    )
+    ) : MessageRequest()
     @Serializable
     data class DeleteMessage(
         val messageId: String,
         val roomId: String
-    )
+    ) : MessageRequest()
+    @Serializable
+    data class ReportMessage(
+        val messageId: String,
+        val roomId: String,
+        val reporterId: String
+    ) : MessageRequest()
 }

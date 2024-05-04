@@ -181,6 +181,13 @@ fun ReplyItem(
                                             reply = nestedReply.reply ?: Reply()
                                         )
                                     )
+                                },
+                                ReplyDropDownItem(stringResource(Res.string.report)) {
+                                    replyEvent(
+                                        ReplyEvent.OnReportReply(
+                                            reply = nestedReply.reply ?: Reply()
+                                        )
+                                    )
                                 }
                             )
                         } else {

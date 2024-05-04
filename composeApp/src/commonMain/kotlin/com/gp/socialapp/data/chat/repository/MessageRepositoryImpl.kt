@@ -71,6 +71,17 @@ class MessageRepositoryImpl(
         return messageRemoteDataSource.sendMessage(request)
     }
 
+    override suspend fun reportMessage(
+        messageId: String,
+        roomId: String,
+        reporterId: String
+    ): Result<Nothing> {
+        val request = MessageRequest.ReportMessage(
+            messageId = messageId, roomId = roomId, reporterId = reporterId
+        )
+        return messageRemoteDataSource.reportMessage(request)
+    }
+
     override suspend fun updateMessage(
         messageId: String, roomId: String, updatedContent: String
     ): Result<Nothing> {

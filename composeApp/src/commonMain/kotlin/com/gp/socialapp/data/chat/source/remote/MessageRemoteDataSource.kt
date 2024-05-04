@@ -14,6 +14,6 @@ interface MessageRemoteDataSource {
     suspend fun updateMessage(request: MessageRequest.UpdateMessage): Result<Nothing>
     suspend fun observeMessages(): Flow<Result<NewDataResponse>>
     suspend fun deleteMessage(request: MessageRequest.DeleteMessage): Result<Nothing>
-
+    suspend fun reportMessage(request: MessageRequest.ReportMessage): Result<Nothing>
     suspend fun closeSocket()
 }
