@@ -18,7 +18,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Assignment
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,6 +41,7 @@ import cafe.adriel.voyager.kodein.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gp.socialapp.data.assignment.model.Assignment
+import com.gp.socialapp.presentation.assignment.createassignment.CreateAssignmentScreen
 import com.gp.socialapp.presentation.assignment.submitassignment.SubmitAssignmentScreen
 import com.gp.socialapp.util.LocalDateTimeUtil.convertEpochToTime
 
@@ -67,6 +71,9 @@ data class AssignmentHomeScreen(val communityId: String = "") : Screen {
                     }
 
                     AssignmentHomeUiAction.OnBackClicked -> navigator.pop()
+                    AssignmentHomeUiAction.OnFabClicked -> {
+                        navigator.push(CreateAssignmentScreen(communityId))
+                    }
                 }
             }
         )
@@ -77,7 +84,20 @@ data class AssignmentHomeScreen(val communityId: String = "") : Screen {
 fun AssignmentHomeScreenContent(
     state: AssignmentHomeUiState, action: (AssignmentHomeUiAction) -> Unit
 ) {
-    Scaffold { paddingValues ->
+    Scaffold (
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {
+                    action(AssignmentHomeUiAction.OnFabClicked)
+                }
+            ){
+                Icon(
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = null
+                )
+            }
+        }
+    ){ paddingValues ->
         Column(
             modifier = Modifier.padding(paddingValues).fillMaxSize()
         ) {

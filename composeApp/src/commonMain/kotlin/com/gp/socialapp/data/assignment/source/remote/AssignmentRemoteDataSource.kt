@@ -22,4 +22,6 @@ interface AssignmentRemoteDataSource {
     suspend fun submitAssignmentSubmissionReview(
         request: AssignmentRequest.SubmitReview
     ): Result<Boolean>
+
+    suspend fun turnInAssignments(userAssignmentId: String): Result<Boolean>
 }

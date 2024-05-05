@@ -32,17 +32,16 @@ class SubmitAssignmentScreenModel(
 
                 is Result.SuccessWithData -> {
                     _uiState.value = _uiState.value.copy(assignment = assignment, user = user.data)
-                    getOldSubmission(assignment)
+                    getOldSubmission(assignment.id)
                 }
 
                 else -> {}
             }
         }
     }
-    private fun getOldSubmission(assignment: Assignment) {
+    private fun getOldSubmission(assignmentId: String) {
         screenModelScope.launch {
             val userId = uiState.value.user.id
-            val assignmentId = assignment.id
             assignmentRepository.getAttachments(userId, assignmentId).collect { result ->
                 println("resulto ${result}")
                 when (result) {
@@ -81,8 +80,9 @@ class SubmitAssignmentScreenModel(
                     _uiState.value = _uiState.value.copy(isLoading = true)
                 }
 
-                is Result.Success -> {
+                is Result.SuccessWithData -> {
                     _uiState.value = _uiState.value.copy(isLoading = false, newSubmission = UserAssignmentSubmission())
+                    getOldSubmission(assignmentId)
                 }
 
                 else -> {}
@@ -102,12 +102,25 @@ class SubmitAssignmentScreenModel(
                         userId = user.id,
                         attachments = newSubmission.attachments
                     )
-                    getOldSubmission(assignment)
                 }
 
             }
+            is SubmitAssignmentUiAction.OnTurnInAssignment -> turnInAssignment(action.userAssignmentId,action.assignmentId)
 
             else -> {}
+        }
+    }
+
+    private fun turnInAssignment(userAssignmentId: String, assignmentId: String) {
+        screenModelScope.launch {
+            when(val result = assignmentRepository.turnInAssignments(userAssignmentId)){
+                is Result.Error -> println(result.message)
+                Result.Loading -> {}
+                is Result.SuccessWithData -> {
+                    getOldSubmission(assignmentId)
+                }
+                else->Unit
+            }
         }
     }
 }

@@ -27,4 +27,6 @@ interface AssignmentRepository {
         grade: Int,
         feedback: String,
     ): Result<Boolean>
+
+    suspend fun turnInAssignments(userAssignmentId: String):Result<Boolean>
 }

@@ -28,6 +28,10 @@ class AssignmentRepositoryImpl(
         return remoteDataSource.submitAssignment(assignmentId, userId, attachments)
     }
 
+    override suspend fun turnInAssignments(userAssignmentId: String): Result<Boolean> {
+        return remoteDataSource.turnInAssignments(userAssignmentId)
+    }
+
     override fun getAssignments(userId: String): Flow<Result<List<Assignment>>> {
         return remoteDataSource.getAssignments(userId)
     }
