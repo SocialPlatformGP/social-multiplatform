@@ -126,7 +126,7 @@ fun SubmitAssignmentContent(
             UploadSection(
                 onViewUploadedAttachment = { showBottomSheet = true },
                 onUploadAttachment = { filePicker.launch() },
-                uploadedFileSize = assignment.attachments.size
+                uploadedFileSize = state.oldSubmission.attachments.size
             )
 
         }

@@ -2,6 +2,7 @@ package com.gp.socialapp.data.assignment.source.remote
 
 import com.gp.socialapp.data.assignment.model.Assignment
 import com.gp.socialapp.data.assignment.model.AssignmentAttachment
+import com.gp.socialapp.data.assignment.model.UserAssignmentSubmission
 import com.gp.socialapp.data.assignment.source.remote.model.request.AssignmentRequest
 import com.gp.socialapp.data.post.util.endPoint
 import io.ktor.client.HttpClient
@@ -33,21 +34,23 @@ class AssignmentRemoteDataSourceImpl(
         }
     }
 
-    override fun getAttachments(userId: String, assignmentId: String): Flow<Result<List<AssignmentAttachment>>> = flow {
+    override fun getAttachments(userId: String, assignmentId: String): Flow<Result<UserAssignmentSubmission>> = flow {
         try{
             val request = AssignmentRequest.GetUserAttachmentsRequest(userId, assignmentId)
             val response = httpClient.post {
                 endPoint("getAttachments")
                 setBody(request)
             }
+            println("rea $response")
             if(response.status == HttpStatusCode.OK){
-                val assignmentAttachments = response.body<List<AssignmentAttachment>>()
+                val assignmentAttachments = response.body<UserAssignmentSubmission>()
                 emit(Result.SuccessWithData(assignmentAttachments))
             } else {
                 emit(Result.Error("Error getting attachments: ${response.status}"))
             }
         } catch (e: Exception) {
             emit(Result.Error("Error getting attachments: ${e.message}"))
+            e.printStackTrace()
         }
     }
 
@@ -72,11 +75,11 @@ class AssignmentRemoteDataSourceImpl(
         }
     }
 
-    override fun getAssignments(communityId: String): Flow<Result<List<Assignment>>> = flow {
+    override fun getAssignments(userId: String): Flow<Result<List<Assignment>>> = flow {
         try{
             val response = httpClient.post {
                 endPoint("getAssignments")
-                setBody(communityId)
+                setBody(userId)
             }
             if(response.status == HttpStatusCode.OK){
                 val assignments = response.body<List<Assignment>>()

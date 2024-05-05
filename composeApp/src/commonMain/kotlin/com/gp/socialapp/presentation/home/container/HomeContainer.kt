@@ -179,7 +179,7 @@ data class HomeContainer(
 
             val defaultTab = when (startingTab) {
                 HomeTab.CHAT -> ChatTab(onNavigation)
-                HomeTab.ASSIGNMENTS -> AssignmentsTab
+                HomeTab.ASSIGNMENTS -> AssignmentsTab()
                 HomeTab.COMMUNITIES -> CommunitiesTab(onNavigation)
                 HomeTab.CALENDAR -> CalendarTab
                 HomeTab.GRADES -> GradesTab
@@ -209,7 +209,7 @@ data class HomeContainer(
 
                         if (barsVisibility) NavigationBar {
                             BottomTabNavigationItem(tab = ChatTab(onNavigation))
-                            BottomTabNavigationItem(tab = AssignmentsTab)
+                            BottomTabNavigationItem(tab = AssignmentsTab())
                             BottomTabNavigationItem(
                                 tab = CommunitiesTab(
                                     onNavigation

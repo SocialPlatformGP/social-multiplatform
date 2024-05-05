@@ -42,7 +42,7 @@ data class CreateAssignmentScreen(val communityId: String) : Screen {
                 screenModel.onDispose()
             }
         )
-        if(state.isCreated){
+        if (state.isCreated) {
             //TODO: Navigate to the created assignment
         }
         CreateAssignmentContent(

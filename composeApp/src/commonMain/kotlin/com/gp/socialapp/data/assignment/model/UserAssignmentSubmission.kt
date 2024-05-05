@@ -5,9 +5,9 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class UserAssignmentSubmission(
     val id : String = "",
-    val assignmentId: String,
-    val userId: String,
-    val attachments: List<AssignmentAttachment>,
+    val assignmentId: String="",
+    val userId: String="",
+    val attachments: List<AssignmentAttachment> = emptyList(),
     val submittedAt: Long = 0,
     val grade: Int = 0,
     val isReviewed: Boolean = false,

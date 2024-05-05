@@ -1,6 +1,5 @@
 package com.gp.socialapp.presentation.assignment.createassignment.components
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -24,9 +23,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.gp.socialapp.data.assignment.model.AssignmentAttachment
-import com.gp.socialapp.presentation.chat.chatroom.ChatRoomAction
-import com.gp.socialapp.presentation.material.utils.getFileImageVector
 import com.gp.socialapp.presentation.material.utils.MimeType
+import com.gp.socialapp.presentation.material.utils.getFileImageVector
 import com.mohamedrejeb.calf.core.LocalPlatformContext
 import com.mohamedrejeb.calf.io.getName
 import com.mohamedrejeb.calf.io.readByteArray
@@ -60,10 +58,10 @@ fun AssignmentAttachmentsSection(
                 }
             }
         })
-    Column (
+    Column(
         modifier = Modifier.fillMaxWidth().then(modifier),
         horizontalAlignment = Alignment.CenterHorizontally,
-    ){
+    ) {
         AssignmentAttachmentsPreview(
             attachments = attachments,
             onRemoveAttachment = onRemoveAttachment
@@ -86,7 +84,7 @@ private fun AssignmentAttachmentsPreview(
     LazyColumn(
         modifier = Modifier.fillMaxWidth().heightIn(max = 360.dp).then(modifier)
     ) {
-        items(attachments){ attachment ->
+        items(attachments) { attachment ->
             val mimeType = MimeType.getMimeTypeFromFileName(attachment.name)
             val imageVector = getFileImageVector(mimeType)
             ListItem(

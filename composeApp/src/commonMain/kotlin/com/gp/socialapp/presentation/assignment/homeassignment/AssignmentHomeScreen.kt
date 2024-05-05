@@ -41,7 +41,7 @@ import com.gp.socialapp.data.assignment.model.Assignment
 import com.gp.socialapp.presentation.assignment.submitassignment.SubmitAssignmentScreen
 import com.gp.socialapp.util.LocalDateTimeUtil.convertEpochToTime
 
-data class AssignmentHomeScreen(val communityId: String) : Screen {
+data class AssignmentHomeScreen(val communityId: String = "") : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
@@ -56,15 +56,21 @@ data class AssignmentHomeScreen(val communityId: String) : Screen {
             state = state.value,
             action = fun(action: AssignmentHomeUiAction) {
                 when (action) {
-                    is AssignmentHomeUiAction.OnAssignmentClicked -> navigator.push(SubmitAssignmentScreen(action.assignment))
+                    is AssignmentHomeUiAction.OnAssignmentClicked -> {
+                        if (action.assignment.creatorId == state.value.currentUser.id) {
+                            //TODO Navigate to dashboard
+                        } else {
+                            navigator.push(
+                                SubmitAssignmentScreen(action.assignment)
+                            )
+                        }
+                    }
+
                     AssignmentHomeUiAction.OnBackClicked -> navigator.pop()
                 }
             }
         )
-
     }
-
-
 }
 
 @Composable

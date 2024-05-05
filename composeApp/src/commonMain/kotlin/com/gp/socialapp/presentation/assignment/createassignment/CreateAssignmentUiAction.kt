@@ -16,6 +16,7 @@ sealed interface CreateAssignmentUiAction {
         val size: Long,
         val byteArray: ByteArray
     ) : CreateAssignmentUiAction
+
     data class AttachmentRemoved(val attachment: AssignmentAttachment) : CreateAssignmentUiAction
 
     object CreateAssignment : CreateAssignmentUiAction

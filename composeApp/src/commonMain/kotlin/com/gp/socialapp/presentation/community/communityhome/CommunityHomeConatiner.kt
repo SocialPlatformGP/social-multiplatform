@@ -23,6 +23,7 @@ import cafe.adriel.voyager.navigator.tab.CurrentTab
 import cafe.adriel.voyager.navigator.tab.TabNavigator
 import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.data.community.source.remote.model.Community
+import com.gp.socialapp.navigation.tabs.AssignmentsTab
 import com.gp.socialapp.navigation.tabs.CommunityMembersTab
 import com.gp.socialapp.navigation.tabs.MaterialTab
 import com.gp.socialapp.navigation.tabs.PostsTab
@@ -46,7 +47,7 @@ data class CommunityHomeContainer(
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = rememberScreenModel<CommunityHomeContainerScreenModel>()
         LifecycleEffect(
-            onStarted ={
+            onStarted = {
                 screenModel.init(communityId)
             },
             onDisposed = {
@@ -54,7 +55,7 @@ data class CommunityHomeContainer(
             }
         )
         val state by screenModel.uiState.collectAsState()
-        if(state.isLoggedOut){
+        if (state.isLoggedOut) {
             navigator.replaceAll(LoginScreen)
         }
         CommunityHomeContainerContent(
@@ -113,9 +114,11 @@ data class CommunityHomeContainer(
                                         onNavigateToSearch()
                                         onNavigation(false)
                                     }
+
                                     is MaterialTab -> {
                                         /*TODO*/
                                     }
+
                                     is CommunityMembersTab -> {
                                         /*TODO*/
                                     }
@@ -135,6 +138,11 @@ data class CommunityHomeContainer(
                         NavigationBar {
                             BottomTabNavigationItem(tab = PostsTab(communityId, onNavigation))
                             BottomTabNavigationItem(tab = MaterialTab(communityId))
+                            if (userCommunities.find { it.id == communityId }?.members?.get(currentUser.id) == true ) {
+                                BottomTabNavigationItem(
+                                    tab = AssignmentsTab(communityId)
+                                )
+                            }
                             BottomTabNavigationItem(tab = CommunityMembersTab(communityId))
                         }
                     }

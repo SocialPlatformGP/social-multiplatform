@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -23,7 +22,6 @@ import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
@@ -42,7 +40,6 @@ import com.gp.socialapp.util.LocalDateTimeUtil.now
 import com.gp.socialapp.util.LocalDateTimeUtil.toDDMMYYYY
 import com.gp.socialapp.util.LocalDateTimeUtil.toHHMMTimestamp
 import com.gp.socialapp.util.LocalDateTimeUtil.toLocalDateTime
-import com.gp.socialapp.util.LocalDateTimeUtil.toYYYYMMDD
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
@@ -58,9 +55,9 @@ fun CreateAssignmentDueDate(
     modifier: Modifier = Modifier,
     onDueDateChanged: (Long) -> Unit,
 ) {
-    Column (
+    Column(
         modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp).then(modifier)
-    ){
+    ) {
         var hasDueDate by remember { mutableStateOf(false) }
         var isDateDialogOpen by remember { mutableStateOf(false) }
         val datePickerState = rememberDatePickerState(

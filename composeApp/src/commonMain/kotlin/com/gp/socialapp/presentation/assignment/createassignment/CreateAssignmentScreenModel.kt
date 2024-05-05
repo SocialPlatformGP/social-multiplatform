@@ -35,6 +35,7 @@ class CreateAssignmentScreenModel(
                         println("Error getting signed in user")
                         Napier.d("Error getting signed in user")
                     }
+
                     is Result.SuccessWithData -> {
                         _uiState.update {
                             it.copy(currentUser = result.data)
@@ -111,10 +112,12 @@ class CreateAssignmentScreenModel(
                             it.copy(isCreated = true, assignmentId = result.data)
                         }
                     }
+
                     is Result.Error -> {
                         println("Assignment creation failed")
                         Napier.d("Assignment creation failed")
                     }
+
                     else -> Unit
                 }
             }

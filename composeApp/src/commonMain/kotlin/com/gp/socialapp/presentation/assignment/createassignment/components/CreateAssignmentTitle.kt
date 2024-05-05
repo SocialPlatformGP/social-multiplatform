@@ -17,7 +17,7 @@ fun CreateAssignmentTitle(
     modifier: Modifier = Modifier,
     onTitleChanged: (String) -> Unit,
 ) {
-    var title by remember{ mutableStateOf("") }
+    var title by remember { mutableStateOf("") }
     TextField(
         value = title,
         onValueChange = {

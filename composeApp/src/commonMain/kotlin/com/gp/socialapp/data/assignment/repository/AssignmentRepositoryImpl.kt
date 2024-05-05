@@ -2,6 +2,7 @@ package com.gp.socialapp.data.assignment.repository
 
 import com.gp.socialapp.data.assignment.model.Assignment
 import com.gp.socialapp.data.assignment.model.AssignmentAttachment
+import com.gp.socialapp.data.assignment.model.UserAssignmentSubmission
 import com.gp.socialapp.data.assignment.source.remote.AssignmentRemoteDataSource
 import com.gp.socialapp.data.assignment.source.remote.model.request.AssignmentRequest
 import com.gp.socialapp.util.Result
@@ -15,7 +16,7 @@ class AssignmentRepositoryImpl(
         return remoteDataSource.createAssignment(request)
     }
 
-    override fun getAttachments(userId: String, assignmentId: String): Flow<Result<List<AssignmentAttachment>>> {
+    override fun getAttachments(userId: String, assignmentId: String): Flow<Result<UserAssignmentSubmission>> {
         return remoteDataSource.getAttachments(userId, assignmentId)
     }
 
@@ -27,7 +28,7 @@ class AssignmentRepositoryImpl(
         return remoteDataSource.submitAssignment(assignmentId, userId, attachments)
     }
 
-    override fun getAssignments(communityId: String): Flow<Result<List<Assignment>>> {
-        return remoteDataSource.getAssignments(communityId)
+    override fun getAssignments(userId: String): Flow<Result<List<Assignment>>> {
+        return remoteDataSource.getAssignments(userId)
     }
 }
