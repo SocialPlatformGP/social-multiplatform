@@ -32,6 +32,12 @@ object LocalDateTimeUtil {
         }
     }
 
+    fun Long.getSubmissionFormattedDate(): String {
+        val localDateTime = Instant.fromEpochMilliseconds(this).toLocalDateTime(TimeZone.UTC)
+        val today = LocalDateTime.now().date
+        return this.getDateHeader() + ", " + this.toHHMMTimestamp()
+    }
+
     fun convertEpochToTime(epoch: Long): String {
         val localDateTime = Instant.fromEpochMilliseconds(epoch).toLocalDateTime(TimeZone.UTC)
         val hour = (localDateTime.hour + 2)
@@ -39,5 +45,10 @@ object LocalDateTimeUtil {
         val amOrPm = if (hour < 12) "AM" else "PM"
         val hourIn12HrFormat = if (hour > 12) hour - 12 else hour
         return "$hourIn12HrFormat:$minute $amOrPm"
+    }
+    private fun LocalDateTime.toMMMDD(): String {
+        val month = this.month.name.take(3)
+        val day = this.dayOfMonth
+        return "$month $day"
     }
 }

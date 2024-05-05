@@ -17,4 +17,9 @@ interface AssignmentRemoteDataSource {
     ): Result<Boolean>
 
     fun getAssignments(userId: String): Flow<Result<List<Assignment>>>
+    suspend fun getAssignmentById(request: AssignmentRequest.GetAssignmentById): Result<Assignment>
+    fun getSubmissions(request: AssignmentRequest.GetAssignmentSubmissions): Flow<Result<List<UserAssignmentSubmission>>>
+    suspend fun submitAssignmentSubmissionReview(
+        request: AssignmentRequest.SubmitReview
+    ): Result<Boolean>
 }

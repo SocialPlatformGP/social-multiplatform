@@ -8,9 +8,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import com.gp.socialapp.data.assignment.model.UserAssignmentSubmission
 import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.data.community.model.CommunityMemberRequest
 import com.gp.socialapp.presentation.app.App
+import com.gp.socialapp.presentation.assignment.submissionreview.components.SubmissionReviewTopRow
 import com.gp.socialapp.presentation.settings.components.SwitchSettingItem
 import com.gp.socialapp.theme.AppTheme
 import java.awt.Dimension
@@ -25,18 +27,23 @@ fun main() = application {
         App()
     }
 }
-
+val currentSubmission = UserAssignmentSubmission(userName = "Ana de armas")
+val submissions = listOf(
+    UserAssignmentSubmission(userName = "Userer")
+)
 @Preview
 @Composable
 fun PreviewApp() {
     AppTheme {
         Column {
-            SwitchSettingItem(
-                icon = Icons.Default.ShieldMoon,
-                name = "Dark Mode",
-                isChecked = true,
-                onClick = {}
-            )
+//            SubmissionReviewTopRow(
+//                currentSubmission = currentSubmission,
+//                submissions = submissions,
+//                onNextClick = {},
+//                onPreviousClick = {},
+//                onSubmissionSelected = {},
+//                onSubmitReviewClick = {}
+//            )
         }
 
     }

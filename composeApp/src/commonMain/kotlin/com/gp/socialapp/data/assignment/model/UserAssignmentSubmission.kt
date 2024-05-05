@@ -5,11 +5,13 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class UserAssignmentSubmission(
     val id : String = "",
-    val assignmentId: String="",
-    val userId: String="",
+    val assignmentId: String = "",
+    val userId: String = "",
+    val userName: String = "",
     val attachments: List<AssignmentAttachment> = emptyList(),
     val submittedAt: Long = 0,
     val grade: Int = 0,
+    val feedback: String = "",
     val isReviewed: Boolean = false,
     val isAccepted: Boolean = false,
     val isReturned: Boolean = false,

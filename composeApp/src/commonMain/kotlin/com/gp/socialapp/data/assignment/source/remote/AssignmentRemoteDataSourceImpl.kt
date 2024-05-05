@@ -91,4 +91,56 @@ class AssignmentRemoteDataSourceImpl(
             emit(Result.Error("Error getting assignments: ${e.message}"))
         }
     }
+
+    override suspend fun getAssignmentById(request: AssignmentRequest.GetAssignmentById): Result<Assignment> {
+        return try{
+            val response = httpClient.post {
+                endPoint("getAssignmentById")
+                setBody(request)
+            }
+            if(response.status == HttpStatusCode.OK){
+                val assignment = response.body<Assignment>()
+                Result.SuccessWithData(assignment)
+            } else {
+                Result.Error("Error getting assignment: ${response.status}")
+            }
+        } catch (e: Exception) {
+            Result.Error("Error getting assignment: ${e.message}")
+        }
+    }
+
+    override fun getSubmissions(request: AssignmentRequest.GetAssignmentSubmissions): Flow<Result<List<UserAssignmentSubmission>>> = flow {
+        emit (Result.Loading)
+        try {
+            val response = httpClient.post {
+                endPoint("getSubmissions")
+                setBody(request)
+            }
+            if(response.status == HttpStatusCode.OK){
+                val submissions = response.body<List<UserAssignmentSubmission>>()
+                emit(Result.SuccessWithData(submissions))
+            } else {
+                emit(Result.Error("Error getting submissions: ${response.status}"))
+            }
+        } catch (e: Exception) {
+            emit(Result.Error("Error getting submissions: ${e.message}"))
+
+        }
+    }
+
+    override suspend fun submitAssignmentSubmissionReview(request: AssignmentRequest.SubmitReview): Result<Boolean> {
+        return try{
+            val response = httpClient.post {
+                endPoint("submitReview")
+                setBody(request)
+            }
+            if(response.status == HttpStatusCode.OK){
+                Result.SuccessWithData(true)
+            } else {
+                Result.Error("Error submitting review: ${response.status}")
+            }
+        } catch (e: Exception) {
+            Result.Error("Error submitting review: ${e.message}")
+        }
+    }
 }

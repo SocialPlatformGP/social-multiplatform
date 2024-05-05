@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.navigator.Navigator
 import com.gp.socialapp.di.appModuleK
 import com.gp.socialapp.presentation.assignment.createassignment.CreateAssignmentScreen
+import com.gp.socialapp.presentation.assignment.submissionreview.SubmissionReviewScreen
 import com.gp.socialapp.presentation.assignment.submitassignment.SubmitAssignmentScreen
 import com.gp.socialapp.presentation.auth.login.LoginScreen
 import com.gp.socialapp.theme.AppTheme

@@ -2,6 +2,7 @@ package com.gp.socialapp.di
 
 import com.gp.socialapp.presentation.assignment.createassignment.CreateAssignmentScreenModel
 import com.gp.socialapp.presentation.assignment.homeassignment.AssignmentHomeScreenModel
+import com.gp.socialapp.presentation.assignment.submissionreview.SubmissionReviewScreenModel
 import com.gp.socialapp.presentation.assignment.submitassignment.SubmitAssignmentScreenModel
 import com.gp.socialapp.presentation.auth.login.LoginScreenModel
 import com.gp.socialapp.presentation.auth.passwordreset.PasswordResetScreenModel
@@ -44,6 +45,9 @@ val screenModelModuleK = DI.Module("screenModelModule") {
             instance(),
             instance()
         )
+    }
+    bind<SubmissionReviewScreenModel>() with singleton {
+        SubmissionReviewScreenModel(instance())
     }
     bind<FeedScreenModel>() with singleton { FeedScreenModel(instance(), instance(), instance()) }
     bind<EditPostScreenModel>() with singleton { EditPostScreenModel(instance()) }

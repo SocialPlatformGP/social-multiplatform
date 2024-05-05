@@ -19,4 +19,12 @@ interface AssignmentRepository {
     ): Result<Boolean>
 
     fun getAssignments(userId: String): Flow<Result<List<Assignment>>>
+
+    suspend fun getAssignmentById(assignmentId: String): Result<Assignment>
+    fun getSubmissions(assignmentId: String): Flow<Result<List<UserAssignmentSubmission>>>
+    suspend fun submitAssignmentSubmissionReview(
+        submissionId: String,
+        grade: Int,
+        feedback: String,
+    ): Result<Boolean>
 }

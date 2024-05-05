@@ -31,4 +31,24 @@ class AssignmentRepositoryImpl(
     override fun getAssignments(userId: String): Flow<Result<List<Assignment>>> {
         return remoteDataSource.getAssignments(userId)
     }
+
+    override suspend fun getAssignmentById(assignmentId: String): Result<Assignment> {
+        val request = AssignmentRequest.GetAssignmentById(assignmentId)
+        return remoteDataSource.getAssignmentById(request)
+
+    }
+
+    override fun getSubmissions(assignmentId: String): Flow<Result<List<UserAssignmentSubmission>>> {
+        val request = AssignmentRequest.GetAssignmentSubmissions(assignmentId)
+        return remoteDataSource.getSubmissions(request)
+    }
+
+    override suspend fun submitAssignmentSubmissionReview(
+        submissionId: String,
+        grade: Int,
+        feedback: String
+    ): Result<Boolean> {
+        val request = AssignmentRequest.SubmitReview(submissionId, grade, feedback)
+        return remoteDataSource.submitAssignmentSubmissionReview(request)
+    }
 }
