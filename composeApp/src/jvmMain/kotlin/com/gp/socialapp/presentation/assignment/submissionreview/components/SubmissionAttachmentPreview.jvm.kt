@@ -1,47 +1,12 @@
 package com.gp.socialapp.presentation.assignment.submissionreview.components
 
-import CURRENT_WINDOW
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import com.gp.socialapp.data.assignment.model.AssignmentAttachment
-import com.sun.javafx.application.PlatformImpl
-import javafx.embed.swing.JFXPanel
-import netscape.javascript.JSObject
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.round
 import dev.zt64.compose.pdf.component.PdfColumn
 import dev.zt64.compose.pdf.rememberLocalPdfState
-import javafx.application.Platform
-import javafx.concurrent.Worker
-import javafx.scene.Group
-import javafx.scene.Scene
-import javafx.scene.web.WebView
-import java.awt.BorderLayout
-import java.awt.Container
 import java.net.URL
-import javax.swing.JPanel
-import javafx.scene.paint.Color as JFXColor
-import javafx.scene.text.Font as JFXFont
-import javafx.scene.text.Text as JFXText
 
 
 @Composable
