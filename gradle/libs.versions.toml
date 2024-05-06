@@ -27,7 +27,8 @@ apollo = "4.0.0-beta.4"
 dotsIndicator = "5.0"
 undercouch-download = "5.6.0"
 ktlint = "11.0.0"
-
+bouquet="1.1.2"
+compose-pdf = "1.1.1"
 
 [libraries]
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-appcompat" }
@@ -62,6 +63,8 @@ kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.
 multiplatformSettings = { module = "com.russhwolf:multiplatform-settings", version.ref = "multiplatformSettings" }
 multiplatformSettingsNoArgs = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "multiplatformSettings" }
 kstore = { module = "io.github.xxfast:kstore", version.ref = "kstore" }
+bouquet = { module = "io.github.grizzi91:bouquet", version.ref = "bouquet" }
+compose-pdf = { module = "dev.zt64:compose-pdf", version.ref = "compose-pdf" }
 
 sqlDelight-driver-sqlite = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqlDelight" }
 sqlDelight-driver-android = { module = "app.cash.sqldelight:android-driver", version.ref = "sqlDelight" }

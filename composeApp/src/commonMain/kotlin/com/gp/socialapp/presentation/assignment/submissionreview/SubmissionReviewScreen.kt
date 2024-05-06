@@ -111,17 +111,17 @@ data class SubmissionReviewScreen(
                         scope.launch {
                             if (pagerState.currentPage > 0) {
                                 pagerState.animateScrollToPage(pagerState.currentPage - 1)
+                                onAction(SubmissionReviewUiAction.ViewPrevious(submissions[pagerState.currentPage - 1].id))
                             }
                         }
-                        onAction(SubmissionReviewUiAction.ViewPrevious(submissions[pagerState.currentPage - 1].id))
                     },
                     onNextClicked = {
                         scope.launch {
                             if (pagerState.currentPage < submissions.size - 1) {
                                 pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                                onAction(SubmissionReviewUiAction.ViewNext(submissions[pagerState.currentPage + 1].id))
                             }
                         }
-                        onAction(SubmissionReviewUiAction.ViewNext(submissions[pagerState.currentPage + 1].id))
                     })
                 HorizontalPager(
                     state = pagerState, modifier = Modifier.fillMaxSize()

@@ -111,6 +111,7 @@ kotlin {
             implementation(compose.preview)
             implementation(libs.realm.base)
             implementation(libs.realm.sync)
+            implementation(libs.bouquet)
         }
 
         jvmMain.dependencies {
@@ -121,6 +122,7 @@ kotlin {
             implementation(libs.sqlDelight.driver.sqlite)
             implementation(libs.realm.base)
             implementation(libs.realm.sync)
+            implementation(libs.compose.pdf)
         }
 
         jsMain.dependencies {

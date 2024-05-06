@@ -16,13 +16,16 @@ import com.gp.socialapp.presentation.assignment.submissionreview.components.Subm
 import com.gp.socialapp.presentation.settings.components.SwitchSettingItem
 import com.gp.socialapp.theme.AppTheme
 import java.awt.Dimension
+import java.awt.Window
 
+lateinit var CURRENT_WINDOW: Window
 fun main() = application {
     Window(
         title = "EduLink",
         state = rememberWindowState(width = 800.dp, height = 600.dp),
         onCloseRequest = ::exitApplication,
     ) {
+        CURRENT_WINDOW = window
         window.minimumSize = Dimension(350, 600)
         App()
     }
