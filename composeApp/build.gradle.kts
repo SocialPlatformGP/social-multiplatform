@@ -94,6 +94,7 @@ kotlin {
             implementation(libs.sqlDelight.coroutines)
             implementation(libs.supabase.auth)
             implementation(libs.supabase.storage)
+            implementation(libs.korge.foundation)
         }
 
         commonTest.dependencies {

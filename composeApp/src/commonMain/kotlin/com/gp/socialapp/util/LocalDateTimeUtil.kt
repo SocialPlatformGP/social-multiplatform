@@ -1,8 +1,11 @@
 package com.gp.socialapp.util
 
+import korlibs.time.Month
+import korlibs.time.YearMonth
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.daysUntil
@@ -36,6 +39,29 @@ object LocalDateTimeUtil {
         val localDateTime = Instant.fromEpochMilliseconds(this).toLocalDateTime(TimeZone.UTC)
         val today = LocalDateTime.now().date
         return this.getDateHeader() + ", " + this.toHHMMTimestamp()
+    }
+    val YearMonth.lengthOfMonth: Int
+        get() = when (this.month.index1) {
+            1 -> 31
+            2 -> if (year.year % 4 == 0) 29 else 28
+            3 -> 31
+            4 -> 30
+            5 -> 31
+            6 -> 30
+            7 -> 31
+            8 -> 31
+            9 -> 30
+            10 -> 31
+            11 -> 30
+            12 -> 31
+            else -> throw IllegalArgumentException("Invalid month number")
+        }
+    fun LocalDate.with(predicate: (LocalDate) -> Boolean): LocalDate {
+        var date = this
+        while (!predicate(date)) {
+            date = LocalDate.fromEpochDays(date.toEpochDays().minus(1))
+        }
+        return date
     }
 
     fun convertEpochToTime(epoch: Long): String {

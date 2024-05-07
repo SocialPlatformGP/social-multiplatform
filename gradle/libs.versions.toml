@@ -1,6 +1,7 @@
 [versions]
 
 calfFilePicker = "0.4.0"
+korgeFoundation = "5.1.0"
 supabase-client = "2.3.0"
 kodeinDiFrameworkCompose = "7.21.1"
 kotlin = "1.9.22"
@@ -35,6 +36,7 @@ androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "a
 androidx-activityCompose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
 calf-file-picker = { module = "com.mohamedrejeb.calf:calf-file-picker", version.ref = "calfFilePicker" }
 compose-uitooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose-uitooling" }
+korge-foundation = { module = "com.soywiz.korge:korge-foundation", version.ref = "korgeFoundation" }
 supabase-auth = { module = "io.github.jan-tennert.supabase:gotrue-kt", version.ref = "supabase-client" }
 supabase-storage = { module = "io.github.jan-tennert.supabase:storage-kt", version.ref = "supabase-client" }
 realm-base = { module = "io.realm.kotlin:library-base", version.ref = "realm" }
