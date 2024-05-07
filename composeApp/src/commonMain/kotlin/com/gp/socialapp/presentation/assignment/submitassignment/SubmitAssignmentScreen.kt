@@ -117,15 +117,20 @@ fun SubmitAssignmentContent(
                     Button(
                         enabled = state.oldSubmission.attachments.isNotEmpty(),
                         onClick = {
-                            action(
-                                SubmitAssignmentUiAction.OnTurnInAssignment(
-                                    state.oldSubmission.id,
-                                    state.oldSubmission.assignmentId
+                            if(state.oldSubmission.isTurnedIn){
+                                action(SubmitAssignmentUiAction.OnUnSubmitAssignment(state.oldSubmission.id,state.assignment.id))
+                            }
+                            else {
+                                action(
+                                    SubmitAssignmentUiAction.OnTurnInAssignment(
+                                        state.oldSubmission.id,
+                                        state.oldSubmission.assignmentId
+                                    )
                                 )
-                            )
+                            }
                         }
                     ) {
-                        val text = if (state.oldSubmission.isTurnedIn) "Turned in" else "Turn in"
+                        val text = if (state.oldSubmission.isTurnedIn) "UnSubmit" else "Submit"
                         Text(text = text)
                     }
 
