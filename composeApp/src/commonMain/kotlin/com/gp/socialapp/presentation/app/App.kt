@@ -20,21 +20,9 @@ import org.kodein.di.compose.withDI
 internal fun App() =
     withDI(appModuleK) {
         AppTheme {
-//            Navigator(
-//                LoginScreen
-//            )
-            Box(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                SubmissionAttachmentPreview(
-                    attachment = AssignmentAttachment(
-                        id = "1",
-                        name = "Test",
-                        type = "pdf",
-                        url = "assignments/8197d8be-2022-4636-b180-c0e9a5fc6a19/mid-ihab.pdf"
-                    )
-                )
-            }
+            Navigator(
+                LoginScreen
+            )
         }
     }
 

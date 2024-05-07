@@ -25,6 +25,7 @@ import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.data.community.source.remote.model.Community
 import com.gp.socialapp.navigation.tabs.AssignmentsTab
 import com.gp.socialapp.navigation.tabs.CommunityMembersTab
+import com.gp.socialapp.navigation.tabs.CreatorAssignmentTab
 import com.gp.socialapp.navigation.tabs.MaterialTab
 import com.gp.socialapp.navigation.tabs.PostsTab
 import com.gp.socialapp.navigation.util.BottomTabNavigationItem
@@ -140,7 +141,7 @@ data class CommunityHomeContainer(
                             BottomTabNavigationItem(tab = MaterialTab(communityId))
                             if (userCommunities.find { it.id == communityId }?.members?.get(currentUser.id) == true ) {
                                 BottomTabNavigationItem(
-                                    tab = AssignmentsTab(communityId)
+                                    tab = CreatorAssignmentTab(communityId)
                                 )
                             }
                             BottomTabNavigationItem(tab = CommunityMembersTab(communityId))

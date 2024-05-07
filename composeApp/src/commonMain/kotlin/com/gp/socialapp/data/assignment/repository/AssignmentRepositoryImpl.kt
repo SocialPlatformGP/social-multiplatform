@@ -32,6 +32,10 @@ class AssignmentRepositoryImpl(
         return remoteDataSource.turnInAssignments(userAssignmentId)
     }
 
+    override suspend fun unSubmitAssignment(userAssignmentId: String): Result<Boolean> {
+        return remoteDataSource.unSubmitAssignment(userAssignmentId)
+    }
+
     override fun getAssignments(userId: String): Flow<Result<List<Assignment>>> {
         return remoteDataSource.getAssignments(userId)
     }

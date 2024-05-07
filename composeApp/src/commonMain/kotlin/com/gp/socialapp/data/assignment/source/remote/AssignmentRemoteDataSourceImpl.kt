@@ -163,4 +163,20 @@ class AssignmentRemoteDataSourceImpl(
             Result.Error("Error submitting review: ${e.message}")
         }
     }
+
+    override suspend fun unSubmitAssignment(userAssignmentId: String): Result<Boolean> {
+        return try {
+            val response = httpClient.post {
+                endPoint("unSubmitAssignment")
+                setBody(userAssignmentId)
+            }
+            if (response.status == HttpStatusCode.OK) {
+                Result.SuccessWithData(true)
+            } else {
+                Result.Error("Error submitting review: ${response.status}")
+            }
+        } catch (e: Exception) {
+            Result.Error("Error submitting review: ${e.message}")
+        }
+    }
 }
