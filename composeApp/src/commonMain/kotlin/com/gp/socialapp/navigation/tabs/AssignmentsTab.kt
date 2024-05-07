@@ -28,7 +28,7 @@ data class AssignmentsTab(val communityId:String = "") : Tab {
 
             return remember {
                 TabOptions(
-                    index = 1u,
+                    index = if(communityId.isEmpty()) 1u else 2u,
                     title = title,
                     icon = icon
                 )

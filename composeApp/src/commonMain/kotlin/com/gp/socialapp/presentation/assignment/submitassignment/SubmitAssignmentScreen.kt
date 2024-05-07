@@ -213,7 +213,7 @@ fun UploadSection(
                     onClick = onViewUploadedAttachment,
                     modifier = Modifier.weight(1f).padding(8.dp)
                 ) {
-                    Text("View Uploaded Assignment")
+                    Text("View Uploaded files")
                     Text(
                         text = uploadedFileSize.toString(),
                         modifier =  Modifier.padding(start = 4.dp).border(1.dp,MaterialTheme.colorScheme.surface,CircleShape).padding(8.dp)

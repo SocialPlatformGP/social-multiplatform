@@ -42,6 +42,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gp.socialapp.data.assignment.model.Assignment
 import com.gp.socialapp.presentation.assignment.createassignment.CreateAssignmentScreen
+import com.gp.socialapp.presentation.assignment.submissionreview.SubmissionReviewScreen
 import com.gp.socialapp.presentation.assignment.submitassignment.SubmitAssignmentScreen
 import com.gp.socialapp.util.LocalDateTimeUtil.convertEpochToTime
 
@@ -62,7 +63,7 @@ data class AssignmentHomeScreen(val communityId: String = "") : Screen {
                 when (action) {
                     is AssignmentHomeUiAction.OnAssignmentClicked -> {
                         if (action.assignment.creatorId == state.value.currentUser.id) {
-                            //TODO Navigate to dashboard
+                            navigator.push(SubmissionReviewScreen(action.assignment.id,""))
                         } else {
                             navigator.push(
                                 SubmitAssignmentScreen(action.assignment)
@@ -176,6 +177,4 @@ fun AssignmentItem(
             }
         }
     }
-
-
 }

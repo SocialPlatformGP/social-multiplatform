@@ -23,6 +23,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import com.gp.socialapp.data.assignment.model.AssignmentAttachment
+import com.gp.socialapp.util.AppConstants.BASE_URL
 import com.seiko.imageloader.model.ImageAction
 import com.seiko.imageloader.rememberImageSuccessPainter
 import com.seiko.imageloader.ui.AutoSizeBox
@@ -45,12 +46,12 @@ fun SubmissionAttachmentPreview(
             when {
                 attachment.type.contains("image") -> {
                     // Image Preview
-                    ImagePreview(attachment = attachment)
+                    ImagePreview(attachment = attachment.copy(url = BASE_URL+attachment.url))
                 }
 
                 attachment.type.contains("pdf") -> {
                     PdfPreview(
-                        attachment = attachment
+                        attachment = attachment.copy(url = BASE_URL+attachment.url)
                     )
                 }
 

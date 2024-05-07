@@ -74,7 +74,7 @@ data class SubmissionReviewScreen(
             initialPage = submissions.indexOfFirst { it.id == submissionId }.let { if (it == -1) 0 else it },
             pageCount = { submissions.size },
         )
-        val currentSubmission = submissions[pagerState.currentPage]
+        val currentSubmission = submissions.getOrNull(pagerState.currentPage)?:UserAssignmentSubmission()
         Scaffold(modifier = modifier, topBar = {
             TopAppBar(title = {
                 Text(
