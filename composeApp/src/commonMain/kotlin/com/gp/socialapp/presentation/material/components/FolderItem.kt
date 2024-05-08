@@ -53,7 +53,7 @@ fun FolderItem(
                 modifier = Modifier.fillMaxWidth().size(100.dp)
             )
             Text(
-                text = "Name: " + folder.name,
+                text = folder.name,
                 fontSize = 14.sp,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,

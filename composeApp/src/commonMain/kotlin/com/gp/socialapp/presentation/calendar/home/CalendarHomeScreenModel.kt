@@ -44,43 +44,18 @@ class CalendarHomeScreenModel (
 
     private fun getUserEvents() {
         screenModelScope.launch (DispatcherIO){
-//            calendarRepo.getUserEvents(_uiState.value.currentUser.id).collect { result ->
-//                result.onSuccessWithData {  events ->
-//                    _uiState.update { oldState ->
-//                        oldState.copy(
-//                            events = events
-//                        )
-//                    }
-//                }.onFailure {
-//                    /*TODO handle error*/
-//                }.onLoading {
-//                    /*TODO handle loading*/
-//                }
-//            }
-            val events = listOf(
-                CalendarEvent(
-                    title = "User Event 1",
-                    description = "User Event 1 Description",
-                    date = LocalDateTime.now().toInstant(TimeZone.UTC).toEpochMilliseconds(),
-                    type = EventType.EVENT.value
-                ),
-                CalendarEvent(
-                    title = "User Event 2",
-                    description = "User Event 2 Description",
-                    date = LocalDateTime.now().toInstant(TimeZone.UTC).toEpochMilliseconds(),
-                    type = EventType.EVENT.value
-                ),
-                CalendarEvent(
-                    title = "User TASK 1",
-                    description = "User TASK 1 Description",
-                    date = LocalDateTime.now().toInstant(TimeZone.UTC).toEpochMilliseconds(),
-                    type = EventType.TASK.value
-                ),
-            )
-            _uiState.update {
-                it.copy(
-                    events = events
-                )
+            calendarRepo.getUserEvents(_uiState.value.currentUser.id).collect { result ->
+                result.onSuccessWithData {  events ->
+                    _uiState.update { oldState ->
+                        oldState.copy(
+                            events = events
+                        )
+                    }
+                }.onFailure {
+                    /*TODO handle error*/
+                }.onLoading {
+                    /*TODO handle loading*/
+                }
             }
         }
     }

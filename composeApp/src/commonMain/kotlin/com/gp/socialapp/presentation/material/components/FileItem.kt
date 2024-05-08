@@ -51,7 +51,7 @@ fun FileItem(
                 modifier = Modifier.fillMaxWidth().size(100.dp)
             )
             Text(
-                text = "Name: " + file.name,
+                text = file.name,
                 fontSize = 14.sp,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,

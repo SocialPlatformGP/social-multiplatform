@@ -231,8 +231,8 @@ data class UserInformationScreen(
 
                     },
                     modifier = Modifier
-                        .weight(1f)
-                        .padding(top = 8.dp, end = 4.dp),
+                        .fillMaxWidth()
+                        .padding(top = 4.dp)
                 )
                 OutlinedTextField(
                     value = state.phoneNumber,

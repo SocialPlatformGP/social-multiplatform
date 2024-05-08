@@ -96,7 +96,7 @@ fun CreateAssignmentDueDate(
             OutlinedTextField(
                 value = formattedDate,
                 onValueChange = {},
-                label = { Text(text = stringResource(Res.string.date_of_birth)) },
+                label = { Text(text = "Due data") },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 4.dp)

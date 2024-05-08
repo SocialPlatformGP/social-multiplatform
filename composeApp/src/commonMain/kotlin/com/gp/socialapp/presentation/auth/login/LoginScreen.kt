@@ -124,10 +124,7 @@ object LoginScreen : Screen {
             val providers = listOf(
                 MyOAuthProvider("Google", OAuthProviderIcons.Google, Google),
                 MyOAuthProvider("Microsoft", OAuthProviderIcons.Microsoft, Azure),
-                MyOAuthProvider("Facebook", OAuthProviderIcons.Facebook, Facebook),
-                MyOAuthProvider("Twitter", OAuthProviderIcons.Twitter, Twitter),
                 MyOAuthProvider("GitHub", OAuthProviderIcons.Github, Github),
-                MyOAuthProvider("Linkedin", OAuthProviderIcons.Linkedin, LinkedIn),
                 MyOAuthProvider("Discord", OAuthProviderIcons.Discord, Discord),
                 MyOAuthProvider("Slack", OAuthProviderIcons.Slack, Slack),
             )
