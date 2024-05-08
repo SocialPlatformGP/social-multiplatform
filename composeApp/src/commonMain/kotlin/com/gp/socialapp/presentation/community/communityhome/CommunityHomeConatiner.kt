@@ -141,7 +141,7 @@ data class CommunityHomeContainer(
                             BottomTabNavigationItem(tab = MaterialTab(communityId))
                             if (userCommunities.find { it.id == communityId }?.members?.get(currentUser.id) == true ) {
                                 BottomTabNavigationItem(
-                                    tab = CreatorAssignmentTab(communityId)
+                                    tab = AssignmentsTab(onNavigation, communityId)
                                 )
                             }
                             BottomTabNavigationItem(tab = CommunityMembersTab(communityId))

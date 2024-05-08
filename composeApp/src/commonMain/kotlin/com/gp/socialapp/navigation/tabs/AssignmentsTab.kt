@@ -18,8 +18,13 @@ import cafe.adriel.voyager.navigator.tab.TabOptions
 import cafe.adriel.voyager.transitions.SlideTransition
 import com.gp.socialapp.presentation.assignment.homeassignment.AssignmentHomeScreen
 import com.gp.socialapp.presentation.home.screen.HomeScreen
+import kotlin.jvm.Transient
 
-object AssignmentsTab : Tab {
+data class AssignmentsTab(
+    @Transient
+    private val onNavigation:(Boolean) -> Unit,
+    private val communityId:String = ""
+) : Tab {
     override val options: TabOptions
         @Composable
         get() {
@@ -28,7 +33,7 @@ object AssignmentsTab : Tab {
 
             return remember {
                 TabOptions(
-                    index =  1u,
+                    index = 1u,
                     title = title,
                     icon = icon
                 )
@@ -38,12 +43,11 @@ object AssignmentsTab : Tab {
     @Composable
     override fun Content() {
         Navigator(
-            screen = AssignmentHomeScreen()
-//            { onBottomBarVisibilityChanged(it) }
+            screen = AssignmentHomeScreen(communityId)
         ) { navigator ->
-//            LaunchedEffect(navigator.lastItem) {
-//                onBottomBarVisibilityChanged(navigator.lastItem is HomeScreen)
-//            }
+            LaunchedEffect(navigator.lastItem) {
+                onNavigation(navigator.lastItem is AssignmentHomeScreen)
+            }
             SlideTransition(navigator = navigator)
         }
     }

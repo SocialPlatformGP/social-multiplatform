@@ -8,14 +8,23 @@ import androidx.compose.material.icons.rounded.Description
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
+import cafe.adriel.voyager.transitions.SlideTransition
+import com.gp.socialapp.presentation.calendar.home.CalendarHomeScreen
+import com.gp.socialapp.presentation.chat.home.ChatHomeScreen
+import kotlin.jvm.Transient
 
-object CalendarTab: Tab {
+data class CalendarTab(
+    @Transient
+    private val onNavigation: (Boolean) -> Unit,
+): Tab {
     override val options: TabOptions
     @Composable
     get() {
@@ -34,12 +43,11 @@ object CalendarTab: Tab {
     @Composable
     override fun Content() {
         //TODO
-        Box(modifier = Modifier.fillMaxSize()) {
-            Text(
-                "Calendar Tab Content",
-                style = MaterialTheme.typography.headlineLarge,
-                modifier = Modifier.align(Alignment.Center)
-            )
+        Navigator(screen = CalendarHomeScreen) { navigator ->
+            LaunchedEffect(navigator.lastItem) {
+                onNavigation(navigator.lastItem is CalendarHomeScreen)
+            }
+            SlideTransition(navigator = navigator)
         }
     }
 }

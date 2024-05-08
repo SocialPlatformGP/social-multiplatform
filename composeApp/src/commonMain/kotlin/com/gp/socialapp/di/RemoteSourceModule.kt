@@ -6,6 +6,8 @@ import com.gp.socialapp.data.auth.source.remote.AuthenticationRemoteDataSource
 import com.gp.socialapp.data.auth.source.remote.AuthenticationRemoteDataSourceImpl
 import com.gp.socialapp.data.auth.source.remote.UserRemoteDataSource
 import com.gp.socialapp.data.auth.source.remote.UserRemoteDataSourceImpl
+import com.gp.socialapp.data.calendar.source.remote.CalendarRemoteDataSource
+import com.gp.socialapp.data.calendar.source.remote.CalendarRemoteDataSourceImpl
 import com.gp.socialapp.data.chat.source.remote.MessageRemoteDataSource
 import com.gp.socialapp.data.chat.source.remote.MessageRemoteDataSourceImpl
 import com.gp.socialapp.data.chat.source.remote.RecentRoomRemoteDataSource
@@ -75,6 +77,12 @@ val remoteDataSourceModuleK = DI.Module("remoteDataSourceModule") {
                 contentConverter = KotlinxWebsocketSerializationConverter(Json)
             }
         }
+    }
+    bind<CalendarRemoteDataSource>() with singleton {
+        CalendarRemoteDataSourceImpl(
+            instance(),
+            instance()
+        )
     }
 }
 

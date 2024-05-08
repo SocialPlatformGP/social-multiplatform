@@ -12,11 +12,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.core.lifecycle.LifecycleEffect
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.kodein.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gp.socialapp.data.calendar.model.CalendarEvent
+import com.gp.socialapp.presentation.calendar.createevent.CreateEventScreen
 import com.gp.socialapp.presentation.calendar.home.components.CalendarWithEvents
 
 object CalendarHomeScreen: Screen {
@@ -24,14 +26,17 @@ object CalendarHomeScreen: Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = rememberScreenModel<CalendarHomeScreenModel>()
+        LifecycleEffect(
+            onStarted = {screenModel.init()},
+            onDisposed = {screenModel.onDispose()}
+        )
         val state = screenModel.uiState.collectAsState()
         CalendarScreenContent(
             events = state.value.events,
             onAction = { action ->
                 when(action) {
                     is CalendarHomeUiAction.CreateEvent -> {
-//                        navigator.push()
-                        TODO()
+                        navigator.push(CreateEventScreen)
                     }
                 }
             }

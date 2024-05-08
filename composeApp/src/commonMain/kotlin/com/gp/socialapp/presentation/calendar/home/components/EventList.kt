@@ -3,6 +3,7 @@ package com.gp.socialapp.presentation.calendar.home.components
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.Task
@@ -18,6 +19,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.gp.socialapp.data.calendar.model.CalendarEvent
 
@@ -49,7 +51,7 @@ private fun EventItem(
         modifier = modifier
             .clickable {
                 isExpanded = !isExpanded
-            },
+            }.clip(RoundedCornerShape(2.dp)),
         headlineContent = {
             Text(
                 text = event.title,
