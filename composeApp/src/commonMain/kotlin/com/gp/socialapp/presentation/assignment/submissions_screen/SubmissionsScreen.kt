@@ -1,4 +1,4 @@
-package com.gp.socialapp.presentation.assignment.homeassignment
+package com.gp.socialapp.presentation.assignment.submissions_screen
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -17,13 +17,17 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Assignment
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -41,63 +45,66 @@ import cafe.adriel.voyager.kodein.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gp.socialapp.data.assignment.model.Assignment
-import com.gp.socialapp.presentation.assignment.createassignment.CreateAssignmentScreen
+import com.gp.socialapp.data.assignment.model.UserAssignmentSubmission
+import com.gp.socialapp.presentation.assignment.homeassignment.AssignmentHomeUiAction
+import com.gp.socialapp.presentation.assignment.homeassignment.AssignmentHomeUiState
+import com.gp.socialapp.presentation.assignment.homeassignment.AssignmentItem
 import com.gp.socialapp.presentation.assignment.submissionreview.SubmissionReviewScreen
-import com.gp.socialapp.presentation.assignment.submissions_screen.SubmissionsScreen
-import com.gp.socialapp.presentation.assignment.submitassignment.SubmitAssignmentScreen
 import com.gp.socialapp.util.LocalDateTimeUtil.convertEpochToTime
 
-data class AssignmentHomeScreen(val communityId: String = "") : Screen {
+data class SubmissionsScreen(
+    val assignment: Assignment,
+) : Screen {
+
+
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val screenModel = rememberScreenModel<AssignmentHomeScreenModel>()
-        val state = screenModel.uiState.collectAsState()
+        val screenModel = rememberScreenModel<SubmissionsScreenModel>()
         LifecycleEffect(
             onStarted = {
-                screenModel.onInit(communityId)
-            },
+                screenModel.init(assignment)
+            }
         )
-        AssignmentHomeScreenContent(
+        val state = screenModel.uiState.collectAsState()
+        SubmissionsScreenContent(
             state = state.value,
-            action = fun(action: AssignmentHomeUiAction) {
-                when (action) {
-                    is AssignmentHomeUiAction.OnAssignmentClicked -> {
-                        if (action.assignment.creatorId == state.value.currentUser.id) {
-                            navigator.push(SubmissionsScreen(action.assignment))
-                        } else {
-                            navigator.push(
-                                SubmitAssignmentScreen(action.assignment)
-                            )
-                        }
-                    }
-
-                    AssignmentHomeUiAction.OnBackClicked -> navigator.pop()
-                    AssignmentHomeUiAction.OnFabClicked -> {
-                        navigator.push(CreateAssignmentScreen(communityId))
+            onBack = {
+                navigator.pop()
+            },
+            action = {
+                when (it) {
+                    is SubmissionsScreenUiAction.SubmissionClick -> {
+                        navigator.push(SubmissionReviewScreen(assignment.id, it.submission.id))
                     }
                 }
             }
         )
     }
-}
 
+}
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AssignmentHomeScreenContent(
-    state: AssignmentHomeUiState, action: (AssignmentHomeUiAction) -> Unit
-) {
-    Scaffold (
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    action(AssignmentHomeUiAction.OnFabClicked)
+fun SubmissionsScreenContent(
+    state: SubmissionsScreenUiState,
+    onBack: () -> Unit,
+    action: (SubmissionsScreenUiAction) -> Unit) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(text = "Submissions") },
+                navigationIcon = {
+                    IconButton(
+                        onClick = onBack
+                    ) {
+                        Image(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
+
                 }
-            ){
-                Icon(
-                    imageVector = Icons.Filled.Add,
-                    contentDescription = null
-                )
-            }
+            )
         }
     ){ paddingValues ->
         Column(
@@ -106,17 +113,17 @@ fun AssignmentHomeScreenContent(
             LazyColumn(
                 modifier = Modifier.fillMaxSize()
             ) {
-                items(state.assignments) { assignment ->
+                items(state.submissions) { submission ->
                     val animatable = remember { Animatable(0.5f) }
                     LaunchedEffect(key1 = true) {
                         animatable.animateTo(1f, tween(350, easing = FastOutSlowInEasing))
                     }
-                    AssignmentItem(
+                    SubmissionItem(
                         modifier = Modifier.graphicsLayer {
                             this.scaleX = animatable.value
                             this.scaleY = animatable.value
                         },
-                        assignment,
+                        submission,
                         action = action
                     )
                 }
@@ -126,13 +133,13 @@ fun AssignmentHomeScreenContent(
 }
 
 @Composable
-fun AssignmentItem(
+fun SubmissionItem(
     modifier: Modifier = Modifier,
-    assignment: Assignment,
-    action: (AssignmentHomeUiAction) -> Unit
+    submission: UserAssignmentSubmission,
+    action: (SubmissionsScreenUiAction) -> Unit
 ) {
     Card(
-        onClick = { action(AssignmentHomeUiAction.OnAssignmentClicked(assignment)) },
+        onClick = { action(SubmissionsScreenUiAction.SubmissionClick(submission)) },
         modifier = modifier
             .fillMaxWidth()
             .padding(
@@ -166,11 +173,11 @@ fun AssignmentItem(
                     Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        text = assignment.title
+                        text = submission.userName
                     )
                     Spacer(modifier = Modifier.weight(1f))
                     Text(
-                        text = convertEpochToTime(assignment.createdAt),
+                        text = convertEpochToTime(submission.submittedAt),
                         modifier = Modifier.padding(end = 8.dp)
                     )
                 }

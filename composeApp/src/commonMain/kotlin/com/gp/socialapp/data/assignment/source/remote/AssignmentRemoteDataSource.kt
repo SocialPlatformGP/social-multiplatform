@@ -24,4 +24,5 @@ interface AssignmentRemoteDataSource {
     ): Result<Boolean>
 
     suspend fun turnInAssignments(userAssignmentId: String): Result<Boolean>
+    suspend fun unSubmitAssignment(userAssignmentId: String): Result<Boolean>
 }

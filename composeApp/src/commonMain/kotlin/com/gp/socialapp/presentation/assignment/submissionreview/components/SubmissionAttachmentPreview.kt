@@ -2,12 +2,17 @@ package com.gp.socialapp.presentation.assignment.submissionreview.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BrokenImage
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -23,6 +28,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import com.gp.socialapp.data.assignment.model.AssignmentAttachment
+import com.gp.socialapp.presentation.material.utils.MimeType
+import com.gp.socialapp.util.AppConstants.BASE_URL
 import com.seiko.imageloader.model.ImageAction
 import com.seiko.imageloader.rememberImageSuccessPainter
 import com.seiko.imageloader.ui.AutoSizeBox
@@ -31,31 +38,52 @@ import com.seiko.imageloader.ui.AutoSizeBox
 fun SubmissionAttachmentPreview(
     modifier: Modifier = Modifier,
     attachment: AssignmentAttachment?,
+    onDownloadClicked: (AssignmentAttachment?) -> Unit={}
 ) {
-    Box(
+    Column (
         modifier = modifier.fillMaxHeight()
     ) {
-        if (attachment == null) {
+        Row (
+            modifier = Modifier.fillMaxWidth()
+        ){
             Text(
                 text = attachment?.name ?: "No attachment selected",
                 style = MaterialTheme.typography.headlineMedium,
-                modifier = Modifier.align(Alignment.Center)
+                modifier = Modifier.padding(8.dp)
             )
-        } else {
-            when {
-                attachment.type.contains("image") -> {
-                    // Image Preview
-                    ImagePreview(attachment = attachment)
-                }
+            Spacer(modifier = Modifier.weight(1f))
+            Button(
+                onClick = {onDownloadClicked(attachment)},
+                modifier = Modifier.padding(8.dp)
+            ){
+                Text("Download")
+            }
+        }
+        Box {
+            if (attachment == null) {
+                Text(
+                    text = attachment?.name ?: "No attachment selected",
+                    style = MaterialTheme.typography.headlineMedium,
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            } else {
+                when (val mimetype = MimeType.getMimeTypeFromFileName(attachment.name)) {
 
-                attachment.type.contains("pdf") -> {
-                    PdfPreview(
-                        attachment = attachment
-                    )
-                }
+                    is MimeType.Image -> {
+                        // Image Preview
+                        ImagePreview(attachment = attachment.copy(url = BASE_URL + attachment.url))
+                    }
 
-                else -> {
-                    // Other file type
+                    is MimeType.Application -> {
+                        if (mimetype == MimeType.Application.PDF)
+                            PdfPreview(
+                                attachment = attachment.copy(url = BASE_URL + attachment.url)
+                            )
+                    }
+
+                    else -> {
+
+                    }
                 }
             }
         }

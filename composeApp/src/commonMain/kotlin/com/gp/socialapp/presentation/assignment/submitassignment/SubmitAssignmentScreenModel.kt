@@ -106,8 +106,22 @@ class SubmitAssignmentScreenModel(
 
             }
             is SubmitAssignmentUiAction.OnTurnInAssignment -> turnInAssignment(action.userAssignmentId,action.assignmentId)
+            is SubmitAssignmentUiAction.OnUnSubmitAssignment -> unSubmitAssignment(action.userAssignmentId,action.assignmentId)
 
             else -> {}
+        }
+    }
+
+    private fun unSubmitAssignment(userAssignmentId: String, assignmentId: String) {
+                screenModelScope.launch {
+            when(val result = assignmentRepository.unSubmitAssignment(userAssignmentId)){
+                is Result.Error -> println(result.message)
+                Result.Loading -> {}
+                is Result.SuccessWithData -> {
+                    getOldSubmission(assignmentId)
+                }
+                else->Unit
+            }
         }
     }
 

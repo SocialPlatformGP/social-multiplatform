@@ -16,7 +16,7 @@ actual fun PdfPreview(
     attachment: AssignmentAttachment
 ) {
     val pdfState = rememberVerticalPdfReaderState(
-        resource = ResourceType.Remote("https://myreport.altervista.org/Lorem_Ipsum.pdf"),
+        resource = ResourceType.Remote(attachment.url),
         isZoomEnable = true
     )
     VerticalPDFReader(

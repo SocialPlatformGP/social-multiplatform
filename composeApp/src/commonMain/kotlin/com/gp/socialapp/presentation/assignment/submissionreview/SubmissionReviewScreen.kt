@@ -74,7 +74,7 @@ data class SubmissionReviewScreen(
             initialPage = submissions.indexOfFirst { it.id == submissionId }.let { if (it == -1) 0 else it },
             pageCount = { submissions.size },
         )
-        val currentSubmission = submissions[pagerState.currentPage]
+        val currentSubmission = submissions.getOrNull(pagerState.currentPage)?:UserAssignmentSubmission()
         Scaffold(modifier = modifier, topBar = {
             TopAppBar(title = {
                 Text(
@@ -131,8 +131,15 @@ data class SubmissionReviewScreen(
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         //AttachmentPreview
-                        SubmissionAttachmentPreview(modifier = modifier.weight(1f),
-                            attachment = currentSubmission.attachments.find { it.id == currentPreviewedAttachmentId })
+                        SubmissionAttachmentPreview(
+                            modifier = modifier.weight(1f),
+                            attachment = currentSubmission.attachments.find { it.id == currentPreviewedAttachmentId },
+                            onDownloadClicked = { attachment ->
+                                attachment?.let {
+                                    onAction(SubmissionReviewUiAction.DownloadAttachment(attachment))
+                                }
+                            }
+                        )
                         //Side Column (Submission Details, Comments, Grade, Feedback)
                         SubmissionReviewSideColumn(currentSubmission = currentSubmission,
                             currentPreviewedAttachmentId = currentPreviewedAttachmentId,

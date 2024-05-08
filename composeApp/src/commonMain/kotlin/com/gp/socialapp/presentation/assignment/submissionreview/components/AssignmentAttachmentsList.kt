@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -65,8 +66,8 @@ private fun AssignmentAttachmentItem(
     val imageVector = getFileImageVector(mimeType)
     Surface (
         modifier = modifier
-            .widthIn(
-                min = TextFieldDefaults.MinWidth
+            .width(
+                TextFieldDefaults.MinWidth
             ).clickable {
             onAttachmentClicked(attachment.id)
         },
@@ -91,5 +92,4 @@ private fun AssignmentAttachmentItem(
             )
         }
     }
-
 }
