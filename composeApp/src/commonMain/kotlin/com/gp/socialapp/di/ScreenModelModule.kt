@@ -48,7 +48,7 @@ val screenModelModuleK = DI.Module("screenModelModule") {
         )
     }
     bind<SubmissionReviewScreenModel>() with singleton {
-        SubmissionReviewScreenModel(instance())
+        SubmissionReviewScreenModel(instance(),instance())
     }
     bind<FeedScreenModel>() with singleton { FeedScreenModel(instance(), instance(), instance()) }
     bind<EditPostScreenModel>() with singleton { EditPostScreenModel(instance()) }

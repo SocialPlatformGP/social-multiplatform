@@ -1,5 +1,7 @@
 package com.gp.socialapp.presentation.assignment.submissionreview
 
+import com.gp.socialapp.data.assignment.model.AssignmentAttachment
+
 sealed interface SubmissionReviewUiAction {
     data object BackPressed : SubmissionReviewUiAction
     data object SubmitReview : SubmissionReviewUiAction
@@ -10,4 +12,5 @@ sealed interface SubmissionReviewUiAction {
     data class ViewSubmission(val submissionId: String): SubmissionReviewUiAction
     data class GradeChanged(val grade: String) : SubmissionReviewUiAction
     data class FeedbackChanged(val feedback: String) : SubmissionReviewUiAction
+    data class DownloadAttachment(val attachment: AssignmentAttachment) : SubmissionReviewUiAction
 }

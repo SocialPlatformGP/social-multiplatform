@@ -131,8 +131,15 @@ data class SubmissionReviewScreen(
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         //AttachmentPreview
-                        SubmissionAttachmentPreview(modifier = modifier.weight(1f),
-                            attachment = currentSubmission.attachments.find { it.id == currentPreviewedAttachmentId })
+                        SubmissionAttachmentPreview(
+                            modifier = modifier.weight(1f),
+                            attachment = currentSubmission.attachments.find { it.id == currentPreviewedAttachmentId },
+                            onDownloadClicked = { attachment ->
+                                attachment?.let {
+                                    onAction(SubmissionReviewUiAction.DownloadAttachment(attachment))
+                                }
+                            }
+                        )
                         //Side Column (Submission Details, Comments, Grade, Feedback)
                         SubmissionReviewSideColumn(currentSubmission = currentSubmission,
                             currentPreviewedAttachmentId = currentPreviewedAttachmentId,

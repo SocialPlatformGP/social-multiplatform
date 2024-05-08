@@ -2,7 +2,10 @@ package com.gp.socialapp.presentation.assignment.submissionreview
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
+import com.gp.socialapp.data.assignment.model.AssignmentAttachment
 import com.gp.socialapp.data.assignment.repository.AssignmentRepository
+import com.gp.socialapp.data.material.repository.MaterialRepository
+import com.gp.socialapp.presentation.material.utils.MimeType
 import com.gp.socialapp.util.DispatcherIO
 import com.gp.socialapp.util.Result
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,7 +15,8 @@ import kotlinx.coroutines.launch
 
 class SubmissionReviewScreenModel(
     private val assignmentRepo: AssignmentRepository,
-): ScreenModel {
+    private val materialRepo: MaterialRepository
+) : ScreenModel {
     private val _uiState = MutableStateFlow(SubmissionReviewUiState())
 
     val uiState = _uiState.asStateFlow()
@@ -20,18 +24,21 @@ class SubmissionReviewScreenModel(
         getCurrentAssignmentAndSubmissions(assignmentId)
         getSubmissions(assignmentId, submissionId)
     }
+
     private fun getCurrentAssignmentAndSubmissions(assignmentId: String) {
-        screenModelScope.launch (DispatcherIO) {
-            assignmentRepo.getAssignmentById(assignmentId).let{ result ->
-                when(result){
+        screenModelScope.launch(DispatcherIO) {
+            assignmentRepo.getAssignmentById(assignmentId).let { result ->
+                when (result) {
                     is Result.SuccessWithData -> {
                         _uiState.update {
                             it.copy(currentAssignment = result.data)
                         }
                     }
+
                     is Result.Error -> {
                         println("Error: ${result.message}")
                     }
+
                     else -> Unit
                 }
             }
@@ -39,12 +46,15 @@ class SubmissionReviewScreenModel(
     }
 
     private fun getSubmissions(assignmentId: String, initialSubmissionId: String) {
-        screenModelScope.launch (DispatcherIO) {
-            assignmentRepo.getSubmissions(assignmentId).collect{ result ->
-                when(result){
+        screenModelScope.launch(DispatcherIO) {
+            assignmentRepo.getSubmissions(assignmentId).collect { result ->
+                when (result) {
                     is Result.SuccessWithData -> {
                         _uiState.update {
-                            it.copy(submissions = result.data, currentSubmissionId = result.data.firstOrNull()?.id?:"")
+                            it.copy(
+                                submissions = result.data,
+                                currentSubmissionId = result.data.firstOrNull()?.id ?: ""
+                            )
                         }
                         if (initialSubmissionId.isNotEmpty()) {
                             _uiState.update {
@@ -52,9 +62,11 @@ class SubmissionReviewScreenModel(
                             }
                         }
                     }
+
                     is Result.Error -> {
                         println("Error: ${result.message}")
                     }
+
                     else -> Unit
                 }
             }
@@ -62,31 +74,50 @@ class SubmissionReviewScreenModel(
     }
 
     fun submitAction(action: SubmissionReviewUiAction) {
-        when(action) {
+        when (action) {
             is SubmissionReviewUiAction.AttachmentClicked -> {
                 _uiState.update {
                     it.copy(currentPreviewedAttachmentId = action.attachmentId)
                 }
             }
+
             is SubmissionReviewUiAction.FeedbackChanged -> {
                 updateFeedback(action.feedback)
             }
+
             is SubmissionReviewUiAction.GradeChanged -> {
                 updateGrade(action.grade)
             }
+
             SubmissionReviewUiAction.SubmitReview -> {
                 submitReview()
             }
+
             is SubmissionReviewUiAction.ViewNext -> {
                 updateCurrentSubmission(action.nextId)
             }
+
             is SubmissionReviewUiAction.ViewPrevious -> {
                 updateCurrentSubmission(action.previousId)
             }
+
             is SubmissionReviewUiAction.ViewSubmission -> {
                 updateCurrentSubmission(action.submissionId)
             }
+
+            is SubmissionReviewUiAction.DownloadAttachment -> {
+                downloadAttachment(action.attachment)
+            }
+
             else -> Unit
+        }
+    }
+
+    private fun downloadAttachment(attachment: AssignmentAttachment) {
+        val mimeType = MimeType.getMimeTypeFromFileName(attachment.name)
+        val fullMime = MimeType.getFullMimeType(mimeType)
+        screenModelScope.launch {
+            materialRepo.openFile(attachment.id,attachment.url,fullMime)
         }
     }
 
@@ -97,20 +128,22 @@ class SubmissionReviewScreenModel(
     }
 
     private fun submitReview() {
-        screenModelScope.launch (DispatcherIO) {
-            with(_uiState.value){
+        screenModelScope.launch(DispatcherIO) {
+            with(_uiState.value) {
                 assignmentRepo.submitAssignmentSubmissionReview(
                     submissionId = currentSubmissionId,
                     grade = grade,
                     feedback = feedback,
-                ).let{ result ->
-                    when(result){
+                ).let { result ->
+                    when (result) {
                         is Result.Success -> {
                             println("Review submitted successfully")
                         }
+
                         is Result.Error -> {
                             println("Error: ${result.message}")
                         }
+
                         else -> Unit
                     }
                 }
