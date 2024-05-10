@@ -1,11 +1,11 @@
 package com.gp.socialapp.data.chat.source.remote
 
-import com.gp.socialapp.data.chat.model.RecentRoomResponse
+import com.gp.socialapp.data.chat.model.RecentRoom
 import com.gp.socialapp.util.Result
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 
 interface RecentRoomRemoteDataSource {
-    fun getAllRecentRooms(userId: String): Flow<Result<List<RecentRoomResponse>>>
-
-
+    fun fetchRecentRooms(userId: String, scope: CoroutineScope): Flow<Result<List<RecentRoom>>>
+    suspend fun onDispose()
 }

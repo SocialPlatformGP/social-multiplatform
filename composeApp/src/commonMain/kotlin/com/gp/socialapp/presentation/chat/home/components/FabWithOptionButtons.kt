@@ -8,21 +8,15 @@ import com.gp.socialapp.presentation.chat.home.ChatHomeUiEvent
 
 @Composable
 fun FabWithOptionButtons(
-    fabState: MutableState<Boolean>,
-    event: (ChatHomeUiEvent) -> Unit
+    fabState: MutableState<Boolean>, event: (ChatHomeUiEvent) -> Unit
 ) {
     RectangleFab(
-        fabState,
-        { event(ChatHomeUiEvent.OnCreateGroupClick) },
-        "Create Group"
+        fabState, { event(ChatHomeUiEvent.OnCreateGroupClick) }, "Create Group"
     )
     RectangleFab(
-        fabState,
-        { event(ChatHomeUiEvent.OnCreatePrivateChatClick) },
-        "Create Private Chat"
+        fabState, { event(ChatHomeUiEvent.OnCreatePrivateChatClick) }, "Create Private Chat"
     )
     SingleFab(
-        fabState,
-        Icons.Default.Cancel
+        fabState, Icons.Default.Cancel
     )
 }

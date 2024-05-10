@@ -1,37 +1,57 @@
 package com.gp.socialapp.data.chat.source.remote
 
-import com.gp.socialapp.data.chat.source.remote.model.request.RecentRoomRequests
-import com.gp.socialapp.data.chat.source.remote.model.response.RecentRoomResponses
-import com.gp.socialapp.data.chat.utils.EndPoint
-import com.gp.socialapp.data.post.util.endPoint
+
+import com.gp.socialapp.data.chat.model.RecentRoom
+import com.gp.socialapp.data.chat.model.UserRooms
+import com.gp.socialapp.data.chat.source.remote.model.RemoteRecentRoom
 import com.gp.socialapp.util.Result
-import io.ktor.client.HttpClient
-import io.ktor.client.call.body
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
-import io.ktor.http.HttpStatusCode
+import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.postgrest.query.filter.FilterOperation
+import io.github.jan.supabase.postgrest.query.filter.FilterOperator
+import io.github.jan.supabase.realtime.channel
+import io.github.jan.supabase.realtime.postgresListDataFlow
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 class RecentRoomRemoteDataSourceImpl(
-    private val client: HttpClient
+    private val supabase: SupabaseClient
 ) : RecentRoomRemoteDataSource {
-    override fun getAllRecentRooms(userId: String) = flow {
-        println("Id: $userId")
+    private val userRoomsChannel = supabase.channel("user_rooms")
+    private val recentRoomsChannel = supabase.channel("messages")
+    override fun fetchRecentRooms(
+        userId: String,
+        scope: CoroutineScope
+    ): Flow<Result<List<RecentRoom>>> = flow {
         emit(Result.Loading)
         try {
-            val response = client.post {
-                endPoint(EndPoint.GetAllRecentRooms.url)
-                setBody(RecentRoomRequests.GetAllRecentRooms(userId))
-            }
-            println("response: $response")
-            if (response.status == HttpStatusCode.OK) {
-                val result = response.body<RecentRoomResponses.GetAllRecentRooms>()
-                emit(Result.SuccessWithData(result.recentRooms))
-            } else {
-                emit(Result.Error("An error occurred"))
-            }
+            userRoomsChannel.postgresListDataFlow(
+                schema = "public",
+                table = "user_rooms",
+                primaryKey = UserRooms::userId,
+                filter = FilterOperation("userId", FilterOperator.EQ, userId)
+            ).onEach { userRooms ->
+                recentRoomsChannel.postgresListDataFlow(
+                    schema = "public",
+                    table = "recent_rooms",
+                    primaryKey = RemoteRecentRoom::roomId,
+                    filter = FilterOperation("roomId", FilterOperator.IN, userRooms)
+                ).onEach { remoteRecentRooms ->
+                    emit(Result.SuccessWithData(remoteRecentRooms.map { remoteRecentRoom -> remoteRecentRoom.toRecentRoom() }
+                        .sortedByDescending { recentRoom -> recentRoom.lastMessageTime }))
+                }.launchIn(scope)
+            }.launchIn(scope)
         } catch (e: Exception) {
-            emit(Result.Error(e.message ?: "An error occurred"))
+            emit(Result.Error("Error fetching recent rooms: ${e.message}"))
         }
     }
+
+
+    override suspend fun onDispose() {
+        userRoomsChannel.unsubscribe()
+        recentRoomsChannel.unsubscribe()
+    }
+
 }

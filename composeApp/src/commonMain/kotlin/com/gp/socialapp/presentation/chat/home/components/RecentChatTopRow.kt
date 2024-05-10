@@ -5,11 +5,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import korlibs.time.DateTimeTz
 
 @Composable
 fun RecentChatTopRow(
     title: String,
-    lastMessageTime: Long,
+    lastMessageTime: DateTimeTz,
 ) {
     Row(
         Modifier.fillMaxWidth()
