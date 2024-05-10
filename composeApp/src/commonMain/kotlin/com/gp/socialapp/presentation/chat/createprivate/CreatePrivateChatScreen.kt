@@ -39,13 +39,12 @@ object CreatePrivateChatScreen : Screen {
             )
             screenModel.clear()
         }
-        CreatePrivateChatContent(
-            users = state.matchingUsers,
+        CreatePrivateChatContent(users = state.matchingUsers,
             onUserSelected = { user ->
-            screenModel.onUserSelected(user)
+                screenModel.onUserSelected(user)
             },
             onSearchQueryChanged = screenModel::onSearchQueryChanged,
-            onSearchQuerySubmitted = {  },
+            onSearchQuerySubmitted = { },
             onBackPressed = navigator::pop
         )
     }
@@ -58,26 +57,22 @@ object CreatePrivateChatScreen : Screen {
         onUserSelected: (User) -> Unit,
         onBackPressed: () -> Unit
     ) {
-        var isSearchBarVisible by remember{ mutableStateOf(false) }
-        Scaffold (
-            topBar = {
-                if(isSearchBarVisible) {
-                    CreatePrivateChatSearchBar(
-                        onSearchQueryChange = onSearchQueryChanged,
-                        onSearchQuerySubmit = {
-                            isSearchBarVisible = false
-                            onSearchQuerySubmitted()
-                        },
-                        onBackPressed = onBackPressed
-                    )
-                } else {
-                    CreatePrivateChatTopBar (onBackPressed= onBackPressed){
-                        isSearchBarVisible = true
-                    }
-
+        var isSearchBarVisible by remember { mutableStateOf(false) }
+        Scaffold(topBar = {
+            if (isSearchBarVisible) {
+                CreatePrivateChatSearchBar(
+                    onSearchQueryChange = onSearchQueryChanged, onSearchQuerySubmit = {
+                        isSearchBarVisible = false
+                        onSearchQuerySubmitted()
+                    }, onBackPressed = onBackPressed
+                )
+            } else {
+                CreatePrivateChatTopBar(onBackPressed = onBackPressed) {
+                    isSearchBarVisible = true
                 }
+
             }
-        ){ innerPadding ->
+        }) { innerPadding ->
             Column(
                 modifier = Modifier.padding(innerPadding).fillMaxSize(),
                 horizontalAlignment = Alignment.Start,

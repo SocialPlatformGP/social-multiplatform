@@ -18,39 +18,33 @@ import androidx.compose.ui.unit.dp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreatePrivateChatTopBar(
-    modifier: Modifier = Modifier,
-    onBackPressed: () -> Unit,
-    onSearchClick: () -> Unit
+    modifier: Modifier = Modifier, onBackPressed: () -> Unit, onSearchClick: () -> Unit
 ) {
-    TopAppBar(
-        title = { Text(
+    TopAppBar(title = {
+        Text(
             text = "New Chat",
             style = MaterialTheme.typography.headlineSmall,
             modifier = Modifier.padding(start = 16.dp)
-        ) },
-        navigationIcon = {
-            IconButton(
-                onClick = { onBackPressed() },
-                modifier = Modifier.padding(horizontal = 8.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBackIosNew,
-                    contentDescription = "Back",
-                )
-            }
-        },
-        actions = {
-            IconButton(
-                onClick = onSearchClick,
-                modifier = Modifier.padding(horizontal = 8.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = "Search",
-                )
-            }
-        },
-        modifier = modifier
+        )
+    }, navigationIcon = {
+        IconButton(
+            onClick = { onBackPressed() }, modifier = Modifier.padding(horizontal = 8.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.ArrowBackIosNew,
+                contentDescription = "Back",
+            )
+        }
+    }, actions = {
+        IconButton(
+            onClick = onSearchClick, modifier = Modifier.padding(horizontal = 8.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Search,
+                contentDescription = "Search",
+            )
+        }
+    }, modifier = modifier
     )
 
 }

@@ -28,16 +28,18 @@ class CreatePrivateChatScreenModel(
     }
 
     private fun getCurrentUser() {
-        screenModelScope.launch (DispatcherIO) {
-            authenticationRepository.getSignedInUser().let{ result ->
-                when(result) {
+        screenModelScope.launch(DispatcherIO) {
+            authenticationRepository.getSignedInUser().let { result ->
+                when (result) {
                     is Result.SuccessWithData -> {
-                        setCurrentUserId(result.data.id)
+                        setCurrentUser(result.data)
                     }
+
                     is Result.Error -> {
                         //TODO: Handle error
                         println("Error: ${result.message}")
                     }
+
                     else -> Unit
                 }
             }
@@ -45,10 +47,10 @@ class CreatePrivateChatScreenModel(
         }
     }
 
-    private fun setCurrentUserId(id: String) {
+    private fun setCurrentUser(user: User) {
         state.update { oldState ->
             oldState.copy(
-                currentUserId = id
+                currentUser = user
             )
         }
     }
@@ -57,7 +59,7 @@ class CreatePrivateChatScreenModel(
         screenModelScope.launch {
             userRepository.fetchUsers().collect { result ->
                 result.onSuccessWithData { data ->
-                    val users = data.filter { it.id != state.value.currentUserId }
+                    val users = data.filter { it.id != state.value.currentUser.id }
                     state.update {
                         it.copy(allUsers = users, matchingUsers = users)
                     }
@@ -70,7 +72,7 @@ class CreatePrivateChatScreenModel(
 
     fun onUserSelected(user: User) {
         screenModelScope.launch {
-            roomRepository.checkIfRoomExists(state.value.currentUserId, user.id).collect { result ->
+            roomRepository.getPrivateRoom(state.value.currentUser, user).let { result ->
                 result.onSuccessWithData { data ->
                     state.update { oldState ->
                         oldState.copy(
@@ -89,11 +91,14 @@ class CreatePrivateChatScreenModel(
     }
 
     fun onSearchQueryChanged(s: String) {
-        screenModelScope.launch (Dispatchers.Default) {
+        screenModelScope.launch(Dispatchers.Default) {
             state.update { oldState ->
-                oldState.copy(
-                    matchingUsers = oldState.allUsers.filter { (it.name).contains(s, ignoreCase = true) }
-                )
+                oldState.copy(matchingUsers = oldState.allUsers.filter {
+                    (it.name).contains(
+                        s,
+                        ignoreCase = true
+                    )
+                })
             }
         }
     }

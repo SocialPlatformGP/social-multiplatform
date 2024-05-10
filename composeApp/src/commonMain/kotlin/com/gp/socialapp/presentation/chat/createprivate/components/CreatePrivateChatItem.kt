@@ -12,20 +12,13 @@ import com.gp.socialapp.data.auth.source.remote.model.User
 
 @Composable
 fun CreatePrivateChatItem(
-    user: User,
-    OnUserSelected: () -> Unit
+    user: User, OnUserSelected: () -> Unit
 ) {
     Card(
-        onClick = { OnUserSelected() },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
+        onClick = { OnUserSelected() }, modifier = Modifier.fillMaxWidth().padding(8.dp)
     ) {
         Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically
+            Modifier.fillMaxWidth().padding(8.dp), verticalAlignment = Alignment.CenterVertically
         ) {
             UserImage(user)
             UserName(user)
