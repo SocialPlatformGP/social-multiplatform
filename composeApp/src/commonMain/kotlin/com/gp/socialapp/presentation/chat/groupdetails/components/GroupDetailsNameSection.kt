@@ -42,13 +42,10 @@ fun GroupDetailsNameSection(
         newName = name
     }
     Box(
-        modifier = modifier
-            .padding(vertical = 8.dp)
-            .fillMaxWidth()
+        modifier = modifier.padding(vertical = 8.dp).fillMaxWidth()
     ) {
         if (isModifying) {
-            OutlinedTextField(
-                shape = RoundedCornerShape(32.dp),
+            OutlinedTextField(shape = RoundedCornerShape(32.dp),
                 value = newName,
                 colors = OutlinedTextFieldDefaults.colors(
                     unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
@@ -74,17 +71,12 @@ fun GroupDetailsNameSection(
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Done
                 ),
-                keyboardActions = KeyboardActions(
-                    onDone = {
-                        isModifying = !isModifying
-                        onChangeName(newName)
-                    }
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.Center)
-                    .focusRequester(focusRequester)
-            )
+                keyboardActions = KeyboardActions(onDone = {
+                    isModifying = !isModifying
+                    onChangeName(newName)
+                }),
+                modifier = Modifier.fillMaxWidth().align(Alignment.Center)
+                    .focusRequester(focusRequester))
             LaunchedEffect(true) {
                 focusRequester.requestFocus()
             }
@@ -99,12 +91,10 @@ fun GroupDetailsNameSection(
             IconButton(
                 onClick = {
                     isModifying = !isModifying
-                },
-                modifier = Modifier.align(Alignment.CenterEnd)
+                }, modifier = Modifier.align(Alignment.CenterEnd)
             ) {
                 Icon(
-                    imageVector = Icons.Rounded.Create,
-                    contentDescription = null
+                    imageVector = Icons.Rounded.Create, contentDescription = null
                 )
             }
         }

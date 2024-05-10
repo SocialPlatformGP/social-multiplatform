@@ -33,9 +33,9 @@ import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.presentation.chat.addmembers.AddMembersScreen
 import com.gp.socialapp.presentation.chat.chatroom.ChatRoomScreen
 import com.gp.socialapp.presentation.chat.creategroup.components.ModifiableAvatarSection
+import com.gp.socialapp.presentation.chat.groupdetails.components.ConfirmActionAlertDialog
 import com.gp.socialapp.presentation.chat.groupdetails.components.GroupDetailsNameSection
 import com.gp.socialapp.presentation.chat.groupdetails.components.GroupMembersSection
-import com.gp.socialapp.presentation.chat.groupdetails.components.ConfirmActionAlertDialog
 import com.gp.socialapp.presentation.chat.groupdetails.components.UserClickedDialog
 import com.gp.socialapp.presentation.chat.home.ChatHomeScreen
 import org.jetbrains.compose.resources.stringResource
@@ -43,7 +43,7 @@ import socialmultiplatform.composeapp.generated.resources.Res
 import socialmultiplatform.composeapp.generated.resources.confirm_member_removal
 
 data class GroupDetailsScreen(
-    private val roomId: String,
+    private val roomId: Long,
     private val roomTitle: String,
     private val roomAvatarUrl: String
 ) : Screen {
@@ -60,13 +60,15 @@ data class GroupDetailsScreen(
             }
         )
         val state by screenModel.uiState.collectAsState()
-        if(state.privateRoom != null) {
-            navigator.push(ChatRoomScreen(
-                roomId = state.privateRoom!!.id,
-                roomTitle = state.privateRoom!!.name,
-                roomAvatarUrl = state.privateRoom!!.picUrl,
-                isPrivate = true
-            ))
+        if (state.privateRoom != null) {
+            navigator.push(
+                ChatRoomScreen(
+                    roomId = state.privateRoom!!.id,
+                    roomTitle = state.privateRoom!!.name,
+                    roomAvatarUrl = state.privateRoom!!.picUrl,
+                    isPrivate = true
+                )
+            )
             navigator.popUntil { it is ChatHomeScreen }
         } else {
             GroupDetailsContent(
@@ -98,7 +100,7 @@ data class GroupDetailsScreen(
                 name = state.groupName,
                 members = state.members,
                 admins = state.admins,
-                currentUserId = state.currentUserId,
+                currentUserId = state.currentUser.id,
             )
         }
     }
@@ -115,7 +117,7 @@ data class GroupDetailsScreen(
         admins: List<String>,
         currentUserId: String,
     ) {
-        var clickedUserId by remember { mutableStateOf("") }
+        var clickedUser by remember { mutableStateOf(User()) }
         var isUserClickedDialogOpen by remember { mutableStateOf(false) }
         var isRemoveMemberDialogOpen by rememberSaveable { mutableStateOf(false) }
         Scaffold(
@@ -152,8 +154,8 @@ data class GroupDetailsScreen(
                     ModifiableAvatarSection(
                         avatarURL = avatarURL,
                         isModifiable = isAdmin,
-                        onImagePicked = { array ->
-                            onAction(GroupDetailsAction.OnChangeAvatar(array))
+                        onImagePicked = { array, extension ->
+                            onAction(GroupDetailsAction.OnChangeAvatar(array, extension))
                         }
                     )
                     GroupDetailsNameSection(
@@ -170,7 +172,7 @@ data class GroupDetailsScreen(
                         isAdmin = isAdmin,
                         onAddMembersClicked = { onAction(GroupDetailsAction.OnAddMembersClicked) },
                         onUserClicked = {
-                            clickedUserId = it
+                            clickedUser = it
                             isUserClickedDialogOpen = true
                         }
                     )
@@ -179,7 +181,7 @@ data class GroupDetailsScreen(
                     ConfirmActionAlertDialog(
                         onDismissRequest = { isRemoveMemberDialogOpen = false },
                         onConfirmation = {
-                            onAction(GroupDetailsAction.OnRemoveMember(clickedUserId))
+                            onAction(GroupDetailsAction.OnRemoveMember(clickedUser.id))
                             isRemoveMemberDialogOpen = false
                         },
                         dialogTitle = stringResource(resource = Res.string.confirm_member_removal)
@@ -188,10 +190,9 @@ data class GroupDetailsScreen(
                 if (isUserClickedDialogOpen) {
                     UserClickedDialog(
                         isAdmin = isAdmin,
-                        isCurrentUser = clickedUserId == currentUserId,
-                        userId = clickedUserId,
+                        isCurrentUser = clickedUser.id == currentUserId,
+                        clickedUser = clickedUser,
                         onRemoveMember = {
-                            clickedUserId = it
                             isRemoveMemberDialogOpen = true
                             isUserClickedDialogOpen = false
                         },
