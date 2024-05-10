@@ -55,7 +55,7 @@ class MessageEntity (): RealmObject {
             senderId = senderId,
             id = id,
             senderName = senderName,
-            senderPfpURL = senderPfpURL,
+            senderPfpUrl = senderPfpURL,
             hasAttachment = hasAttachment,
             attachment = MessageAttachment(byteArrayOf(), attachmentUrl, attachmentName, attachmentType, attachmentSize)
         )
@@ -69,7 +69,7 @@ class MessageEntity (): RealmObject {
                 senderId = this.senderId,
                 id = this.id,
                 senderName = this.senderName,
-                senderPfpURL = this.senderPfpURL,
+                senderPfpURL = this.senderPfpUrl,
                 hasAttachment = this.hasAttachment,
                 attachment = this.attachment
             )

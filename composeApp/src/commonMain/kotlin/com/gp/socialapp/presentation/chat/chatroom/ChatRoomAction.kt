@@ -8,24 +8,21 @@ sealed interface ChatRoomAction {
     data class OnImageClicked(val imageUrl: String) : ChatRoomAction
     data class OnUserClicked(val userId: String) : ChatRoomAction
     data class OnDropDownItemClicked(
-        val action: DropDownItem,
-        val messageId: String,
-        val messageContent: String
+        val action: DropDownItem, val messageId: Long, val messageContent: String
     ) : ChatRoomAction
+
     data object OnRemoveAttachment : ChatRoomAction
 
     data class OnSendMessage(val message: String) : ChatRoomAction
     data class OnAttachClicked(val type: FilePickerFileType) : ChatRoomAction
-    data class OnUpdateMessage(val messageId: String, val message: String) : ChatRoomAction
+    data class OnUpdateMessage(val messageId: Long, val message: String) : ChatRoomAction
     data class OnFileClicked(val attachment: MessageAttachment) : ChatRoomAction
     data class OnAttachmentPicked(
-        val byteArray: ByteArray,
-        val fileName: String,
-        val fileType: String
+        val byteArray: ByteArray, val fileName: String, val fileType: String
     ) : ChatRoomAction
 
-    data class OnChatHeaderClicked(val roomId: String, val isPrivate: Boolean) : ChatRoomAction
+    data class OnChatHeaderClicked(val roomId: Long, val isPrivate: Boolean) : ChatRoomAction
     data object OnBackPressed : ChatRoomAction
-    data class OnDeleteMessage(val messageId: String) : ChatRoomAction
-    data class OnReportMessage(val messageId: String) : ChatRoomAction
+    data class OnDeleteMessage(val messageId: Long) : ChatRoomAction
+    data class OnReportMessage(val messageId: Long) : ChatRoomAction
 }

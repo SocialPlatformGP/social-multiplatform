@@ -31,7 +31,6 @@ import androidx.compose.ui.unit.dp
 import com.gp.socialapp.data.chat.model.Message
 import com.gp.socialapp.data.chat.model.MessageAttachment
 import com.gp.socialapp.presentation.material.utils.MimeType
-import com.gp.socialapp.util.LocalDateTimeUtil.toHHMMTimestamp
 
 @Composable
 fun MessageItem(
@@ -41,7 +40,7 @@ fun MessageItem(
     onImageClicked: (String) -> Unit,
     onUserClicked: (String) -> Unit,
     dropDownItems: List<DropDownItem>,
-    onDropDownItemClicked: (DropDownItem, String, String) -> Unit,
+    onDropDownItemClicked: (DropDownItem, Long, String) -> Unit,
     isPrivateChat: Boolean,
     isSameSender: Boolean,
     isCurrentUser: Boolean,
@@ -49,7 +48,8 @@ fun MessageItem(
     maxScreenHeightDP: Dp,
 ) {
     val topPadding = if (isSameSender) 2.dp else 12.dp
-    val timestamp = message.createdAt.toHHMMTimestamp()
+//    val timestamp = message.createdAt.toHHMMTimestamp()
+    val timestamp = message.createdAt.format("HH:mm a")
     val horizontalArrangement = if (isCurrentUser) Arrangement.End else Arrangement.Start
     val backgroundColor = if (isCurrentUser) MaterialTheme.colorScheme.primary
     else MaterialTheme.colorScheme.surfaceVariant
@@ -74,7 +74,7 @@ fun MessageItem(
         MessageUserAvatar(isCurrentUser = isCurrentUser,
             isSameSender = isSameSender,
             isPrivateChat = isPrivateChat,
-            imageURL = message.senderPfpURL,
+            imageURL = message.senderPfpUrl,
             onUserClicked = { onUserClicked(message.senderId) })
         Surface(color = backgroundColor,
             shape = surfaceShape,
