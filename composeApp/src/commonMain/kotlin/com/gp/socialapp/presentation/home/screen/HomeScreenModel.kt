@@ -9,7 +9,6 @@ import com.gp.socialapp.data.community.repository.CommunityRepository
 import com.gp.socialapp.data.community.source.remote.model.Community
 import com.gp.socialapp.util.DispatcherIO
 import com.gp.socialapp.util.Result
-import com.gp.socialapp.util.Results
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -33,17 +32,17 @@ class HomeScreenModel(
         screenModelScope.launch {
             userRepo.getUserCommunities(uiState.value.user.id).collect {
                 when (it) {
-                    is Results.Failure -> {
+                    is Result.Error -> {
                         resetLoading()
-                        setError(it.error.userMessage)
+                        setError(it.message.userMessage)
                     }
 
-                    Results.Loading -> {
+                    Result.Loading -> {
                         resetError()
                         setLoading()
                     }
 
-                    is Results.Success -> {
+                    is Result.Success -> {
                         resetLoading()
                         resetError()
                         setCommunities(it.data)
@@ -59,10 +58,10 @@ class HomeScreenModel(
             authRepo.getSignedInUser().let { result ->
                 when (result) {
                     is Result.Error -> {
-                        setError(result.message)
+                        setError(result.message.userMessage)
                     }
 
-                    is Result.SuccessWithData -> {
+                    is Result.Success -> {
                         setUser(result.data)
                         println(result.data)
                         getUserCommunities()
@@ -118,15 +117,15 @@ class HomeScreenModel(
                 uiState.value.user.id, id
             ).collect {
                 when (it) {
-                    is Results.Failure -> {
-                        setError(it.error.userMessage)
+                    is Result.Error -> {
+                        setError(it.message.userMessage)
                     }
 
-                    Results.Loading -> {
+                    Result.Loading -> {
                         setLoading()
                     }
 
-                    is Results.Success -> {
+                    is Result.Success -> {
                         resetLoading()
                         resetError()
                         setCommunities(it.data)
@@ -140,17 +139,17 @@ class HomeScreenModel(
         screenModelScope.launch {
             userRepo.joinCommunity(uiState.value.user.id, code).collect {
                 when (it) {
-                    is Results.Failure -> {
-                        setError(it.error.userMessage)
-                        println(it.error.userMessage)
-                        Napier.e(it.error.userMessage)
+                    is Result.Error -> {
+                        setError(it.message.userMessage)
+                        println(it.message.userMessage)
+                        Napier.e(it.message.userMessage)
                     }
 
-                    Results.Loading -> {
+                    Result.Loading -> {
                         setLoading()
                     }
 
-                    is Results.Success -> {
+                    is Result.Success -> {
                         resetLoading()
                         resetError()
                         println(it.data.map { it.name })
@@ -163,13 +162,27 @@ class HomeScreenModel(
 
     fun userLogout() {
         screenModelScope.launch {
-            authRepo.logout().onSuccess {
-                _uiState.update {
-                    it.copy(loggedOut = true)
+            val result = authRepo.logout()
+            when (result) {
+                is Result.Error -> {
+                    setError(result.message.userMessage)
+                }
+
+                Result.Loading -> {
+                    setLoading()
+                }
+
+                is Result.Success -> {
+                    resetLoading()
+                    resetError()
+                    _uiState.update {
+                        it.copy(loggedOut = true)
+                    }
                 }
             }
         }
     }
+
 
     fun dispose() {
         _uiState.value = HomeUiState()
@@ -179,15 +192,15 @@ class HomeScreenModel(
         screenModelScope.launch(DispatcherIO) {
             communityRepo.deleteCommunity(communityId).let {
                 when (it) {
-                    is Results.Failure -> {
-                        setError(it.error.userMessage)
+                    is Result.Error -> {
+                        setError(it.message.userMessage)
                     }
 
-                    Results.Loading -> {
+                    Result.Loading -> {
                         setLoading()
                     }
 
-                    is Results.Success -> {
+                    is Result.Success -> {
                         resetLoading()
                         resetError()
                         _uiState.update { state ->

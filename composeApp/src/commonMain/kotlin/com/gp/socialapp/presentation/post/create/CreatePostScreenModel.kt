@@ -10,7 +10,6 @@ import com.gp.socialapp.data.post.source.remote.model.PostAttachment
 import com.gp.socialapp.data.post.source.remote.model.Tag
 import com.gp.socialapp.presentation.post.feed.FeedTab
 import com.gp.socialapp.util.Result
-import com.gp.socialapp.util.Results
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -84,15 +83,15 @@ class CreatePostScreenModel(
                     )
                 ).collect { it ->
                     when (it) {
-                        is Results.Success -> {
+                        is Result.Success -> {
                             _uiState.update { it.copy(createdState = true) }
                         }
 
-                        is Results.Failure -> {
-                            println(it.error)
+                        is Result.Error -> {
+                            println(it.message)
                         }
 
-                        Results.Loading -> {
+                        Result.Loading -> {
                             //TODO
                         }
                     }
@@ -114,7 +113,7 @@ class CreatePostScreenModel(
         screenModelScope.launch {
             authRepository.getSignedInUser().let {
                 when (it) {
-                    is Result.SuccessWithData -> {
+                    is Result.Success -> {
                         currentUser.value = it.data
                     }
 

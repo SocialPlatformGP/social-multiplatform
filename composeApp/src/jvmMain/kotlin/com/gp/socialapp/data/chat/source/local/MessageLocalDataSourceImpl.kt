@@ -3,6 +3,7 @@ package com.gp.socialapp.data.chat.source.local
 import com.gp.socialapp.data.chat.model.Message
 import com.gp.socialapp.data.chat.source.local.model.MessageEntity
 import com.gp.socialapp.data.chat.source.local.model.MessageEntity.Companion.toEntity
+import com.gp.socialapp.util.ChatError
 import io.realm.kotlin.Realm
 import io.realm.kotlin.notifications.InitialResults
 import io.realm.kotlin.notifications.UpdatedResults
@@ -15,7 +16,7 @@ import io.realm.kotlin.UpdatePolicy
 class MessageLocalDataSourceImpl(
     private val realm: Realm
 ) : MessageLocalDataSource {
-    override fun getMessagesFlow(roomId: String): Flow<Result<List<Message>>> =
+    override fun getMessagesFlow(roomId: String): Flow<Result<List<Message>,ChatError.Temp>> =
         flow {
             try {
                 val messagesFlow = realm.query(
@@ -30,23 +31,22 @@ class MessageLocalDataSourceImpl(
                     when (results) {
                         is InitialResults<MessageEntity> -> {
                             val data = results.list.map { it.toMessage() }
-                            emit(Result.SuccessWithData(data))
+                            emit(Result.Success(data))
                         }
 
                         is UpdatedResults -> {
                             val data = results.list.map { it.toMessage() }
-                            emit(Result.SuccessWithData(data))
+                            emit(Result.Success(data))
                         }
                     }
                 }
             } catch(e: Exception) {
-                emit(Result.Error(e.message ?: "An error occurred"))
+                emit(Result.Error(ChatError.Temp.SERVER_ERROR))
             }
         }
 
-    override suspend fun insertMessages(vararg messages: Message): Result<Nothing> {
+    override suspend fun insertMessages(vararg messages: Message): Result<Unit,ChatError.Temp> {
         return try {
-            println("\n\n\nMessages to insert ${messages.joinToString(",,,,,,")}\n\n\n")
             realm.write {
                 messages.forEach { message ->
                     val messageEntity = message.toEntity()
@@ -56,38 +56,38 @@ class MessageLocalDataSourceImpl(
                     )
                 }
             }
-            Result.Success
+            Result.Success(Unit)
         } catch (e: Exception) {
-            Result.Error(e.message ?: "An error occurred")
+            Result.Error(ChatError.Temp.SERVER_ERROR)
         }
     }
 
-    override suspend fun deleteMessage(messageId: String): Result<Nothing> {
+    override suspend fun deleteMessage(messageId: String): Result<Unit,ChatError.Temp> {
         return try {
             realm.write {
                 val messageToDelete: MessageEntity =
                     query(clazz = MessageEntity::class, "id == $0", messageId).find().first()
                 delete(messageToDelete)
             }
-            Result.Success
+            Result.Success(Unit)
         } catch (e: Exception) {
-            Result.Error(e.message ?: "An error occurred")
+            Result.Error(ChatError.Temp.SERVER_ERROR)
         }
     }
 
-    override suspend fun updateMessage(message: Message): Result<Nothing> {
+    override suspend fun updateMessage(message: Message): Result<Unit,ChatError.Temp> {
         return try {
             realm.write {
                 val messageToUpdate = query(clazz = MessageEntity::class, "id == $0", message.id).find().first()
                 if(message.content.isNotBlank())messageToUpdate.content = message.content
             }
-            Result.Success
+            Result.Success(Unit)
         } catch (e: Exception) {
-            Result.Error(e.message ?: "An error occurred")
+            Result.Error(ChatError.Temp.SERVER_ERROR)
         }
     }
 
-    override suspend fun getLastLocalMessage(chatId: String): Result<Message> {
+    override suspend fun getLastLocalMessage(chatId: String): Result<Message,ChatError.Temp> {
         return try {
             val messageEntity = realm.query(
                 clazz = MessageEntity::class,
@@ -97,9 +97,9 @@ class MessageLocalDataSourceImpl(
                 property = "createdAt",
                 sortOrder = Sort.DESCENDING
             ).find().first()
-            Result.SuccessWithData(messageEntity.toMessage())
+            Result.Success(messageEntity.toMessage())
         } catch(e: Exception) {
-            Result.Error(e.message ?: "An error occurred")
+            Result.Error(ChatError.Temp.SERVER_ERROR)
         }
     }
 }

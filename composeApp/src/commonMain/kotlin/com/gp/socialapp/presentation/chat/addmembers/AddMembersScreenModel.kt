@@ -11,7 +11,6 @@ import com.gp.socialapp.util.Result
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -43,7 +42,7 @@ class AddMembersScreenModel(
                     is Result.Loading -> {
                         //TODO handle loading
                     }
-                    is Result.SuccessWithData -> {
+                    is Result.Success -> {
                         val allUsers = result.data.filter { it.id != currentUserId && !groupMembersIds.contains(it.id) }
                         _uiState.update {
                             it.copy(
@@ -62,7 +61,7 @@ class AddMembersScreenModel(
         screenModelScope.launch (DispatcherIO) {
             authRepo.getSignedInUser().let{ result ->
                 when(result) {
-                    is Result.SuccessWithData -> {
+                    is Result.Success -> {
                         currentUserId = result.data.id
                     }
                     is Result.Error -> {
@@ -117,11 +116,15 @@ class AddMembersScreenModel(
     fun submitGroupUsers() {
         screenModelScope.launch {
             val selectedUserIds = _uiState.value.selectedUsers.map { it.id }
-            roomRepo.addMembers(roomId, selectedUserIds).onSuccess {
-                _uiState.update { it.copy(isDone = true) }
-            }.onFailure {
-                //TODO handle error
-            }
+           when(val result =  roomRepo.addMembers(roomId, selectedUserIds)){
+               is Result.Error -> TODO()
+               Result.Loading -> TODO()
+               is Result.Success -> {
+                   _uiState.update {
+                       it.copy(isDone = true)
+                   }
+               }
+           }
         }
     }
 

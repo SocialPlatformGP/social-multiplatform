@@ -43,10 +43,16 @@ class ChatRoomScreenModel(
     private fun getMessages() {
         screenModelScope.launch(DispatcherIO) {
             messageRepo.fetchChatMessages(roomId).collect { result ->
-                result.onSuccessWithData { messages ->
-                    _uiState.update { it.copy(messages = messages) }
-                }.onFailure {
-                    println("Error: $it")
+                when (result) {
+                    is Result.Error -> {
+                        //TODO handle error
+                    }
+                    is Result.Loading -> {
+                        //TODO handle loading
+                    }
+                    is Result.Success -> {
+                        _uiState.update { it.copy(messages = result.data) }
+                    }
                 }
                 observeMessages()
             }
@@ -57,15 +63,19 @@ class ChatRoomScreenModel(
         if (job == null) {
             job = screenModelScope.launch(DispatcherIO) {
                 messageRepo.observeMessages().collect { result ->
-                    result.onSuccessWithData { newData ->
-                        println("im in room vm :")
-                        if (newData.messages == null || newData.messages.roomId != roomId)
+                    when(result){
+                        is Result.Error -> TODO()
+                        Result.Loading -> TODO()
+                        is Result.Success -> {
+                        if (result.data.messages == null || result.data.messages.roomId != roomId)
                         else {
                             val newList = _uiState.value.messages.toMutableList()
-                            newList.add(0, newData.messages)
+                            newList.add(0, result.data.messages)
                             _uiState.update {
                                 it.copy(messages = newList)
                             }
+                        }
+
                         }
                     }
                 }
@@ -77,7 +87,7 @@ class ChatRoomScreenModel(
         screenModelScope.launch(DispatcherIO) {
             authRepo.getSignedInUser().let {
                 when (it) {
-                    is Result.SuccessWithData -> {
+                    is Result.Success -> {
                         updateCurrentUserId(it.data.id)
                     }
 
@@ -98,17 +108,25 @@ class ChatRoomScreenModel(
     private fun sendMessage(content: String) {
         screenModelScope.launch(DispatcherIO) {
             if (content.isEmpty() && _uiState.value.currentAttachment.type.isBlank()) return@launch
-            messageRepo.sendMessage(
+            val result = messageRepo.sendMessage(
                 messageContent = content,
                 roomId = roomId,
                 senderId = _uiState.value.currentUserId,
                 attachment = _uiState.value.currentAttachment
-            ).onSuccess {
-                println("message sent $content $roomId ${_uiState.value.currentUserId}")
-                _uiState.update { it.copy(currentAttachment = MessageAttachment()) }
-            }.onFailure {
-                println("message not sent")
-            }
+            )
+
+                when(result) {
+                    is Result.Success -> {
+                        println("message sent $content $roomId ${_uiState.value.currentUserId}")
+                        _uiState.update { it.copy(currentAttachment = MessageAttachment()) }
+                    }
+
+                    is Result.Error -> {
+                        println("message not sent")
+                    }
+
+                    else -> Unit
+                }
         }
     }
 

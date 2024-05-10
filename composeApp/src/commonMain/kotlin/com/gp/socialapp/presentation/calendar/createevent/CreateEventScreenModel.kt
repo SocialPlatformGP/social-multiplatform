@@ -8,6 +8,7 @@ import com.gp.socialapp.data.calendar.model.CalendarEvent
 import com.gp.socialapp.data.calendar.repository.CalendarRepository
 import com.gp.socialapp.presentation.calendar.home.components.EventType
 import com.gp.socialapp.util.DispatcherIO
+import com.gp.socialapp.util.Result
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -26,13 +27,17 @@ class CreateEventScreenModel(
     private fun getSignedInUser() {
         screenModelScope.launch (DispatcherIO){
             authRepo.getSignedInUser().let { result ->
-                result.onSuccessWithData { user ->
-                    _uiState.update {
-                        it.copy(currentUser = user)
+                when(result) {
+                    is Result.Success -> {
+                        _uiState.update {
+                            it.copy(currentUser = result.data)
+                        }
                     }
-                }.onFailure {
-                    /*TODO: Handle Error*/
+
+                    is Result.Error -> {}
+                    Result.Loading -> {}
                 }
+
             }
         }
     }
@@ -89,12 +94,14 @@ class CreateEventScreenModel(
                     date = _uiState.value.date
                 )
             ).let {
-                it.onSuccess {
-                    _uiState.update {
-                        it.copy(isCreated = true)
+                when(it){
+                    is Result.Success -> {
+                        _uiState.update {
+                            it.copy(isCreated = true)
+                        }
                     }
-                }.onFailure {
-
+                    is Result.Error -> {}
+                    Result.Loading -> {}
                 }
             }
         }

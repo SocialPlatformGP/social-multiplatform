@@ -11,7 +11,6 @@ import com.gp.socialapp.data.community.source.remote.model.UserId
 import com.gp.socialapp.data.community.source.remote.model.isAdmin
 import com.gp.socialapp.util.DispatcherIO
 import com.gp.socialapp.util.Result
-import com.gp.socialapp.util.Results
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -35,7 +34,7 @@ class CommunityMembersScreenModel(
         screenModelScope.launch(DispatcherIO) {
             authRepo.getSignedInUser().let { result ->
                 when (result) {
-                    is Result.SuccessWithData -> {
+                    is Result.Success -> {
                         _uiState.update { it.copy(currentUserId = result.data.id) }
                     }
 
@@ -54,7 +53,7 @@ class CommunityMembersScreenModel(
         screenModelScope.launch(DispatcherIO) {
             communityRepo.fetchCommunity(communityId).collect { result ->
                 when (result) {
-                    is Results.Success -> {
+                    is Result.Success -> {
                         _uiState.update {
                             it.copy(
                                 communityName = result.data.name,
@@ -66,8 +65,8 @@ class CommunityMembersScreenModel(
                         updateAdmins(result.data.members)
                     }
 
-                    is Results.Failure -> {
-                        println("Error: ${result.error.userMessage}")
+                    is Result.Error -> {
+                        println("Error: ${result.message.userMessage}")
                     }
 
                     else -> Unit
@@ -80,14 +79,14 @@ class CommunityMembersScreenModel(
         screenModelScope.launch(DispatcherIO) {
             userRepo.getUsersByIds(memberIds.toList()).collect {
                 when (it) {
-                    is Results.Success -> {
+                    is Result.Success -> {
                         updateMembers(it.data)
                         println("Members: ${it.data}")
                         Napier.d("Members: ${it.data}")
                     }
 
-                    is Results.Failure -> {
-                        println("Error: ${it.error.userMessage}")
+                    is Result.Error -> {
+                        println("Error: ${it.message.userMessage}")
                         Napier.e("Error getting members")
                     }
 
@@ -116,13 +115,13 @@ class CommunityMembersScreenModel(
         screenModelScope.launch(DispatcherIO) {
             communityRepo.fetchCommunityMembersRequests(_uiState.value.communityId).collect {
                 when (it) {
-                    is Results.Success -> {
+                    is Result.Success -> {
                         updateRequests(it.data)
                         Napier.d("Requests: ${it.data}")
                     }
 
-                    is Results.Failure -> {
-                        println("Error: ${it.error.userMessage}")
+                    is Result.Error -> {
+                        println("Error: ${it.message.userMessage}")
                         Napier.e("Error getting requests")
                     }
 
@@ -152,7 +151,7 @@ class CommunityMembersScreenModel(
     private fun acceptRequest(requestId: String) {
         screenModelScope.launch {
             val result = communityRepo.acceptCommunityRequest(requestId)
-            if (result is Results.Success) {
+            if (result is Result.Success) {
                 getRequests()
             } else {
                 //TODO: Handle error
@@ -163,7 +162,7 @@ class CommunityMembersScreenModel(
     private fun declineRequest(requestId: String) {
         screenModelScope.launch {
             val result = communityRepo.declineCommunityRequest(requestId)
-            if (result is Results.Success) {
+            if (result is Result.Success) {
                 getRequests()
             } else {
                 //TODO: Handle error

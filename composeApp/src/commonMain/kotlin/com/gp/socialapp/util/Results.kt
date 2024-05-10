@@ -5,20 +5,48 @@ import kotlinx.serialization.Serializable
 typealias RootError = Error
 
 @Serializable
-sealed interface Results<out D, out E : RootError> {
+sealed interface Result<out D, out E : RootError> {
     @Serializable
-    data object Loading : Results<Nothing, Nothing>
+    data object Loading : Result<Nothing, Nothing>
 
     @Serializable
-    data class Success<out D>(val data: D) : Results<D, Nothing>
+    data class Success<out D>(val data: D) : Result<D, Nothing>
 
     @Serializable
-    data class Failure<out E : RootError>(val error: E) : Results<Nothing, E>
+    data class Error<out E : RootError>(val message: E) : Result<Nothing, E>
 
     fun isSuccessful(): Boolean = this is Success
 
     companion object {
-        fun <D> success(data: D): Results<D, Nothing> = Success(data)
-        fun <E : RootError> failure(error: E): Results<Nothing, E> = Failure(error)
+        fun <D> success(data: D): Result<D, Nothing> = Success(data)
+        fun <E : RootError> failure(error: E): Result<Nothing, E> = Error(error)
+        fun idle(): Result<Nothing, Nothing> = Loading
+    }
+
+    fun onSuccessWithData(block: (D) -> Unit): Result<D,E> {
+        if (this is Success) {
+            block(data)
+        }
+        return this
+    }
+
+    fun onSuccess(block: () -> Unit): Result<D,E> {
+        if (this is Success) {
+            block()
+        }
+        return this
+    }
+
+    fun onLoading(block: () -> Unit): Result<D,E> {
+        if (this is Loading) {
+            block()
+        }
+        return this
+    }
+        fun onFailure(block: (E) -> Unit): Result<D,E> {
+        if (this is Error) {
+            block(message)
+        }
+        return this
     }
 }

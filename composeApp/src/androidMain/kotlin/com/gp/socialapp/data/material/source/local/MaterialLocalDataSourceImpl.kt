@@ -3,6 +3,7 @@ package com.gp.socialapp.data.material.source.local
 import com.gp.socialapp.data.material.model.MaterialFile
 import com.gp.socialapp.data.material.source.local.model.FileEntity
 import com.gp.socialapp.data.material.source.local.model.FileEntity.Companion.toEntity
+import com.gp.socialapp.util.MaterialError
 import com.gp.socialapp.util.Result
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
@@ -14,7 +15,7 @@ import kotlinx.coroutines.flow.flow
 class MaterialLocalDataSourceImpl(
     val realm: Realm
 ) : MaterialLocalDataSource {
-    override suspend fun getFilePath(fileId: String): Flow<Result<MaterialFile>> =
+    override suspend fun getFilePath(fileId: String): Flow<Result<MaterialFile, MaterialError.GetLocalFile>> =
         flow {
             try {
                 val file = realm.query(
@@ -26,30 +27,30 @@ class MaterialLocalDataSourceImpl(
                         is InitialResults<FileEntity> -> {
                             val data = it.list.firstOrNull()?.toMaterialFile()
                             if (data != null) {
-                                emit(Result.SuccessWithData(data))
+                                emit(Result.Success(data))
                             } else {
-                                emit(Result.Error("File not found"))
+                                emit(Result.Error(MaterialError.GetLocalFile.DATABASE_ERROR))
                             }
                         }
 
                         is UpdatedResults -> {
                             val data = it.list.firstOrNull()?.toMaterialFile()
                             if (data != null) {
-                                emit(Result.SuccessWithData(data))
+                                emit(Result.Success(data))
                             } else {
-                                emit(Result.Error("File not found"))
+                                emit(Result.Error(MaterialError.GetLocalFile.DATABASE_ERROR))
                             }
                         }
                     }
                 }
             } catch (e: Exception) {
-                emit(Result.Error(e.message.toString()))
+                emit(Result.Error(MaterialError.GetLocalFile.DATABASE_ERROR))
                 e.printStackTrace()
             }
         }
 
 
-    override suspend fun insertFile(file: MaterialFile): Result<Unit> {
+    override suspend fun insertFile(file: MaterialFile): Result<Unit,MaterialError.InsertLocalFile> {
         return try {
             realm.write {
                 copyToRealm(
@@ -57,9 +58,9 @@ class MaterialLocalDataSourceImpl(
                     updatePolicy = UpdatePolicy.ALL
                 )
             }
-            Result.Success
+            Result.Success(Unit)
         } catch (e: Exception) {
-            Result.Error(e.message.toString())
+            Result.Error(MaterialError.InsertLocalFile.DATABSE_ERROR)
         }
     }
 

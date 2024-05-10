@@ -5,6 +5,7 @@ import com.gp.socialapp.data.chat.source.remote.model.request.RoomRequest
 import com.gp.socialapp.data.chat.source.remote.model.response.RoomResponse
 import com.gp.socialapp.data.chat.utils.EndPoint
 import com.gp.socialapp.data.post.util.endPoint
+import com.gp.socialapp.util.ChatError
 import com.gp.socialapp.util.Result
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -19,7 +20,7 @@ class RoomRemoteDataSourceImpl(
 ) : RoomRemoteDataSource {
 
 
-    override suspend fun createGroupRoom(request: RoomRequest.CreateGroupRoom): Flow<Result<Room>> =
+    override suspend fun createGroupRoom(request: RoomRequest.CreateGroupRoom): Flow<Result<Room,ChatError.Temp>> =
         flow {
             emit(Result.Loading)
             println("Request: $request")
@@ -36,12 +37,12 @@ class RoomRemoteDataSourceImpl(
                         id = body.roomId,
                         picUrl = body.roomAvatarUrl
                     )
-                    emit(Result.SuccessWithData(room))
+                    emit(Result.Success(room))
                 } else {
-                    emit(Result.Error("An error occurred: ${response.status.description}"))
+                    emit(Result.Error(ChatError.Temp.SERVER_ERROR))
                 }
             } catch (e: Exception) {
-                emit(Result.Error("An error occurred: ${e.message}"))
+                emit(Result.Error(ChatError.Temp.SERVER_ERROR))
             }
         }
 
@@ -61,16 +62,16 @@ class RoomRemoteDataSourceImpl(
                 println("Response: ${response.status}")
                 val room = response.body<RoomResponse.CheckIfRoomExists>().room
                 println("Room: $room")
-                emit(Result.SuccessWithData(room))
+                emit(Result.Success(room))
             } else {
-                emit(Result.Error("An error occurred: ${response.status.description}"))
+                emit(Result.Error(ChatError.Temp.SERVER_ERROR))
             }
         } catch (e: Exception) {
-            emit(Result.Error("An error occurred: ${e.message}"))
+            emit(Result.Error(ChatError.Temp.SERVER_ERROR))
         }
     }
 
-    override suspend fun getRoomDetails(request: RoomRequest.GetRoomDetails): Result<Room> {
+    override suspend fun getRoomDetails(request: RoomRequest.GetRoomDetails): Result<Room,ChatError.Temp> {
         return try {
             val response = httpClient.post {
                 endPoint("getRoomDetails")
@@ -78,16 +79,16 @@ class RoomRemoteDataSourceImpl(
             }
             if(response.status == HttpStatusCode.OK) {
                 val room = response.body<RoomResponse.GetRoomDetails>().room
-                Result.SuccessWithData(room)
+                Result.Success(room)
             } else {
-                Result.Error("An error occurred: ${response.status.description}")
+                Result.Error(ChatError.Temp.SERVER_ERROR)
             }
         } catch (e: Exception) {
-            Result.Error("An error occurred: ${e.message}")
+            Result.Error(ChatError.Temp.SERVER_ERROR)
         }
     }
 
-    override suspend fun updateRoomAvatar(request: RoomRequest.UpdateRoomAvatar): Result<String> {
+    override suspend fun updateRoomAvatar(request: RoomRequest.UpdateRoomAvatar): Result<String,ChatError.Temp> {
         return try {
             val response = httpClient.post {
                 endPoint("updateRoomAvatar")
@@ -95,48 +96,48 @@ class RoomRemoteDataSourceImpl(
             }
             if(response.status == HttpStatusCode.OK) {
                 val roomId = response.body<RoomResponse.UpdateRoomAvatar>().avatarUrl
-                Result.SuccessWithData(roomId)
+                Result.Success(roomId)
             } else {
-                Result.Error("An error occurred: ${response.status.description}")
+            Result.Error(ChatError.Temp.SERVER_ERROR)
             }
         } catch (e: Exception) {
-            Result.Error("An error occurred: ${e.message}")
+            Result.Error(ChatError.Temp.SERVER_ERROR)
         }
     }
 
-    override suspend fun updateRoomName(request: RoomRequest.UpdateRoomName): Result<Nothing> {
+    override suspend fun updateRoomName(request: RoomRequest.UpdateRoomName): Result<Unit,ChatError.Temp> {
         return try {
             val response = httpClient.post {
                 endPoint("updateRoomName")
                 setBody(request)
             }
             if(response.status == HttpStatusCode.OK) {
-                Result.Success
+                Result.Success(Unit)
             } else {
-                Result.Error("An error occurred: ${response.status.description}")
+            Result.Error(ChatError.Temp.SERVER_ERROR)
             }
         } catch (e: Exception) {
-            Result.Error("An error occurred: ${e.message}")
+            Result.Error(ChatError.Temp.SERVER_ERROR)
         }
     }
 
-    override suspend fun addMembers(request: RoomRequest.AddMembers): Result<Nothing> {
+    override suspend fun addMembers(request: RoomRequest.AddMembers): Result<Unit,ChatError.Temp> {
         return try {
             val response = httpClient.post {
                 endPoint("addMembers")
                 setBody(request)
             }
             if(response.status == HttpStatusCode.OK) {
-                Result.Success
+                Result.Success(Unit)
             } else {
-                Result.Error("An error occurred: ${response.status.description}")
+            Result.Error(ChatError.Temp.SERVER_ERROR)
             }
         } catch (e: Exception) {
-            Result.Error("An error occurred: ${e.message}")
+            Result.Error(ChatError.Temp.SERVER_ERROR)
         }
     }
 
-    override suspend fun removeMember(request: RoomRequest.RemoveMember): Result<Nothing> {
+    override suspend fun removeMember(request: RoomRequest.RemoveMember): Result<Unit,ChatError.Temp> {
         println("reached client")
         return try {
             val response = httpClient.post {
@@ -145,14 +146,14 @@ class RoomRemoteDataSourceImpl(
             }
             if(response.status == HttpStatusCode.OK) {
                 println("Response is OK for remove member")
-                Result.Success
+                Result.Success(Unit)
             } else {
                 println("Response is not OK for remove member: ${response.status.description}")
-                Result.Error("An error occurred: ${response.status.description}")
+            Result.Error(ChatError.Temp.SERVER_ERROR)
             }
         } catch (e: Exception) {
             println("Exception occurred: ${e.message}")
-            Result.Error("An error occurred: ${e.message}")
+            Result.Error(ChatError.Temp.SERVER_ERROR)
         }
     }
 }

@@ -1,11 +1,12 @@
 package com.gp.socialapp.data.chat.source.remote
 
 import com.gp.socialapp.data.chat.model.RecentRoomResponse
+import com.gp.socialapp.util.ChatError
 import com.gp.socialapp.util.Result
 import kotlinx.coroutines.flow.Flow
 
 interface RecentRoomRemoteDataSource {
-    fun getAllRecentRooms(userId: String): Flow<Result<List<RecentRoomResponse>>>
+    fun getAllRecentRooms(userId: String): Flow<Result<List<RecentRoomResponse>,ChatError.Temp>>
 
 
 }

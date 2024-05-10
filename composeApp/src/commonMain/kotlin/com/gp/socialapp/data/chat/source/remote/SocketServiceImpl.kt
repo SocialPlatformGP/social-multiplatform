@@ -3,6 +3,7 @@ package com.gp.socialapp.data.chat.source.remote
 import com.gp.socialapp.data.chat.source.remote.model.request.MessageRequest
 import com.gp.socialapp.data.chat.source.remote.model.response.NewDataResponse
 import com.gp.socialapp.util.AppConstants.SOCKET_URL
+import com.gp.socialapp.util.ChatError
 import com.gp.socialapp.util.DispatcherIO
 import com.gp.socialapp.util.Result
 import io.ktor.client.HttpClient
@@ -30,8 +31,8 @@ class SocketServiceImpl(
     private val client: HttpClient
 ) : SocketService {
     var socket: DefaultClientWebSocketSession? = null
-    var sharedFlow = MutableSharedFlow<Result<NewDataResponse>>()
-    override suspend fun connectToSocket(userId: String): Result<Nothing> {
+    var sharedFlow = MutableSharedFlow<Result<NewDataResponse,ChatError.Temp>>()
+    override suspend fun connectToSocket(userId: String): Result<Unit, ChatError.Temp> {
         return try {
             println("userId: $userId")
             socket = client.webSocketSession {
@@ -44,13 +45,13 @@ class SocketServiceImpl(
             if (socket?.isActive == true) {
                 println("Roomsocket connected")
                 connectToRecentSocket()
-                Result.Success
+                Result.Success(Unit)
             } else {
                 println("socket not connected")
-                Result.Error("An error occurred")
+            Result.Error(ChatError.Temp.SERVER_ERROR)
             }
         } catch (e: Exception) {
-            Result.Error("An error occurred: ${e.message}")
+            Result.Error(ChatError.Temp.SERVER_ERROR)
         }
     }
 
@@ -62,7 +63,7 @@ class SocketServiceImpl(
                 val json = (it as? Frame.Text)?.readText() ?: ""
                 val response = Json.decodeFromString<NewDataResponse>(json)
                 println("messageResponse: ${response.messages?.content}")
-                Result.SuccessWithData(
+                Result.Success(
                     response
                 )
             }?.collect {
@@ -83,29 +84,29 @@ class SocketServiceImpl(
 
     }
 
-    override suspend fun observeNewData(): Flow<Result<NewDataResponse>> {
+    override suspend fun observeNewData(): Flow<Result<NewDataResponse, ChatError.Temp>> {
         return sharedFlow
     }
 
-    override suspend fun sendMessage(message: MessageRequest.SendMessage): Result<Nothing> {
+    override suspend fun sendMessage(message: MessageRequest.SendMessage): Result<Unit, ChatError.Temp> {
         println("message: $message")
         return try {
             socket?.send(Frame.Text(Json.encodeToString(message)))
             println("message sent via socket $socket")
-            Result.Success
+            Result.Success(Unit)
         } catch (e: Exception) {
             println("error: ${e.message}")
             e.printStackTrace()
-            Result.Error(e.message ?: "An error occurred")
+            Result.Error(ChatError.Temp.SERVER_ERROR)
         }
     }
 
-    override suspend fun closeSocket(): Result<Nothing> {
+    override suspend fun closeSocket(): Result<Unit, ChatError.Temp> {
         socket?.close()
-        return Result.Success
+        return Result.Success(Unit)
     }
 
-    override suspend fun observeNewDataMessage(): Flow<Result<NewDataResponse>> {
+    override suspend fun observeNewDataMessage(): Flow<Result<NewDataResponse, ChatError.Temp>> {
         return sharedFlow
     }
 }

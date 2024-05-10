@@ -30,7 +30,7 @@ class SubmitAssignmentScreenModel(
                     _uiState.value = _uiState.value.copy(isLoading = true)
                 }
 
-                is Result.SuccessWithData -> {
+                is Result.Success -> {
                     _uiState.value = _uiState.value.copy(assignment = assignment, user = user.data)
                     getOldSubmission(assignment.id)
                 }
@@ -53,7 +53,7 @@ class SubmitAssignmentScreenModel(
                         _uiState.value = _uiState.value.copy(isLoading = true)
                     }
 
-                    is Result.SuccessWithData -> {
+                    is Result.Success -> {
                         _uiState.value =
                             _uiState.value.copy(oldSubmission = result.data, isLoading = false)
                     }
@@ -80,7 +80,7 @@ class SubmitAssignmentScreenModel(
                     _uiState.value = _uiState.value.copy(isLoading = true)
                 }
 
-                is Result.SuccessWithData -> {
+                is Result.Success -> {
                     _uiState.value = _uiState.value.copy(isLoading = false, newSubmission = UserAssignmentSubmission())
                     getOldSubmission(assignmentId)
                 }
@@ -117,7 +117,7 @@ class SubmitAssignmentScreenModel(
             when(val result = assignmentRepository.unSubmitAssignment(userAssignmentId)){
                 is Result.Error -> println(result.message)
                 Result.Loading -> {}
-                is Result.SuccessWithData -> {
+                is Result.Success -> {
                     getOldSubmission(assignmentId)
                 }
                 else->Unit
@@ -130,7 +130,7 @@ class SubmitAssignmentScreenModel(
             when(val result = assignmentRepository.turnInAssignments(userAssignmentId)){
                 is Result.Error -> println(result.message)
                 Result.Loading -> {}
-                is Result.SuccessWithData -> {
+                is Result.Success -> {
                     getOldSubmission(assignmentId)
                 }
                 else->Unit

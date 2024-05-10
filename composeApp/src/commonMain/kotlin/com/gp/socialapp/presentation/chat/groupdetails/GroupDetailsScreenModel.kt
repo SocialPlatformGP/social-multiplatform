@@ -7,7 +7,6 @@ import com.gp.socialapp.data.auth.repository.UserRepository
 import com.gp.socialapp.data.chat.repository.RoomRepository
 import com.gp.socialapp.util.DispatcherIO
 import com.gp.socialapp.util.Result
-import com.gp.socialapp.util.Results
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -36,7 +35,7 @@ class GroupDetailsScreenModel(
         screenModelScope.launch(DispatcherIO) {
             authRepo.getSignedInUser().let { result ->
                 when(result){
-                    is Result.SuccessWithData -> {
+                    is Result.Success -> {
                         _uiState.update {
                             it.copy(currentUserId = result.data.id)
                         }
@@ -54,26 +53,27 @@ class GroupDetailsScreenModel(
 
     private fun initGroupDetails() {
         screenModelScope.launch(DispatcherIO) {
-            roomRepo.getRoomDetails(roomId).onSuccessWithData { room ->
-                println("room: $room")
-                val userIds = room.members.keys
+            val result1 =roomRepo.getRoomDetails(roomId)
+                when(result1){
+                    is Result.Success -> {
+                val userIds = result1.data.members.keys
                 launch {
                     userRepo.getUsersByIds(userIds.toList()).collect { result ->
                         when (result) {
-                            is Results.Failure -> {
+                            is Result.Error -> {
                                 //todo handle error
-                                println("error: ${result.error}")
+                                println("error: ${result.message}")
                             }
 
-                            Results.Loading -> {
+                            Result.Loading -> {
                                 //todo handle loading
                             }
 
-                            is Results.Success -> {
+                            is Result.Success -> {
                                 _uiState.update { state ->
                                     state.copy(
                                         members = result.data,
-                                        admins = room.members.filter { it.value }.keys.toList(),
+                                        admins = result1.data.members.filter { it.value }.keys.toList(),
                                     )
                                 }
                             }
@@ -82,13 +82,16 @@ class GroupDetailsScreenModel(
                 }
                 _uiState.update { state ->
                     state.copy(
-                        isAdmin = room.members[_uiState.value.currentUserId] ?: false
+                        isAdmin = result1.data.members[_uiState.value.currentUserId] ?: false
                     )
                 }
-            }.onFailure {
-                //todo handle error
-                println("error: $it")
-            }
+                    }
+                    is Result.Error -> {
+                        //todo handle error
+                    }
+                    else -> Unit
+                }
+
         }
     }
 
@@ -116,51 +119,72 @@ class GroupDetailsScreenModel(
     private fun onMessageUser(userId: String) {
         screenModelScope.launch {
             roomRepo.checkIfRoomExists(_uiState.value.currentUserId, userId).collect { result ->
-                result.onSuccessWithData { data ->
-                    _uiState.update { oldState ->
-                        oldState.copy(
-                            privateRoom = data
-                        )
+                when (result) {
+                    is Result.Success -> {
+                        _uiState.update { state ->
+                            state.copy(
+                                privateRoom = result.data
+                            )
+                        }
                     }
-                }.onFailure {
-                    println("Error: $it")
+                    is Result.Error -> {
+                        //todo handle error
+                    }
+                    else -> Unit
                 }
             }
         }
     }
     private fun removeMember(userId: String) {
         screenModelScope.launch(DispatcherIO) {
-            roomRepo.removeMember(roomId, userId).onSuccess {
-                _uiState.update {
-                    it.copy(members = it.members.filter { user -> user.id != userId })
+            val result = roomRepo.removeMember(roomId, userId)
+                when(result){
+                    is Result.Error -> TODO()
+                    Result.Loading -> TODO()
+                    is Result.Success -> {
+                        _uiState.update {
+                            it.copy(members = it.members.filter { user -> user.id != userId })
+                        }
+                    }
                 }
-            }.onFailure {
-                //todo handle error
-            }
         }
     }
 
     private fun changeName(name: String) {
         screenModelScope.launch(DispatcherIO) {
-            roomRepo.updateRoomName(roomId, name).onSuccess {
-                _uiState.update { state ->
-                    state.copy(groupName = name)
+            val  result = roomRepo.updateRoomName(roomId, name)
+                when(result){
+                    is Result.Error -> {
+                        //todo handle error
+                    }
+                    Result.Loading -> {
+                        //todo handle loading
+                    }
+                    is Result.Success -> {
+                        _uiState.update { state ->
+                            state.copy(groupName = name)
+                        }
+                    }
                 }
-            }.onFailure {
-                //todo handle error
-            }
         }
     }
 
     private fun changeAvatar(byteArray: ByteArray) {
         screenModelScope.launch(DispatcherIO) {
-            roomRepo.updateRoomAvatar(roomId, byteArray).onSuccessWithData { url ->
-                _uiState.update { state ->
-                    state.copy(groupAvatarUrl = url)
+           val result =  roomRepo.updateRoomAvatar(roomId, byteArray)
+               when(result){
+                   is Result.Error -> {
+                       //todo handle error
+                   }
+                   Result.Loading -> {
+                       //todo handle loading
+                   }
+                   is Result.Success -> {
+                      _uiState.update { state ->
+                    state.copy(groupAvatarUrl = result.data)
                 }
-            }.onFailure {
-                //todo handle error
-            }
+                   }
+               }
         }
     }
     fun dispose() {

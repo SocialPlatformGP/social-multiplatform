@@ -6,12 +6,11 @@ import com.gp.socialapp.data.chat.source.local.MessageLocalDataSource
 import com.gp.socialapp.data.chat.source.remote.MessageRemoteDataSource
 import com.gp.socialapp.data.chat.source.remote.model.request.MessageRequest
 import com.gp.socialapp.data.chat.source.remote.model.response.NewDataResponse
-import com.gp.socialapp.data.material.model.MaterialFile
 import com.gp.socialapp.data.material.source.remote.MaterialRemoteDataSource
 import com.gp.socialapp.data.material.utils.FileManager
+import com.gp.socialapp.util.ChatError
 import com.gp.socialapp.util.Platform
 import com.gp.socialapp.util.Result
-import com.gp.socialapp.util.Results
 import com.gp.socialapp.util.getPlatform
 import kotlinx.coroutines.flow.Flow
 
@@ -21,21 +20,21 @@ class MessageRepositoryImpl(
     private val materialRemoteDataSource: MaterialRemoteDataSource,
     private val fileManager: FileManager
 ) : MessageRepository {
-    override suspend fun connectToSocket(userId: String, roomId: String): Result<Nothing> =
+    override suspend fun connectToSocket(userId: String, roomId: String): Result<Unit,ChatError.Temp> =
         messageRemoteDataSource.connectToSocket(userId, roomId)
 
-    override suspend fun fetchChatMessages(chatId: String): Flow<Result<List<Message>>> {
+    override suspend fun fetchChatMessages(chatId: String): Flow<Result<List<Message>, ChatError.Temp>> {
         val platform = getPlatform()
         val jsRequest = MessageRequest.FetchMessages(chatId)
         return if (platform == Platform.JS) messageRemoteDataSource.fetchChatMessages(jsRequest)
         else messageLocalDataSource.getMessagesFlow(chatId).also {
             val lastMessage = messageLocalDataSource.getLastLocalMessage(chatId)
             val request = MessageRequest.FetchMessages(
-                chatId, timestamp = (lastMessage as? Result.SuccessWithData<Message>)?.data?.createdAt?:0L
+                chatId, timestamp = (lastMessage as? Result.Success<Message>)?.data?.createdAt?:0L
             )
             messageRemoteDataSource.fetchChatMessages(request).collect { result ->
                 when (result) {
-                    is Result.SuccessWithData -> {
+                    is Result.Success -> {
                         messageLocalDataSource.insertMessages(*result.data.toTypedArray())
                     }
 
@@ -53,14 +52,14 @@ class MessageRepositoryImpl(
         messageRemoteDataSource.closeSocket()
     }
 
-    override suspend fun observeMessages(): Flow<Result<NewDataResponse>> {
+    override suspend fun observeMessages(): Flow<Result<NewDataResponse, ChatError.Temp>> {
         println("im in message repo")
         return messageRemoteDataSource.observeMessages()
     }
 
     override suspend fun sendMessage(
         messageContent: String, roomId: String, senderId: String, attachment: MessageAttachment
-    ): Result<Nothing> {
+    ): Result<Unit, ChatError.Temp> {
         val request = MessageRequest.SendMessage(
             content = messageContent,
             roomId = roomId,
@@ -75,7 +74,7 @@ class MessageRepositoryImpl(
         messageId: String,
         roomId: String,
         reporterId: String
-    ): Result<Nothing> {
+    ): Result<Unit, ChatError.Temp> {
         val request = MessageRequest.ReportMessage(
             messageId = messageId, roomId = roomId, reporterId = reporterId
         )
@@ -84,7 +83,7 @@ class MessageRepositoryImpl(
 
     override suspend fun updateMessage(
         messageId: String, roomId: String, updatedContent: String
-    ): Result<Nothing> {
+    ): Result<Unit, ChatError.Temp> {
         val request = MessageRequest.UpdateMessage(
             messageId = messageId, roomId = roomId, updatedContent = updatedContent
         )
@@ -97,11 +96,11 @@ class MessageRepositoryImpl(
                 )
             )
         } else {
-            Result.Error("An error occurred")
+            error(ChatError.Temp.SERVER_ERROR)
         }
     }
 
-    override suspend fun deleteMessage(messageId: String, chatId: String): Result<Nothing> {
+    override suspend fun deleteMessage(messageId: String, chatId: String): Result<Unit, ChatError.Temp> {
         val request = MessageRequest.DeleteMessage(
             messageId = messageId, roomId = chatId
         )
@@ -110,7 +109,7 @@ class MessageRepositoryImpl(
         return if (result is Result.Success) {
             messageLocalDataSource.deleteMessage(messageId)
         } else {
-            Result.Error("An error occurred")
+            error(ChatError.Temp.SERVER_ERROR)
         }
     }
 
@@ -118,15 +117,15 @@ class MessageRepositoryImpl(
         try {
             val data = materialRemoteDataSource.downloadFile(url)
             when (data) {
-                is Results.Failure -> {
-                    println(data.error)
+                is Result.Error -> {
+                    println(data.message)
                 }
 
-                Results.Loading -> {
+                Result.Loading -> {
                     //TODO
                 }
 
-                is Results.Success -> {
+                is Result.Success -> {
                     val localPath = fileManager.saveFile(data.data.data, data.data.fileName, mimeType)
                     fileManager.openFile(localPath, mimeType)
                 }

@@ -4,6 +4,7 @@ import com.gp.socialapp.data.chat.source.remote.model.request.RecentRoomRequests
 import com.gp.socialapp.data.chat.source.remote.model.response.RecentRoomResponses
 import com.gp.socialapp.data.chat.utils.EndPoint
 import com.gp.socialapp.data.post.util.endPoint
+import com.gp.socialapp.util.ChatError
 import com.gp.socialapp.util.Result
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -26,12 +27,12 @@ class RecentRoomRemoteDataSourceImpl(
             println("response: $response")
             if (response.status == HttpStatusCode.OK) {
                 val result = response.body<RecentRoomResponses.GetAllRecentRooms>()
-                emit(Result.SuccessWithData(result.recentRooms))
+                emit(Result.Success(result.recentRooms))
             } else {
-                emit(Result.Error("An error occurred"))
+                emit(Result.Error(ChatError.Temp.SERVER_ERROR))
             }
         } catch (e: Exception) {
-            emit(Result.Error(e.message ?: "An error occurred"))
+            emit(Result.Error(ChatError.Temp.SERVER_ERROR))
         }
     }
 }

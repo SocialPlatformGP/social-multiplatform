@@ -5,7 +5,6 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import com.gp.socialapp.data.auth.repository.AuthenticationRepository
 import com.gp.socialapp.data.auth.repository.UserRepository
 import com.gp.socialapp.data.auth.source.remote.UserData
-import com.gp.socialapp.data.auth.source.remote.model.UserSettings
 import com.gp.socialapp.util.DispatcherIO
 import com.gp.socialapp.util.Result
 import io.github.aakira.napier.Napier
@@ -27,13 +26,18 @@ class SettingsScreenModel(
 
     private fun getUserSettings() {
         screenModelScope.launch {
-            userRepo.getUserSettings().onSuccessWithData { settings ->
-                _uiState.update {  state ->
-                    state.copy(currentUserSettings = settings)
+            val result = userRepo.getUserSettings()
+                when(result){
+                    is Result.Success -> {
+                        _uiState.update {
+                            it.copy(currentUserSettings = result.data)
+                        }
+                    }
+                    is Result.Error -> {
+                        Napier.d("Error getting user settings: ${result.message}")
+                    }
+                    else -> Unit
                 }
-            }.onFailure {  message ->
-                Napier.d("Error getting user settings: $message")
-            }
         }
     }
 
@@ -44,7 +48,7 @@ class SettingsScreenModel(
                     is Result.Error -> {
                         /*TODO: Handle Error*/
                     }
-                    is Result.SuccessWithData -> {
+                    is Result.Success -> {
                         _uiState.update {
                             it.copy(currentUser = result.data)
                         }
@@ -118,14 +122,19 @@ class SettingsScreenModel(
 
     private fun updatePassword(oldPassword: String, newPassword: String) {
         screenModelScope.launch (DispatcherIO) {
-            userRepo.changePassword(oldPassword, newPassword).onSuccess {
-                println("Password changed successfully")
-                getSignedInUser()
-                Napier.d("Password changed successfully")
-            }.onFailure {
-                println("Error changing password: $it")
-                Napier.d("Error changing password: $it")
-            }
+            val result = userRepo.changePassword(oldPassword, newPassword)
+                when(result){
+                    is Result.Success -> {
+                        println("Password changed successfully")
+                        getSignedInUser()
+                        Napier.d("Password changed successfully")
+                    }
+                    is Result.Error -> {
+                        println("Error changing password: ${result.message}")
+                        Napier.d("Error changing password: ${result.message}")
+                    }
+                    else -> Unit
+                }
         }
     }
 

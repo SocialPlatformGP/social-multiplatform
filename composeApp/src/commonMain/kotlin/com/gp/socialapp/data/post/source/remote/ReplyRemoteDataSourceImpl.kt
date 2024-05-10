@@ -3,8 +3,9 @@ package com.gp.socialapp.data.post.source.remote
 import com.gp.socialapp.data.post.source.remote.model.Reply
 import com.gp.socialapp.data.post.source.remote.model.ReplyRequest
 import com.gp.socialapp.data.post.util.endPoint
-import com.gp.socialapp.util.DataError
-import com.gp.socialapp.util.Results
+import com.gp.socialapp.util.ReplyError
+import com.gp.socialapp.util.Result
+import com.gp.socialapp.util.Result.Companion.success
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.post
@@ -18,7 +19,7 @@ class ReplyRemoteDataSourceImpl(
     private val client: HttpClient
 ) : ReplyRemoteDataSource {
 
-    override suspend fun createReply(request: ReplyRequest.CreateRequest): Results<Unit, DataError.Network> =
+    override suspend fun createReply(request: ReplyRequest.CreateRequest): Result<Unit, ReplyError.InsertReply> =
         try {
             val response = client.post {
                 endPoint("createReply")
@@ -27,22 +28,21 @@ class ReplyRemoteDataSourceImpl(
                 )
             }
             if (response.status == HttpStatusCode.OK) {
-                Results.Success(Unit)
+                success(Unit)
             } else {
-                val error = response.body<DataError.Network>()
-                Results.Failure(error)
+                val serverError = response.body<ReplyError.InsertReply>()
+                error(serverError)
 
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN)
+            error(ReplyError.InsertReply.SERVER_ERROR)
         }
 
 
-    override fun fetchReplies(request: ReplyRequest.FetchRequest): Flow<Results<List<Reply>, DataError.Network>> =
+    override fun fetchReplies(request: ReplyRequest.FetchRequest): Flow<Result<List<Reply>, ReplyError.GetReplies>> =
         flow {
-            emit(Results.Loading)
-            println("fetchReplies: $request")
+            emit(Result.Loading)
             try {
                 val response = client.post {
                     endPoint("fetchReplies")
@@ -52,40 +52,38 @@ class ReplyRemoteDataSourceImpl(
                 }
                 if (response.status == HttpStatusCode.OK) {
                     val replies = response.body<List<Reply>>()
-                    emit(Results.Success(replies))
+                    emit(Result.Success(replies))
                 } else {
-                    val error = response.body<DataError.Network>()
-                    emit(Results.Failure(error))
+                    val error = response.body<ReplyError.GetReplies>()
+                    emit(Result.Error(error))
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                emit(Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN))
+                emit(Result.Error(ReplyError.GetReplies.SERVER_ERROR))
             }
         }
 
-    override suspend fun updateReply(request: ReplyRequest.UpdateRequest): Results<Unit, DataError.Network> =
+    override suspend fun updateReply(request: ReplyRequest.UpdateRequest): Result<Unit, ReplyError.UpdateReply> =
         try {
-            println("updateReply request: $request")
             val response = client.post {
                 endPoint("updateReply")
                 setBody(
                     request
                 )
             }
-            println("updateReply response: ${response.status}")
             if (response.status == HttpStatusCode.OK) {
-                Results.Success(Unit)
+                success(Unit)
             } else {
-                val error = response.body<DataError.Network>()
-                Results.Failure(error)
+                val serverError = response.body<ReplyError.UpdateReply>()
+                error(serverError)
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN)
+            error(ReplyError.UpdateReply.SERVER_ERROR)
         }
 
 
-    override suspend fun deleteReply(request: ReplyRequest.DeleteRequest): Results<Unit, DataError.Network> =
+    override suspend fun deleteReply(request: ReplyRequest.DeleteRequest): Result<Unit, ReplyError.DeleteReply> =
         try {
             val response = client.post {
                 endPoint("deleteReply")
@@ -94,18 +92,18 @@ class ReplyRemoteDataSourceImpl(
                 )
             }
             if (response.status == HttpStatusCode.OK) {
-                Results.Success(Unit)
+                success(Unit)
             } else {
-                val message = response.body<DataError.Network>()
-                Results.Failure(message)
+                val message = response.body<ReplyError.DeleteReply>()
+                error(message)
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN)
+            error(ReplyError.DeleteReply.SERVER_ERROR)
         }
 
 
-    override suspend fun upvoteReply(request: ReplyRequest.UpvoteRequest): Results<Unit, DataError.Network> =
+    override suspend fun upvoteReply(request: ReplyRequest.UpvoteRequest): Result<Unit, ReplyError.UpvoteReply> =
         try {
             val response = client.post {
                 endPoint("upvoteReply")
@@ -114,18 +112,18 @@ class ReplyRemoteDataSourceImpl(
                 )
             }
             if (response.status == HttpStatusCode.OK) {
-                Results.Success(Unit)
+                success(Unit)
             } else {
-                val error = response.body<DataError.Network>()
-                Results.Failure(error)
+                val serverError = response.body<ReplyError.UpvoteReply>()
+                error(serverError)
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN)
+            error(ReplyError.UpvoteReply.SERVER_ERROR)
         }
 
 
-    override suspend fun downvoteReply(request: ReplyRequest.DownvoteRequest): Results<Unit, DataError.Network> =
+    override suspend fun downvoteReply(request: ReplyRequest.DownvoteRequest): Result<Unit, ReplyError.DownvoteReply> =
         try {
             val response = client.post {
                 endPoint("downvoteReply")
@@ -134,18 +132,18 @@ class ReplyRemoteDataSourceImpl(
                 )
             }
             if (response.status == HttpStatusCode.OK) {
-                Results.Success(Unit)
+                success(Unit)
             } else {
-                val error = response.body<DataError.Network>()
-                Results.Failure(error)
+                val serverError = response.body<ReplyError.DownvoteReply>()
+                error(serverError)
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN)
+            error(ReplyError.DownvoteReply.SERVER_ERROR)
         }
 
 
-    override suspend fun reportReply(request: ReplyRequest.ReportRequest): Results<Unit, DataError.Network> =
+    override suspend fun reportReply(request: ReplyRequest.ReportRequest): Result<Unit, ReplyError.ReportReply> =
         try {
             val response = client.post {
                 endPoint("reportReply")
@@ -155,14 +153,14 @@ class ReplyRemoteDataSourceImpl(
             }
             val message = response.bodyAsText()
             if (response.status == HttpStatusCode.OK) {
-                Results.Success(Unit)
+                success(Unit)
             } else {
-                val error = response.body<DataError.Network>()
-                Results.Failure(error)
+                val serverError = response.body<ReplyError.ReportReply>()
+                error(serverError)
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN)
+            error(ReplyError.ReportReply.SERVER_ERROR)
         }
 
 }

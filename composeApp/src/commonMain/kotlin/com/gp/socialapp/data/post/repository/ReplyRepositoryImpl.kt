@@ -4,25 +4,25 @@ import com.gp.socialapp.data.auth.source.local.AuthKeyValueStorage
 import com.gp.socialapp.data.post.source.remote.ReplyRemoteDataSource
 import com.gp.socialapp.data.post.source.remote.model.Reply
 import com.gp.socialapp.data.post.source.remote.model.ReplyRequest
-import com.gp.socialapp.util.DataError
-import com.gp.socialapp.util.Results
+import com.gp.socialapp.util.ReplyError
+import com.gp.socialapp.util.Result
 import kotlinx.coroutines.flow.Flow
 
 class ReplyRepositoryImpl(
     private val remoteSource: ReplyRemoteDataSource,
     private val authStorage: AuthKeyValueStorage
 ) : ReplyRepository {
-    override fun getReplies(postId: String): Flow<Results<List<Reply>, DataError.Network>> {
+    override fun getReplies(postId: String): Flow<Result<List<Reply>, ReplyError.GetReplies>> {
         val request = ReplyRequest.FetchRequest(postId)
         return remoteSource.fetchReplies(request)
     }
 
-    override suspend fun updateReply(replyId: String, replyContent: String): Results<Unit, DataError.Network> {
+    override suspend fun updateReply(replyId: String, replyContent: String): Result<Unit, ReplyError.UpdateReply> {
         val request = ReplyRequest.UpdateRequest(replyId, replyContent)
         return remoteSource.updateReply(request)
     }
 
-    override suspend fun deleteReply(replyId: String): Results<Unit, DataError.Network> {
+    override suspend fun deleteReply(replyId: String): Result<Unit, ReplyError.DeleteReply> {
         val request = ReplyRequest.DeleteRequest(replyId)
         return remoteSource.deleteReply(request)
     }
@@ -30,7 +30,7 @@ class ReplyRepositoryImpl(
     override suspend fun upvoteReply(
         replyId: String,
         currentUserId: String
-    ): Results<Unit, DataError.Network> {
+    ): Result<Unit, ReplyError.UpvoteReply> {
         val request = ReplyRequest.UpvoteRequest(replyId, currentUserId)
         return remoteSource.upvoteReply(request)
     }
@@ -38,12 +38,12 @@ class ReplyRepositoryImpl(
     override suspend fun downvoteReply(
         replyId: String,
         currentUserId: String
-    ): Results<Unit, DataError.Network> {
+    ): Result<Unit, ReplyError.DownvoteReply> {
         val request = ReplyRequest.DownvoteRequest(replyId, currentUserId)
         return remoteSource.downvoteReply(request)
     }
 
-    override suspend fun insertReply(reply: Reply): Results<Unit, DataError.Network> {
+    override suspend fun insertReply(reply: Reply): Result<Unit, ReplyError.InsertReply> {
         val request = ReplyRequest.CreateRequest(reply)
         println("request: $request")
         return remoteSource.createReply(request)
@@ -52,7 +52,7 @@ class ReplyRepositoryImpl(
     override suspend fun reportReply(
         replyId: String,
         reporterId: String
-    ): Results<Unit, DataError.Network> {
+    ): Result<Unit, ReplyError.ReportReply> {
         val request = ReplyRequest.ReportRequest(replyId, reporterId)
         return remoteSource.reportReply(request)
     }

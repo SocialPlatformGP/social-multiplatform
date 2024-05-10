@@ -10,7 +10,6 @@ import com.gp.socialapp.presentation.auth.util.Validator
 import com.gp.socialapp.util.DispatcherIO
 import com.gp.socialapp.util.LocalDateTimeUtil.toMillis
 import com.gp.socialapp.util.Result
-import com.gp.socialapp.util.Results
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -76,7 +75,7 @@ class UserInformationScreenModel(
                 if (result is Result.Success) {
                     getSignedInUser()
                 } else if (result is Result.Error) {
-                    _uiState.update { it.copy(error = AuthError.ServerError(result.message)) }
+                    _uiState.update { it.copy(error = AuthError.ServerError(result.message.userMessage)) }
                 }
             }
         }
@@ -85,30 +84,30 @@ class UserInformationScreenModel(
     private fun getSignedInUser() {
         screenModelScope.launch(DispatcherIO) {
             authRepo.getSignedInUser().let { result ->
-                if (result is Result.SuccessWithData) {
+                if (result is Result.Success) {
                     println("User: ${result.data}")
                     userRepo.createRemoteUser(result.data).let { result2 ->
                         when (result2) {
-                            is Results.Failure -> _uiState.update { state ->
+                            is Result.Error -> _uiState.update { state ->
                                 state.copy(
                                     error = AuthError.ServerError(
-                                        result2.error.userMessage
+                                        result2.message.userMessage
                                     )
                                 )
                             }
 
-                            is Results.Success -> _uiState.update { state ->
+                            is Result.Success -> _uiState.update { state ->
                                 state.copy(
                                     signedInUser = result.data,
-                                    createdState = Result.Success
+                                    createdState = Result.Success(Unit)
                                 )
                             }
 
-                            Results.Loading -> Unit
+                            Result.Loading -> Unit
                         }
                     }
                 } else if (result is Result.Error) {
-                    _uiState.update { state -> state.copy(error = AuthError.ServerError(result.message)) }
+                    _uiState.update { state -> state.copy(error = AuthError.ServerError(result.message.userMessage)) }
                 }
             }
         }

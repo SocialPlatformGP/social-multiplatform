@@ -28,16 +28,18 @@ class CreatePrivateChatScreenModel(
     }
 
     private fun getCurrentUser() {
-        screenModelScope.launch (DispatcherIO) {
-            authenticationRepository.getSignedInUser().let{ result ->
-                when(result) {
-                    is Result.SuccessWithData -> {
+        screenModelScope.launch(DispatcherIO) {
+            authenticationRepository.getSignedInUser().let { result ->
+                when (result) {
+                    is Result.Success -> {
                         setCurrentUserId(result.data.id)
                     }
+
                     is Result.Error -> {
                         //TODO: Handle error
                         println("Error: ${result.message}")
                     }
+
                     else -> Unit
                 }
             }
@@ -56,45 +58,68 @@ class CreatePrivateChatScreenModel(
     private fun getUsers() {
         screenModelScope.launch {
             userRepository.fetchUsers().collect { result ->
-                result.onSuccessWithData { data ->
-                    val users = data.filter { it.id != state.value.currentUserId }
-                    state.update {
-                        it.copy(allUsers = users, matchingUsers = users)
+                when (result) {
+                    is Result.Success -> {
+                        val users = result.data.filter { it.id != state.value.currentUserId }
+                        state.update {
+                            it.copy(allUsers = users, matchingUsers = users)
+                        }
                     }
-                }.onFailure {
-                    println("Error: $it")
+
+                    is Result.Error -> {
+
+                    }
+
+                    Result.Loading -> {
+
+                    }
+
                 }
             }
         }
     }
+        fun onUserSelected(user: User) {
+            screenModelScope.launch {
+                roomRepository.checkIfRoomExists(state.value.currentUserId, user.id)
+                    .collect { result ->
+                        when (result) {
+                            is Result.Success -> {
+                                state.update { oldState ->
+                                    oldState.copy(
+                                        room = result.data
+                                    )
+                                }
+                            }
 
-    fun onUserSelected(user: User) {
-        screenModelScope.launch {
-            roomRepository.checkIfRoomExists(state.value.currentUserId, user.id).collect { result ->
-                result.onSuccessWithData { data ->
-                    state.update { oldState ->
-                        oldState.copy(
-                            room = data
-                        )
+                            is Result.Error -> {
+                                println("Error: ${result.message}")
+                            }
+
+                            Result.Loading -> {
+
+                            }
+                        }
+
                     }
-                }.onFailure {
-                    println("Error: $it")
+            }
+        }
+
+        fun clear() {
+            state.value = CreatePrivateChatUiState()
+        }
+
+        fun onSearchQueryChanged(s: String) {
+            screenModelScope.launch(Dispatchers.Default) {
+                state.update { oldState ->
+                    oldState.copy(
+                        matchingUsers = oldState.allUsers.filter {
+                            (it.name).contains(
+                                s,
+                                ignoreCase = true
+                            )
+                        }
+                    )
                 }
             }
         }
     }
-
-    fun clear() {
-        state.value = CreatePrivateChatUiState()
-    }
-
-    fun onSearchQueryChanged(s: String) {
-        screenModelScope.launch (Dispatchers.Default) {
-            state.update { oldState ->
-                oldState.copy(
-                    matchingUsers = oldState.allUsers.filter { (it.name).contains(s, ignoreCase = true) }
-                )
-            }
-        }
-    }
-}

@@ -8,11 +8,10 @@ import com.gp.socialapp.data.post.source.remote.model.Post
 import com.gp.socialapp.data.post.source.remote.model.PostRequest
 import com.gp.socialapp.data.post.source.remote.model.Tag
 import com.gp.socialapp.util.AppConstants
-import com.gp.socialapp.util.DataError
 import com.gp.socialapp.util.LocalDateTimeUtil.now
 import com.gp.socialapp.util.Platform
+import com.gp.socialapp.util.PostError
 import com.gp.socialapp.util.Result
-import com.gp.socialapp.util.Results
 import com.gp.socialapp.util.getPlatform
 import com.russhwolf.settings.Settings
 import com.russhwolf.settings.set
@@ -40,7 +39,7 @@ class PostRepositoryImpl(
             settings[AppConstants.StorageKeys.RECENT_SEARCHES.key] = value
         }
 
-    override suspend fun createPost(post: Post): Flow<Results<Unit, DataError.Network>> {
+    override suspend fun createPost(post: Post): Flow<Result<Unit, PostError.CreatePost>> {
         val request = PostRequest.CreateRequest(post)
         return postRemoteSource.createPost(request)
     }
@@ -48,17 +47,17 @@ class PostRepositoryImpl(
     override suspend fun reportPost(
         postId: String,
         reporterId: String
-    ): Results<Unit, DataError.Network> {
+    ): Result<Unit, PostError.ReportPost> {
         val request = PostRequest.ReportRequest(postId, reporterId)
         return postRemoteSource.reportPost(request)
     }
 
-    override fun searchByTitle(title: String): Flow<Results<List<Post>, DataError.Network>> = flow {
-        emit(Results.Loading)
+    override fun searchByTitle(title: String): Flow<Result<List<Post>, PostError.SearchByTitle>> = flow {
+        emit(Result.Loading)
         val platform = getPlatform()
         try {
             if (title.isEmpty()) {
-                emit(Results.Success(emptyList()))
+                emit(Result.Success(emptyList()))
                 return@flow
             } else if (platform == Platform.JS) {
                 postRemoteSource.searchByTitle(title).collect {
@@ -67,11 +66,11 @@ class PostRepositoryImpl(
                 return@flow
             } else {
                 postLocalSource.searchByTitle(title).collect {
-                    emit(Results.Success(it))
+                    emit(Result.Success(it))
                 }
             }
         } catch (e: Exception) {
-            emit(Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN))
+            emit(Result.Error(PostError.SearchByTitle.SERVER_ERROR))
         }
     }
 
@@ -79,25 +78,19 @@ class PostRepositoryImpl(
         postLocalSource.insertPost(post)
     }
 
-    override fun getPosts(): Flow<Results<List<Post>, DataError.Network>> = flow {
-        println("getPosts: $lastUpdated repo *********************125")
-        emit(Results.Loading)
+    override fun getPosts(): Flow<Result<List<Post>, PostError.GetPosts>> = flow {
+        emit(Result.Loading)
         val platform = getPlatform()
-        println("platform: $platform")
         try {
             if (platform == Platform.JS) {
-                println("getPosts: $lastUpdated repo *********************126")
                 postRemoteSource.fetchAllPosts().collect {
                     emit(it)
                 }
             } else {
-                println("getPosts: $lastUpdated repo *********************126")
 
                 getRemotePosts().collect {
                     println(it)
-                    println("getPosts: $lastUpdated repo *********************127")
-                    if (it is Results.Success && it.data.isNotEmpty()) {
-                        println("getPosts: $lastUpdated repo *********************127")
+                    if (it is Result.Success && it.data.isNotEmpty()) {
                         lastUpdated = LocalDateTime.now().toInstant(TimeZone.UTC).epochSeconds
                         it.data.forEach { post ->
                             insertLocalPost(post)
@@ -105,17 +98,17 @@ class PostRepositoryImpl(
                     }
                 }
                 getLocalPosts().collect {
-                    emit(Results.Success(it))
+                    emit(Result.Success(it))
                 }
 
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            emit(Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN))
+            emit(Result.Error(PostError.GetPosts.SERVER_ERROR))
         }
     }
 
-    private fun getRemotePosts(): Flow<Results<List<Post>, DataError.Network>> {
+    private fun getRemotePosts(): Flow<Result<List<Post>, PostError.GetPosts>> {
         println("getRemotePosts: $lastUpdated repo *********************1255")
         return postRemoteSource.fetchPosts(
             PostRequest.FetchRequest(
@@ -128,19 +121,19 @@ class PostRepositoryImpl(
         return postLocalSource.getAllPosts()
     }
 
-    override suspend fun updatePost(post: Post): Results<Unit, DataError.Network> {
+    override suspend fun updatePost(post: Post): Result<Unit,PostError.UpdatePost > {
         val request = PostRequest.UpdateRequest(post)
         return postRemoteSource.updatePost(request)
     }
 
 
-    override suspend fun deletePost(post: Post): Results<Unit, DataError.Network> {
+    override suspend fun deletePost(post: Post): Result<Unit,PostError.DeletePost> {
         val request = PostRequest.DeleteRequest(post.id)
         postLocalSource.deletePostById(post.id)
         return postRemoteSource.deletePost(request)
     }
 
-    override suspend fun upvotePost(post: Post, userId: String): Results<Unit, DataError.Network> {
+    override suspend fun upvotePost(post: Post, userId: String): Result<Unit, PostError.UpvotePost> {
         val request = PostRequest.UpvoteRequest(
             post.id,
             userId
@@ -151,7 +144,7 @@ class PostRepositoryImpl(
     override suspend fun downvotePost(
         post: Post,
         userId: String
-    ): Results<Unit, DataError.Network> {
+    ): Result<Unit, PostError.DownvotePost> {
         val request = PostRequest.DownvoteRequest(
             post.id,
             userId
@@ -170,7 +163,7 @@ class PostRepositoryImpl(
         postRemoteSource.insertTag(tag)
     }
 
-    override suspend fun getUserPosts(userId: String): Result<List<Post>> {
+    override suspend fun getUserPosts(userId: String): Result<List<Post>,PostError.GetUserPosts> {
         return postRemoteSource.getUserPosts(userId)
     }
 
@@ -192,12 +185,12 @@ class PostRepositoryImpl(
         println("recentSearches after: $recentSearches")
     }
 
-    override fun searchByTag(tag: Tag): Flow<Results<List<Post>, DataError.Network>> = flow {
-        emit(Results.Loading)
+    override fun searchByTag(tag: Tag): Flow<Result<List<Post>, PostError.SearchByTag>> = flow {
+        emit(Result.Loading)
         val platform = getPlatform()
         try {
             if (tag.label.isEmpty()) {
-                emit(Results.Success(emptyList()))
+                emit(Result.Success(emptyList()))
                 return@flow
             } else if (platform == Platform.JS) {
                 postRemoteSource.searchByTag(tag.label).collect {
@@ -206,26 +199,26 @@ class PostRepositoryImpl(
                 return@flow
             } else {
                 postLocalSource.searchByTag(tag.label).collect {
-                    emit(Results.Success(it))
+                    emit(Result.Success(it))
                 }
             }
         } catch (e: Exception) {
-            emit(Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN))
+            emit(Result.Error(PostError.SearchByTag.SERVER_ERROR))
         }
     }
 
     override suspend fun openAttachment(url: String, mimeType: String) {
         try {
             when (val data = materialRemoteDataSource.downloadFile(url)) {
-                is Results.Failure -> {
-                    println(data.error)
+                is Result.Error -> {
+                    println(data.message)
                 }
 
-                Results.Loading -> {
+                Result.Loading -> {
                     //TODO
                 }
 
-                is Results.Success -> {
+                is Result.Success -> {
                     val localPath =
                         fileManager.saveFile(data.data.data, data.data.fileName, mimeType)
                     fileManager.openFile(localPath, mimeType)

@@ -12,7 +12,6 @@ import com.gp.socialapp.util.Result
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -34,7 +33,7 @@ class CreateGroupScreenModel(
         screenModelScope.launch(DispatcherIO) {
             authRepo.getSignedInUser().let{ result ->
                 when(result) {
-                    is Result.SuccessWithData -> {
+                    is Result.Success -> {
                         currentUserId = result.data.id
                         getAllUsers()
                     }
@@ -50,12 +49,16 @@ class CreateGroupScreenModel(
     private fun getAllUsers() {
         screenModelScope.launch(DispatcherIO) {
             userRepo.fetchUsers().collect { result ->
-                result.onSuccessWithData { data ->
-                    updateUsersListState(data)
-                }.onFailure {
-//                    updateError(true)
-                    println("Error: $it")
+                when (result) {
+                    is Result.Success -> {
+                        updateUsersListState(result.data)
+                    }
+                    is Result.Error -> {
+                        //TODO handle error
+                    }
+                    else -> Unit
                 }
+
             }
         }
     }
@@ -129,17 +132,22 @@ class CreateGroupScreenModel(
                     userIds = selectedUsers.map { it.id },
                     creatorId = currentUserId
                 ).collect { result ->
-                    result.onSuccessWithData { room ->
-                        _uiState.update {
-                            it.copy(
-                                isCreated = true,
-                                groupId = room.id,
-                                groupAvatarUrl = room.picUrl
-                            )
+                    when (result) {
+                        is Result.Success -> {
+                            _uiState.update {
+                                it.copy(
+                                    isCreated = true,
+                                    groupId = result.data.id,
+                                    groupAvatarUrl = result.data.picUrl
+                                )
+                            }
                         }
-                    }.onFailure {
-                        println("Error: $it")
+                        is Result.Error -> {
+                            println("Error: $result")
+                        }
+                        else -> Unit
                     }
+
                 }
             }
         }

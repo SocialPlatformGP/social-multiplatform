@@ -31,7 +31,7 @@ class ChatHomeScreenModel(
         screenModelScope.launch(DispatcherIO) {
             authenticationRepository.getSignedInUser().let { result ->
                 when(result) {
-                    is Result.SuccessWithData -> {
+                    is Result.Success -> {
                         state.update {
                             it.copy(currentUserId = result.data.id)
                         }
@@ -50,35 +50,35 @@ class ChatHomeScreenModel(
 
     private fun connectToSocket() {
         screenModelScope.launch(DispatcherIO) {
-            recentRoomRepository.connectToSocket(
+            val result = recentRoomRepository.connectToSocket(
                 uiState.value.currentUserId,
-            ).onSuccess {
-                println("Socket connected")
-            }.onFailure {
-                println("Socket connection failed")
-            }
+            )
+                when (result) {
+                    is Result.Success -> {
+                        println("Socket connected")
+                    }
+                    is Result.Error -> {
+                        println("Socket connection failed")
+                    }
+                    else -> Unit
+                }
         }
     }
 
-    //    suspend fun observeMessages() {
-//        recentRoomRepository.observeNewData().onEach { result ->
-//            result.onSuccessWithData { newData ->
-//                state.update {
-//                    it.copy(recentRooms = newData.recentRooms)
-//                }
-//            }
-//        }.launchIn(screenModelScope)
-//
-//    }
     fun observeMessages() {
         if (job == null) {
             job = screenModelScope.launch {
                 recentRoomRepository.observeNewData().collect { result ->
-                    println("im in home vm ")
-                    result.onSuccessWithData { newData ->
-                        state.update {
-                            it.copy(recentRooms = newData.recentRooms.sortedByDescending { it.lastMessageTime })
+                    when (result) {
+                        is Result.Success -> {
+                            state.update {
+                            it.copy(recentRooms = result.data.recentRooms.sortedByDescending { it.lastMessageTime })
                         }
+                        }
+                        is Result.Error -> {
+                            println("Error: ${result.message}")
+                        }
+                        else -> Unit
                     }
                 }
             }
@@ -91,11 +91,15 @@ class ChatHomeScreenModel(
         screenModelScope.launch(DispatcherIO) {
             recentRoomRepository.getAllRecentRooms(uiState.value.currentUserId)
                 .collect { result ->
-                    result.onSuccessWithData { data ->
-                        state.value =
-                            ChatHomeUiState(recentRooms = data.sortedByDescending { it.lastMessageTime })
-                    }.onFailure {
-                        println("Error: $it")
+                    when (result) {
+                        is Result.Success -> {
+                            state.value =
+                            ChatHomeUiState(recentRooms = result.data.sortedByDescending { it.lastMessageTime })
+                        }
+                        is Result.Error -> {
+                            println("Error: ${result.message}")
+                        }
+                        else -> Unit
                     }
                 }
             observeMessages()
@@ -104,11 +108,16 @@ class ChatHomeScreenModel(
 
     fun onClear() {
         screenModelScope.launch(DispatcherIO) {
-            recentRoomRepository.closeSocket().onSuccess {
-                println("Socket closed")
-            }.onFailure {
-                println("Socket close failed")
-            }
+            val result = recentRoomRepository.closeSocket()
+                when (result) {
+                    is Result.Success -> {
+                        println("Socket closed")
+                    }
+                    is Result.Error -> {
+                        println("Socket close failed")
+                    }
+                    else -> Unit
+                }
         }
     }
 
