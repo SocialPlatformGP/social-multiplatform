@@ -43,17 +43,16 @@ data class AddMembersScreen(
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = rememberScreenModel<AddMembersScreenModel>()
-        LifecycleEffect(
-            onStarted = {
-                screenModel.init(roomId, groupMembersIds)
-            }
-        )
+        LifecycleEffect(onStarted = {
+            screenModel.init(roomId, groupMembersIds)
+        }, onDisposed = {
+            screenModel.onDispose()
+        })
         val state by screenModel.uiState.collectAsState()
         if (state.isDone) {
             navigator.pop()
         }
-        AddMembersContent(
-            selectedUsers = state.selectedUsers,
+        AddMembersContent(selectedUsers = state.selectedUsers,
             allUsers = state.allUsers,
             onRemoveMember = screenModel::removeMember,
             onAddMember = screenModel::addMember,
@@ -63,8 +62,7 @@ data class AddMembersScreen(
             },
             onBackClicked = {
                 navigator.pop()
-            }
-        )
+            })
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -103,8 +101,7 @@ data class AddMembersScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = modifier.fillMaxSize()
                 ) {
-                    ChooseGroupMembersSection(
-                        modifier = Modifier.padding(top = 8.dp),
+                    ChooseGroupMembersSection(modifier = Modifier.padding(top = 8.dp),
                         selectedUsers = selectedUsers,
                         users = allUsers,
                         onUnselectUser = {

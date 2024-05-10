@@ -25,7 +25,6 @@ class CreateGroupScreenModel(
     val uiState = _uiState.asStateFlow()
 
     fun init() {
-        resetState()
         getSignedInUser()
     }
 
@@ -158,7 +157,8 @@ class CreateGroupScreenModel(
         }
     }
 
-    private fun resetState() {
+    override fun onDispose() {
+        super.onDispose()
         _uiState.value = CreateGroupUiState()
     }
 }

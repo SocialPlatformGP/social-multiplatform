@@ -33,7 +33,6 @@ fun MessageAttachment(
 
             else -> {
                 MessageFileAttachment(
-                    fileType = fileType,
                     fileName = fileName,
                     onFileClicked = { onFileClicked() },
                     modifier = modifier,

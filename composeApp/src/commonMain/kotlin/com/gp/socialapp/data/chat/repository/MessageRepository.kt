@@ -26,5 +26,4 @@ interface MessageRepository {
     ): Result<Nothing>
 
     suspend fun openAttachment(path: String, name: String, mimeType: String)
-    suspend fun onDispose()
 }

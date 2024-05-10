@@ -9,7 +9,6 @@ import com.gp.socialapp.util.Result
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -49,8 +48,8 @@ class ChatHomeScreenModel(
     }
 
     private fun fetchRecentRooms(id: String) {
-        screenModelScope.launch {
-            recentRoomRepository.fetchRecentRooms(id, this).collectLatest { result ->
+        screenModelScope.launch(DispatcherIO) {
+            recentRoomRepository.fetchRecentRooms(id, screenModelScope).collect { result ->
                 result.onSuccessWithData { data ->
                     state.value = ChatHomeUiState(recentRooms = data)
                 }.onFailure {
@@ -62,10 +61,7 @@ class ChatHomeScreenModel(
 
     override fun onDispose() {
         super.onDispose()
-        screenModelScope.launch {
-            state.value = ChatHomeUiState()
-            recentRoomRepository.onDispose()
-        }
+        state.value = ChatHomeUiState()
         println("Disposed")
     }
 }

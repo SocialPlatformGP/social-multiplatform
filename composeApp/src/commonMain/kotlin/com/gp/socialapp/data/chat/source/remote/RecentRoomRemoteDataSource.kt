@@ -7,5 +7,4 @@ import kotlinx.coroutines.flow.Flow
 
 interface RecentRoomRemoteDataSource {
     fun fetchRecentRooms(userId: String, scope: CoroutineScope): Flow<Result<List<RecentRoom>>>
-    suspend fun onDispose()
 }

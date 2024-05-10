@@ -25,5 +25,4 @@ interface MessageRemoteDataSource {
         messageId: Long, roomId: Long
     ): Result<Nothing>
 
-    suspend fun onDispose()
 }

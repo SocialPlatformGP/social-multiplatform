@@ -17,8 +17,7 @@ import kotlinx.coroutines.launch
 import kotlin.properties.Delegates
 
 class ChatRoomScreenModel(
-    private val messageRepo: MessageRepository,
-    private val authRepo: AuthenticationRepository
+    private val messageRepo: MessageRepository, private val authRepo: AuthenticationRepository
 ) : ScreenModel {
     private val _uiState = MutableStateFlow(ChatRoomUiState())
     val uiState = _uiState.asStateFlow()
@@ -186,7 +185,6 @@ class ChatRoomScreenModel(
     override fun onDispose() {
         screenModelScope.launch {
             _uiState.value = ChatRoomUiState()
-            messageRepo.onDispose()
         }
         super.onDispose()
     }

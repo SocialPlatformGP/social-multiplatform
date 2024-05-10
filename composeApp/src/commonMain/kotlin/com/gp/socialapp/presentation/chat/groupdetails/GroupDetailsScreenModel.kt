@@ -173,7 +173,8 @@ class GroupDetailsScreenModel(
         }
     }
 
-    fun dispose() {
+    override fun onDispose() {
+        super.onDispose()
         _uiState.value = GroupDetailsUiState()
     }
 }

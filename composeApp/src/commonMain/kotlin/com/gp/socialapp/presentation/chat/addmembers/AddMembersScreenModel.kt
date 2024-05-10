@@ -28,7 +28,6 @@ class AddMembersScreenModel(
     fun init(roomId: Long, groupMembersIds: List<String>) {
         this.roomId = roomId
         this.groupMembersIds = groupMembersIds
-        resetState()
         getUserID()
         initAddMembers()
     }
@@ -50,9 +49,7 @@ class AddMembersScreenModel(
                             it.id != currentUserId && !groupMembersIds.contains(it.id)
                         }
                         _uiState.update {
-                            it.copy(
-                                allUsers = allUsers.map { user -> user.toSelectableUser() }
-                            )
+                            it.copy(allUsers = allUsers.map { user -> user.toSelectableUser() })
                         }
                         println("All Users: ${_uiState.value.allUsers}")
                     }
@@ -132,7 +129,8 @@ class AddMembersScreenModel(
         }
     }
 
-    private fun resetState() {
-        _uiState.update { AddMembersUiState() }
+    override fun onDispose() {
+        super.onDispose()
+        _uiState.value = AddMembersUiState()
     }
 }

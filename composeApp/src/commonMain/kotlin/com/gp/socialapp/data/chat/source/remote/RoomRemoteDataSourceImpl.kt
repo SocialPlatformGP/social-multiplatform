@@ -8,7 +8,7 @@ import com.gp.socialapp.data.chat.source.remote.model.RemoteRoom
 import com.gp.socialapp.util.LocalDateTimeUtil.now
 import com.gp.socialapp.util.Result
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.postgrest.postgrest
+import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.storage.storage
 import korlibs.time.DateTimeTz.Companion.nowLocal
 import kotlinx.datetime.LocalDateTime
@@ -18,9 +18,9 @@ import kotlinx.datetime.toInstant
 class RoomRemoteDataSourceImpl(
     private val supabase: SupabaseClient
 ) : RoomRemoteDataSource {
-    private val roomsTable = supabase.postgrest["rooms"]
-    private val recentRoomsTable = supabase.postgrest["recent_rooms"]
-    private val userRoomsTable = supabase.postgrest["user_rooms"]
+    private val ROOMS = "rooms"
+    private val RECENTROOMS = "recent_rooms"
+    private val USERROOMS = "user_rooms"
     override suspend fun createGroupRoom(
         groupName: String,
         groupAvatarByteArray: ByteArray,
@@ -31,26 +31,24 @@ class RoomRemoteDataSourceImpl(
         return try {
             if (groupAvatarByteArray.isNotEmpty()) {
                 uploadGroupAvatar(
-                    groupAvatarByteArray,
-                    groupName,
-                    groupAvatarExtension
+                    groupAvatarByteArray, groupName, groupAvatarExtension
                 ).let { result ->
                     if (result is Result.SuccessWithData) {
                         val members = mutableMapOf(
-                            creatorId to true,
-                            *userIds.map { it to false }.toTypedArray()
+                            creatorId to true, *userIds.map { it to false }.toTypedArray()
                         )
                         val room = RemoteRoom(
                             name = groupName,
                             picUrl = result.data,
                             members = members,
                             isPrivate = false,
+                            createdAt = nowLocal().format("yyyy-MM-dd'T'HH:mm:ss.SSSSSSX")
                         )
-                        val roomResult = roomsTable.insert(room) {
+                        val roomResult = supabase.from(ROOMS).insert(room) {
                             select()
                         }.decodeSingle<RemoteRoom>().toRoom()
                         createRecentRoom(roomResult.id, roomResult.name, roomResult.picUrl)
-                        updateUsersRooms(userIds.plus(creatorId), roomResult.id)
+                        updateUsersRooms(userIds.plus(creatorId), creatorId, roomResult.id)
                         Result.SuccessWithData(roomResult)
                     } else {
                         Result.Error("Error uploading image: ${(result as Result.Error).message}")
@@ -63,12 +61,13 @@ class RoomRemoteDataSourceImpl(
                     name = groupName,
                     members = members,
                     isPrivate = false,
+                    createdAt = nowLocal().format("yyyy-MM-dd'T'HH:mm:ss.SSSSSSX")
                 )
-                val roomResult = roomsTable.insert(room) {
+                val roomResult = supabase.from(ROOMS).insert(room) {
                     select()
                 }.decodeSingle<RemoteRoom>().toRoom()
                 createRecentRoom(roomResult.id, roomResult.name, roomResult.picUrl)
-                updateUsersRooms(userIds.plus(creatorId), roomResult.id)
+                updateUsersRooms(userIds.plus(creatorId), creatorId, roomResult.id)
                 Result.SuccessWithData(roomResult)
             }
         } catch (e: Exception) {
@@ -78,19 +77,19 @@ class RoomRemoteDataSourceImpl(
 
     override suspend fun addGroupMembers(roomId: Long, userIds: List<String>): Result<Unit> {
         return try {
-            val room = roomsTable.select {
+            val room = supabase.from(ROOMS).select {
                 filter {
                     eq("id", roomId)
                 }
             }.decodeSingle<RemoteRoom>()
-            roomsTable.update({
+            supabase.from(ROOMS).update({
                 set("members", room.members.plus(userIds.map { it to false }))
             }) {
                 filter {
                     eq("id", roomId)
                 }
             }
-            updateUsersRooms(userIds, roomId)
+            updateUsersRooms(userIds, creatorId = "", roomId)
             Result.Success
         } catch (e: Exception) {
             e.printStackTrace()
@@ -100,7 +99,7 @@ class RoomRemoteDataSourceImpl(
 
     override suspend fun getRoom(roomId: Long): Result<Room> {
         return try {
-            val room = roomsTable.select {
+            val room = supabase.from(ROOMS).select {
                 filter {
                     eq("id", roomId)
                 }
@@ -113,13 +112,13 @@ class RoomRemoteDataSourceImpl(
 
     override suspend fun getPrivateRoom(currentUser: User, otherUser: User): Result<Room> {
         return try {
-            val userPrivateChats = userRoomsTable.select {
+            val userPrivateChats = supabase.from(USERROOMS).select {
                 filter {
                     eq("userId", currentUser.id)
                 }
             }.decodeSingle<UserRooms>().privateChats
             if (userPrivateChats.containsKey(otherUser.id)) {
-                val room = roomsTable.select {
+                val room = supabase.from(ROOMS).select {
                     filter {
                         eq("id", userPrivateChats.getValue(otherUser.id))
                     }
@@ -133,7 +132,7 @@ class RoomRemoteDataSourceImpl(
                     isPrivate = true,
                     createdAt = timestamp
                 )
-                val createdRoom = roomsTable.insert(remoteRoom) {
+                val createdRoom = supabase.from(ROOMS).insert(remoteRoom) {
                     select()
                 }.decodeSingle<RemoteRoom>()
                 val remoteRecentRoom = RemoteRecentRoom(
@@ -148,8 +147,10 @@ class RoomRemoteDataSourceImpl(
                     receiverPicUrl = otherUser.profilePictureURL,
                     lastMessageTime = timestamp
                 )
-                recentRoomsTable.insert(remoteRecentRoom)
-                updateUsersRooms(listOf(currentUser.id, otherUser.id), createdRoom.id)
+                supabase.from(RECENTROOMS).insert(remoteRecentRoom)
+                updateUsersRooms(
+                    listOf(currentUser.id, otherUser.id), creatorId = currentUser.id, createdRoom.id
+                )
                 updateUsersPrivateChats(currentUser.id, otherUser.id, createdRoom.id)
                 updateUsersPrivateChats(otherUser.id, currentUser.id, createdRoom.id)
                 Result.SuccessWithData(createdRoom.toRoom())
@@ -162,24 +163,24 @@ class RoomRemoteDataSourceImpl(
 
     override suspend fun removeMember(roomId: Long, userId: String): Result<Unit> {
         return try {
-            val room = roomsTable.select {
+            val room = supabase.from(ROOMS).select {
                 filter {
                     eq("id", roomId)
                 }
             }.decodeSingle<RemoteRoom>()
-            roomsTable.update({
+            supabase.from(ROOMS).update({
                 set("members", room.members.minus(userId))
             }) {
                 filter {
                     eq("id", roomId)
                 }
             }
-            val userRooms = userRoomsTable.select {
+            val userRooms = supabase.from(USERROOMS).select {
                 filter {
                     eq("userId", userId)
                 }
             }.decodeSingle<UserRooms>().rooms.minus(roomId)
-            userRoomsTable.update({
+            supabase.from(USERROOMS).update({
                 set("rooms", userRooms)
             }) {
                 filter {
@@ -198,19 +199,17 @@ class RoomRemoteDataSourceImpl(
     ): Result<String> {
         return try {
             uploadGroupAvatar(
-                newAvatarByteArray,
-                roomId.toString(),
-                newAvatarExtension
+                newAvatarByteArray, roomId.toString(), newAvatarExtension
             ).let { result ->
                 if (result is Result.SuccessWithData) {
-                    roomsTable.update({
+                    supabase.from(ROOMS).update({
                         set("picUrl", result.data)
                     }) {
                         filter {
                             eq("id", roomId)
                         }
                     }
-                    recentRoomsTable.update({
+                    supabase.from(RECENTROOMS).update({
                         set("senderPicUrl", result.data)
                     }) {
                         filter {
@@ -229,14 +228,14 @@ class RoomRemoteDataSourceImpl(
 
     override suspend fun updateRoomName(roomId: Long, newName: String): Result<Unit> {
         return try {
-            roomsTable.update({
+            supabase.from(ROOMS).update({
                 set("name", newName)
             }) {
                 filter {
                     eq("id", roomId)
                 }
             }
-            recentRoomsTable.update({
+            supabase.from(RECENTROOMS).update({
                 set("senderName", newName)
             }) {
                 filter {
@@ -249,16 +248,16 @@ class RoomRemoteDataSourceImpl(
         }
     }
 
-    private suspend fun updateUsersRooms(userIds: List<String>, roomId: Long) {
+    private suspend fun updateUsersRooms(userIds: List<String>, creatorId: String, roomId: Long) {
         try {
             userIds.forEach { userId ->
-                val userRooms = userRoomsTable.select {
+                val userRooms = supabase.from(USERROOMS).select {
                     filter {
                         eq("userId", userId)
                     }
-                }.decodeSingle<UserRooms>()
-                userRoomsTable.update({
-                    set("rooms", userRooms.rooms + roomId)
+                }.decodeSingle<UserRooms>().rooms
+                supabase.from(USERROOMS).update({
+                    set("rooms", userRooms + roomId)
                 }) {
                     filter {
                         eq("userId", userId)
@@ -271,17 +270,15 @@ class RoomRemoteDataSourceImpl(
     }
 
     private suspend fun updateUsersPrivateChats(
-        firstUserId: String,
-        secondUserId: String,
-        roomId: Long
+        firstUserId: String, secondUserId: String, roomId: Long
     ) {
         try {
-            val firstUserPrivateChats = userRoomsTable.select {
+            val firstUserPrivateChats = supabase.from(USERROOMS).select {
                 filter {
                     eq("userId", firstUserId)
                 }
             }.decodeSingle<UserRooms>()
-            userRoomsTable.update({
+            supabase.from(USERROOMS).update({
                 set(
                     "privateChats",
                     firstUserPrivateChats.privateChats + mapOf(secondUserId to roomId)
@@ -304,8 +301,9 @@ class RoomRemoteDataSourceImpl(
                 isPrivate = false,
                 senderName = roomName,
                 senderPicUrl = roomPicUrl,
+                lastMessageTime = nowLocal().format("yyyy-MM-dd'T'HH:mm:ss.SSSSSSX")
             )
-            recentRoomsTable.insert(room)
+            supabase.from(RECENTROOMS).insert(room)
         } catch (e: Exception) {
             e.printStackTrace()
         }

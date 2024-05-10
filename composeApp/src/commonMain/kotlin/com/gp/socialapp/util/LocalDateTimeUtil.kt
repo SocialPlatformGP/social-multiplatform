@@ -40,11 +40,11 @@ object LocalDateTimeUtil {
         }
     }
     fun DateTimeTz.getDateHeader(): String {
-        val today = DateTime.now().date
+        val today = DateTimeTz.nowLocal()
         return when {
-            this.dayOfYear == today.dayOfYear && this.year == today.yearYear -> "Today"
-            this.dayOfYear == (today - 1.days).dayOfYear && this.year == (today - 1.days).yearYear-> "Yesterday"
-            this.dayOfYear == (today - 7.days).dayOfYear && this.year == (today - 7.days).yearYear -> this.dayOfWeek.name
+            this.dayOfYear == today.dayOfYear && this.year == today.year -> "Today"
+            this.dayOfYear == (today - 1.days).dayOfYear && this.year == (today - 1.days).year-> "Yesterday"
+            this.dayOfYear == (today - 7.days).dayOfYear && this.year == (today - 7.days).year -> this.dayOfWeek.name
             else -> this.format("dd / MM / yyyy")
         }
     }

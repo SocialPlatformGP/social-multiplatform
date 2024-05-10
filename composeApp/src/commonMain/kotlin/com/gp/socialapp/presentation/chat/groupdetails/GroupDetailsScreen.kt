@@ -43,22 +43,17 @@ import socialmultiplatform.composeapp.generated.resources.Res
 import socialmultiplatform.composeapp.generated.resources.confirm_member_removal
 
 data class GroupDetailsScreen(
-    private val roomId: Long,
-    private val roomTitle: String,
-    private val roomAvatarUrl: String
+    private val roomId: Long, private val roomTitle: String, private val roomAvatarUrl: String
 ) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = rememberScreenModel<GroupDetailsScreenModel>()
-        LifecycleEffect(
-            onStarted = {
-                screenModel.init(roomId, roomTitle, roomAvatarUrl)
-            },
-            onDisposed = {
-                screenModel.dispose()
-            }
-        )
+        LifecycleEffect(onStarted = {
+            screenModel.init(roomId, roomTitle, roomAvatarUrl)
+        }, onDisposed = {
+            screenModel.onDispose()
+        })
         val state by screenModel.uiState.collectAsState()
         if (state.privateRoom != null) {
             navigator.push(
@@ -78,8 +73,7 @@ data class GroupDetailsScreen(
                     when (action) {
                         is GroupDetailsAction.OnAddMembersClicked -> {
                             navigator.push(
-                                AddMembersScreen(
-                                    roomId = roomId,
+                                AddMembersScreen(roomId = roomId,
                                     groupMembersIds = state.members.map { it.id })
                             )
                         }
@@ -126,11 +120,9 @@ data class GroupDetailsScreen(
                 TopAppBar(
                     title = {},
                     navigationIcon = {
-                        IconButton(
-                            onClick = {
-                                onAction(GroupDetailsAction.OnBackClicked)
-                            }
-                        ) {
+                        IconButton(onClick = {
+                            onAction(GroupDetailsAction.OnBackClicked)
+                        }) {
                             Icon(
                                 imageVector = Icons.Default.ArrowBackIosNew,
                                 contentDescription = "Back"
@@ -142,44 +134,36 @@ data class GroupDetailsScreen(
             },
         ) {
             Surface(
-                modifier = Modifier.padding(it),
-                color = MaterialTheme.colorScheme.inverseOnSurface
+                modifier = Modifier.padding(it), color = MaterialTheme.colorScheme.inverseOnSurface
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp)
+                    modifier = Modifier.fillMaxSize().padding(16.dp)
                 ) {
-                    ModifiableAvatarSection(
-                        avatarURL = avatarURL,
+                    ModifiableAvatarSection(avatarURL = avatarURL,
                         isModifiable = isAdmin,
                         onImagePicked = { array, extension ->
                             onAction(GroupDetailsAction.OnChangeAvatar(array, extension))
-                        }
-                    )
-                    GroupDetailsNameSection(
-                        name = name,
+                        })
+                    GroupDetailsNameSection(name = name,
                         isModifiable = isAdmin,
                         onChangeName = { newName ->
                             onAction(GroupDetailsAction.OnChangeName(newName))
-                        }
-                    )
+                        })
                     HorizontalDivider(modifier = Modifier.height(2.dp))
-                    GroupMembersSection(
-                        members = members,
+                    GroupMembersSection(members = members,
                         admins = admins,
                         isAdmin = isAdmin,
                         onAddMembersClicked = { onAction(GroupDetailsAction.OnAddMembersClicked) },
                         onUserClicked = {
                             clickedUser = it
                             isUserClickedDialogOpen = true
-                        }
-                    )
+                        })
                 }
                 if (isRemoveMemberDialogOpen) {
-                    ConfirmActionAlertDialog(
-                        onDismissRequest = { isRemoveMemberDialogOpen = false },
+                    ConfirmActionAlertDialog(onDismissRequest = {
+                        isRemoveMemberDialogOpen = false
+                    },
                         onConfirmation = {
                             onAction(GroupDetailsAction.OnRemoveMember(clickedUser.id))
                             isRemoveMemberDialogOpen = false
@@ -188,8 +172,7 @@ data class GroupDetailsScreen(
                     )
                 }
                 if (isUserClickedDialogOpen) {
-                    UserClickedDialog(
-                        isAdmin = isAdmin,
+                    UserClickedDialog(isAdmin = isAdmin,
                         isCurrentUser = clickedUser.id == currentUserId,
                         clickedUser = clickedUser,
                         onRemoveMember = {
@@ -202,8 +185,7 @@ data class GroupDetailsScreen(
                         onDismiss = { isUserClickedDialogOpen = false },
                         onViewProfile = {
                             onAction(GroupDetailsAction.OnViewUserProfile(it))
-                        }
-                    )
+                        })
                 }
             }
         }

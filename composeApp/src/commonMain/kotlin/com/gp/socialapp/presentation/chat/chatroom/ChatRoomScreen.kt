@@ -23,7 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.lifecycle.LifecycleEffect
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
+import cafe.adriel.voyager.kodein.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gp.socialapp.data.chat.model.Message
@@ -54,18 +54,14 @@ data class ChatRoomScreen(
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val screenModel = navigator.rememberNavigatorScreenModel<ChatRoomScreenModel>()
+        val screenModel = rememberScreenModel<ChatRoomScreenModel>()
         val state by screenModel.uiState.collectAsState()
-        LifecycleEffect(
-            onStarted = {
-                screenModel.initScreen(roomId, isPrivate)
-            },
-            onDisposed = {
-                screenModel.onDispose()
-            }
-        )
-        ChatRoomContent(
-            messages = state.messages,
+        LifecycleEffect(onStarted = {
+            screenModel.initScreen(roomId, isPrivate)
+        }, onDisposed = {
+            screenModel.onDispose()
+        })
+        ChatRoomContent(messages = state.messages,
             currentUserId = state.currentUser.id,
             attachment = state.currentAttachment,
             onAction = { action ->
@@ -114,8 +110,7 @@ data class ChatRoomScreen(
         var editedMessageID by remember { mutableStateOf(0L) }
         var editedMessageBody by remember { mutableStateOf("") }
         var pickedFileType: FilePickerFileType by remember { mutableStateOf(FilePickerFileType.All) }
-        val filePicker = rememberFilePickerLauncher(
-            type = pickedFileType,
+        val filePicker = rememberFilePickerLauncher(type = pickedFileType,
             selectionMode = FilePickerSelectionMode.Single,
             onResult = { files ->
                 scope.launch {
@@ -133,8 +128,7 @@ data class ChatRoomScreen(
             modifier = modifier,
             containerColor = MaterialTheme.colorScheme.inverseOnSurface,
             topBar = {
-                ChatRoomTopBar(
-                    onBackPressed = { onAction(ChatRoomAction.OnBackPressed) },
+                ChatRoomTopBar(onBackPressed = { onAction(ChatRoomAction.OnBackPressed) },
                     onChatHeaderClicked = {
                         onAction(
                             ChatRoomAction.OnChatHeaderClicked(
@@ -212,8 +206,7 @@ data class ChatRoomScreen(
 
                                 else -> onAction(action)
                             }
-                        },
-                        attachment = attachment
+                        }, attachment = attachment
                     )
                     if (isEditMessageDialogOpen) {
                         EditMessageDialog(initialMessage = editedMessageBody,

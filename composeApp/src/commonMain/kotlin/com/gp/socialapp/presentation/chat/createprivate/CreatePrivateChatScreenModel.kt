@@ -22,7 +22,7 @@ class CreatePrivateChatScreenModel(
     private val state = MutableStateFlow(CreatePrivateChatUiState())
     val uiState = state
 
-    init {
+    fun init() {
         getUsers()
         getCurrentUser()
     }
@@ -86,7 +86,8 @@ class CreatePrivateChatScreenModel(
         }
     }
 
-    fun clear() {
+    override fun onDispose() {
+        super.onDispose()
         state.value = CreatePrivateChatUiState()
     }
 
@@ -95,8 +96,7 @@ class CreatePrivateChatScreenModel(
             state.update { oldState ->
                 oldState.copy(matchingUsers = oldState.allUsers.filter {
                     (it.name).contains(
-                        s,
-                        ignoreCase = true
+                        s, ignoreCase = true
                     )
                 })
             }

@@ -1,5 +1,6 @@
 package com.gp.socialapp.data.chat.source.remote
 
+
 import com.gp.socialapp.data.chat.model.Message
 import com.gp.socialapp.data.chat.model.MessageAttachment
 import com.gp.socialapp.data.chat.source.remote.model.RemoteMessage
@@ -7,19 +8,17 @@ import com.gp.socialapp.data.chat.source.remote.model.RemoteRecentRoom
 import com.gp.socialapp.util.LocalDateTimeUtil.now
 import com.gp.socialapp.util.Result
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.postgrest.postgrest
+import io.github.jan.supabase.annotations.SupabaseExperimental
+import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.filter.FilterOperation
 import io.github.jan.supabase.postgrest.query.filter.FilterOperator
-import io.github.jan.supabase.realtime.channel
-import io.github.jan.supabase.realtime.postgresListDataFlow
-import io.github.jan.supabase.realtime.realtime
+import io.github.jan.supabase.realtime.selectAsFlow
 import io.github.jan.supabase.storage.storage
+import korlibs.time.DateTimeTz
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
@@ -27,25 +26,22 @@ import kotlinx.datetime.toInstant
 class MessageRemoteDataSourceImpl(
     private val supabase: SupabaseClient
 ) : MessageRemoteDataSource {
-    private val messagesTable = supabase.postgrest["messages"]
-    private val recentRoomsTable = supabase.postgrest["recent_rooms"]
-    private val messagesChannel = supabase.channel("messages")
+    private val MESSAGES = "messages"
+    private val RECENTROOMS = "recent_rooms"
+
+    @OptIn(SupabaseExperimental::class)
     override suspend fun fetchChatMessages(
         roomId: Long, scope: CoroutineScope
     ): Flow<Result<List<Message>>> = callbackFlow {
         trySend(Result.Loading)
         try {
-            messagesChannel.postgresListDataFlow(
-                schema = "public",
-                table = "messages",
-                primaryKey = RemoteMessage::id,
-                filter = FilterOperation("roomId", FilterOperator.EQ, roomId)
-            ).onEach {
+            supabase.from(MESSAGES).selectAsFlow(
+                RemoteMessage::id, filter = FilterOperation("roomId", FilterOperator.EQ, roomId)
+            ).collect {
                 println("received data in remote source :$it")
                 trySend(Result.SuccessWithData(it.map { it.toMessage() }
                     .sortedByDescending { it.createdAt }))
-            }.launchIn(scope)
-            messagesChannel.subscribe()
+            }
         } catch (e: Exception) {
             e.printStackTrace()
             trySend(Result.Error("Error fetching messages: ${e.message}"))
@@ -70,12 +66,13 @@ class MessageRemoteDataSourceImpl(
                     senderName = senderName,
                     senderPfpUrl = senderPfpUrl,
                     hasAttachment = false,
+                    createdAt = DateTimeTz.nowLocal().format("yyyy-MM-dd'T'HH:mm:ss.SSSSSSX")
                 )
                 println("message to be sent: $message")
-                val createdRemoteMessage = messagesTable.insert(message) {
+                val createdRemoteMessage = supabase.from(MESSAGES).insert(message) {
                     select()
                 }.decodeSingle<RemoteMessage>()
-                recentRoomsTable.update({
+                supabase.from(RECENTROOMS).update({
                     set("lastMessage", messageContent)
                     set("lastMessageTime", createdRemoteMessage.createdAt)
                     set("lastMessageId", createdRemoteMessage.id)
@@ -96,12 +93,14 @@ class MessageRemoteDataSourceImpl(
                             senderName = senderName,
                             senderPfpUrl = senderPfpUrl,
                             hasAttachment = true,
-                            attachment = newAttachment
+                            attachment = newAttachment,
+                            createdAt = DateTimeTz.nowLocal()
+                                .format("yyyy-MM-dd'T'HH:mm:ss.SSSSSSX")
                         )
-                        val createdRemoteMessage = messagesTable.insert(message) {
+                        val createdRemoteMessage = supabase.from(MESSAGES).insert(message) {
                             select()
                         }.decodeSingle<RemoteMessage>()
-                        recentRoomsTable.update({
+                        supabase.from(RECENTROOMS).update({
                             set("lastMessage", messageContent)
                             set("lastMessageTime", createdRemoteMessage.createdAt)
                             set("lastMessageId", createdRemoteMessage.id)
@@ -126,20 +125,20 @@ class MessageRemoteDataSourceImpl(
         messageId: Long, roomId: Long, content: String
     ): Result<Nothing> {
         return try {
-            messagesTable.update({
+            supabase.from(MESSAGES).update({
                 set("content", content)
             }) {
                 filter {
                     eq("id", messageId)
                 }
             }
-            val recentRoom = recentRoomsTable.select {
+            val recentRoom = supabase.from(RECENTROOMS).select {
                 filter {
                     eq("roomId", roomId)
                 }
             }.decodeSingle<RemoteRecentRoom>()
             if (recentRoom.lastMessageId == messageId) {
-                recentRoomsTable.update({
+                supabase.from(RECENTROOMS).update({
                     set("lastMessage", content)
                 }) {
                     filter {
@@ -156,18 +155,18 @@ class MessageRemoteDataSourceImpl(
 
     override suspend fun deleteMessage(messageId: Long, roomId: Long): Result<Nothing> {
         return try {
-            messagesTable.delete {
+            supabase.from(MESSAGES).delete {
                 filter {
                     eq("id", messageId)
                 }
             }
-            val recentRoom = recentRoomsTable.select {
+            val recentRoom = supabase.from(RECENTROOMS).select {
                 filter {
                     eq("roomId", roomId)
                 }
             }.decodeSingle<RemoteRecentRoom>()
             if (recentRoom.lastMessageId == messageId) {
-                recentRoomsTable.update({
+                supabase.from(RECENTROOMS).update({
                     set("lastMessage", "Deleted message")
                 }) {
                     filter {
@@ -204,11 +203,6 @@ class MessageRemoteDataSourceImpl(
             Result.Error("An error occurred uploading attachment: ${e.message}")
         }
 
-    }
-
-
-    override suspend fun onDispose() {
-        supabase.realtime.removeChannel(messagesChannel)
     }
 
 }

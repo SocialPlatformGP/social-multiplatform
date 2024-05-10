@@ -2,7 +2,7 @@
 
 calfFilePicker = "0.4.0"
 korgeFoundation = "5.1.0"
-supabase-client = "2.3.0"
+supabase-client = "2.4.0"
 kodeinDiFrameworkCompose = "7.21.1"
 kotlin = "1.9.22"
 compose = "1.6.0"

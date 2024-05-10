@@ -5,17 +5,18 @@ import com.gp.socialapp.data.chat.model.MessageAttachment
 import com.gp.socialapp.util.LocalDateTimeUtil.now
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
+import korlibs.time.DateFormat
+import korlibs.time.parse
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
 
 class MessageEntity (): RealmObject {
     var content: String = ""
-    var createdAt: Long = LocalDateTime.now().toInstant(TimeZone.UTC).epochSeconds
-    var roomId: String = ""
+    var createdAt: String = ""
+    var roomId: Long = 0L
     var senderId: String = ""
-    @PrimaryKey
-    var id: String = ""
+    @PrimaryKey var id: Long = 0L
     var senderName: String = ""
     var senderPfpURL: String = ""
     var hasAttachment: Boolean = false
@@ -25,10 +26,10 @@ class MessageEntity (): RealmObject {
     var attachmentSize: Long = 0
     constructor(
         content: String = "",
-        createdAt: Long = 0L,
-        roomId: String = "",
+        createdAt: String = "",
+        roomId: Long = 0L,
         senderId: String = "",
-        id: String = "",
+        id: Long = 0L,
         senderName: String = "",
         senderPfpURL: String = "",
         hasAttachment: Boolean = false,
@@ -48,6 +49,8 @@ class MessageEntity (): RealmObject {
         this.attachmentSize = attachment.size
     }
     fun toMessage(): Message {
+        val formatter = DateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSX")
+        val createdAt = formatter.parse(this.createdAt)
         return Message(
             content = content,
             createdAt = createdAt,
@@ -57,14 +60,21 @@ class MessageEntity (): RealmObject {
             senderName = senderName,
             senderPfpUrl = senderPfpURL,
             hasAttachment = hasAttachment,
-            attachment = MessageAttachment(byteArrayOf(), attachmentUrl, attachmentName, attachmentType, attachmentSize)
+            attachment = MessageAttachment(
+                byteArray = byteArrayOf(),
+                url = attachmentUrl,
+                name = attachmentName,
+                type = attachmentType,
+                size =attachmentSize
+            )
         )
     }
     companion object {
         fun Message.toEntity(): MessageEntity {
+            val createdAt = this.createdAt.format("yyyy-MM-dd'T'HH:mm:ss.SSSSSSX")
             return MessageEntity(
                 content = this.content,
-                createdAt = this.createdAt,
+                createdAt = createdAt,
                 roomId = this.roomId,
                 senderId = this.senderId,
                 id = this.id,

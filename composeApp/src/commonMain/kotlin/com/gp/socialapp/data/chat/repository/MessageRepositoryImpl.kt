@@ -16,8 +16,7 @@ class MessageRepositoryImpl(
     private val fileManager: FileManager
 ) : MessageRepository {
     override suspend fun fetchChatMessages(
-        roomId: Long,
-        scope: CoroutineScope
+        roomId: Long, scope: CoroutineScope
     ): Flow<Result<List<Message>>> {
         return messageRemoteDataSource.fetchChatMessages(roomId, scope)
     }
@@ -31,19 +30,12 @@ class MessageRepositoryImpl(
         attachment: MessageAttachment
     ): Result<Nothing> {
         return messageRemoteDataSource.sendMessage(
-            messageContent,
-            roomId,
-            senderId,
-            senderName,
-            senderPfpUrl,
-            attachment
+            messageContent, roomId, senderId, senderName, senderPfpUrl, attachment
         )
     }
 
     override suspend fun updateMessage(
-        messageId: Long,
-        roomId: Long,
-        content: String
+        messageId: Long, roomId: Long, content: String
     ): Result<Nothing> {
         return messageRemoteDataSource.updateMessage(messageId, roomId, content)
     }
@@ -74,8 +66,5 @@ class MessageRepositoryImpl(
         }
     }
 
-    override suspend fun onDispose() {
-        return messageRemoteDataSource.onDispose()
-    }
 
 }
