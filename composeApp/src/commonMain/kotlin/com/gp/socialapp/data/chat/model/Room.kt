@@ -1,18 +1,14 @@
 package com.gp.socialapp.data.chat.model
 
-import com.gp.socialapp.util.LocalDateTimeUtil.now
-import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toInstant
-import kotlinx.serialization.Serializable
+import korlibs.time.DateTimeTz
 
-@Serializable
+
 data class Room(
-    val id: String = "",
+    val id: Long = 0L,
     val name: String = "",
     val picUrl: String = "",
-    val members: Map<String,Boolean> = emptyMap(), //userId to isAdmin
+    val members: Map<String, Boolean> = emptyMap(), //userId to isAdmin
     val isPrivate: Boolean = true,
-    val createdAt: Long = LocalDateTime.now().toInstant(TimeZone.UTC).epochSeconds,
+    val createdAt: DateTimeTz = DateTimeTz.nowLocal(),
     val bio: String = "", //group chat description
 )

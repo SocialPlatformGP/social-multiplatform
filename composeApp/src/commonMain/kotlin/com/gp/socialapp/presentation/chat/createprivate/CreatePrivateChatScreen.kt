@@ -14,6 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import cafe.adriel.voyager.core.lifecycle.LifecycleEffect
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -30,22 +31,24 @@ object CreatePrivateChatScreen : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = navigator.rememberNavigatorScreenModel<CreatePrivateChatScreenModel>()
         val state by screenModel.uiState.collectAsState()
-
+        LifecycleEffect(onStarted = {
+            screenModel.init()
+        }, onDisposed = {
+            screenModel.onDispose()
+        })
         state.room?.let {
             navigator.push(
                 ChatRoomScreen(
                     roomId = it.id, isPrivate = true, roomAvatarUrl = it.picUrl, roomTitle = it.name
                 )
             )
-            screenModel.clear()
         }
-        CreatePrivateChatContent(
-            users = state.matchingUsers,
+        CreatePrivateChatContent(users = state.matchingUsers,
             onUserSelected = { user ->
-            screenModel.onUserSelected(user)
+                screenModel.onUserSelected(user)
             },
             onSearchQueryChanged = screenModel::onSearchQueryChanged,
-            onSearchQuerySubmitted = {  },
+            onSearchQuerySubmitted = { },
             onBackPressed = navigator::pop
         )
     }
@@ -58,26 +61,22 @@ object CreatePrivateChatScreen : Screen {
         onUserSelected: (User) -> Unit,
         onBackPressed: () -> Unit
     ) {
-        var isSearchBarVisible by remember{ mutableStateOf(false) }
-        Scaffold (
-            topBar = {
-                if(isSearchBarVisible) {
-                    CreatePrivateChatSearchBar(
-                        onSearchQueryChange = onSearchQueryChanged,
-                        onSearchQuerySubmit = {
-                            isSearchBarVisible = false
-                            onSearchQuerySubmitted()
-                        },
-                        onBackPressed = onBackPressed
-                    )
-                } else {
-                    CreatePrivateChatTopBar (onBackPressed= onBackPressed){
-                        isSearchBarVisible = true
-                    }
-
+        var isSearchBarVisible by remember { mutableStateOf(false) }
+        Scaffold(topBar = {
+            if (isSearchBarVisible) {
+                CreatePrivateChatSearchBar(
+                    onSearchQueryChange = onSearchQueryChanged, onSearchQuerySubmit = {
+                        isSearchBarVisible = false
+                        onSearchQuerySubmitted()
+                    }, onBackPressed = onBackPressed
+                )
+            } else {
+                CreatePrivateChatTopBar(onBackPressed = onBackPressed) {
+                    isSearchBarVisible = true
                 }
+
             }
-        ){ innerPadding ->
+        }) { innerPadding ->
             Column(
                 modifier = Modifier.padding(innerPadding).fillMaxSize(),
                 horizontalAlignment = Alignment.Start,

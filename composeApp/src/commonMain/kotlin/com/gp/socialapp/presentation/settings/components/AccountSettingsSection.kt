@@ -32,7 +32,7 @@ fun AccountSettingsSection(
             ModifiableAvatarSection(
                 avatarURL = currentUser.profilePictureURL,
                 isModifiable = true,
-                onImagePicked = { newAvatar ->
+                onImagePicked = { newAvatar, _ ->
                     onAction(SettingsAction.AccountSettingsAction.UpdateAvatar(newAvatar))
                 },
                 modifier = Modifier.padding(vertical = 8.dp)

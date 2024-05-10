@@ -23,13 +23,11 @@ fun GroupMembersSection(
     admins: List<String>,
     isAdmin: Boolean = false,
     onAddMembersClicked: () -> Unit,
-    onUserClicked: (String) -> Unit,
+    onUserClicked: (User) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier
-            .padding(top = 4.dp)
-            .fillMaxWidth(),
+        modifier = modifier.padding(top = 4.dp).fillMaxWidth(),
     ) {
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -37,8 +35,7 @@ fun GroupMembersSection(
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(
-                text = "Members:",
-                style = MaterialTheme.typography.titleMedium
+                text = "Members:", style = MaterialTheme.typography.titleMedium
             )
             Text(
                 text = "${members.size} Member${if (members.size != 1) "s" else ""}",
@@ -56,9 +53,8 @@ fun GroupMembersSection(
             }
             items(members.size) { index ->
                 val user = members[index]
-                GroupMemberItem(
-                    selectableUser = SelectableUser(user, false),
-                    isAdmin = admins.any { it == user.id},
+                GroupMemberItem(selectableUser = SelectableUser(user, false),
+                    isAdmin = admins.any { it == user.id },
                     onUserClick = {
                         onUserClicked(it)
                     })

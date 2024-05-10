@@ -9,6 +9,9 @@ import com.gp.socialapp.data.assignment.model.AssignmentAttachment
 import com.gp.socialapp.di.appModuleK
 import com.gp.socialapp.presentation.assignment.submissionreview.components.SubmissionAttachmentPreview
 import com.gp.socialapp.presentation.auth.login.LoginScreen
+import com.gp.socialapp.presentation.chat.chatroom.ChatRoomScreen
+import com.gp.socialapp.presentation.chat.creategroup.CreateGroupScreen
+import com.gp.socialapp.presentation.chat.home.ChatHomeScreen
 import com.gp.socialapp.theme.AppTheme
 import org.kodein.di.compose.withDI
 
@@ -19,8 +22,13 @@ internal fun App() =
             Navigator(
                 LoginScreen
             )
+//            Navigator(
+//                ChatRoomScreen(
+//                    roomId = 20,
+//                    roomTitle = "Room 1",
+//                    roomAvatarUrl = "",
+//                    isPrivate = false
+//                )
+//            )
         }
     }
-
-
-

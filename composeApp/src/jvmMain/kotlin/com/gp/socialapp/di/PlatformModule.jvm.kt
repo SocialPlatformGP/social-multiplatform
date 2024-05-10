@@ -20,6 +20,9 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.gotrue.FlowType
+import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.realtime.Realtime
+import io.github.jan.supabase.storage.Storage
 import io.realm.kotlin.Configuration
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
@@ -62,6 +65,9 @@ actual val platformModule = DI.Module("platformModule") {
                     htmlTitle = "EduLink Redirect"
                 }
             }
+            install(Storage)
+            install(Postgrest)
+            install(Realtime)
         }
     }
 }

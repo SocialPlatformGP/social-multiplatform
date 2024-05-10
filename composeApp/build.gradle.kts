@@ -92,9 +92,11 @@ kotlin {
             implementation(libs.calf.file.picker)
             implementation(libs.kodein.di.framework.compose)
             implementation(libs.sqlDelight.coroutines)
+            implementation(libs.korge.foundation)
             implementation(libs.supabase.auth)
             implementation(libs.supabase.storage)
-            implementation(libs.korge.foundation)
+            implementation(libs.supabase.realtime)
+            implementation(libs.supabase.postgrest)
         }
 
         commonTest.dependencies {

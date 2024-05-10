@@ -28,14 +28,11 @@ fun ImagePreviewDialog(
     imageURL: String,
     onDismissRequest: () -> Unit = {},
 ) {
-    Dialog(
-        onDismissRequest = {
-            onDismissRequest()
-        }
-    ) {
+    Dialog(onDismissRequest = {
+        onDismissRequest()
+    }) {
         Card(
-            modifier = modifier
-                .padding(16.dp),
+            modifier = modifier.padding(16.dp),
         ) {
             Column(
                 verticalArrangement = Arrangement.Center,
@@ -51,8 +48,7 @@ fun ImagePreviewDialog(
                                 ),
                                 contentDescription = null,
                                 contentScale = ContentScale.FillWidth,
-                                modifier = Modifier
-                                    .clickable { onDismissRequest() },
+                                modifier = Modifier.clickable { onDismissRequest() },
                             )
                         }
 
@@ -60,9 +56,7 @@ fun ImagePreviewDialog(
                             Icon(
                                 imageVector = Icons.Filled.Error,
                                 contentDescription = null,
-                                modifier = Modifier
-                                    .align(Alignment.Center)
-                                    .size(50.dp),
+                                modifier = Modifier.align(Alignment.Center).size(50.dp),
                             )
                         }
 

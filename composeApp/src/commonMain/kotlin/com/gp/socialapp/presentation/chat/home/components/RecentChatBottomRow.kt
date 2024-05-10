@@ -7,9 +7,7 @@ import androidx.compose.ui.Modifier
 
 @Composable
 fun RecentChatBottomRow(
-    senderName: String,
-    lastMessage: String,
-    isPrivate: Boolean
+    senderName: String, lastMessage: String, isPrivate: Boolean
 ) {
     Row(
         Modifier.fillMaxWidth()

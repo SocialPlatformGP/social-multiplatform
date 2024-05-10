@@ -31,7 +31,6 @@ import com.mohamedrejeb.calf.picker.FilePickerFileType
 
 @Composable
 fun MessageFileAttachment(
-    fileType: String,
     fileName: String,
     onFileClicked: () -> Unit,
     modifier: Modifier = Modifier,

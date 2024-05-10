@@ -10,7 +10,6 @@ import com.gp.socialapp.data.auth.source.remote.model.User
 @Composable
 fun UserName(user: User) {
     Text(
-        text = user.name,
-        modifier = Modifier.padding(8.dp)
+        text = user.name, modifier = Modifier.padding(8.dp)
     )
 }

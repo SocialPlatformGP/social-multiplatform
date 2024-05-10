@@ -6,6 +6,7 @@ import com.gp.socialapp.data.auth.source.remote.model.UserSettings
 import com.gp.socialapp.data.auth.source.remote.model.requests.GetUsersByIdsRequest
 import com.gp.socialapp.data.auth.source.remote.model.requests.UpdateUserEndpoint
 import com.gp.socialapp.data.auth.source.remote.model.requests.UpdateUserRequest
+import com.gp.socialapp.data.chat.model.UserRooms
 import com.gp.socialapp.data.community.source.remote.model.Community
 import com.gp.socialapp.data.community.source.remote.model.request.CommunityRequest
 import com.gp.socialapp.data.post.util.endPoint
@@ -15,6 +16,7 @@ import com.gp.socialapp.util.Result
 import com.gp.socialapp.util.Results
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.gotrue.auth
+import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.storage.storage
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -348,6 +350,12 @@ class UserRemoteDataSourceImpl(
             }
             if (request.status == HttpStatusCode.OK) {
                 val message = request.body<DataSuccess.User>()
+                val userRoomsTable = supabaseClient.postgrest["user_rooms"]
+                userRoomsTable.insert(
+                    UserRooms(
+                        userId = user.id,
+                    )
+                )
                 Results.Success(message)
             } else {
                 val error = request.body<DataError.Network>()

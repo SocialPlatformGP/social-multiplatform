@@ -37,35 +37,26 @@ fun MessageImageAttachment(
         ) { action ->
             when (action) {
                 is ImageAction.Success -> {
-                    Image(
-                        painter = rememberImageSuccessPainter(
-                            action = action,
-                            filterQuality = FilterQuality.Medium
-                        ),
+                    Image(painter = rememberImageSuccessPainter(
+                        action = action, filterQuality = FilterQuality.Medium
+                    ),
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
-                        modifier = modifier
-                            .fillMaxWidth()
-                            .heightIn(max = maxHeight)
-                            .clickable { onImageClicked() }
-                    )
+                        modifier = modifier.fillMaxWidth().heightIn(max = maxHeight)
+                            .clickable { onImageClicked() })
                 }
 
                 is ImageAction.Failure -> {
                     Icon(
                         imageVector = Icons.Default.BrokenImage,
                         contentDescription = null,
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .size(50.dp),
+                        modifier = Modifier.align(Alignment.Center).size(50.dp),
                     )
                 }
 
                 is ImageAction.Loading -> {
                     CircularProgressIndicator(
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .size(50.dp),
+                        modifier = Modifier.align(Alignment.Center).size(50.dp),
                     )
                 }
             }

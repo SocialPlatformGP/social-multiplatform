@@ -10,7 +10,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.gp.socialapp.data.chat.model.Message
 import com.gp.socialapp.presentation.chat.chatroom.ChatRoomAction
-import com.gp.socialapp.util.LocalDateTimeUtil.getDateHeader
 
 @Composable
 fun MessagesContent(
@@ -54,7 +53,7 @@ fun MessagesContent(
                 maxScreenWidthDP = maxScreenWidthDP,
                 maxScreenHeightDP = maxScreenHeightDP,
             )
-            if (previousMessage?.createdAt?.getDateHeader() != message.createdAt.getDateHeader()) {
+            if (previousMessage?.createdAt?.year != message.createdAt.year || previousMessage.createdAt.dayOfYear != message.createdAt.dayOfYear) {
                 DateHeader(
                     createdAt = message.createdAt,
                 )

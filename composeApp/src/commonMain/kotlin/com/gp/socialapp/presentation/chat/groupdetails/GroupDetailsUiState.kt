@@ -8,7 +8,7 @@ data class GroupDetailsUiState(
     val groupAvatarUrl: String = "",
     val members: List<User> = emptyList(),
     val admins: List<String> = emptyList(),
-    val currentUserId: String = "",
+    val currentUser: User = User(),
     val isAdmin: Boolean = false,
     val privateRoom: Room? = null,
 )

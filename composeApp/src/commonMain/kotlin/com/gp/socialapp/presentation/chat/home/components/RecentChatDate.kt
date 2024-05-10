@@ -5,12 +5,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.gp.socialapp.util.LocalDateTimeUtil.convertEpochToTime
+import com.gp.socialapp.util.LocalDateTimeUtil.getRecentRoomTimestamp
+import korlibs.time.DateTimeTz
 
 @Composable
-fun RecentChatDate(date: Long) {
+fun RecentChatDate(date: DateTimeTz) {
     Text(
-        text = convertEpochToTime(date),
+        text = date.getRecentRoomTimestamp(),
         modifier = Modifier.padding(end = 8.dp)
     )
 }

@@ -7,7 +7,6 @@ import com.gp.socialapp.data.chat.repository.RecentRoomRepository
 import com.gp.socialapp.util.DispatcherIO
 import com.gp.socialapp.util.Result
 import io.github.aakira.napier.Napier
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -19,10 +18,9 @@ class ChatHomeScreenModel(
 ) : ScreenModel {
     private val state = MutableStateFlow(ChatHomeUiState())
     val uiState = state.asStateFlow()
-    var job: Job? = null
 
 
-    init {
+    fun init() {
         getCurrentUser()
     }
 
@@ -30,92 +28,40 @@ class ChatHomeScreenModel(
     fun getCurrentUser() {
         screenModelScope.launch(DispatcherIO) {
             authenticationRepository.getSignedInUser().let { result ->
-                when(result) {
+                when (result) {
                     is Result.SuccessWithData -> {
                         state.update {
-                            it.copy(currentUserId = result.data.id)
+                            it.copy(currentUser = result.data)
                         }
-                        getRecentRooms()
-                        connectToSocket()
+                        fetchRecentRooms(result.data.id)
                     }
+
                     is Result.Error -> {
                         // TODO Handle error
                         Napier.d("Error: ${result.message}")
                     }
+
                     else -> Unit
                 }
             }
         }
     }
 
-    private fun connectToSocket() {
+    private fun fetchRecentRooms(id: String) {
         screenModelScope.launch(DispatcherIO) {
-            recentRoomRepository.connectToSocket(
-                uiState.value.currentUserId,
-            ).onSuccess {
-                println("Socket connected")
-            }.onFailure {
-                println("Socket connection failed")
-            }
-        }
-    }
-
-    //    suspend fun observeMessages() {
-//        recentRoomRepository.observeNewData().onEach { result ->
-//            result.onSuccessWithData { newData ->
-//                state.update {
-//                    it.copy(recentRooms = newData.recentRooms)
-//                }
-//            }
-//        }.launchIn(screenModelScope)
-//
-//    }
-    fun observeMessages() {
-        if (job == null) {
-            job = screenModelScope.launch {
-                recentRoomRepository.observeNewData().collect { result ->
-                    println("im in home vm ")
-                    result.onSuccessWithData { newData ->
-                        state.update {
-                            it.copy(recentRooms = newData.recentRooms.sortedByDescending { it.lastMessageTime })
-                        }
-                    }
+            recentRoomRepository.fetchRecentRooms(id).collect { result ->
+                result.onSuccessWithData { data ->
+                    state.value = ChatHomeUiState(recentRooms = data)
+                }.onFailure {
+                    //TODO Handle error
                 }
-            }
-
-        }
-    }
-
-
-    suspend fun getRecentRooms() {
-        screenModelScope.launch(DispatcherIO) {
-            recentRoomRepository.getAllRecentRooms(uiState.value.currentUserId)
-                .collect { result ->
-                    result.onSuccessWithData { data ->
-                        state.value =
-                            ChatHomeUiState(recentRooms = data.sortedByDescending { it.lastMessageTime })
-                    }.onFailure {
-                        println("Error: $it")
-                    }
-                }
-            observeMessages()
-        }
-    }
-
-    fun onClear() {
-        screenModelScope.launch(DispatcherIO) {
-            recentRoomRepository.closeSocket().onSuccess {
-                println("Socket closed")
-            }.onFailure {
-                println("Socket close failed")
             }
         }
     }
 
     override fun onDispose() {
         super.onDispose()
+        state.value = ChatHomeUiState()
         println("Disposed")
     }
-
-
 }

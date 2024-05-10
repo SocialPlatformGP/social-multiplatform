@@ -65,17 +65,19 @@ fun MessageInput(
     Column(
         modifier = modifier.padding(horizontal = 8.dp, vertical = 2.dp).fillMaxWidth()
     ) {
-        if(attachment.type.isNotEmpty()){
-            Box (
+        if (attachment.type.isNotEmpty()) {
+            Box(
                 modifier = Modifier.padding(8.dp).fillMaxWidth()
-            ){
+            ) {
                 MessageFileAttachment(
-                    fileType = attachment.type,
                     fileName = attachment.name,
                     onFileClicked = { /**/ },
                     modifier = Modifier.padding(2.dp).fillMaxWidth().align(Alignment.CenterStart)
                 )
-                IconButton(onClick = { onAction(ChatRoomAction.OnRemoveAttachment) }, modifier =Modifier.align(Alignment.CenterEnd)) {
+                IconButton(
+                    onClick = { onAction(ChatRoomAction.OnRemoveAttachment) },
+                    modifier = Modifier.align(Alignment.CenterEnd)
+                ) {
                     Icon(
                         imageVector = Icons.Default.Cancel,
                         contentDescription = "Remove attachment",
@@ -90,8 +92,7 @@ fun MessageInput(
                 bottom = 4.dp
             ),
         ) {
-            TextField(
-                value = message,
+            TextField(value = message,
                 onValueChange = { value -> message = value },
                 placeholder = { Text("Type your message") },
                 modifier = Modifier.weight(1F).clip(RoundedCornerShape(32.dp)),
@@ -128,11 +129,10 @@ fun MessageInput(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                IconButton(
-                    onClick = {
-                        println("Attach clicked in message input")
-                        onAction(ChatRoomAction.OnAttachClicked(FilePickerFileType.All))
-                    }) {
+                IconButton(onClick = {
+                    println("Attach clicked in message input")
+                    onAction(ChatRoomAction.OnAttachClicked(FilePickerFileType.All))
+                }) {
                     Icon(
                         imageVector = Icons.Default.AttachFile,
                         contentDescription = "Attach file",
