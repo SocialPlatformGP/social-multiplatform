@@ -18,6 +18,7 @@ data class RemoteRecentRoom(
     val receiverPicUrl: String = "",
     val lastMessageTime: String = "",
     val lastMessageId: Long = 0L,
+    val lastMessageSenderName: String = ""
 ) {
     fun toRecentRoom(): RecentRoom {
         val formatter = DateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSX")
@@ -33,7 +34,8 @@ data class RemoteRecentRoom(
             receiverName = receiverName,
             receiverPicUrl = receiverPicUrl,
             lastMessageTime = lastMessageTime,
-            lastMessageId = lastMessageId
+            lastMessageId = lastMessageId,
+            lastMessageSenderName = lastMessageSenderName
         )
     }
 
@@ -51,7 +53,8 @@ data class RemoteRecentRoom(
                 receiverName = recentRoom.receiverName,
                 receiverPicUrl = recentRoom.receiverPicUrl,
                 lastMessageTime = lastMessageTime,
-                lastMessageId = recentRoom.lastMessageId
+                lastMessageId = recentRoom.lastMessageId,
+                lastMessageSenderName = recentRoom.lastMessageSenderName
             )
         }
     }

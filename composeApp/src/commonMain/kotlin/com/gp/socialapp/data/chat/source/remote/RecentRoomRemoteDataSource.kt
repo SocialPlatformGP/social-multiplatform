@@ -6,5 +6,5 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 
 interface RecentRoomRemoteDataSource {
-    fun fetchRecentRooms(userId: String, scope: CoroutineScope): Flow<Result<List<RecentRoom>>>
+    fun fetchRecentRooms(userId: String): Flow<Result<List<RecentRoom>>>
 }

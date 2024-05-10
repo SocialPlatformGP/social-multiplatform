@@ -16,9 +16,9 @@ class MessageRepositoryImpl(
     private val fileManager: FileManager
 ) : MessageRepository {
     override suspend fun fetchChatMessages(
-        roomId: Long, scope: CoroutineScope
+        roomId: Long
     ): Flow<Result<List<Message>>> {
-        return messageRemoteDataSource.fetchChatMessages(roomId, scope)
+        return messageRemoteDataSource.fetchChatMessages(roomId)
     }
 
     override suspend fun sendMessage(

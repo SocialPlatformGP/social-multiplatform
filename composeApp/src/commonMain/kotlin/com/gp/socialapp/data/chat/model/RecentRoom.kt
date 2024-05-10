@@ -15,5 +15,6 @@ data class RecentRoom(
     val receiverPicUrl: String = "",
     val lastMessageTime: DateTimeTz = DateTimeTz.nowLocal(),
     val lastMessageId: Long = 0L,
+    val lastMessageSenderName: String = "",
 )
 

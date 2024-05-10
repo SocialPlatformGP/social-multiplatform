@@ -7,12 +7,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.gp.socialapp.presentation.material.utils.MimeType
 
 @Composable
 fun MessageAttachment(
     modifier: Modifier = Modifier,
     fileUrl: String,
-    fileType: String,
     fileName: String,
     maxHeight: Dp,
     onFileClicked: () -> Unit = {},
@@ -22,7 +22,7 @@ fun MessageAttachment(
         shape = RoundedCornerShape(20.dp), color = Color.Transparent
     ) {
         when {
-            fileType.contains("image".toRegex()) -> {
+            MimeType.getMimeTypeFromFileName(fileName) is MimeType.Image -> {
                 MessageImageAttachment(
                     imageURL = fileUrl,
                     onImageClicked = { onImageClicked() },

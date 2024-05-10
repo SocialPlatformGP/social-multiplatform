@@ -10,8 +10,8 @@ class RecentRoomRepositoryImpl(
     private val remoteDataSource: RecentRoomRemoteDataSource,
 ) : RecentRoomRepository {
     override fun fetchRecentRooms(
-        userId: String, scope: CoroutineScope
+        userId: String
     ): Flow<Result<List<RecentRoom>>> {
-        return remoteDataSource.fetchRecentRooms(userId, scope)
+        return remoteDataSource.fetchRecentRooms(userId)
     }
 }

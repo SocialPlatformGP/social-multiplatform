@@ -12,10 +12,8 @@ import io.github.jan.supabase.postgrest.query.filter.FilterOperation
 import io.github.jan.supabase.postgrest.query.filter.FilterOperator
 import io.github.jan.supabase.realtime.selectAsFlow
 import io.github.jan.supabase.realtime.selectSingleValueAsFlow
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.flow
 
 class RecentRoomRemoteDataSourceImpl(
     private val supabase: SupabaseClient
@@ -25,9 +23,9 @@ class RecentRoomRemoteDataSourceImpl(
 
     @OptIn(SupabaseExperimental::class)
     override fun fetchRecentRooms(
-        userId: String, scope: CoroutineScope
-    ): Flow<Result<List<RecentRoom>>> = callbackFlow {
-        trySend(Result.Loading)
+        userId: String
+    ): Flow<Result<List<RecentRoom>>> = flow {
+        emit(Result.Loading)
         try {
             supabase.from(USERROOMS).selectSingleValueAsFlow(UserRooms::userId) {
                 eq("userId", userId)
@@ -40,15 +38,14 @@ class RecentRoomRemoteDataSourceImpl(
                     filter = FilterOperation("roomId", FilterOperator.IN, roomsString)
                 ).collect {
                     println("received data in remote source from recent_rooms :$it")
-                    trySend(Result.SuccessWithData(it.map { remoteRecentRoom -> remoteRecentRoom.toRecentRoom() }
+                    emit(Result.SuccessWithData(it.map { remoteRecentRoom -> remoteRecentRoom.toRecentRoom() }
                         .sortedByDescending { recentRoom -> recentRoom.lastMessageTime }))
                 }
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            trySend(Result.Error("Error fetching recent rooms: ${e.message}"))
+            emit(Result.Error("Error fetching recent rooms: ${e.message}"))
         }
-        awaitClose()
     }
 
 }

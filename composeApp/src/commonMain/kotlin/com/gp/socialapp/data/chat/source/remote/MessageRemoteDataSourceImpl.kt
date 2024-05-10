@@ -15,10 +15,8 @@ import io.github.jan.supabase.postgrest.query.filter.FilterOperator
 import io.github.jan.supabase.realtime.selectAsFlow
 import io.github.jan.supabase.storage.storage
 import korlibs.time.DateTimeTz
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
@@ -31,22 +29,21 @@ class MessageRemoteDataSourceImpl(
 
     @OptIn(SupabaseExperimental::class)
     override suspend fun fetchChatMessages(
-        roomId: Long, scope: CoroutineScope
-    ): Flow<Result<List<Message>>> = callbackFlow {
-        trySend(Result.Loading)
+        roomId: Long
+    ): Flow<Result<List<Message>>> = flow {
+        emit(Result.Loading)
         try {
             supabase.from(MESSAGES).selectAsFlow(
                 RemoteMessage::id, filter = FilterOperation("roomId", FilterOperator.EQ, roomId)
             ).collect {
                 println("received data in remote source :$it")
-                trySend(Result.SuccessWithData(it.map { it.toMessage() }
+                emit(Result.SuccessWithData(it.map { it.toMessage() }
                     .sortedByDescending { it.createdAt }))
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            trySend(Result.Error("Error fetching messages: ${e.message}"))
+            emit(Result.Error("Error fetching messages: ${e.message}"))
         }
-        awaitClose()
     }
 
     override suspend fun sendMessage(
@@ -73,6 +70,7 @@ class MessageRemoteDataSourceImpl(
                     select()
                 }.decodeSingle<RemoteMessage>()
                 supabase.from(RECENTROOMS).update({
+                    set("lastMessageSenderName", senderName)
                     set("lastMessage", messageContent)
                     set("lastMessageTime", createdRemoteMessage.createdAt)
                     set("lastMessageId", createdRemoteMessage.id)
@@ -100,8 +98,13 @@ class MessageRemoteDataSourceImpl(
                         val createdRemoteMessage = supabase.from(MESSAGES).insert(message) {
                             select()
                         }.decodeSingle<RemoteMessage>()
+                        val lastMessageContent = if (createdRemoteMessage.content.isBlank()) {
+                            "Sent an attachment"
+                        } else {
+                            messageContent
+                        }
                         supabase.from(RECENTROOMS).update({
-                            set("lastMessage", messageContent)
+                            set("lastMessage", lastMessageContent)
                             set("lastMessageTime", createdRemoteMessage.createdAt)
                             set("lastMessageId", createdRemoteMessage.id)
                         }) {

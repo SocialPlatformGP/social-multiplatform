@@ -58,7 +58,7 @@ fun RecentRoomItem(
                     lastMessageTime = recentRoom.lastMessageTime
                 )
                 RecentChatBottomRow(
-                    senderName = recentRoom.senderName,
+                    senderName = recentRoom.lastMessageSenderName,
                     lastMessage = recentRoom.lastMessage,
                     isPrivate = recentRoom.isPrivate
                 )

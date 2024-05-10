@@ -49,7 +49,7 @@ class ChatHomeScreenModel(
 
     private fun fetchRecentRooms(id: String) {
         screenModelScope.launch(DispatcherIO) {
-            recentRoomRepository.fetchRecentRooms(id, screenModelScope).collect { result ->
+            recentRoomRepository.fetchRecentRooms(id).collect { result ->
                 result.onSuccessWithData { data ->
                     state.value = ChatHomeUiState(recentRooms = data)
                 }.onFailure {

@@ -7,7 +7,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 
 interface MessageRemoteDataSource {
-    suspend fun fetchChatMessages(roomId: Long, scope: CoroutineScope): Flow<Result<List<Message>>>
+    suspend fun fetchChatMessages(roomId: Long): Flow<Result<List<Message>>>
     suspend fun sendMessage(
         messageContent: String,
         roomId: Long,

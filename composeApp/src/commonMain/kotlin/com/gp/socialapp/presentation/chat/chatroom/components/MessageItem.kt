@@ -105,7 +105,6 @@ fun MessageItem(
                     if (message.hasAttachment) {
                         MessageAttachment(
                             fileUrl = message.attachment.url,
-                            fileType = message.attachment.type,
                             fileName = message.attachment.name,
                             onFileClicked = {
                                 onFileClicked(

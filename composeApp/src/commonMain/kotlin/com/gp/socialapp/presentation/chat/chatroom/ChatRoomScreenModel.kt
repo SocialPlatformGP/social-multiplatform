@@ -42,7 +42,7 @@ class ChatRoomScreenModel(
 
     private fun fetchChatMessages(roomId: Long) {
         screenModelScope.launch(DispatcherIO) {
-            messageRepo.fetchChatMessages(roomId, screenModelScope).collect { result ->
+            messageRepo.fetchChatMessages(roomId).collect { result ->
                 result.onSuccessWithData { data ->
                     println("received data in screen model :$data")
                     _uiState.update {

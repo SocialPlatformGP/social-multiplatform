@@ -7,6 +7,6 @@ import kotlinx.coroutines.flow.Flow
 
 
 interface RecentRoomRepository {
-    fun fetchRecentRooms(userId: String, scope: CoroutineScope): Flow<Result<List<RecentRoom>>>
+    fun fetchRecentRooms(userId: String): Flow<Result<List<RecentRoom>>>
 
 }
