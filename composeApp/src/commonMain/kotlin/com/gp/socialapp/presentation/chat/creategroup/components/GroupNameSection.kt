@@ -12,10 +12,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun GroupNameSection(
-    name: String,
-    onUpdateName: (String) -> Unit,
-    isError: Boolean,
-    onChangeError: (Boolean) -> Unit
+    name: String, onUpdateName: (String) -> Unit, isError: Boolean, onChangeError: (Boolean) -> Unit
 ) {
     OutlinedTextField(
         shape = RoundedCornerShape(32.dp),
@@ -45,9 +42,7 @@ fun GroupNameSection(
             unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
         ),
         singleLine = true,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
+        modifier = Modifier.fillMaxWidth().padding(8.dp),
     )
 
 }

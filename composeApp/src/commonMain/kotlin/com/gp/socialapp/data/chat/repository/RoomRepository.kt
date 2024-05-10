@@ -1,38 +1,45 @@
 package com.gp.socialapp.data.chat.repository
 
+import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.data.chat.model.Room
 import com.gp.socialapp.util.Result
-import kotlinx.coroutines.flow.Flow
 
 interface RoomRepository {
     suspend fun createGroupRoom(
         groupName: String,
-        groupAvatar: ByteArray,
+        groupAvatarByteArray: ByteArray,
+        groupAvatarExtension: String,
         userIds: List<String>,
-        creatorId: String
-    ): Flow<Result<Room>>
-
-    suspend fun checkIfRoomExists(
-        user1: String,
-        user2: String
-    ): Flow<Result<Room?>>
-    suspend fun getRoomDetails(
-        roomId: String
+        creatorId: String,
     ): Result<Room>
 
-    suspend fun updateRoomAvatar(
-        roomId: String, byteArray: ByteArray
-    ): Result<String>
+    suspend fun addGroupMembers(
+        roomId: Long,
+        userIds: List<String>,
+    ): Result<Unit>
 
-    suspend fun updateRoomName(
-        roomId: String, name: String
-    ): Result<Nothing>
-
-    suspend fun addMembers(
-        roomId: String, userIds: List<String>
-    ): Result<Nothing>
+    suspend fun getRoom(
+        roomId: Long
+    ): Result<Room>
 
     suspend fun removeMember(
-        roomId: String, userId: String
-    ): Result<Nothing>
+        roomId: Long,
+        userId: String
+    ): Result<Unit>
+
+    suspend fun updateRoomAvatar(
+        roomId: Long,
+        newAvatarByteArray: ByteArray,
+        newAvatarExtension: String,
+    ): Result<String>
+
+    suspend fun getPrivateRoom(
+        currentUser: User,
+        otherUser: User
+    ): Result<Room>
+
+    suspend fun updateRoomName(
+        roomId: Long,
+        newName: String
+    ): Result<Unit>
 }

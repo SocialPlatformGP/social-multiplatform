@@ -14,8 +14,6 @@ import com.gp.socialapp.data.chat.source.remote.RecentRoomRemoteDataSource
 import com.gp.socialapp.data.chat.source.remote.RecentRoomRemoteDataSourceImpl
 import com.gp.socialapp.data.chat.source.remote.RoomRemoteDataSource
 import com.gp.socialapp.data.chat.source.remote.RoomRemoteDataSourceImpl
-import com.gp.socialapp.data.chat.source.remote.SocketService
-import com.gp.socialapp.data.chat.source.remote.SocketServiceImpl
 import com.gp.socialapp.data.community.source.remote.CommunityRemoteDataSource
 import com.gp.socialapp.data.community.source.remote.CommunityRemoteDataSourceImpl
 import com.gp.socialapp.data.material.source.remote.MaterialRemoteDataSource
@@ -46,6 +44,7 @@ val remoteDataSourceModuleK = DI.Module("remoteDataSourceModule") {
     bind<MaterialRemoteDataSource>() with singleton {
         MaterialRemoteDataSourceImpl(
             instance(),
+            instance()
         )
     }
     bind<ReplyRemoteDataSource>() with singleton { ReplyRemoteDataSourceImpl(instance()) }
@@ -53,14 +52,12 @@ val remoteDataSourceModuleK = DI.Module("remoteDataSourceModule") {
     bind<MessageRemoteDataSource>() with singleton {
         MessageRemoteDataSourceImpl(
             instance(),
-            instance()
         )
     }
     bind<RoomRemoteDataSource>() with singleton { RoomRemoteDataSourceImpl(instance()) }
     bind<RecentRoomRemoteDataSource>() with singleton { RecentRoomRemoteDataSourceImpl(instance()) }
     bind<UserRemoteDataSource>() with singleton { UserRemoteDataSourceImpl(instance(), instance()) }
     bind<CommunityRemoteDataSource>() with singleton { CommunityRemoteDataSourceImpl(instance()) }
-    bind<SocketService>() with singleton { SocketServiceImpl(instance()) }
     bind<AssignmentRemoteDataSource>() with singleton { AssignmentRemoteDataSourceImpl(instance()) }
     bind<HttpClient>() with singleton {
         HttpClient {

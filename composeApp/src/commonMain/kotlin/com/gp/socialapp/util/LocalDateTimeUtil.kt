@@ -1,7 +1,12 @@
 package com.gp.socialapp.util
 
+import com.gp.socialapp.util.LocalDateTimeUtil.getDateHeader
+import korlibs.time.DateTime
+import korlibs.time.DateTimeTz
 import korlibs.time.Month
 import korlibs.time.YearMonth
+import korlibs.time.days
+import korlibs.time.minus
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.Instant
@@ -34,6 +39,15 @@ object LocalDateTimeUtil {
             else -> localDateTime.toDDMMYYYY()
         }
     }
+    fun DateTimeTz.getDateHeader(): String {
+        val today = DateTime.now().date
+        return when {
+            this.dayOfYear == today.dayOfYear && this.year == today.yearYear -> "Today"
+            this.dayOfYear == (today - 1.days).dayOfYear && this.year == (today - 1.days).yearYear-> "Yesterday"
+            this.dayOfYear == (today - 7.days).dayOfYear && this.year == (today - 7.days).yearYear -> this.dayOfWeek.name
+            else -> this.format("dd / MM / yyyy")
+        }
+    }
 
     fun Long.getSubmissionFormattedDate(): String {
         val localDateTime = Instant.fromEpochMilliseconds(this).toLocalDateTime(TimeZone.UTC)
@@ -62,6 +76,15 @@ object LocalDateTimeUtil {
             date = LocalDate.fromEpochDays(date.toEpochDays().minus(1))
         }
         return date
+    }
+    fun DateTimeTz.getRecentRoomTimestamp(): String {
+        val today = DateTimeTz.nowLocal()
+        return when {
+            this.dayOfYear == today.dayOfYear && this.year == today.year -> this.format("HH:mm a")
+            this.dayOfYear == (today - 1.days).dayOfYear && this.year == (today - 1.days).year-> "Yesterday"
+            this.dayOfYear == (today - 7.days).dayOfYear && this.year == (today - 7.days).year -> this.dayOfWeek.name
+            else -> this.format("dd / MM / yyyy")
+        }
     }
 
     fun convertEpochToTime(epoch: Long): String {

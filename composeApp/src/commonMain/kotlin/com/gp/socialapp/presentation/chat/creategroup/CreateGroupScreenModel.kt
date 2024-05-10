@@ -12,7 +12,6 @@ import com.gp.socialapp.util.Result
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -27,20 +26,22 @@ class CreateGroupScreenModel(
 
     fun init() {
         resetState()
-        getUsers()
+        getSignedInUser()
     }
 
-    private fun getUsers() {
+    private fun getSignedInUser() {
         screenModelScope.launch(DispatcherIO) {
-            authRepo.getSignedInUser().let{ result ->
-                when(result) {
+            authRepo.getSignedInUser().let { result ->
+                when (result) {
                     is Result.SuccessWithData -> {
                         currentUserId = result.data.id
                         getAllUsers()
                     }
+
                     is Result.Error -> {
                         //TODO handle error
                     }
+
                     else -> Unit
                 }
             }
@@ -74,8 +75,9 @@ class CreateGroupScreenModel(
         _uiState.value = _uiState.value.copy(groupName = name)
     }
 
-    private fun updateAvatar(byteArray: ByteArray) {
-        _uiState.value = _uiState.value.copy(groupAvatarByteArray = byteArray)
+    private fun updateAvatar(byteArray: ByteArray, extenstion: String) {
+        _uiState.value =
+            _uiState.value.copy(groupAvatarByteArray = byteArray, groupAvatarExtension = extenstion)
     }
 
     private fun updateError(value: Boolean) {
@@ -125,16 +127,15 @@ class CreateGroupScreenModel(
             with(uiState.value) {
                 roomRepo.createGroupRoom(
                     groupName = groupName,
-                    groupAvatar = groupAvatarByteArray,
+                    groupAvatarByteArray = groupAvatarByteArray,
+                    groupAvatarExtension = groupAvatarExtension,
                     userIds = selectedUsers.map { it.id },
                     creatorId = currentUserId
-                ).collect { result ->
+                ).let { result ->
                     result.onSuccessWithData { room ->
                         _uiState.update {
                             it.copy(
-                                isCreated = true,
-                                groupId = room.id,
-                                groupAvatarUrl = room.picUrl
+                                isCreated = true, groupId = room.id, groupAvatarUrl = room.picUrl
                             )
                         }
                     }.onFailure {
@@ -151,7 +152,7 @@ class CreateGroupScreenModel(
             is CreateGroupAction.OnSetError -> updateError(action.value)
             is CreateGroupAction.OnUnselectUser -> removeMember(action.userId)
             is CreateGroupAction.OnCreateGroup -> createGroup()
-            is CreateGroupAction.OnImagePicked -> updateAvatar(action.array)
+            is CreateGroupAction.OnImagePicked -> updateAvatar(action.array, action.extension)
             is CreateGroupAction.OnSelectUser -> addMember(action.userId)
             else -> Unit
         }
