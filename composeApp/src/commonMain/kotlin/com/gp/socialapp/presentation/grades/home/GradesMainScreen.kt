@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -48,33 +49,76 @@ fun GradeMainScreenContent(
             LazyColumn(
                 Modifier.fillMaxWidth().padding(8.dp)
             ) {
-                item {
-                    Row (
-                        Modifier.background(color = MaterialTheme.colorScheme.primaryContainer).padding(4.dp)
-                    ){
-                        Text(text = "Name",Modifier.weight(3f), textAlign = TextAlign.Center)
-                        Text(text = "Course",Modifier.weight(1f), textAlign = TextAlign.Center)
-                        state.grades.firstOrNull()?.let {
-                            it.grade.forEach {
-                                Text(text = it.topic,Modifier.weight(1f), textAlign = TextAlign.Center)
+                items(state.grades) { grades ->
+                    Column(
+                        Modifier.fillMaxSize()
+                    ) {
+                        Row(
+                            Modifier.fillMaxWidth()
+                        ) {
+                            Column(
+                                Modifier.weight(3f),
+                            ) {
+                                Text(
+                                    text = "Name",
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.onTertiary)
+                                )
+                                Text(
+                                    text = grades.userName,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
+                            Column(
+                                Modifier.weight(1f),
+                            ) {
+                                Text(
+                                    text = "Course",
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.onTertiary)
+                                )
+                                Text(
+                                    text = grades.course,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
+                            grades.grade.forEach { grade ->
+                                Column(
+                                    Modifier.weight(1f),
+                                ) {
+                                    Text(
+                                        text = grade.topic,
+                                        textAlign = TextAlign.Center,
+                                    modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.onTertiary)
+                                    )
+                                    Text(
+                                        text = grade.grade.toString(),
+                                        textAlign = TextAlign.Center,
+                                        modifier = Modifier.fillMaxWidth()
+                                    )
+                                }
+                            }
+                            Column(
+                                Modifier.weight(1f),
+                            ) {
+                                Text(
+                                    text = "Total",
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.onTertiary)
+                                )
+                                Text(
+                                    text = grades.grade.sumOf { it.grade }.toString(),
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
                             }
                         }
-                        Text(text = "Total",Modifier.weight(1f), textAlign = TextAlign.Center)
-
                     }
-                }
-                items(state.grades) {grades->
-
-                    Column {
-                        Row {
-                            Text(text = grades.userName,Modifier.weight(3f), textAlign = TextAlign.Center)
-                            Text(text = grades.course,Modifier.weight(1f), textAlign = TextAlign.Center)
-                            grades.grade.forEach {grade->
-                                Text(text = grade.grade.toString(),Modifier.weight(1f), textAlign = TextAlign.Center)
-                            }
-                            Text(text = grades.grade.sumOf { it.grade }.toString(),Modifier.weight(1f), textAlign = TextAlign.Center)
-                        }
-                    }
+                    HorizontalDivider(
+                        Modifier.padding(8.dp)
+                    )
                 }
             }
         }
