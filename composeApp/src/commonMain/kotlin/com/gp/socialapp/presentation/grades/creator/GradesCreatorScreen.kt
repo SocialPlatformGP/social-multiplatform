@@ -85,7 +85,7 @@ fun GradesCreatorContent(
     var dialogState by remember { mutableStateOf(false) }
     var courseName by remember { mutableStateOf("") }
     val filePicker = rememberFilePickerLauncher {
-        if(it.isEmpty()) return@rememberFilePickerLauncher
+        if (it.isEmpty()) return@rememberFilePickerLauncher
         scope.launch {
             val file = it.first()
             val name = file.getName(context) ?: "Unknown"
@@ -204,6 +204,7 @@ fun GradesCreatorContent(
             }
         }
         if (dialogState) {
+            var errorMessage by remember { mutableStateOf("") }
             courseName = ""
             AlertDialog(
                 onDismissRequest = { dialogState = false },
@@ -213,14 +214,23 @@ fun GradesCreatorContent(
                         Text("Enter the Course Name ")
                         TextField(
                             value = courseName,
-                            onValueChange = { courseName = it },
-                            label = { Text("Course Name") }
+                            onValueChange = {
+                                courseName = it
+                                errorMessage = ""
+                            },
+                            label = { Text("Course Name") },
+                            isError = errorMessage.isNotEmpty(),
+                            supportingText = { Text(errorMessage) }
                         )
                     }
                 },
                 confirmButton = {
                     TextButton(
                         onClick = {
+                            if (courseName.isEmpty()){
+                                errorMessage = "Course Name is required"
+                                return@TextButton
+                            }
                             dialogState = false
                             filePicker.launch()
                         }
