@@ -6,16 +6,17 @@ import com.gp.socialapp.data.auth.source.remote.model.UserSettings
 import com.gp.socialapp.data.auth.source.remote.model.requests.GetUsersByIdsRequest
 import com.gp.socialapp.data.auth.source.remote.model.requests.UpdateUserEndpoint
 import com.gp.socialapp.data.auth.source.remote.model.requests.UpdateUserRequest
+import com.gp.socialapp.data.chat.model.UserRooms
 import com.gp.socialapp.data.community.source.remote.model.Community
 import com.gp.socialapp.data.community.source.remote.model.request.CommunityRequest
 import com.gp.socialapp.data.post.util.endPoint
+import com.gp.socialapp.util.DataError
 import com.gp.socialapp.util.DataSuccess
 import com.gp.socialapp.util.Result
-import com.gp.socialapp.util.Result.Companion.failure
-import com.gp.socialapp.util.Result.Companion.success
-import com.gp.socialapp.util.UserError
+import com.gp.socialapp.util.Results
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.gotrue.auth
+import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.storage.storage
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -34,7 +35,7 @@ class UserRemoteDataSourceImpl(
     private val httpClient: HttpClient,
     private val supabaseClient: SupabaseClient
 ) : UserRemoteDataSource {
-    override suspend fun updateUserInfo(user: User): Result<Unit,UserError.UpdateUserInfo> {
+    override suspend fun updateUserInfo(user: User): Result<Nothing> {
         return try {
             supabaseClient.auth.updateUser {
                 phone = user.phoneNumber
@@ -46,57 +47,47 @@ class UserRemoteDataSourceImpl(
                     put(UserData.IS_DATA_COMPLETE.value, true)
                 }
             }
-            success(Unit)
+            Result.Success
         } catch (e: Exception) {
             e.printStackTrace()
-            Result.Error(UserError.UpdateUserInfo.SERVER_ERROR)
+            Result.Error(e.message ?: "An unknown error occurred")
         }
     }
 
-    override suspend fun updatePhoneNumber(userId: String, phoneNumber: String): Result<Unit, UserError.UpdatePhoneNumber> {
+    override suspend fun updatePhoneNumber(userId: String, phoneNumber: String): Result<Nothing> {
         return try {
             supabaseClient.auth.updateUser {
                 this.phone = phoneNumber
             }
-            val result = updateRemoteUser(
+            updateRemoteUser(
                 UpdateUserRequest.UpdatePhoneNumber(userId, phoneNumber),
                 UpdateUserEndpoint.UpdatePhoneNumber
             )
-            if(result is Result.Success) {
-                success(Unit)
-            } else {
-                failure(UserError.UpdatePhoneNumber.SERVER_ERROR)
-            }
         } catch (e: Exception) {
             e.printStackTrace()
-            failure(UserError.UpdatePhoneNumber.SERVER_ERROR)
+            Result.Error(e.message ?: "Null")
         }
     }
 
-    override suspend fun updateName(userId: String, name: String): Result<Unit, UserError.UpdateName>{
+    override suspend fun updateName(userId: String, name: String): Result<Nothing> {
         return try {
             supabaseClient.auth.updateUser {
                 data {
                     put(UserData.NAME.value, name)
                 }
             }
-            val result = updateRemoteUser(
+            updateRemoteUser(
                 UpdateUserRequest.UpdateName(userId, name),
                 UpdateUserEndpoint.UpdateName
             )
-            if(result is Result.Success) {
-                success(Unit)
-            } else {
-                failure(UserError.UpdateName.SERVER_ERROR)
-            }
         } catch (e: Exception) {
             e.printStackTrace()
-            failure(UserError.UpdateName.SERVER_ERROR)
+            Result.Error(e.message ?: "Null")
         }
     }
 
 
-    override fun fetchUsers(): Flow<Result<List<User>,UserError.FetchUsers>> = flow {
+    override fun fetchUsers(): Flow<Result<List<User>>> = flow {
         emit(Result.Loading)
         try {
             val response = httpClient.get {
@@ -104,22 +95,21 @@ class UserRemoteDataSourceImpl(
             }
             if (response.status == HttpStatusCode.OK) {
                 val users = response.body<List<User>>()
-                emit(Result.Success(users))
+                emit(Result.SuccessWithData(users))
             } else {
-                val error = response.body<UserError.FetchUsers>()
-                emit(Result.Error(error))
+                emit(Result.Error("An unknown error occurred ${response.status}"))
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            emit(Result.Error(UserError.FetchUsers.SERVER_ERROR))
+            emit(Result.Error(e.message ?: "An unknown error occurred"))
         }
     }
 
 
-    override fun getUsersByIds(request: GetUsersByIdsRequest): Flow<Result<List<User>, UserError.FetchUsers>> =
+    override fun getUsersByIds(request: GetUsersByIdsRequest): Flow<Results<List<User>, DataError.Network>> =
         flow {
             println("Request: $request")
-            emit(Result.Loading)
+            emit(Results.Loading)
             try {
                 val response = httpClient.post {
                     endPoint("getUsersByIds")
@@ -127,62 +117,57 @@ class UserRemoteDataSourceImpl(
                 }
                 if (response.status == HttpStatusCode.OK) {
                     val users = response.body<List<User>>()
-                    emit(Result.Success(users))
+                    emit(Results.Success(users))
                 } else {
-                    val error = response.body<UserError.FetchUsers>()
-                    emit(Result.Error(error))
+                    val error = response.body<DataError.Network>()
+                    emit(Results.Failure(error))
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                emit(Result.Error(UserError.FetchUsers.SERVER_ERROR))
+                emit(Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN))
             }
         }
 
-    override suspend fun uploadUserPfp(pfpByteArray: ByteArray, userId: String): Result<String, UserError.UpdateUserInfo> {
+    override suspend fun uploadUserPfp(pfpByteArray: ByteArray, userId: String): Result<String> {
         return try {
             val path = "${userId.first()}/$userId"
             val bucket = supabaseClient.storage.from("avatars")
             bucket.upload(path, pfpByteArray, upsert = true)
             val url = supabaseClient.storage.from("avatars").publicUrl(path)
-            success(url)
+            Result.SuccessWithData(url)
         } catch (e: Exception) {
             e.printStackTrace()
-            failure(UserError.UpdateUserInfo.SERVER_ERROR)
+            Result.Error(e.message ?: "An unknown error occurred")
         }
     }
 
     override suspend fun updateUserAvatar(
         avatarByteArray: ByteArray,
         userId: String
-    ): Result<Unit, UserError.UpdateUserAvatar> {
+    ): Result<Nothing> {
         return try {
             uploadUserPfp(avatarByteArray, userId).let { result ->
-                if (result is Result.Success) {
+                if (result is Result.SuccessWithData) {
                     supabaseClient.auth.updateUser {
                         data {
                             put(UserData.PROFILE_PICTURE_URL.value, result.data)
                         }
                     }
-                    val result = updateRemoteUser(
+                    updateRemoteUser(
                         UpdateUserRequest.UpdateAvatarUrl(userId, result.data),
                         UpdateUserEndpoint.UpdateAvatarUrl
                     )
-                    if(result is Result.Success) {
-                        success(Unit)
-                    } else {
-                        failure(UserError.UpdateUserAvatar.SERVER_ERROR)
-                    }
                 } else {
-                    failure(UserError.UpdateUserAvatar.SERVER_ERROR)
+                    Result.Error("An error occurred while uploading the profile picture")
                 }
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            failure(UserError.UpdateUserAvatar.SERVER_ERROR)
+            Result.Error(e.message ?: "An unknown error occurred")
         }
     }
 
-    override suspend fun getUserSettings(): Result<UserSettings, UserError.GetUserSettings> {
+    override suspend fun getUserSettings(): Result<UserSettings> {
         val userInfo = supabaseClient.auth.sessionManager.loadSession()?.user
         return if (userInfo != null) {
             println("User Info: ${userInfo.userMetadata}")
@@ -225,43 +210,38 @@ class UserRemoteDataSourceImpl(
             } else {
                 UserSettings()
             }
-            success(user)
+            Result.SuccessWithData(user)
         } else {
-            failure(UserError.GetUserSettings.SERVER_ERROR)
+            Result.Error("User not found")
         }
     }
 
-    override suspend fun changePassword(oldPassword: String, newPassword: String): Result<Unit, UserError.ChangePassword> {
+    override suspend fun changePassword(oldPassword: String, newPassword: String): Result<Nothing> {
         return try {
 //            val user = supabaseClient.auth.retrieveUserForCurrentSession(updateSession = true)
 //            TODO("Check if old password is correct")
             supabaseClient.auth.updateUser {
                 password = newPassword
             }
-            success(Unit)
+            Result.Success
         } catch (e: Exception) {
             e.printStackTrace()
-            failure(UserError.ChangePassword.SERVER_ERROR)
+            Result.Error(e.message ?: "Null")
         }
     }
 
-    override suspend fun changeEmail(userId: String, email: String): Result<Unit, UserError.ChangeEmail> {
+    override suspend fun changeEmail(userId: String, email: String): Result<Nothing> {
         return try {
             supabaseClient.auth.updateUser {
                 this.email = email
             }
-            val result = updateRemoteUser(
+            updateRemoteUser(
                 UpdateUserRequest.UpdateEmail(userId, email),
                 UpdateUserEndpoint.UpdateEmail
             )
-            if(result is Result.Success) {
-                success(Unit)
-            } else {
-                failure(UserError.ChangeEmail.SERVER_ERROR)
-            }
         } catch (e: Exception) {
             e.printStackTrace()
-            failure(UserError.ChangeEmail.SERVER_ERROR)
+            Result.Error(e.message ?: "Null")
         }
     }
 
@@ -269,7 +249,7 @@ class UserRemoteDataSourceImpl(
         userId: String,
         tag: String,
         value: String
-    ): Result<Unit, UserError.UpdateUserSetting> {
+    ): Result<Nothing> {
         return try {
             supabaseClient.auth.updateUser {
                 data {
@@ -287,12 +267,12 @@ class UserRemoteDataSourceImpl(
                     value
                 )
 
-                else -> return failure(UserError.UpdateUserSetting.SERVER_ERROR)
+                else -> return Result.Error("Invalid tag")
             }
             val endpoint = when (tag) {
                 UserData.ALLOW_MESSAGES_FROM.value -> UpdateUserEndpoint.UpdateAllowMessagesFrom
                 UserData.WHO_CAN_ADD_TO_GROUPS.value -> UpdateUserEndpoint.UpdateWhoCanAddToGroups
-                else -> return failure(UserError.UpdateUserSetting.SERVER_ERROR)
+                else -> return Result.Error("Invalid tag")
             }
             updateRemoteUser(
                 request,
@@ -300,7 +280,7 @@ class UserRemoteDataSourceImpl(
             )
         } catch (e: Exception) {
             e.printStackTrace()
-            failure(UserError.UpdateUserSetting.SERVER_ERROR)
+            Result.Error(e.message ?: "Null")
         }
     }
 
@@ -308,7 +288,7 @@ class UserRemoteDataSourceImpl(
         userId: String,
         tag: String,
         value: Boolean
-    ): Result<Unit, UserError.UpdateUserSetting> {
+    ): Result<Nothing> {
         return try {
             supabaseClient.auth.updateUser {
                 data {
@@ -341,7 +321,7 @@ class UserRemoteDataSourceImpl(
                     value
                 )
 
-                else -> return failure(UserError.UpdateUserSetting.SERVER_ERROR)
+                else -> return Result.Error("Invalid tag")
             }
             val endpoint = when (tag) {
                 UserData.ALLOW_NOTIFICATIONS.value -> UpdateUserEndpoint.UpdateIsNotificationsAllowed
@@ -349,20 +329,20 @@ class UserRemoteDataSourceImpl(
                 UserData.ALLOW_CHAT_NOTIFICATIONS.value -> UpdateUserEndpoint.UpdateIsChatNotificationsAllowed
                 UserData.ALLOW_ASSIGNMENTS_NOTIFICATIONS.value -> UpdateUserEndpoint.UpdateIsAssignmentsNotificationsAllowed
                 UserData.ALLOW_CALENDAR_NOTIFICATIONS.value -> UpdateUserEndpoint.UpdateIsCalendarNotificationsAllowed
-                else -> return failure(UserError.UpdateUserSetting.SERVER_ERROR)
+                else -> return Result.Error("Invalid tag")
             }
             updateRemoteUser(
                 request,
                 endpoint
             )
-            success(Unit)
+            Result.Success
         } catch (e: Exception) {
             e.printStackTrace()
-            failure(UserError.UpdateUserSetting.SERVER_ERROR)
+            Result.Error(e.message ?: "Null")
         }
     }
 
-    override suspend fun createRemoteUser(user: User): Result<Unit, UserError.CreateRemoteUser> =
+    override suspend fun createRemoteUser(user: User): Results<DataSuccess.User, DataError.Network> =
         try {
             val request = httpClient.post {
                 endPoint("createUser")
@@ -370,19 +350,25 @@ class UserRemoteDataSourceImpl(
             }
             if (request.status == HttpStatusCode.OK) {
                 val message = request.body<DataSuccess.User>()
-                success(Unit)
+                val userRoomsTable = supabaseClient.postgrest["user_rooms"]
+                userRoomsTable.insert(
+                    UserRooms(
+                        userId = user.id,
+                    )
+                )
+                Results.Success(message)
             } else {
-                val error = request.body<UserError.CreateRemoteUser>()
-                failure(error)
+                val error = request.body<DataError.Network>()
+                Results.Failure(error)
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            failure(UserError.CreateRemoteUser.SERVER_ERROR)
+            Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN)
         }
 
-    override fun getUserCommunities(userId: String): Flow<Result<List<Community>, UserError.GetUserCommunities>> =
+    override fun getUserCommunities(userId: String): Flow<Results<List<Community>, DataError.Network>> =
         flow {
-            emit(Result.Loading)
+            emit(Results.Loading)
             try {
                 val response = httpClient.post {
                     endPoint("getUserCommunities")
@@ -390,14 +376,14 @@ class UserRemoteDataSourceImpl(
                 }
                 if (response.status == HttpStatusCode.OK) {
                     val communities = response.body<List<Community>>()
-                    emit(Result.Success(communities))
+                    emit(Results.Success(communities))
                 } else {
-                    val error = response.body<UserError.GetUserCommunities>()
-                    emit(Result.Error(error))
+                    val error = response.body<DataError.Network>()
+                    emit(Results.Failure(error))
                 }
 
             } catch (e: Exception) {
-                emit(Result.Error(UserError.GetUserCommunities.SERVER_ERROR))
+                emit(Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN))
             }
 
         }
@@ -405,9 +391,9 @@ class UserRemoteDataSourceImpl(
     override fun communityLogout(
         id: String,
         selectedCommunityId: String
-    ): Flow<Result<List<Community>, UserError.CommunityLogout>> =
+    ): Flow<Results<List<Community>, DataError.Network>> =
         flow {
-            emit(Result.Loading)
+            emit(Results.Loading)
             val request = CommunityRequest.LogoutCommunity(id, selectedCommunityId)
             try {
                 val response = httpClient.post {
@@ -416,43 +402,43 @@ class UserRemoteDataSourceImpl(
                 }
                 if (response.status == HttpStatusCode.OK) {
                     val communities = response.body<List<Community>>()
-                    emit(Result.Success(communities))
+                    emit(Results.Success(communities))
                 } else {
-                    val error = response.body<UserError.CommunityLogout>()
-                    emit(Result.Error(error))
+                    val error = response.body<DataError.Network>()
+                    emit(Results.Failure(error))
                 }
 
             } catch (e: Exception) {
-                emit(Result.Error(UserError.CommunityLogout.SERVER_ERROR))
+                emit(Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN))
             }
         }
 
     private suspend fun updateRemoteUser(
         request: UpdateUserRequest,
         endpoint: UpdateUserEndpoint
-    ): Result<Unit , UserError.UpdateUserSetting> {
+    ): Result<Nothing> {
         return try {
             val response = httpClient.post {
                 endPoint(endpoint.route)
                 setBody(request)
             }
             if (response.status == HttpStatusCode.OK) {
-                success(Unit)
+                Result.Success
             } else {
-                failure(UserError.UpdateUserSetting.SERVER_ERROR)
+                Result.Error("An unknown error occurred")
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            failure(UserError.UpdateUserSetting.SERVER_ERROR)
+            Result.Error(e.message ?: "An unknown error occurred")
         }
     }
 
     override fun joinCommunity(
         id: String,
         code: String
-    ): Flow<Result<List<Community>, UserError.JoinCommunity>> =
+    ): Flow<Results<List<Community>, DataError.Network>> =
         flow {
-            emit(Result.Loading)
+            emit(Results.Loading)
             val request = CommunityRequest.JoinCommunity(id, code)
             try {
                 println(request)
@@ -463,15 +449,15 @@ class UserRemoteDataSourceImpl(
                 println(response)
                 if (response.status == HttpStatusCode.OK) {
                     val communities = response.body<List<Community>>()
-                    emit(Result.Success(communities))
+                    emit(Results.Success(communities))
                 } else {
-                    val error = response.body<UserError.JoinCommunity>()
-                    emit(Result.Error(error))
+                    val error = response.body<DataError.Network>()
+                    emit(Results.Failure(error))
                 }
 
             } catch (e: Exception) {
                 e.printStackTrace()
-                emit(Result.Error(UserError.JoinCommunity.SERVER_ERROR))
+                emit(Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN))
             }
         }
 

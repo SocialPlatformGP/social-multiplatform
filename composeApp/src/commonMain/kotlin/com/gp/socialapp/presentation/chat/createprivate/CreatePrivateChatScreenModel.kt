@@ -22,7 +22,7 @@ class CreatePrivateChatScreenModel(
     private val state = MutableStateFlow(CreatePrivateChatUiState())
     val uiState = state
 
-    init {
+    fun init() {
         getUsers()
         getCurrentUser()
     }
@@ -31,8 +31,8 @@ class CreatePrivateChatScreenModel(
         screenModelScope.launch(DispatcherIO) {
             authenticationRepository.getSignedInUser().let { result ->
                 when (result) {
-                    is Result.Success -> {
-                        setCurrentUserId(result.data.id)
+                    is Result.SuccessWithData -> {
+                        setCurrentUser(result.data)
                     }
 
                     is Result.Error -> {
@@ -47,10 +47,10 @@ class CreatePrivateChatScreenModel(
         }
     }
 
-    private fun setCurrentUserId(id: String) {
+    private fun setCurrentUser(user: User) {
         state.update { oldState ->
             oldState.copy(
-                currentUserId = id
+                currentUser = user
             )
         }
     }
@@ -58,68 +58,48 @@ class CreatePrivateChatScreenModel(
     private fun getUsers() {
         screenModelScope.launch {
             userRepository.fetchUsers().collect { result ->
-                when (result) {
-                    is Result.Success -> {
-                        val users = result.data.filter { it.id != state.value.currentUserId }
-                        state.update {
-                            it.copy(allUsers = users, matchingUsers = users)
-                        }
+                result.onSuccessWithData { data ->
+                    val users = data.filter { it.id != state.value.currentUser.id }
+                    state.update {
+                        it.copy(allUsers = users, matchingUsers = users)
                     }
-
-                    is Result.Error -> {
-
-                    }
-
-                    Result.Loading -> {
-
-                    }
-
+                }.onFailure {
+                    println("Error: $it")
                 }
             }
         }
     }
-        fun onUserSelected(user: User) {
-            screenModelScope.launch {
-                roomRepository.checkIfRoomExists(state.value.currentUserId, user.id)
-                    .collect { result ->
-                        when (result) {
-                            is Result.Success -> {
-                                state.update { oldState ->
-                                    oldState.copy(
-                                        room = result.data
-                                    )
-                                }
-                            }
 
-                            is Result.Error -> {
-                                println("Error: ${result.message}")
-                            }
-
-                            Result.Loading -> {
-
-                            }
-                        }
-
+    fun onUserSelected(user: User) {
+        screenModelScope.launch {
+            roomRepository.getPrivateRoom(state.value.currentUser, user).let { result ->
+                result.onSuccessWithData { data ->
+                    state.update { oldState ->
+                        oldState.copy(
+                            room = data
+                        )
                     }
+                }.onFailure {
+                    println("Error: $it")
+                }
             }
         }
+    }
 
-        fun clear() {
-            state.value = CreatePrivateChatUiState()
-        }
+    override fun onDispose() {
+        super.onDispose()
+        state.value = CreatePrivateChatUiState()
+    }
 
-        fun onSearchQueryChanged(s: String) {
-            screenModelScope.launch(Dispatchers.Default) {
-                state.update { oldState ->
-                    oldState.copy(
-                        matchingUsers = oldState.allUsers.filter {
-                            (it.name).contains(
-                                s,
-                                ignoreCase = true
-                            )
-                        }
+    fun onSearchQueryChanged(s: String) {
+        screenModelScope.launch(Dispatchers.Default) {
+            state.update { oldState ->
+                oldState.copy(matchingUsers = oldState.allUsers.filter {
+                    (it.name).contains(
+                        s, ignoreCase = true
                     )
-                }
+                })
             }
         }
     }
+}

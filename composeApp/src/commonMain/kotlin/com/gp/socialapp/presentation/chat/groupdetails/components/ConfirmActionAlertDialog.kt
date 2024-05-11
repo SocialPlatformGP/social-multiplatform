@@ -12,34 +12,23 @@ fun ConfirmActionAlertDialog(
     dialogTitle: String,
     dialogText: String = "",
 ) {
-    AlertDialog(
-        title = {
-            Text(text = dialogTitle)
-        },
-        text = {
-            if(dialogText.isNotEmpty())
-                Text(text = dialogText)
-        },
-        onDismissRequest = {
-            onDismissRequest()
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    onConfirmation()
-                }
-            ) {
-                Text("Confirm")
-            }
-        },
-        dismissButton = {
-            TextButton(
-                onClick = {
-                    onDismissRequest()
-                }
-            ) {
-                Text("Dismiss")
-            }
+    AlertDialog(title = {
+        Text(text = dialogTitle)
+    }, text = {
+        if (dialogText.isNotEmpty()) Text(text = dialogText)
+    }, onDismissRequest = {
+        onDismissRequest()
+    }, confirmButton = {
+        TextButton(onClick = {
+            onConfirmation()
+        }) {
+            Text("Confirm")
         }
-    )
+    }, dismissButton = {
+        TextButton(onClick = {
+            onDismissRequest()
+        }) {
+            Text("Dismiss")
+        }
+    })
 }

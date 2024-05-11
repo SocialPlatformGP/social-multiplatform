@@ -25,21 +25,22 @@ class CreateGroupScreenModel(
     val uiState = _uiState.asStateFlow()
 
     fun init() {
-        resetState()
-        getUsers()
+        getSignedInUser()
     }
 
-    private fun getUsers() {
+    private fun getSignedInUser() {
         screenModelScope.launch(DispatcherIO) {
-            authRepo.getSignedInUser().let{ result ->
-                when(result) {
-                    is Result.Success -> {
+            authRepo.getSignedInUser().let { result ->
+                when (result) {
+                    is Result.SuccessWithData -> {
                         currentUserId = result.data.id
                         getAllUsers()
                     }
+
                     is Result.Error -> {
                         //TODO handle error
                     }
+
                     else -> Unit
                 }
             }
@@ -49,16 +50,12 @@ class CreateGroupScreenModel(
     private fun getAllUsers() {
         screenModelScope.launch(DispatcherIO) {
             userRepo.fetchUsers().collect { result ->
-                when (result) {
-                    is Result.Success -> {
-                        updateUsersListState(result.data)
-                    }
-                    is Result.Error -> {
-                        //TODO handle error
-                    }
-                    else -> Unit
+                result.onSuccessWithData { data ->
+                    updateUsersListState(data)
+                }.onFailure {
+//                    updateError(true)
+                    println("Error: $it")
                 }
-
             }
         }
     }
@@ -77,8 +74,9 @@ class CreateGroupScreenModel(
         _uiState.value = _uiState.value.copy(groupName = name)
     }
 
-    private fun updateAvatar(byteArray: ByteArray) {
-        _uiState.value = _uiState.value.copy(groupAvatarByteArray = byteArray)
+    private fun updateAvatar(byteArray: ByteArray, extenstion: String) {
+        _uiState.value =
+            _uiState.value.copy(groupAvatarByteArray = byteArray, groupAvatarExtension = extenstion)
     }
 
     private fun updateError(value: Boolean) {
@@ -128,26 +126,20 @@ class CreateGroupScreenModel(
             with(uiState.value) {
                 roomRepo.createGroupRoom(
                     groupName = groupName,
-                    groupAvatar = groupAvatarByteArray,
+                    groupAvatarByteArray = groupAvatarByteArray,
+                    groupAvatarExtension = groupAvatarExtension,
                     userIds = selectedUsers.map { it.id },
                     creatorId = currentUserId
-                ).collect { result ->
-                    when (result) {
-                        is Result.Success -> {
-                            _uiState.update {
-                                it.copy(
-                                    isCreated = true,
-                                    groupId = result.data.id,
-                                    groupAvatarUrl = result.data.picUrl
-                                )
-                            }
+                ).let { result ->
+                    result.onSuccessWithData { room ->
+                        _uiState.update {
+                            it.copy(
+                                isCreated = true, groupId = room.id, groupAvatarUrl = room.picUrl
+                            )
                         }
-                        is Result.Error -> {
-                            println("Error: $result")
-                        }
-                        else -> Unit
+                    }.onFailure {
+                        println("Error: $it")
                     }
-
                 }
             }
         }
@@ -159,13 +151,14 @@ class CreateGroupScreenModel(
             is CreateGroupAction.OnSetError -> updateError(action.value)
             is CreateGroupAction.OnUnselectUser -> removeMember(action.userId)
             is CreateGroupAction.OnCreateGroup -> createGroup()
-            is CreateGroupAction.OnImagePicked -> updateAvatar(action.array)
+            is CreateGroupAction.OnImagePicked -> updateAvatar(action.array, action.extension)
             is CreateGroupAction.OnSelectUser -> addMember(action.userId)
             else -> Unit
         }
     }
 
-    private fun resetState() {
+    override fun onDispose() {
+        super.onDispose()
         _uiState.value = CreateGroupUiState()
     }
 }

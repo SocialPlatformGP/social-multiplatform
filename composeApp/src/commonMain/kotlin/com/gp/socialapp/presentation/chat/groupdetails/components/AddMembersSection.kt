@@ -25,9 +25,7 @@ fun AddMembersSection(
     modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier
-            .padding(start = 8.dp, end = 8.dp, top = 16.dp)
-            .fillMaxWidth()
+        modifier = modifier.padding(start = 8.dp, end = 8.dp, top = 16.dp).fillMaxWidth()
             .clickable {
                 onAddMembersClicked()
             },
@@ -36,8 +34,7 @@ fun AddMembersSection(
         Icon(
             imageVector = MyIconPack.AddPeopleCircle,
             contentDescription = null,
-            modifier = Modifier
-                .size(55.dp),
+            modifier = Modifier.size(55.dp),
             tint = MaterialTheme.colorScheme.outline
         )
         Spacer(modifier = modifier.width(12.dp))

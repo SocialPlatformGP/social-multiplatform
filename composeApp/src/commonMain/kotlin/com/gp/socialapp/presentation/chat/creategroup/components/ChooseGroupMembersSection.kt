@@ -29,22 +29,19 @@ fun ChooseGroupMembersSection(
         FlowRow {
             selectedUsers.forEach { user ->
                 SelectedMemberItem(
-                    user = user,
-                    onUnselect = onUnselectUser
+                    user = user, onUnselect = onUnselectUser
                 )
             }
         }
         HorizontalDivider(
-            modifier = modifier.padding(top = 16.dp),
-            thickness = 2.dp
+            modifier = modifier.padding(top = 16.dp), thickness = 2.dp
         )
         LazyColumn(
             modifier = Modifier.padding(top = 20.dp).fillMaxHeight()
         ) {
             items(users.size) { index ->
                 val user = users[index]
-                GroupMemberItem(
-                    selectableUser = user,
+                GroupMemberItem(selectableUser = user,
                     isSelected = user.isSelected,
                     isSelectable = true,
                     onUserClick = {

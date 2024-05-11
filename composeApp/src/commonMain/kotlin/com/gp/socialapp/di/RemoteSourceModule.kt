@@ -14,20 +14,16 @@ import com.gp.socialapp.data.chat.source.remote.RecentRoomRemoteDataSource
 import com.gp.socialapp.data.chat.source.remote.RecentRoomRemoteDataSourceImpl
 import com.gp.socialapp.data.chat.source.remote.RoomRemoteDataSource
 import com.gp.socialapp.data.chat.source.remote.RoomRemoteDataSourceImpl
-import com.gp.socialapp.data.chat.source.remote.SocketService
-import com.gp.socialapp.data.chat.source.remote.SocketServiceImpl
 import com.gp.socialapp.data.community.source.remote.CommunityRemoteDataSource
 import com.gp.socialapp.data.community.source.remote.CommunityRemoteDataSourceImpl
+import com.gp.socialapp.data.grades.source.remote.GradesRemoteDataSource
+import com.gp.socialapp.data.grades.source.remote.GradesRemoteDataSourceImpl
 import com.gp.socialapp.data.material.source.remote.MaterialRemoteDataSource
 import com.gp.socialapp.data.material.source.remote.MaterialRemoteDataSourceImpl
 import com.gp.socialapp.data.post.source.remote.PostRemoteDataSource
 import com.gp.socialapp.data.post.source.remote.PostRemoteDataSourceImpl
 import com.gp.socialapp.data.post.source.remote.ReplyRemoteDataSource
 import com.gp.socialapp.data.post.source.remote.ReplyRemoteDataSourceImpl
-import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.createSupabaseClient
-import io.github.jan.supabase.gotrue.Auth
-import io.github.jan.supabase.gotrue.FlowType
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.websocket.WebSockets
@@ -46,21 +42,25 @@ val remoteDataSourceModuleK = DI.Module("remoteDataSourceModule") {
     bind<MaterialRemoteDataSource>() with singleton {
         MaterialRemoteDataSourceImpl(
             instance(),
+            instance()
         )
     }
     bind<ReplyRemoteDataSource>() with singleton { ReplyRemoteDataSourceImpl(instance()) }
-    bind<AuthenticationRemoteDataSource>() with singleton { AuthenticationRemoteDataSourceImpl(instance(), instance()) }
+    bind<AuthenticationRemoteDataSource>() with singleton {
+        AuthenticationRemoteDataSourceImpl(
+            instance(),
+            instance()
+        )
+    }
     bind<MessageRemoteDataSource>() with singleton {
         MessageRemoteDataSourceImpl(
             instance(),
-            instance()
         )
     }
     bind<RoomRemoteDataSource>() with singleton { RoomRemoteDataSourceImpl(instance()) }
     bind<RecentRoomRemoteDataSource>() with singleton { RecentRoomRemoteDataSourceImpl(instance()) }
     bind<UserRemoteDataSource>() with singleton { UserRemoteDataSourceImpl(instance(), instance()) }
     bind<CommunityRemoteDataSource>() with singleton { CommunityRemoteDataSourceImpl(instance()) }
-    bind<SocketService>() with singleton { SocketServiceImpl(instance()) }
     bind<AssignmentRemoteDataSource>() with singleton { AssignmentRemoteDataSourceImpl(instance()) }
     bind<HttpClient>() with singleton {
         HttpClient {
@@ -82,6 +82,11 @@ val remoteDataSourceModuleK = DI.Module("remoteDataSourceModule") {
         CalendarRemoteDataSourceImpl(
             instance(),
             instance()
+        )
+    }
+    bind<GradesRemoteDataSource>() with singleton {
+        GradesRemoteDataSourceImpl(
+            instance(),
         )
     }
 }

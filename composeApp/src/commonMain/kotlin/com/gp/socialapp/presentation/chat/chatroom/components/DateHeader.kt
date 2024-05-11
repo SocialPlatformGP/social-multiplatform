@@ -10,18 +10,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.gp.socialapp.util.LocalDateTimeUtil.getDateHeader
+import korlibs.time.DateTimeTz
 
 @Composable
 fun DateHeader(
     modifier: Modifier = Modifier,
-    createdAt: Long,
+    createdAt: DateTimeTz,
 ) {
     val header = createdAt.getDateHeader()
     Row(modifier = modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
         HorizontalDivider(
-            modifier = Modifier
-                .weight(1f)
-                .align(Alignment.CenterVertically),
+            modifier = Modifier.weight(1f).align(Alignment.CenterVertically),
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
         )
         Text(
@@ -31,9 +30,7 @@ fun DateHeader(
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         HorizontalDivider(
-            modifier = Modifier
-                .weight(1f)
-                .align(Alignment.CenterVertically),
+            modifier = Modifier.weight(1f).align(Alignment.CenterVertically),
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
         )
     }

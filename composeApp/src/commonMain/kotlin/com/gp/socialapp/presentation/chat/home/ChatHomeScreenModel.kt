@@ -7,7 +7,6 @@ import com.gp.socialapp.data.chat.repository.RecentRoomRepository
 import com.gp.socialapp.util.DispatcherIO
 import com.gp.socialapp.util.Result
 import io.github.aakira.napier.Napier
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -19,10 +18,9 @@ class ChatHomeScreenModel(
 ) : ScreenModel {
     private val state = MutableStateFlow(ChatHomeUiState())
     val uiState = state.asStateFlow()
-    var job: Job? = null
 
 
-    init {
+    fun init() {
         getCurrentUser()
     }
 
@@ -30,101 +28,40 @@ class ChatHomeScreenModel(
     fun getCurrentUser() {
         screenModelScope.launch(DispatcherIO) {
             authenticationRepository.getSignedInUser().let { result ->
-                when(result) {
-                    is Result.Success -> {
+                when (result) {
+                    is Result.SuccessWithData -> {
                         state.update {
-                            it.copy(currentUserId = result.data.id)
+                            it.copy(currentUser = result.data)
                         }
-                        getRecentRooms()
-                        connectToSocket()
+                        fetchRecentRooms(result.data.id)
                     }
+
                     is Result.Error -> {
                         // TODO Handle error
                         Napier.d("Error: ${result.message}")
                     }
+
                     else -> Unit
                 }
             }
         }
     }
 
-    private fun connectToSocket() {
+    private fun fetchRecentRooms(id: String) {
         screenModelScope.launch(DispatcherIO) {
-            val result = recentRoomRepository.connectToSocket(
-                uiState.value.currentUserId,
-            )
-                when (result) {
-                    is Result.Success -> {
-                        println("Socket connected")
-                    }
-                    is Result.Error -> {
-                        println("Socket connection failed")
-                    }
-                    else -> Unit
-                }
-        }
-    }
-
-    fun observeMessages() {
-        if (job == null) {
-            job = screenModelScope.launch {
-                recentRoomRepository.observeNewData().collect { result ->
-                    when (result) {
-                        is Result.Success -> {
-                            state.update {
-                            it.copy(recentRooms = result.data.recentRooms.sortedByDescending { it.lastMessageTime })
-                        }
-                        }
-                        is Result.Error -> {
-                            println("Error: ${result.message}")
-                        }
-                        else -> Unit
-                    }
+            recentRoomRepository.fetchRecentRooms(id).collect { result ->
+                result.onSuccessWithData { data ->
+                    state.value = ChatHomeUiState(recentRooms = data)
+                }.onFailure {
+                    //TODO Handle error
                 }
             }
-
-        }
-    }
-
-
-    suspend fun getRecentRooms() {
-        screenModelScope.launch(DispatcherIO) {
-            recentRoomRepository.getAllRecentRooms(uiState.value.currentUserId)
-                .collect { result ->
-                    when (result) {
-                        is Result.Success -> {
-                            state.value =
-                            ChatHomeUiState(recentRooms = result.data.sortedByDescending { it.lastMessageTime })
-                        }
-                        is Result.Error -> {
-                            println("Error: ${result.message}")
-                        }
-                        else -> Unit
-                    }
-                }
-            observeMessages()
-        }
-    }
-
-    fun onClear() {
-        screenModelScope.launch(DispatcherIO) {
-            val result = recentRoomRepository.closeSocket()
-                when (result) {
-                    is Result.Success -> {
-                        println("Socket closed")
-                    }
-                    is Result.Error -> {
-                        println("Socket close failed")
-                    }
-                    else -> Unit
-                }
         }
     }
 
     override fun onDispose() {
         super.onDispose()
+        state.value = ChatHomeUiState()
         println("Disposed")
     }
-
-
 }

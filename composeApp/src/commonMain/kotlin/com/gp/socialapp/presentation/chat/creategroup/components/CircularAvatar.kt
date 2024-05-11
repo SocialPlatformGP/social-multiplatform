@@ -14,15 +14,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
-import com.seiko.imageloader.cache.CachePolicy
 import com.seiko.imageloader.model.ImageAction
-import com.seiko.imageloader.model.ImageRequest
 import com.seiko.imageloader.rememberImageSuccessPainter
 import com.seiko.imageloader.ui.AutoSizeBox
-import kotlinx.coroutines.Dispatchers
-import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun CircularAvatar(
@@ -74,9 +69,9 @@ fun CircularAvatar(
 
 @Composable
 fun CircularAvatar(
+    modifier: Modifier = Modifier,
     imageURL: String,
     size: Dp,
-    modifier: Modifier = Modifier,
     placeHolderImageVector: ImageVector,
     onClick: () -> Unit = {},
 ) {

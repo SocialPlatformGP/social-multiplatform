@@ -1,31 +1,45 @@
 package com.gp.socialapp.data.chat.source.remote
 
+import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.data.chat.model.Room
-import com.gp.socialapp.data.chat.source.remote.model.request.RoomRequest
-import com.gp.socialapp.util.ChatError
 import com.gp.socialapp.util.Result
-import kotlinx.coroutines.flow.Flow
 
 interface RoomRemoteDataSource {
-    suspend fun createGroupRoom(request: RoomRequest.CreateGroupRoom): Flow<Result<Room, ChatError.Temp>>
-    suspend fun checkIfRoomExists(user1: String, user2: String): Flow<Result<Room?, ChatError.Temp>>
-    suspend fun getRoomDetails(
-        request: RoomRequest.GetRoomDetails
-    ): Result<Room, ChatError.Temp>
+    suspend fun createGroupRoom(
+        groupName: String,
+        groupAvatarByteArray: ByteArray,
+        groupAvatarExtension: String,
+        userIds: List<String>,
+        creatorId: String,
+    ): Result<Room>
 
-    suspend fun updateRoomAvatar(
-        request: RoomRequest.UpdateRoomAvatar
-    ): Result<String, ChatError.Temp>
+    suspend fun addGroupMembers(
+        roomId: Long,
+        userIds: List<String>,
+    ): Result<Unit>
 
-    suspend fun updateRoomName(
-        request: RoomRequest.UpdateRoomName
-    ): Result<Unit, ChatError.Temp>
+    suspend fun getRoom(
+        roomId: Long
+    ): Result<Room>
 
-    suspend fun addMembers(
-        request: RoomRequest.AddMembers
-    ): Result<Unit, ChatError.Temp>
+    suspend fun getPrivateRoom(
+        currentUser: User,
+        otherUser: User
+    ): Result<Room>
 
     suspend fun removeMember(
-        request: RoomRequest.RemoveMember
-    ): Result<Unit, ChatError.Temp>
+        roomId: Long,
+        userId: String
+    ): Result<Unit>
+
+    suspend fun updateRoomAvatar(
+        roomId: Long,
+        newAvatarByteArray: ByteArray,
+        newAvatarExtension: String,
+    ): Result<String>
+
+    suspend fun updateRoomName(
+        roomId: Long,
+        newName: String
+    ): Result<Unit>
 }

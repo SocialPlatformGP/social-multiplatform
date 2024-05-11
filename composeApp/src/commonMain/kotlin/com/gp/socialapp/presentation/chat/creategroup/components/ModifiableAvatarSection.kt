@@ -22,8 +22,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import com.gp.socialapp.presentation.material.utils.MimeType
 import com.mohamedrejeb.calf.core.LocalPlatformContext
 import com.mohamedrejeb.calf.core.PlatformContext
+import com.mohamedrejeb.calf.io.getName
 import com.mohamedrejeb.calf.io.readByteArray
 import com.mohamedrejeb.calf.picker.FilePickerFileType
 import com.mohamedrejeb.calf.picker.FilePickerSelectionMode
@@ -40,34 +42,28 @@ fun ModifiableAvatarSection(
     avatarURL: String = "",
     avatarByteArray: ByteArray = byteArrayOf(),
     isModifiable: Boolean = false,
-    onImagePicked: (ByteArray) -> Unit,
+    onImagePicked: (ByteArray, String) -> Unit,
     modifier: Modifier = Modifier,
     scope: CoroutineScope = rememberCoroutineScope(),
     context: PlatformContext = LocalPlatformContext.current,
 ) {
-//    val backgroundColor = MaterialTheme.colorScheme.surfaceVariant
-//    val contentColor = contentColorFor(backgroundColor)
-    val imagePicker = rememberFilePickerLauncher(
-        type = FilePickerFileType.Image,
+    val imagePicker = rememberFilePickerLauncher(type = FilePickerFileType.Image,
         selectionMode = FilePickerSelectionMode.Single,
         onResult = { files ->
             scope.launch {
                 files.firstOrNull()?.let { file ->
                     val image = file.readByteArray(context)
-                    onImagePicked(image)
+                    val name = file.getName(context) ?: ""
+                    val mimeType = MimeType.getMimeTypeFromFileName(name)
+                    val extension = MimeType.getExtensionFromMimeType(mimeType)
+                    onImagePicked(image, extension)
                 }
             }
-        }
-    )
+        })
     Box(
-        contentAlignment = Alignment.Center,
-        modifier = modifier
-            .fillMaxWidth()
+        contentAlignment = Alignment.Center, modifier = modifier.fillMaxWidth()
     ) {
-        val imageModifier = Modifier
-            .size(100.dp)
-            .align(Alignment.Center)
-            .clip(CircleShape)
+        val imageModifier = Modifier.size(100.dp).align(Alignment.Center).clip(CircleShape)
         if (avatarByteArray.isEmpty() && avatarURL.isBlank()) {
             Icon(
                 imageVector = Icons.Filled.AccountCircle,
@@ -75,7 +71,7 @@ fun ModifiableAvatarSection(
                 modifier = imageModifier,
                 tint = MaterialTheme.colorScheme.outline
             )
-        } else if(avatarURL.isBlank()){
+        } else if (avatarURL.isBlank()) {
             val bitmap = avatarByteArray.toImageBitmap()
             Image(
                 bitmap = bitmap,
@@ -113,8 +109,7 @@ fun ModifiableAvatarSection(
         if (isModifiable) {
             IconButton(
                 onClick = { imagePicker.launch() },
-                modifier = Modifier
-                    .offset(x = 38.dp, y = 38.dp)
+                modifier = Modifier.offset(x = 38.dp, y = 38.dp)
                     .background(MaterialTheme.colorScheme.secondaryContainer, CircleShape)
                     .size(32.dp)
             ) {

@@ -17,6 +17,9 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.gotrue.FlowType
+import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.realtime.Realtime
+import io.github.jan.supabase.storage.Storage
 import org.kodein.di.DI
 import org.kodein.di.bind
 import org.kodein.di.singleton
@@ -38,6 +41,9 @@ actual val platformModule = DI.Module("platformModule") {
                 host = "com.gp.socialapp"
                 scheme = "edulink"
             }
+            install(Storage)
+            install(Postgrest)
+            install(Realtime)
         }
     }
 }

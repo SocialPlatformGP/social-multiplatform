@@ -6,6 +6,9 @@ import com.gp.socialapp.util.Result
 import kotlinx.coroutines.flow.Flow
 
 interface MaterialRemoteDataSource {
+    suspend fun downloadChatAttachment(
+        path: String,
+    ): Results<MaterialResponse.DownloadChatAttachment, DataError.Network>
     suspend fun getMaterialAtPath(
         path: String
     ): Flow<Result<MaterialResponse.GetMaterialResponses, MaterialError.GetMaterial>>

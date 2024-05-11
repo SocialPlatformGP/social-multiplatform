@@ -5,7 +5,7 @@ sealed class CreateGroupAction {
     data class OnSetError(val value: Boolean) : CreateGroupAction()
     data class OnUnselectUser(val userId: String) : CreateGroupAction()
     data class OnSelectUser(val userId: String) : CreateGroupAction()
-    data class OnImagePicked(val array: ByteArray) : CreateGroupAction()
+    data class OnImagePicked(val array: ByteArray, val extension: String) : CreateGroupAction()
     object OnCreateGroup : CreateGroupAction()
     data object OnBackClicked : CreateGroupAction()
 }

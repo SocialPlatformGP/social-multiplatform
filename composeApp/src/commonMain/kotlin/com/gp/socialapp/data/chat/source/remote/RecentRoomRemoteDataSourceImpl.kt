@@ -1,38 +1,51 @@
 package com.gp.socialapp.data.chat.source.remote
 
-import com.gp.socialapp.data.chat.source.remote.model.request.RecentRoomRequests
-import com.gp.socialapp.data.chat.source.remote.model.response.RecentRoomResponses
-import com.gp.socialapp.data.chat.utils.EndPoint
-import com.gp.socialapp.data.post.util.endPoint
-import com.gp.socialapp.util.ChatError
+
+import com.gp.socialapp.data.chat.model.RecentRoom
+import com.gp.socialapp.data.chat.model.UserRooms
+import com.gp.socialapp.data.chat.source.remote.model.RemoteRecentRoom
 import com.gp.socialapp.util.Result
-import io.ktor.client.HttpClient
-import io.ktor.client.call.body
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
-import io.ktor.http.HttpStatusCode
+import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.annotations.SupabaseExperimental
+import io.github.jan.supabase.postgrest.from
+import io.github.jan.supabase.postgrest.query.filter.FilterOperation
+import io.github.jan.supabase.postgrest.query.filter.FilterOperator
+import io.github.jan.supabase.realtime.selectAsFlow
+import io.github.jan.supabase.realtime.selectSingleValueAsFlow
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 class RecentRoomRemoteDataSourceImpl(
-    private val client: HttpClient
+    private val supabase: SupabaseClient
 ) : RecentRoomRemoteDataSource {
-    override fun getAllRecentRooms(userId: String) = flow {
-        println("Id: $userId")
+    private val USERROOMS = "user_rooms"
+    private val RECENTROOMS = "recent_rooms"
+
+    @OptIn(SupabaseExperimental::class)
+    override fun fetchRecentRooms(
+        userId: String
+    ): Flow<Result<List<RecentRoom>>> = flow {
         emit(Result.Loading)
         try {
-            val response = client.post {
-                endPoint(EndPoint.GetAllRecentRooms.url)
-                setBody(RecentRoomRequests.GetAllRecentRooms(userId))
-            }
-            println("response: $response")
-            if (response.status == HttpStatusCode.OK) {
-                val result = response.body<RecentRoomResponses.GetAllRecentRooms>()
-                emit(Result.Success(result.recentRooms))
-            } else {
-                emit(Result.Error(ChatError.Temp.SERVER_ERROR))
+            supabase.from(USERROOMS).selectSingleValueAsFlow(UserRooms::userId) {
+                eq("userId", userId)
+            }.collect {
+                println("received data in remote source from user_rooms :$it")
+                val roomsString =
+                    it.rooms.joinToString(separator = ",", prefix = "(", postfix = ")")
+                supabase.from(RECENTROOMS).selectAsFlow(
+                    RemoteRecentRoom::roomId,
+                    filter = FilterOperation("roomId", FilterOperator.IN, roomsString)
+                ).collect {
+                    println("received data in remote source from recent_rooms :$it")
+                    emit(Result.SuccessWithData(it.map { remoteRecentRoom -> remoteRecentRoom.toRecentRoom() }
+                        .sortedByDescending { recentRoom -> recentRoom.lastMessageTime }))
+                }
             }
         } catch (e: Exception) {
-            emit(Result.Error(ChatError.Temp.SERVER_ERROR))
+            e.printStackTrace()
+            emit(Result.Error("Error fetching recent rooms: ${e.message}"))
         }
     }
+
 }
