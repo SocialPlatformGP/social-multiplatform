@@ -9,6 +9,7 @@ import com.gp.socialapp.data.assignment.model.AssignmentAttachment
 import com.gp.socialapp.di.appModuleK
 import com.gp.socialapp.presentation.assignment.submissionreview.components.SubmissionAttachmentPreview
 import com.gp.socialapp.presentation.auth.login.LoginScreen
+import com.gp.socialapp.presentation.grades.GradesMainScreen
 import com.gp.socialapp.presentation.chat.chatroom.ChatRoomScreen
 import com.gp.socialapp.presentation.chat.creategroup.CreateGroupScreen
 import com.gp.socialapp.presentation.chat.home.ChatHomeScreen
@@ -20,7 +21,8 @@ internal fun App() =
     withDI(appModuleK) {
         AppTheme {
             Navigator(
-                LoginScreen
+                GradesMainScreen
+//                LoginScreen
             )
 //            Navigator(
 //                ChatRoomScreen(

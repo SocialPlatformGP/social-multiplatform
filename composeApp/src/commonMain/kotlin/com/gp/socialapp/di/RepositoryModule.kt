@@ -16,6 +16,8 @@ import com.gp.socialapp.data.chat.repository.RoomRepository
 import com.gp.socialapp.data.chat.repository.RoomRepositoryImpl
 import com.gp.socialapp.data.community.repository.CommunityRepository
 import com.gp.socialapp.data.community.repository.CommunityRepositoryImpl
+import com.gp.socialapp.data.grades.repository.GradesRepository
+import com.gp.socialapp.data.grades.repository.GradesRepositoryImpl
 import com.gp.socialapp.data.material.repository.MaterialRepository
 import com.gp.socialapp.data.material.repository.MaterialRepositoryImpl
 import com.gp.socialapp.data.post.repository.PostRepository
@@ -57,6 +59,7 @@ val repositoryModuleK = DI.Module("repositoryModule") {
     bind<RoomRepository>() with singleton { RoomRepositoryImpl(instance()) }
     bind<AssignmentRepository>() with singleton { AssignmentRepositoryImpl(instance()) }
     bind<CalendarRepository>() with singleton { CalendarRepositoryImpl(instance()) }
+    bind<GradesRepository>() with singleton { GradesRepositoryImpl(instance()) }
 }
 
 

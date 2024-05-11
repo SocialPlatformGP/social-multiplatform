@@ -21,6 +21,7 @@ import com.gp.socialapp.presentation.community.communityhome.CommunityHomeContai
 import com.gp.socialapp.presentation.community.communitymembers.CommunityMembersScreenModel
 import com.gp.socialapp.presentation.community.createcommunity.CreateCommunityScreenModel
 import com.gp.socialapp.presentation.community.editcommunity.EditCommunityScreenModel
+import com.gp.socialapp.presentation.grades.GradesHomeScreenModel
 import com.gp.socialapp.presentation.home.container.HomeContainerScreenModel
 import com.gp.socialapp.presentation.home.screen.HomeScreenModel
 import com.gp.socialapp.presentation.material.MaterialScreenModel
@@ -159,5 +160,6 @@ val screenModelModuleK = DI.Module("screenModelModule") {
     bind<SubmitAssignmentScreenModel>() with singleton { SubmitAssignmentScreenModel(instance(),instance()) }
     bind<AssignmentHomeScreenModel>() with singleton { AssignmentHomeScreenModel(instance(),instance()) }
     bind<SubmissionsScreenModel>() with singleton { SubmissionsScreenModel(instance()) }
+    bind<GradesHomeScreenModel>() with singleton { GradesHomeScreenModel(instance(),instance()) }
 }
 
