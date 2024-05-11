@@ -25,10 +25,10 @@ fun UserClickedDialog(
     modifier: Modifier = Modifier,
     isAdmin: Boolean,
     isCurrentUser: Boolean,
-    userId: String,
+    clickedUser: User,
     onDismiss: () -> Unit,
     onRemoveMember: (String) -> Unit,
-    onMessageUser: (String) -> Unit,
+    onMessageUser: (User) -> Unit,
     onViewProfile: (String) -> Unit,
 ) {
     Dialog(onDismissRequest = { onDismiss() }) {
@@ -48,7 +48,7 @@ fun UserClickedDialog(
                         fontWeight = FontWeight.Light,
                         modifier = Modifier.weight(1F).padding(horizontal = 16.dp, vertical = 8.dp)
                             .fillMaxSize().clickable {
-                                onViewProfile(userId)
+                                onViewProfile(clickedUser.id)
                             })
                 }
                 item {
@@ -58,7 +58,7 @@ fun UserClickedDialog(
                         fontWeight = FontWeight.Light,
                         modifier = Modifier.weight(1F).padding(horizontal = 16.dp, vertical = 8.dp)
                             .fillMaxSize().clickable {
-                                onMessageUser(userId)
+                                onMessageUser(clickedUser)
                             })
                 }
                 if (isAdmin && !isCurrentUser) {
@@ -70,7 +70,7 @@ fun UserClickedDialog(
                             modifier = Modifier.weight(1F)
                                 .padding(horizontal = 16.dp, vertical = 8.dp).fillMaxSize()
                                 .clickable {
-                                    onRemoveMember(userId)
+                                    onRemoveMember(clickedUser.id)
                                 })
                     }
                 }

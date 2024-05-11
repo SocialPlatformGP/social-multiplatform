@@ -10,13 +10,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.gp.socialapp.data.chat.model.RecentRoomResponse
+import com.gp.socialapp.data.chat.model.RecentRoom
 import com.gp.socialapp.presentation.chat.home.ChatHomeUiEvent
 
 @Composable
 fun RecentRoomItem(
     modifier: Modifier = Modifier,
-    recentRoom: RecentRoomResponse,
+    recentRoom: RecentRoom,
+    currentUserId: String,
     event: (ChatHomeUiEvent) -> Unit
 ) {
     Card(
@@ -36,7 +37,10 @@ fun RecentRoomItem(
                 .padding(4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            RecentChatImage(recentRoom)
+            RecentChatImage(
+                currentUserId = currentUserId,
+                recentRoom = recentRoom
+            )
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -44,12 +48,17 @@ fun RecentRoomItem(
                     .padding(start = 8.dp, end = 8.dp),
                 horizontalAlignment = Alignment.Start
             ) {
+                val title = if(recentRoom.isPrivate && recentRoom.senderId == currentUserId) {
+                    recentRoom.receiverName
+                } else {
+                    recentRoom.senderName
+                }
                 RecentChatTopRow(
-                    title = recentRoom.title,
+                    title = title,
                     lastMessageTime = recentRoom.lastMessageTime
                 )
                 RecentChatBottomRow(
-                    senderName = recentRoom.senderName,
+                    senderName = recentRoom.lastMessageSenderName,
                     lastMessage = recentRoom.lastMessage,
                     isPrivate = recentRoom.isPrivate
                 )

@@ -29,24 +29,27 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.lifecycle.LifecycleEffect
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
+import cafe.adriel.voyager.kodein.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.presentation.chat.chatroom.ChatRoomScreen
 import com.gp.socialapp.presentation.chat.creategroup.components.ChooseGroupMembersSection
-import com.gp.socialapp.presentation.chat.creategroup.components.ModifiableAvatarSection
 import com.gp.socialapp.presentation.chat.creategroup.components.GroupNameSection
+import com.gp.socialapp.presentation.chat.creategroup.components.ModifiableAvatarSection
 
 object CreateGroupScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val screenModel = navigator.rememberNavigatorScreenModel<CreateGroupScreenModel>()
+        val screenModel = rememberScreenModel<CreateGroupScreenModel>()
         val state by screenModel.uiState.collectAsState()
         LifecycleEffect(
             onStarted = {
                 screenModel.init()
+            },
+            onDisposed = {
+                screenModel.onDispose()
             }
         )
         if (state.isCreated) {
@@ -125,9 +128,9 @@ object CreateGroupScreen : Screen {
                         ModifiableAvatarSection(
                             avatarByteArray = avatarByteArray,
                             isModifiable = true,
-                            onImagePicked = { array ->
+                            onImagePicked = { array, extension ->
                                 onAction(
-                                    CreateGroupAction.OnImagePicked(array)
+                                    CreateGroupAction.OnImagePicked(array, extension)
                                 )
                             },
                         )

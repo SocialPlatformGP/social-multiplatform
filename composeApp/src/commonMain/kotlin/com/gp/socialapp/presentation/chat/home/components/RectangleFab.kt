@@ -10,9 +10,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun RectangleFab(
-    fabState: MutableState<Boolean>,
-    onClick: () -> Unit,
-    text: String
+    fabState: MutableState<Boolean>, onClick: () -> Unit, text: String
 ) {
     FloatingActionButton(
         onClick = {

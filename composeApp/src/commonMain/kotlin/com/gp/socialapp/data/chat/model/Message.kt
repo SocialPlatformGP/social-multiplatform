@@ -1,20 +1,16 @@
 package com.gp.socialapp.data.chat.model
 
-import com.gp.socialapp.util.LocalDateTimeUtil.now
-import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toInstant
-import kotlinx.serialization.Serializable
+import korlibs.time.DateTimeTz
 
-@Serializable
+
 data class Message(
     val content: String = "",
-    val createdAt: Long = LocalDateTime.now().toInstant(TimeZone.UTC).epochSeconds,
-    val roomId: String = "",
+    val createdAt: DateTimeTz = DateTimeTz.nowLocal(),
+    val roomId: Long = 0L,
     val senderId: String = "",
-    val id: String = "",
+    val id: Long = 0L,
     val senderName: String = "",
-    val senderPfpURL: String = "",
+    val senderPfpUrl: String = "",
     val hasAttachment: Boolean = false,
     val attachment: MessageAttachment = MessageAttachment()
 )

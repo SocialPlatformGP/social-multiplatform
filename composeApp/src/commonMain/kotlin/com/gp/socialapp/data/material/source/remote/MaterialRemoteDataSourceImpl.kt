@@ -5,6 +5,8 @@ import com.gp.socialapp.data.material.model.responses.MaterialResponse
 import com.gp.socialapp.data.post.util.endPoint
 import com.gp.socialapp.util.DataError
 import com.gp.socialapp.util.Results
+import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.storage.storage
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.delete
@@ -17,8 +19,22 @@ import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.flow
 
 class MaterialRemoteDataSourceImpl(
-    val client: HttpClient
+    val client: HttpClient,
+    private val supabase: SupabaseClient
 ) : MaterialRemoteDataSource {
+    override suspend fun downloadChatAttachment(path: String,): Results<MaterialResponse.DownloadChatAttachment, DataError.Network> {
+        return try{
+            val bucket = supabase.storage.from("chat_attachments")
+            println("Path: $path")
+            val bytes = bucket.downloadPublic(path)
+            println("Bytes size: ${bytes.size}")
+            Results.Success(MaterialResponse.DownloadChatAttachment(bytes))
+        } catch(e: Exception) {
+            Results.Failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN)
+        }
+
+    }
+
     override suspend fun getMaterialAtPath(path: String): Flow<Results<MaterialResponse.GetMaterialResponses, DataError.Network>> {
         val request = MaterialRequest.GetMaterialRequest(path)
         return flow {

@@ -23,7 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.lifecycle.LifecycleEffect
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
+import cafe.adriel.voyager.kodein.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gp.socialapp.data.chat.model.Message
@@ -36,7 +36,6 @@ import com.gp.socialapp.presentation.chat.chatroom.components.MessageInput
 import com.gp.socialapp.presentation.chat.chatroom.components.MessagesContent
 import com.gp.socialapp.presentation.chat.groupdetails.GroupDetailsScreen
 import com.gp.socialapp.presentation.material.utils.MimeType
-import com.gp.socialapp.util.AppConstants.BASE_URL
 import com.mohamedrejeb.calf.core.LocalPlatformContext
 import com.mohamedrejeb.calf.io.getName
 import com.mohamedrejeb.calf.io.readByteArray
@@ -47,7 +46,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 data class ChatRoomScreen(
-    private val roomId: String,
+    private val roomId: Long,
     private val roomAvatarUrl: String,
     private val roomTitle: String,
     private val isPrivate: Boolean
@@ -55,16 +54,15 @@ data class ChatRoomScreen(
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val screenModel = navigator.rememberNavigatorScreenModel<ChatRoomScreenModel>()
+        val screenModel = rememberScreenModel<ChatRoomScreenModel>()
         val state by screenModel.uiState.collectAsState()
-        LifecycleEffect(
-            onStarted = {
-                screenModel.initScreen(roomId, isPrivate)
-            }
-        )
-        ChatRoomContent(
-            messages = state.messages,
-            currentUserId = state.currentUserId,
+        LifecycleEffect(onStarted = {
+            screenModel.initScreen(roomId, isPrivate)
+        }, onDisposed = {
+            screenModel.onDispose()
+        })
+        ChatRoomContent(messages = state.messages,
+            currentUserId = state.currentUser.id,
             attachment = state.currentAttachment,
             onAction = { action ->
                 when (action) {
@@ -109,11 +107,10 @@ data class ChatRoomScreen(
         var isImagePreviewDialogOpen by rememberSaveable { mutableStateOf(false) }
         var previewedImageURL by rememberSaveable { mutableStateOf("") }
         var isEditMessageDialogOpen by rememberSaveable { mutableStateOf(false) }
-        var editedMessageID by remember { mutableStateOf("") }
+        var editedMessageID by remember { mutableStateOf(0L) }
         var editedMessageBody by remember { mutableStateOf("") }
         var pickedFileType: FilePickerFileType by remember { mutableStateOf(FilePickerFileType.All) }
-        val filePicker = rememberFilePickerLauncher(
-            type = pickedFileType,
+        val filePicker = rememberFilePickerLauncher(type = pickedFileType,
             selectionMode = FilePickerSelectionMode.Single,
             onResult = { files ->
                 scope.launch {
@@ -131,8 +128,7 @@ data class ChatRoomScreen(
             modifier = modifier,
             containerColor = MaterialTheme.colorScheme.inverseOnSurface,
             topBar = {
-                ChatRoomTopBar(
-                    onBackPressed = { onAction(ChatRoomAction.OnBackPressed) },
+                ChatRoomTopBar(onBackPressed = { onAction(ChatRoomAction.OnBackPressed) },
                     onChatHeaderClicked = {
                         onAction(
                             ChatRoomAction.OnChatHeaderClicked(
@@ -177,6 +173,7 @@ data class ChatRoomScreen(
                                         DropDownItem.DELETE -> {
                                             onAction(ChatRoomAction.OnDeleteMessage(action.messageId))
                                         }
+
                                         DropDownItem.REPORT -> {
                                             onAction(ChatRoomAction.OnReportMessage(action.messageId))
                                         }
@@ -209,8 +206,7 @@ data class ChatRoomScreen(
 
                                 else -> onAction(action)
                             }
-                        },
-                        attachment = attachment
+                        }, attachment = attachment
                     )
                     if (isEditMessageDialogOpen) {
                         EditMessageDialog(initialMessage = editedMessageBody,
@@ -225,7 +221,7 @@ data class ChatRoomScreen(
                             onDismissRequest = { isEditMessageDialogOpen = false })
                     }
                     if (isImagePreviewDialogOpen) {
-                        ImagePreviewDialog(imageURL = BASE_URL + previewedImageURL,
+                        ImagePreviewDialog(imageURL = previewedImageURL,
                             onDismissRequest = { isImagePreviewDialogOpen = false })
                     }
                 }

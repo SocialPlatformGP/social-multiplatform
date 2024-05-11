@@ -83,7 +83,6 @@ val screenModelModuleK = DI.Module("screenModelModule") {
         ChatRoomScreenModel(
             instance(),
             instance(),
-            instance()
         )
     }
     bind<GroupDetailsScreenModel>() with singleton {

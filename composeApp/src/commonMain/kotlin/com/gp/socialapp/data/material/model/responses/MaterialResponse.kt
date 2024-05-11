@@ -17,4 +17,8 @@ sealed class MaterialResponse {
         val data: ByteArray,
         val fileName: String
     ) : MaterialResponse()
+    @Serializable
+    data class DownloadChatAttachment(
+        val data: ByteArray,
+    ) : MaterialResponse()
 }

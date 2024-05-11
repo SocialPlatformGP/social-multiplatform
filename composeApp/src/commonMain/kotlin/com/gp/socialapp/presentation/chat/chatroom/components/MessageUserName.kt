@@ -14,8 +14,7 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun MessageUserName(
-    modifier: Modifier = Modifier,
-    name: String, onUserClick: () -> Unit
+    modifier: Modifier = Modifier, name: String, onUserClick: () -> Unit
 ) {
     ClickableText(
         text = AnnotatedString(name),

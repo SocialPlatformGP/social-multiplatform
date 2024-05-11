@@ -1,10 +1,10 @@
 package com.gp.socialapp.presentation.chat.home
 
-import com.gp.socialapp.data.chat.model.RecentRoomResponse
+import com.gp.socialapp.data.auth.source.remote.model.User
+import com.gp.socialapp.data.chat.model.RecentRoom
 
 data class ChatHomeUiState(
-    val recentRooms: List<RecentRoomResponse> = emptyList(),
-    val currentUserId: String = ""
+    val recentRooms: List<RecentRoom> = emptyList(), val currentUser: User = User()
 
 )
 

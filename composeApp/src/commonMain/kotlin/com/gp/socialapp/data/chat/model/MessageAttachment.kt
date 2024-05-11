@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 data class MessageAttachment(
     val byteArray: ByteArray = byteArrayOf(),
     val url: String = "",
+    val path: String = "",
     val name: String = "",
     val type: String = "",
     val size: Long = 0

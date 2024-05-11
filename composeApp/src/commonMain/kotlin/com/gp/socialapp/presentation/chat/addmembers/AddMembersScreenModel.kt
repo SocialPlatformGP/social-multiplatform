@@ -11,47 +11,49 @@ import com.gp.socialapp.util.Result
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.properties.Delegates
 
 class AddMembersScreenModel(
     private val authRepo: AuthenticationRepository,
     private val userRepo: UserRepository,
     private val roomRepo: RoomRepository
-): ScreenModel {
+) : ScreenModel {
     private val _uiState = MutableStateFlow(AddMembersUiState())
     val uiState = _uiState.asStateFlow()
     private lateinit var currentUserId: String
-    private lateinit var roomId: String
+    private var roomId by Delegates.notNull<Long>()
     private lateinit var groupMembersIds: List<String>
-    fun init(roomId: String, groupMembersIds: List<String>) {
+    fun init(roomId: Long, groupMembersIds: List<String>) {
         this.roomId = roomId
         this.groupMembersIds = groupMembersIds
-        resetState()
         getUserID()
         initAddMembers()
     }
 
     private fun initAddMembers() {
-        screenModelScope.launch (DispatcherIO) {
+        screenModelScope.launch(DispatcherIO) {
             userRepo.fetchUsers().collect { result ->
-                when(result) {
+                when (result) {
                     is Result.Error -> {
                         //TODO handle error
                     }
+
                     is Result.Loading -> {
                         //TODO handle loading
                     }
+
                     is Result.SuccessWithData -> {
-                        val allUsers = result.data.filter { it.id != currentUserId && !groupMembersIds.contains(it.id) }
+                        val allUsers = result.data.filter {
+                            it.id != currentUserId && !groupMembersIds.contains(it.id)
+                        }
                         _uiState.update {
-                            it.copy(
-                                allUsers = allUsers.map { user -> user.toSelectableUser() }
-                            )
+                            it.copy(allUsers = allUsers.map { user -> user.toSelectableUser() })
                         }
                         println("All Users: ${_uiState.value.allUsers}")
                     }
+
                     else -> Unit
                 }
             }
@@ -59,15 +61,17 @@ class AddMembersScreenModel(
     }
 
     private fun getUserID() {
-        screenModelScope.launch (DispatcherIO) {
-            authRepo.getSignedInUser().let{ result ->
-                when(result) {
+        screenModelScope.launch(DispatcherIO) {
+            authRepo.getSignedInUser().let { result ->
+                when (result) {
                     is Result.SuccessWithData -> {
                         currentUserId = result.data.id
                     }
+
                     is Result.Error -> {
                         //TODO handle error
                     }
+
                     else -> Unit
                 }
             }
@@ -117,7 +121,7 @@ class AddMembersScreenModel(
     fun submitGroupUsers() {
         screenModelScope.launch {
             val selectedUserIds = _uiState.value.selectedUsers.map { it.id }
-            roomRepo.addMembers(roomId, selectedUserIds).onSuccess {
+            roomRepo.addGroupMembers(roomId, selectedUserIds).onSuccess {
                 _uiState.update { it.copy(isDone = true) }
             }.onFailure {
                 //TODO handle error
@@ -125,7 +129,8 @@ class AddMembersScreenModel(
         }
     }
 
-    private fun resetState() {
-        _uiState.update { AddMembersUiState() }
+    override fun onDispose() {
+        super.onDispose()
+        _uiState.value = AddMembersUiState()
     }
 }

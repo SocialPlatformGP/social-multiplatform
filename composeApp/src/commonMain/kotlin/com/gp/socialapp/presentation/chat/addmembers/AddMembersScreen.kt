@@ -20,15 +20,11 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.lifecycle.LifecycleEffect
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
 import cafe.adriel.voyager.kodein.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -40,24 +36,23 @@ import socialmultiplatform.composeapp.generated.resources.Res
 import socialmultiplatform.composeapp.generated.resources.add_selected_members
 
 data class AddMembersScreen(
-    val roomId: String,
+    val roomId: Long,
     val groupMembersIds: List<String>,
 ) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = rememberScreenModel<AddMembersScreenModel>()
-        LifecycleEffect(
-            onStarted = {
-                screenModel.init(roomId, groupMembersIds)
-            }
-        )
+        LifecycleEffect(onStarted = {
+            screenModel.init(roomId, groupMembersIds)
+        }, onDisposed = {
+            screenModel.onDispose()
+        })
         val state by screenModel.uiState.collectAsState()
         if (state.isDone) {
             navigator.pop()
         }
-        AddMembersContent(
-            selectedUsers = state.selectedUsers,
+        AddMembersContent(selectedUsers = state.selectedUsers,
             allUsers = state.allUsers,
             onRemoveMember = screenModel::removeMember,
             onAddMember = screenModel::addMember,
@@ -67,8 +62,7 @@ data class AddMembersScreen(
             },
             onBackClicked = {
                 navigator.pop()
-            }
-        )
+            })
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -107,8 +101,7 @@ data class AddMembersScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = modifier.fillMaxSize()
                 ) {
-                    ChooseGroupMembersSection(
-                        modifier = Modifier.padding(top = 8.dp),
+                    ChooseGroupMembersSection(modifier = Modifier.padding(top = 8.dp),
                         selectedUsers = selectedUsers,
                         users = allUsers,
                         onUnselectUser = {
