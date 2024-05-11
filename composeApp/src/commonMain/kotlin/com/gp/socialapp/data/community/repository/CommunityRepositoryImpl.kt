@@ -5,8 +5,8 @@ import com.gp.socialapp.data.community.source.local.CommunityLocalDataSource
 import com.gp.socialapp.data.community.source.remote.CommunityRemoteDataSource
 import com.gp.socialapp.data.community.source.remote.model.Community
 import com.gp.socialapp.data.community.source.remote.model.request.CommunityRequest
-import com.gp.socialapp.util.DataError
-import com.gp.socialapp.util.Results
+import com.gp.socialapp.util.CommunityError
+import com.gp.socialapp.util.Result
 import kotlinx.coroutines.flow.Flow
 
 class CommunityRepositoryImpl(
@@ -16,41 +16,41 @@ class CommunityRepositoryImpl(
     override suspend fun createCommunity(
         community: Community,
         userId: String
-    ): Results<Community, DataError.Network> {
+    ): Result<Community, CommunityError> {
         val request = CommunityRequest.CreateCommunity(community, userId)
         return communityRemoteDataSource.createCommunity(request)
     }
 
     override suspend fun acceptCommunityRequest(
         requestId: String
-    ): Results<Unit, DataError.Network> {
+    ): Result<Unit, CommunityError> {
         val request = CommunityRequest.AcceptCommunityRequest(requestId)
         return communityRemoteDataSource.acceptCommunityRequest(request)
     }
 
     override suspend fun declineCommunityRequest(
         requestId: String
-    ): Results<Unit, DataError.Network> {
+    ): Result<Unit, CommunityError> {
         val request = CommunityRequest.DeclineCommunityRequest(requestId)
         return communityRemoteDataSource.declineCommunityRequest(request)
     }
 
-    override fun fetchCommunity(communityId: String): Flow<Results<Community, DataError.Network>> {
+    override fun fetchCommunity(communityId: String): Flow<Result<Community, CommunityError>> {
         val request = CommunityRequest.FetchCommunity(communityId)
         return communityRemoteDataSource.fetchCommunity(request)
     }
 
-    override fun fetchCommunityMembersRequests(communityId: String): Flow<Results<List<CommunityMemberRequest>, DataError.Network>> {
+    override fun fetchCommunityMembersRequests(communityId: String): Flow<Result<List<CommunityMemberRequest>, CommunityError>> {
         val request = CommunityRequest.FetchCommunityMembersRequests(communityId)
         return communityRemoteDataSource.fetchCommunityMembersRequests(request)
     }
 
-    override suspend fun deleteCommunity(communityId: String): Results<Unit, DataError.Network> {
+    override suspend fun deleteCommunity(communityId: String): Result<Unit, CommunityError> {
         val request = CommunityRequest.DeleteCommunity(communityId)
         return communityRemoteDataSource.deleteCommunity(request)
     }
 
-    override suspend fun editCommunity(community: Community): Results<Unit, DataError.Network> {
+    override suspend fun editCommunity(community: Community): Result<Unit, CommunityError> {
         val request = CommunityRequest.EditCommunity(community)
         println("CommunityRepositoryImpl editCommunity request: $request")
         return communityRemoteDataSource.editCommunity(request)

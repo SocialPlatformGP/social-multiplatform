@@ -6,7 +6,7 @@ import com.gp.socialapp.data.post.repository.PostRepository
 import com.gp.socialapp.data.post.source.remote.model.Post
 import com.gp.socialapp.data.post.source.remote.model.PostAttachment
 import com.gp.socialapp.data.post.source.remote.model.Tag
-import com.gp.socialapp.util.Results
+import com.gp.socialapp.util.Result
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -42,15 +42,15 @@ class EditPostScreenModel(
                     )
                 ).let { reault ->
                     when (reault) {
-                        is Results.Failure -> {
+                        is Result.Error -> {
                             // TODO()
                         }
 
-                        Results.Loading -> {
+                        Result.Loading -> {
                             // TODO()
                         }
 
-                        is Results.Success -> {
+                        is Result.Success -> {
                             _uiState.update {
                                 it.copy(editSuccess = true)
                             }

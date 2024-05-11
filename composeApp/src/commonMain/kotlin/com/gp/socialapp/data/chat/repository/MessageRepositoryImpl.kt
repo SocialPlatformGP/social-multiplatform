@@ -5,8 +5,8 @@ import com.gp.socialapp.data.chat.model.MessageAttachment
 import com.gp.socialapp.data.chat.source.remote.MessageRemoteDataSource
 import com.gp.socialapp.data.material.source.remote.MaterialRemoteDataSource
 import com.gp.socialapp.data.material.utils.FileManager
+import com.gp.socialapp.util.ChatError
 import com.gp.socialapp.util.Result
-import com.gp.socialapp.util.Results
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 
@@ -17,7 +17,7 @@ class MessageRepositoryImpl(
 ) : MessageRepository {
     override suspend fun fetchChatMessages(
         roomId: Long
-    ): Flow<Result<List<Message>>> {
+    ): Flow<Result<List<Message>,ChatError>> {
         return messageRemoteDataSource.fetchChatMessages(roomId)
     }
 
@@ -28,7 +28,7 @@ class MessageRepositoryImpl(
         senderName: String,
         senderPfpUrl: String,
         attachment: MessageAttachment
-    ): Result<Nothing> {
+    ): Result<Unit,ChatError> {
         return messageRemoteDataSource.sendMessage(
             messageContent, roomId, senderId, senderName, senderPfpUrl, attachment
         )
@@ -36,11 +36,11 @@ class MessageRepositoryImpl(
 
     override suspend fun updateMessage(
         messageId: Long, roomId: Long, content: String
-    ): Result<Nothing> {
+    ): Result<Unit,ChatError> {
         return messageRemoteDataSource.updateMessage(messageId, roomId, content)
     }
 
-    override suspend fun deleteMessage(messageId: Long, roomId: Long): Result<Nothing> {
+    override suspend fun deleteMessage(messageId: Long, roomId: Long): Result<Unit,ChatError> {
         return messageRemoteDataSource.deleteMessage(messageId, roomId)
     }
 
@@ -48,15 +48,15 @@ class MessageRepositoryImpl(
         try {
             val result = materialRemoteDataSource.downloadChatAttachment(path)
             when (result) {
-                is Results.Failure -> {
-                    println(result.error)
+                is Result.Error -> {
+                    println(result.message)
                 }
 
-                Results.Loading -> {
+                Result.Loading -> {
                     //TODO
                 }
 
-                is Results.Success -> {
+                is Result.Success -> {
                     val localPath = fileManager.saveFile(result.data.data, name, mimeType)
                     fileManager.openFile(localPath, mimeType)
                 }

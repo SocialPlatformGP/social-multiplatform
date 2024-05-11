@@ -1,20 +1,20 @@
 package com.gp.socialapp.data.material.repository
 
 import com.gp.socialapp.data.material.model.responses.MaterialResponse
-import com.gp.socialapp.util.DataError
-import com.gp.socialapp.util.Results
+import com.gp.socialapp.util.MaterialError
+import com.gp.socialapp.util.Result
 import kotlinx.coroutines.flow.Flow
 
 interface MaterialRepository {
     suspend fun getMaterialAtPath(
         path: String
-    ): Flow<Results<MaterialResponse.GetMaterialResponses, DataError.Network>>
+    ): Flow<Result<MaterialResponse.GetMaterialResponses, MaterialError>>
 
     suspend fun createFolder(
         name: String,
         path: String,
         communityId: String,
-    ): Flow<Results<MaterialResponse.GetMaterialResponses, DataError.Network>>
+    ): Flow<Result<MaterialResponse.GetMaterialResponses, MaterialError>>
 
     suspend fun createFile(
         name: String,
@@ -22,16 +22,16 @@ interface MaterialRepository {
         path: String,
         content: ByteArray,
         communityId: String
-    ): Flow<Results<MaterialResponse.GetMaterialResponses, DataError.Network>>
+    ): Flow<Result<MaterialResponse.GetMaterialResponses, MaterialError>>
 
     suspend fun deleteFile(
         fileId: String,
         path: String
-    ): Flow<Results<MaterialResponse.GetMaterialResponses, DataError.Network>>
+    ): Flow<Result<MaterialResponse.GetMaterialResponses, MaterialError>>
 
     suspend fun deleteFolder(
         folderId: String
-    ): Flow<Results<MaterialResponse.GetMaterialResponses, DataError.Network>>
+    ): Flow<Result<MaterialResponse.GetMaterialResponses, MaterialError>>
 
     suspend fun downloadFile(url: String, mimeType: String)
     suspend fun openFile(fileId: String, url: String, mimeType: String)
@@ -40,7 +40,7 @@ interface MaterialRepository {
     fun renameFolder(
         folderId: String,
         newName: String
-    ): Flow<Results<MaterialResponse.GetMaterialResponses, DataError.Network>>
+    ): Flow<Result<MaterialResponse.GetMaterialResponses, MaterialError>>
 
 }
 

@@ -10,9 +10,8 @@ import com.gp.socialapp.data.material.repository.MaterialRepository
 import com.gp.socialapp.presentation.material.utils.MimeType
 import com.gp.socialapp.presentation.material.utils.MimeType.Companion.getFullMimeType
 import com.gp.socialapp.presentation.material.utils.MimeType.Companion.getMimeTypeFromFileName
-import com.gp.socialapp.util.DataError
 import com.gp.socialapp.util.DispatcherIO
-import com.gp.socialapp.util.Results
+import com.gp.socialapp.util.Result
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -33,7 +32,23 @@ class MaterialScreenModel(
     fun getMaterial() {
         screenModelScope.launch {
             materialRepo.getMaterialAtPath(state.value.currentFolder.path).collect { result ->
-                handleUiState(result)
+                when (result) {
+                    is Result.Error -> {
+                        stopLoading()
+                        showError(result.message.userMessage)
+                    }
+
+                    Result.Loading -> {
+                        resetError()
+                        startLoading()
+                    }
+
+                    is Result.Success -> {
+                        resetError()
+                        stopLoading()
+                        updateData(result.data)
+                    }
+                }
             }
         }
     }
@@ -48,8 +63,23 @@ class MaterialScreenModel(
                 path = state.value.currentFolder.path,
                 communityId = state.value.currentCommunityId
             ).collect { result ->
-                handleUiState(result)
-            }
+                when (result) {
+                    is Result.Error -> {
+                        stopLoading()
+                        showError(result.message.userMessage)
+                    }
+
+                    Result.Loading -> {
+                        resetError()
+                        startLoading()
+                    }
+
+                    is Result.Success -> {
+                        resetError()
+                        stopLoading()
+                        updateData(result.data)
+                    }
+                }            }
         }
     }
 
@@ -64,8 +94,23 @@ class MaterialScreenModel(
                 content = fileContent,
                 communityId = state.value.currentCommunityId
             ).collect { result ->
-                handleUiState(result)
-            }
+                when (result) {
+                    is Result.Error -> {
+                        stopLoading()
+                        showError(result.message.userMessage)
+                    }
+
+                    Result.Loading -> {
+                        resetError()
+                        startLoading()
+                    }
+
+                    is Result.Success -> {
+                        resetError()
+                        stopLoading()
+                        updateData(result.data)
+                    }
+                }            }
         }
     }
 
@@ -103,16 +148,46 @@ class MaterialScreenModel(
     private fun deleteFile(fileId: String) {
         screenModelScope.launch {
             materialRepo.deleteFile(fileId, state.value.currentFolder.path).collect { result ->
-                handleUiState(result)
-            }
+                when (result) {
+                    is Result.Error -> {
+                        stopLoading()
+                        showError(result.message.userMessage)
+                    }
+
+                    Result.Loading -> {
+                        resetError()
+                        startLoading()
+                    }
+
+                    is Result.Success -> {
+                        resetError()
+                        stopLoading()
+                        updateData(result.data)
+                    }
+                }            }
         }
     }
 
     private fun deleteFolder(folderId: String) {
         screenModelScope.launch {
             materialRepo.deleteFolder(folderId).collect { result ->
-                handleUiState(result)
-            }
+                when (result) {
+                    is Result.Error -> {
+                        stopLoading()
+                        showError(result.message.userMessage)
+                    }
+
+                    Result.Loading -> {
+                        resetError()
+                        startLoading()
+                    }
+
+                    is Result.Success -> {
+                        resetError()
+                        stopLoading()
+                        updateData(result.data)
+                    }
+                }            }
         }
     }
 
@@ -155,30 +230,26 @@ class MaterialScreenModel(
     private fun renameFolder(folderId: String, newName: String) {
         screenModelScope.launch {
             materialRepo.renameFolder(folderId, newName).collect { result ->
-                handleUiState(result)
-            }
+                when (result) {
+                    is Result.Error -> {
+                        stopLoading()
+                        showError(result.message.userMessage)
+                    }
+
+                    Result.Loading -> {
+                        resetError()
+                        startLoading()
+                    }
+
+                    is Result.Success -> {
+                        resetError()
+                        stopLoading()
+                        updateData(result.data)
+                    }
+                }            }
         }
     }
 
-    private fun handleUiState(result: Results<MaterialResponse.GetMaterialResponses, DataError.Network>) {
-        when (result) {
-            is Results.Failure -> {
-                stopLoading()
-                showError(result.error.userMessage)
-            }
-
-            Results.Loading -> {
-                resetError()
-                startLoading()
-            }
-
-            is Results.Success -> {
-                resetError()
-                stopLoading()
-                updateData(result.data)
-            }
-        }
-    }
 
     private fun openLink(url: String) {
         screenModelScope.launch {

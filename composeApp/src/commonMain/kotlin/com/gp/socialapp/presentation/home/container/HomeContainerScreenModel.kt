@@ -25,7 +25,7 @@ class HomeContainerScreenModel(
                     is Result.Error -> {
                         /*TODO: Handle Error*/
                     }
-                    is Result.SuccessWithData -> {
+                    is Result.Success -> {
                         _uiState.update {
                             it.copy(currentUser = result.data)
                         }
@@ -38,9 +38,14 @@ class HomeContainerScreenModel(
 
     fun logout() {
         screenModelScope.launch {
-            authRepo.logout().onSuccess {
-                _uiState.update {
-                    it.copy(isLoggedOut = true)
+            val result = authRepo.logout()
+                when(result){
+                    is Result.Error -> TODO()
+                    Result.Loading -> TODO()
+                    is Result.Success -> {
+                        _uiState.update {
+                            it.copy(isLoggedOut = true)
+                    }
                 }
             }
         }

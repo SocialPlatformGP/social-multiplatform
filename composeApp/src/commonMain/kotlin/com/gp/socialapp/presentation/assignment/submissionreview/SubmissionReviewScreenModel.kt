@@ -29,7 +29,7 @@ class SubmissionReviewScreenModel(
         screenModelScope.launch(DispatcherIO) {
             assignmentRepo.getAssignmentById(assignmentId).let { result ->
                 when (result) {
-                    is Result.SuccessWithData -> {
+                    is Result.Success -> {
                         _uiState.update {
                             it.copy(currentAssignment = result.data)
                         }
@@ -49,7 +49,7 @@ class SubmissionReviewScreenModel(
         screenModelScope.launch(DispatcherIO) {
             assignmentRepo.getSubmissions(assignmentId).collect { result ->
                 when (result) {
-                    is Result.SuccessWithData -> {
+                    is Result.Success -> {
                         _uiState.update {
                             it.copy(
                                 submissions = result.data,

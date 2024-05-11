@@ -31,7 +31,7 @@ class CreatePrivateChatScreenModel(
         screenModelScope.launch(DispatcherIO) {
             authenticationRepository.getSignedInUser().let { result ->
                 when (result) {
-                    is Result.SuccessWithData -> {
+                    is Result.Success -> {
                         setCurrentUser(result.data)
                     }
 

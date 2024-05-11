@@ -29,7 +29,7 @@ class ChatHomeScreenModel(
         screenModelScope.launch(DispatcherIO) {
             authenticationRepository.getSignedInUser().let { result ->
                 when (result) {
-                    is Result.SuccessWithData -> {
+                    is Result.Success -> {
                         state.update {
                             it.copy(currentUser = result.data)
                         }

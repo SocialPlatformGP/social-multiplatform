@@ -26,7 +26,7 @@ private val assignmentRepo: AssignmentRepository
                         println(result.message)
                     }
                     Result.Loading -> {}
-                    is Result.SuccessWithData -> {
+                    is Result.Success -> {
                         _uiState.value = uiState.value.copy(submissions = result.data)
                     }
                     else->Unit

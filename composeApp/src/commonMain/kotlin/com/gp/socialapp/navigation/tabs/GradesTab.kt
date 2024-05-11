@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
+import com.gp.socialapp.presentation.grades.GradesMainScreen
 import com.gp.socialapp.presentation.material.MaterialScreen
 
 object GradesTab : Tab {
@@ -35,13 +36,7 @@ object GradesTab : Tab {
 
     @Composable
     override fun Content() {
-        //TODO
-        Box(modifier = Modifier.fillMaxSize()) {
-            Text(
-                "Grades Tab Content",
-                style = MaterialTheme.typography.headlineLarge,
-                modifier = Modifier.align(Alignment.Center)
-            )
-        }
+                Navigator(screen = GradesMainScreen)
+
     }
 }

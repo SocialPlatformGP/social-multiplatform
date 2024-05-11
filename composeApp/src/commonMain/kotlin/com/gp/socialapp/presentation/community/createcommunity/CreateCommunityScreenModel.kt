@@ -7,7 +7,7 @@ import com.gp.socialapp.data.community.repository.CommunityRepository
 import com.gp.socialapp.data.community.source.remote.model.Community
 import com.gp.socialapp.util.DispatcherIO
 import com.gp.socialapp.util.Result
-import com.gp.socialapp.util.Results
+
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,7 +26,7 @@ class CreateCommunityScreenModel(
         screenModelScope.launch(DispatcherIO) {
             authRepo.getSignedInUser().let { result ->
                 when (result) {
-                    is Result.SuccessWithData -> {
+                    is Result.Success -> {
                         currentUserId = result.data.id
                     }
 
@@ -105,7 +105,7 @@ class CreateCommunityScreenModel(
                 )
                 communityRepo.createCommunity(community, currentUserId).let { result ->
                     if (result.isSuccessful()) {
-                        setCreatedCommunity((result as Results.Success).data)
+                        setCreatedCommunity((result as Result.Success).data)
                     } else {
                         //TODO: Handle error
                     }

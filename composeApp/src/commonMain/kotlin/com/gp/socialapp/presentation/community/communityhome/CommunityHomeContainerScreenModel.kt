@@ -7,7 +7,6 @@ import com.gp.socialapp.data.auth.repository.UserRepository
 import com.gp.socialapp.data.community.source.remote.model.Community
 import com.gp.socialapp.util.DispatcherIO
 import com.gp.socialapp.util.Result
-import com.gp.socialapp.util.Results
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -16,7 +15,7 @@ import kotlinx.coroutines.launch
 class CommunityHomeContainerScreenModel(
     private val userRepo: UserRepository,
     private val authRepo: AuthenticationRepository,
-): ScreenModel {
+) : ScreenModel {
     private val _uiState = MutableStateFlow(CommunityHomeUiState())
     val uiState = _uiState.asStateFlow()
     fun init(communityId: String) {
@@ -25,6 +24,7 @@ class CommunityHomeContainerScreenModel(
         }
         getSignedInUser()
     }
+
     private fun getSignedInUser() {
         screenModelScope.launch {
             authRepo.getSignedInUser().let { result ->
@@ -32,30 +32,33 @@ class CommunityHomeContainerScreenModel(
                     is Result.Error -> {
                         /*TODO: Handle Error*/
                     }
-                    is Result.SuccessWithData -> {
+
+                    is Result.Success -> {
                         _uiState.update {
                             it.copy(currentUser = result.data)
                         }
                         getUserCommunities()
                     }
+
                     else -> Unit
                 }
             }
         }
     }
+
     private fun getUserCommunities() {
-        screenModelScope.launch (DispatcherIO){
+        screenModelScope.launch(DispatcherIO) {
             userRepo.getUserCommunities(uiState.value.currentUser.id).collect {
                 when (it) {
-                    is Results.Failure -> {
-                        /*TODO*/
+                    is Result.Error -> {
+                        println(it.message)
                     }
 
-                    Results.Loading -> {
-                        /*TODO*/
+                    Result.Loading -> {
+                        println("Loading")
                     }
 
-                    is Results.Success -> {
+                    is Result.Success -> {
                         setCommunities(it.data)
                     }
                 }
@@ -75,11 +78,20 @@ class CommunityHomeContainerScreenModel(
 
     fun logout() {
         screenModelScope.launch {
-            authRepo.logout().onSuccess {
-                _uiState.update {
-                    it.copy(isLoggedOut = true)
+            val resut = authRepo.logout()
+            when (resut) {
+                is Result.Error -> {
+
+                }
+
+                Result.Loading -> TODO()
+                is Result.Success -> {
+                    _uiState.update {
+                        it.copy(isLoggedOut = true)
+                    }
                 }
             }
+
         }
     }
 }

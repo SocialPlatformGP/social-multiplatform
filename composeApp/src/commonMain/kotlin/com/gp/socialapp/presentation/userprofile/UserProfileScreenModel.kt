@@ -5,7 +5,7 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import com.gp.socialapp.data.auth.repository.AuthenticationRepository
 import com.gp.socialapp.data.auth.repository.UserRepository
 import com.gp.socialapp.data.post.repository.PostRepository
-import com.gp.socialapp.util.Results
+import com.gp.socialapp.util.Result
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -43,19 +43,19 @@ class UserProfileScreenModel(
         screenModelScope.launch {
             userRepo.getUsersByIds(listOf(userId)).collect { result ->
                 when (result) {
-                    is Results.Success -> {
+                    is com.gp.socialapp.util.Result.Success -> {
                         _uiState.update {
                             it.copy(user = result.data.first())
                         }
                     }
 
-                    is Results.Failure -> {
+                    is Result.Error -> {
                         _uiState.update {
-                            it.copy(error = result.error.userMessage)
+                            it.copy(error = result.message.userMessage)
                         }
                     }
 
-                    Results.Loading -> {}
+                    Result.Loading -> {}
                 }
             }
         }

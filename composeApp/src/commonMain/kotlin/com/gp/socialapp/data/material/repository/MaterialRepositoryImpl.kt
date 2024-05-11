@@ -6,10 +6,9 @@ import com.gp.socialapp.data.material.model.responses.MaterialResponse
 import com.gp.socialapp.data.material.source.local.MaterialLocalDataSource
 import com.gp.socialapp.data.material.source.remote.MaterialRemoteDataSource
 import com.gp.socialapp.data.material.utils.FileManager
-import com.gp.socialapp.util.DataError
+import com.gp.socialapp.util.MaterialError
 import com.gp.socialapp.util.Platform
 import com.gp.socialapp.util.Result
-import com.gp.socialapp.util.Results
 import com.gp.socialapp.util.getPlatform
 import kotlinx.coroutines.flow.Flow
 
@@ -18,37 +17,35 @@ class MaterialRepositoryImpl(
     private val localDataSource: MaterialLocalDataSource,
     private val fileManager: FileManager
 ) : MaterialRepository {
-    override suspend fun getMaterialAtPath(path: String): Flow<Results<MaterialResponse.GetMaterialResponses, DataError.Network>> {
+    override suspend fun getMaterialAtPath(path: String): Flow<Result<MaterialResponse.GetMaterialResponses,MaterialError>> {
         return remoteDataSource.getMaterialAtPath(path)
     }
-
 
     override suspend fun createFolder(
         name: String,
         path: String,
         communityId: String,
-    ): Flow<Results<MaterialResponse.GetMaterialResponses, DataError.Network>> {
+    ): Flow<Result<MaterialResponse.GetMaterialResponses, MaterialError>> {
         return remoteDataSource.createFolder(name, path, communityId)
     }
-
     override suspend fun createFile(
         name: String,
         type: String,
         path: String,
         content: ByteArray,
         communityId: String
-    ): Flow<Results<MaterialResponse.GetMaterialResponses, DataError.Network>> {
+    ): Flow<Result<MaterialResponse.GetMaterialResponses, MaterialError>> {
         return remoteDataSource.createFile(name, type, path, content, communityId)
     }
 
     override suspend fun deleteFile(
         fileId: String,
         path: String
-    ): Flow<Results<MaterialResponse.GetMaterialResponses, DataError.Network>> {
+    ): Flow<Result<MaterialResponse.GetMaterialResponses, MaterialError>> {
         return remoteDataSource.deleteFile(fileId, path)
     }
 
-    override suspend fun deleteFolder(folderId: String): Flow<Results<MaterialResponse.GetMaterialResponses, DataError.Network>> {
+    override suspend fun deleteFolder(folderId: String): Flow<Result<MaterialResponse.GetMaterialResponses, MaterialError>> {
         return remoteDataSource.deleteFolder(folderId)
     }
 
@@ -59,20 +56,20 @@ class MaterialRepositoryImpl(
     override suspend fun openFile(fileId: String, url: String, mimeType: String) {
         if (getPlatform() != Platform.JS)
             localDataSource.getFilePath(fileId).collect { result ->
-                if (result is Result.SuccessWithData) {
+                if (result is Result.Success) {
                     fileManager.openFile(result.data.localPath, mimeType)
                 } else {
                     val data = remoteDataSource.downloadFile(url)
                     when (data) {
-                        is Results.Failure -> {
-                            println(data.error)
+                        is Result.Error -> {
+                            println(data.message)
                         }
 
-                        Results.Loading -> {
+                        Result.Loading -> {
                             //TODO
                         }
 
-                        is Results.Success -> {
+                        is Result.Success -> {
                             val localPath =
                                 fileManager.saveFile(data.data.data, data.data.fileName, mimeType)
                             localDataSource.insertFile(
@@ -92,7 +89,7 @@ class MaterialRepositoryImpl(
     override fun renameFolder(
         folderId: String,
         newName: String
-    ): Flow<Results<MaterialResponse.GetMaterialResponses, DataError.Network>> {
+    ): Flow<Result<MaterialResponse.GetMaterialResponses, MaterialError>> {
         return remoteDataSource.renameFolder(folderId, newName)
     }
 

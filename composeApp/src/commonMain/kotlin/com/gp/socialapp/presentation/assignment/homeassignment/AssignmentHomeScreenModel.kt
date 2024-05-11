@@ -25,7 +25,7 @@ class AssignmentHomeScreenModel(
             when (val user = authenticationRepo.getSignedInUser()) {
                 is Result.Error -> println(user.message)
                 Result.Loading -> {}
-                is Result.SuccessWithData -> {
+                is Result.Success -> {
                     _uiState.update { it.copy(currentUser = user.data) }
                     getAssignments(user.data.id, communityId)
                 }
@@ -45,7 +45,7 @@ class AssignmentHomeScreenModel(
                         }
                     }
 
-                    is Result.SuccessWithData -> {
+                    is Result.Success -> {
                         _uiState.update { state ->
                             val data =
                                 if (communityId.isEmpty()) result.data else result.data.filter { communityId == it.communityId }
@@ -55,7 +55,7 @@ class AssignmentHomeScreenModel(
 
                     is Result.Error -> {
                         _uiState.update {
-                            it.copy(isLoading = false, error = result.message)
+                            it.copy(isLoading = false, error = result.message.userMessage)
                         }
                     }
 

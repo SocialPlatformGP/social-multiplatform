@@ -17,7 +17,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.getString
 import socialmultiplatform.composeapp.generated.resources.Res
-import socialmultiplatform.composeapp.generated.resources.email_already_exists
 import socialmultiplatform.composeapp.generated.resources.invalid_email
 import socialmultiplatform.composeapp.generated.resources.invalid_password
 import socialmultiplatform.composeapp.generated.resources.passwords_dont_match
@@ -62,7 +61,7 @@ class SignUpScreenModel(
             with(uiState.value) {
                 authRepo.signUpWithEmail(email, password).collect {
                     when (it) {
-                        is Result.SuccessWithData -> {
+                        is Result.Success -> {
                             _uiState.value = _uiState.value.copy(
                                 error = NoError,
                                 signedUpUser = it.data
@@ -72,7 +71,7 @@ class SignUpScreenModel(
                         is Result.Error -> {
                             Napier.d("onSignUp: Error ${it.message}")
                             _uiState.value = _uiState.value.copy(
-                                error = AuthError.ServerError(it.message),
+                                error = AuthError.ServerError(it.message.userMessage),
                             )
                         }
 

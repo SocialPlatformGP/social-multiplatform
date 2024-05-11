@@ -1,23 +1,24 @@
 package com.gp.socialapp.data.material.source.remote
 
 import com.gp.socialapp.data.material.model.responses.MaterialResponse
-import com.gp.socialapp.util.DataError
-import com.gp.socialapp.util.Results
+import com.gp.socialapp.util.ChatError
+import com.gp.socialapp.util.MaterialError
+import com.gp.socialapp.util.Result
 import kotlinx.coroutines.flow.Flow
 
 interface MaterialRemoteDataSource {
     suspend fun downloadChatAttachment(
         path: String,
-    ): Results<MaterialResponse.DownloadChatAttachment, DataError.Network>
+    ): Result<MaterialResponse.DownloadChatAttachment, ChatError>
     suspend fun getMaterialAtPath(
         path: String
-    ): Flow<Results<MaterialResponse.GetMaterialResponses, DataError.Network>>
+    ): Flow<Result<MaterialResponse.GetMaterialResponses, MaterialError>>
 
     suspend fun createFolder(
         name: String,
         path: String,
         communityId: String,
-    ): Flow<Results<MaterialResponse.GetMaterialResponses, DataError.Network>>
+    ): Flow<Result<MaterialResponse.GetMaterialResponses, MaterialError>>
 
     suspend fun createFile(
         name: String,
@@ -25,19 +26,19 @@ interface MaterialRemoteDataSource {
         path: String,
         content: ByteArray,
         communityId: String
-    ): Flow<Results<MaterialResponse.GetMaterialResponses, DataError.Network>>
+    ): Flow<Result<MaterialResponse.GetMaterialResponses, MaterialError>>
 
     suspend fun deleteFile(
         fileId: String,
         path: String
-    ): Flow<Results<MaterialResponse.GetMaterialResponses, DataError.Network>>
+    ): Flow<Result<MaterialResponse.GetMaterialResponses, MaterialError>>
 
-    suspend fun deleteFolder(folderId: String): Flow<Results<MaterialResponse.GetMaterialResponses, DataError.Network>>
-    suspend fun downloadFile(url: String): Results<MaterialResponse.DownloadFileResponse, DataError.Network>
+    suspend fun deleteFolder(folderId: String): Flow<Result<MaterialResponse.GetMaterialResponses, MaterialError>>
+    suspend fun downloadFile(url: String): Result<MaterialResponse.DownloadFileResponse, MaterialError>
     fun renameFolder(
         folderId: String,
         newName: String
-    ): Flow<Results<MaterialResponse.GetMaterialResponses, DataError.Network>>
+    ): Flow<Result<MaterialResponse.GetMaterialResponses, MaterialError>>
 
 }
 

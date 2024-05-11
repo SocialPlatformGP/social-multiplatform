@@ -3,13 +3,14 @@ package com.gp.socialapp.data.grades.repository
 import com.gp.socialapp.data.calendar.source.remote.CalendarRemoteDataSource
 import com.gp.socialapp.data.grades.model.Grades
 import com.gp.socialapp.data.grades.source.remote.GradesRemoteDataSource
+import com.gp.socialapp.util.GradesError
 import com.gp.socialapp.util.Result
 import kotlinx.coroutines.flow.Flow
 
 class GradesRepositoryImpl (
     private val gradesRemoteDataSource: GradesRemoteDataSource
 ): GradesRepository {
-    override fun getGrades(userName: String): Flow<Result<List<Grades>>> {
+    override fun getGrades(userName: String): Flow<Result<List<Grades>,GradesError>> {
         return gradesRemoteDataSource.getGrades(userName)
     }
 

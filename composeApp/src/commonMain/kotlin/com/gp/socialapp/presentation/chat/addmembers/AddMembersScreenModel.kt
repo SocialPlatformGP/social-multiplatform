@@ -44,7 +44,7 @@ class AddMembersScreenModel(
                         //TODO handle loading
                     }
 
-                    is Result.SuccessWithData -> {
+                    is Result.Success -> {
                         val allUsers = result.data.filter {
                             it.id != currentUserId && !groupMembersIds.contains(it.id)
                         }
@@ -64,7 +64,7 @@ class AddMembersScreenModel(
         screenModelScope.launch(DispatcherIO) {
             authRepo.getSignedInUser().let { result ->
                 when (result) {
-                    is Result.SuccessWithData -> {
+                    is Result.Success -> {
                         currentUserId = result.data.id
                     }
 

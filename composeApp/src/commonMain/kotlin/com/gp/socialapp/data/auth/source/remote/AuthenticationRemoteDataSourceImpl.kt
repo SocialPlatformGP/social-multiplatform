@@ -4,14 +4,17 @@ import com.gp.socialapp.data.auth.source.remote.model.PrivacyOptions
 import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.data.auth.source.remote.model.UserSettings
 import com.gp.socialapp.data.post.util.endPoint
+import com.gp.socialapp.util.AuthError
 import com.gp.socialapp.util.Result
-import io.github.aakira.napier.Napier
+import com.gp.socialapp.util.Result.Companion.failure
+import com.gp.socialapp.util.Result.Companion.success
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.gotrue.SessionStatus
 import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.gotrue.providers.OAuthProvider
 import io.github.jan.supabase.gotrue.providers.builtin.Email
 import io.ktor.client.HttpClient
+import io.ktor.client.call.body
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.HttpStatusCode
@@ -30,60 +33,65 @@ class AuthenticationRemoteDataSourceImpl(
 ) : AuthenticationRemoteDataSource {
 
     private val sessionStatusFlow = supabaseClient.auth.sessionStatus
-    override fun signInWithOAuth(provider: OAuthProvider): Flow<Result<User>> = flow {
-        emit(Result.Loading)
-        try {
-            supabaseClient.auth.signInWith(provider) {
-                scopes.addAll(listOf("email", "profile"))
-            }
-            sessionStatusFlow.collect { session ->
-                when (session) {
-                    is SessionStatus.Authenticated -> {
-                        getSignedInUser().let { result ->
-                            emit(result)
+    override fun signInWithOAuth(provider: OAuthProvider): Flow<Result<User, AuthError>> =
+        flow {
+            emit(Result.Loading)
+            try {
+                supabaseClient.auth.signInWith(provider) {
+                    scopes.addAll(listOf("email", "profile"))
+                }
+                sessionStatusFlow.collect { session ->
+                    when (session) {
+                        is SessionStatus.Authenticated -> {
+                            getSignedInUser().let { result ->
+                                when (result) {
+                                    is Result.Success -> emit(success(result.data))
+                                    is Result.Error -> emit(Result.Error(AuthError.SERVER_ERROR))
+                                    else -> Unit
+                                }
+                            }
+                        }
+
+                        SessionStatus.LoadingFromStorage -> {
+                            emit(Result.Loading)
+                        }
+
+                        SessionStatus.NetworkError -> {
+                            emit(Result.Error(AuthError.SERVER_ERROR))
+                        }
+
+                        is SessionStatus.NotAuthenticated -> {
+                            emit(Result.Error(AuthError.SERVER_ERROR))
                         }
                     }
-
-                    SessionStatus.LoadingFromStorage -> {
-                        Napier.e("Loading from storage")
-                        emit(Result.Loading)
-                    }
-
-                    SessionStatus.NetworkError -> {
-                        Napier.e("Network Error")
-                        emit(Result.Error("Network Error"))
-                    }
-
-                    is SessionStatus.NotAuthenticated -> {
-
-                        emit(Result.Error("Not Authenticated"))
-                    }
                 }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                emit(Result.Error(AuthError.SERVER_ERROR))
             }
-        } catch (e: Exception) {
-            emit(Result.Error(e.message ?: "Null"))
         }
-    }
 
-    private suspend fun deleteRemoteUser(userId: String): Result<Nothing> {
+    private suspend fun deleteRemoteUser(userId: String): Result<Unit, AuthError> {
         return try {
             val response = httpClient.post {
                 endPoint("deleteUser")
                 setBody(userId)
             }
-            if(response.status == HttpStatusCode.OK){
-                Result.Success
+            if (response.status == HttpStatusCode.OK) {
+                success(Unit)
             } else {
-                Result.Error("An unknown error occurred")
+                val error = response.body<AuthError>()
+                error(error)
             }
-        } catch(e: Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
-            Result.Error(e.message ?: "An unknown error occurred")
+            error(AuthError.SERVER_ERROR)
         }
     }
+
     override fun signInWithEmail(
         email: String, password: String
-    ): Flow<Result<User>> = flow {
+    ): Flow<Result<User, AuthError>> = flow {
         emit(Result.Loading)
         try {
             supabaseClient.auth.signInWith(Email) {
@@ -94,7 +102,11 @@ class AuthenticationRemoteDataSourceImpl(
                 when (it) {
                     is SessionStatus.Authenticated -> {
                         getSignedInUser().let {
-                            emit(it)
+                            when (it) {
+                                is Result.Success -> emit(success(it.data))
+                                is Result.Error -> emit(Result.Error(AuthError.SERVER_ERROR))
+                                else -> Unit
+                            }
                         }
                     }
 
@@ -102,13 +114,14 @@ class AuthenticationRemoteDataSourceImpl(
                 }
             }
         } catch (e: Exception) {
-            emit(Result.Error(e.message ?: "Null"))
+            e.printStackTrace()
+            emit(Result.Error(AuthError.SERVER_ERROR))
         }
     }
 
     override fun signUpWithEmail(
         email: String, password: String
-    ): Flow<Result<User>> = flow {
+    ): Flow<Result<User, AuthError>> = flow {
         emit(Result.Loading)
         try {
             supabaseClient.auth.signUpWith(Email) {
@@ -119,7 +132,11 @@ class AuthenticationRemoteDataSourceImpl(
                 when (it) {
                     is SessionStatus.Authenticated -> {
                         getSignedInUser().let {
-                            emit(it)
+                            when (it) {
+                                is Result.Success -> emit(success(it.data))
+                                is Result.Error -> emit(Result.Error(AuthError.SERVER_ERROR))
+                                else -> Unit
+                            }
                         }
                     }
 
@@ -127,14 +144,13 @@ class AuthenticationRemoteDataSourceImpl(
                 }
             }
         } catch (e: Exception) {
-            emit(Result.Error(e.message ?: "Null"))
+            emit(Result.Error(AuthError.SERVER_ERROR))
         }
     }
 
-    override suspend fun getSignedInUser(): Result<User> {
+    override suspend fun getSignedInUser(): Result<User, AuthError> {
         val userInfo = supabaseClient.auth.sessionManager.loadSession()?.user
         return if (userInfo != null) {
-            println("User Info: ${userInfo.userMetadata}")
             val isUserDataComplete =
                 userInfo.userMetadata?.get("isUserDataComplete")?.jsonPrimitive?.booleanOrNull
                     ?: false
@@ -177,16 +193,15 @@ class AuthenticationRemoteDataSourceImpl(
                     id = id, email = email, isDataComplete = false
                 )
             }
-            Result.SuccessWithData(user)
+            success(user)
         } else {
-            Result.Error("User not found")
+            Result.Error(AuthError.SERVER_ERROR)
         }
     }
 
-    override suspend fun getUserSettings(): Result<UserSettings> {
+    override suspend fun getUserSettings(): Result<UserSettings, AuthError> {
         val userInfo = supabaseClient.auth.sessionManager.loadSession()?.user
         return if (userInfo != null) {
-            println("User Info: ${userInfo.userMetadata}")
             val isUserDataComplete =
                 userInfo.userMetadata?.get("isUserDataComplete")?.jsonPrimitive?.booleanOrNull
                     ?: false
@@ -226,94 +241,118 @@ class AuthenticationRemoteDataSourceImpl(
             } else {
                 UserSettings()
             }
-            Result.SuccessWithData(user)
+            success(user)
         } else {
-            Result.Error("User not found")
+            error(Result.Error(AuthError.SERVER_ERROR))
         }
     }
 
-    override suspend fun changePassword(oldPassword: String, newPassword: String): Result<Nothing> {
+    override suspend fun changePassword(
+        oldPassword: String,
+        newPassword: String
+    ): Result<Unit, AuthError> {
         return try {
+            if (newPassword.isEmpty()) {
+                Result.Error(AuthError.SERVER_ERROR)
+            }
 //            val user = supabaseClient.auth.retrieveUserForCurrentSession(updateSession = true)
 //            TODO("Check if old password is correct")
             supabaseClient.auth.updateUser {
                 password = newPassword
             }
-            Result.Success
+            success(Unit)
         } catch (e: Exception) {
             e.printStackTrace()
-            Result.Error(e.message ?: "Null")
+            Result.Error(AuthError.SERVER_ERROR)
         }
     }
 
-    override suspend fun changeEmail(email: String): Result<Nothing> {
+    override suspend fun changeEmail(email: String): Result<Unit, AuthError> {
         return try {
+            if (email.isEmpty()) {
+                Result.Error(AuthError.SERVER_ERROR)
+            }
             supabaseClient.auth.updateUser {
                 this.email = email
             }
-            Result.Success
+            success(Unit)
         } catch (e: Exception) {
             e.printStackTrace()
-            Result.Error(e.message ?: "Null")
+            Result.Error(AuthError.SERVER_ERROR)
         }
     }
 
     override suspend fun updateStringRemoteUserSetting(
         tag: String,
         value: String
-    ): Result<Nothing> {
+    ): Result<Unit, AuthError> {
         return try {
+            if (value.isEmpty()) {
+                Result.Error(AuthError.SERVER_ERROR)
+            }
+            if (tag.isEmpty()) {
+                Result.Error(AuthError.SERVER_ERROR)
+            }
             supabaseClient.auth.updateUser {
-                data{
+                data {
                     put(tag, value)
                 }
             }
-            Result.Success
+            success(Unit)
         } catch (e: Exception) {
             e.printStackTrace()
-            Result.Error(e.message ?: "Null")
+            failure(AuthError.SERVER_ERROR)
         }
     }
 
     override suspend fun updateBooleanRemoteUserSetting(
         tag: String,
         value: Boolean
-    ): Result<Nothing> {
+    ): Result<Unit, AuthError> {
         return try {
+            if (tag.isEmpty()) {
+                Result.Error(AuthError.SERVER_ERROR)
+            }
+            if (value) {
+                Result.Error(AuthError.SERVER_ERROR)
+            }
             supabaseClient.auth.updateUser {
-                data{
+                data {
                     put(tag, value)
                 }
             }
-            Result.Success
+            success(Unit)
         } catch (e: Exception) {
             e.printStackTrace()
-            Result.Error(e.message ?: "Null")
+            Result.Error(AuthError.SERVER_ERROR)
         }
     }
 
-    override suspend fun logout(): Result<Nothing> {
+    override suspend fun logout(): Result<Unit, AuthError> {
         return try {
             supabaseClient.auth.signOut()
-            Result.Success
+            success(Unit)
         } catch (e: Exception) {
             e.printStackTrace()
-            Result.Error(e.message ?: "Null")
+            Result.Error(AuthError.SERVER_ERROR)
         }
     }
 
-    override suspend fun deleteAccount(userId: String): Result<Nothing> {
+    override suspend fun deleteAccount(userId: String): Result<Unit, AuthError> {
         return try {
+            if (userId.isEmpty()) {
+                Result.Error(AuthError.SERVER_ERROR)
+            }
             supabaseClient.auth.admin.deleteUser(userId)
             deleteRemoteUser(userId)
         } catch (e: Exception) {
             e.printStackTrace()
-            Result.Error(e.message ?: "Null")
+            Result.Error(AuthError.SERVER_ERROR)
         }
     }
 
 
-    override fun sendPasswordResetEmail(email: String): Flow<Result<Nothing>> {
+    override fun sendPasswordResetEmail(email: String): Flow<Result<Unit, AuthError>> {
         TODO("Not yet implemented")
     }
 }

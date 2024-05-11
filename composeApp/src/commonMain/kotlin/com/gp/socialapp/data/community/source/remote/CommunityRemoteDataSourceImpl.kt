@@ -4,8 +4,9 @@ import com.gp.socialapp.data.community.model.CommunityMemberRequest
 import com.gp.socialapp.data.community.source.remote.model.Community
 import com.gp.socialapp.data.community.source.remote.model.request.CommunityRequest
 import com.gp.socialapp.data.post.util.endPoint
-import com.gp.socialapp.util.DataError
-import com.gp.socialapp.util.Results
+import com.gp.socialapp.util.CommunityError
+import com.gp.socialapp.util.Result
+import com.gp.socialapp.util.Result.Companion.success
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.post
@@ -17,7 +18,7 @@ import kotlinx.coroutines.flow.flow
 class CommunityRemoteDataSourceImpl(
     private val httpClient: HttpClient
 ) : CommunityRemoteDataSource {
-    override suspend fun createCommunity(request: CommunityRequest.CreateCommunity): Results<Community, DataError.Network> {
+    override suspend fun createCommunity(request: CommunityRequest.CreateCommunity): Result<Community, CommunityError> {
         return try {
             val response = httpClient.post {
                 endPoint("createCommunity")
@@ -25,51 +26,54 @@ class CommunityRemoteDataSourceImpl(
             }
             if (response.status == HttpStatusCode.OK) {
                 val community = response.body<Community>()
-                Results.success(community)
+                success(community)
             } else {
-                Results.failure(DataError.Network.SERVER_ERROR)
+                val serverError = response.body<CommunityError>()
+                error(serverError)
             }
         } catch (e: Exception) {
-            Results.failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN)
+            error(CommunityError.SERVER_ERROR)
         }
     }
 
-    override suspend fun acceptCommunityRequest(request: CommunityRequest.AcceptCommunityRequest): Results<Unit, DataError.Network> {
+    override suspend fun acceptCommunityRequest(request: CommunityRequest.AcceptCommunityRequest): Result<Unit, CommunityError> {
         return try {
             val response = httpClient.post {
                 endPoint("acceptCommunityRequest")
                 setBody(request)
             }
             if (response.status == HttpStatusCode.OK) {
-                Results.success(Unit)
+                success(Unit)
             } else {
-                Results.failure(DataError.Network.SERVER_ERROR)
+                val serverError = response.body<CommunityError>()
+                error(serverError)
             }
         } catch (e: Exception) {
-            Results.failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN)
+            error(CommunityError.SERVER_ERROR)
         }
     }
 
-    override suspend fun declineCommunityRequest(request: CommunityRequest.DeclineCommunityRequest): Results<Unit, DataError.Network> {
+    override suspend fun declineCommunityRequest(request: CommunityRequest.DeclineCommunityRequest): Result<Unit, CommunityError> {
         return try {
             val response = httpClient.post {
                 endPoint("declineCommunityRequest")
                 setBody(request)
             }
             if (response.status == HttpStatusCode.OK) {
-                Results.success(Unit)
+                success(Unit)
             } else {
-                Results.failure(DataError.Network.SERVER_ERROR)
+                val serverError = response.body<CommunityError>()
+                error(serverError)
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            Results.failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN)
+            error(CommunityError.SERVER_ERROR)
         }
     }
 
-    override fun fetchCommunity(request: CommunityRequest.FetchCommunity): Flow<Results<Community, DataError.Network>> =
+    override fun fetchCommunity(request: CommunityRequest.FetchCommunity): Flow<Result<Community, CommunityError>> =
         flow {
-            emit(Results.Loading)
+            emit(Result.Loading)
             try {
                 val response = httpClient.post {
                     endPoint("fetchCommunity")
@@ -77,19 +81,20 @@ class CommunityRemoteDataSourceImpl(
                 }
                 if (response.status == HttpStatusCode.OK) {
                     val community = response.body<Community>()
-                    emit(Results.success(community))
+                    emit(success(community))
                 } else {
-                    emit(Results.failure(DataError.Network.SERVER_ERROR))
+                    val serverError = response.body<CommunityError>()
+                    emit(Result.Error(serverError))
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                emit(Results.failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN))
+                emit(Result.Error(CommunityError.SERVER_ERROR))
             }
         }
 
-    override fun fetchCommunityMembersRequests(request: CommunityRequest.FetchCommunityMembersRequests): Flow<Results<List<CommunityMemberRequest>, DataError.Network>> =
+    override fun fetchCommunityMembersRequests(request: CommunityRequest.FetchCommunityMembersRequests): Flow<Result<List<CommunityMemberRequest>, CommunityError>> =
         flow {
-            emit(Results.Loading)
+            emit(Result.Loading)
             try {
                 val response = httpClient.post {
                     endPoint("fetchCommunityMembersRequests")
@@ -97,17 +102,18 @@ class CommunityRemoteDataSourceImpl(
                 }
                 if (response.status == HttpStatusCode.OK) {
                     val community = response.body<List<CommunityMemberRequest>>()
-                    emit(Results.success(community))
+                    emit(success(community))
                 } else {
-                    emit(Results.failure(DataError.Network.SERVER_ERROR))
+                    val serverError = response.body<CommunityError>()
+                    emit(Result.Error(serverError))
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                emit(Results.failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN))
+                emit(Result.Error(CommunityError.SERVER_ERROR))
             }
         }
 
-    override suspend fun deleteCommunity(request: CommunityRequest.DeleteCommunity): Results<Unit, DataError.Network> {
+    override suspend fun deleteCommunity(request: CommunityRequest.DeleteCommunity): Result<Unit, CommunityError> {
         return try {
             println("deleteCommunity request: $request")
             val response = httpClient.post {
@@ -116,17 +122,18 @@ class CommunityRemoteDataSourceImpl(
             }
             println("deleteCommunity response: $response")
             if (response.status == HttpStatusCode.OK) {
-                Results.success(Unit)
+                success(Unit)
             } else {
-                Results.failure(DataError.Network.SERVER_ERROR)
+                val serverError = response.body<CommunityError>()
+                error(serverError)
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            Results.failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN)
+            error(CommunityError.SERVER_ERROR)
         }
     }
 
-    override suspend fun editCommunity(request: CommunityRequest.EditCommunity): Results<Unit, DataError.Network> {
+    override suspend fun editCommunity(request: CommunityRequest.EditCommunity): Result<Unit, CommunityError> {
         return try {
             println("editCommunity request: $request")
             val response = httpClient.post {
@@ -135,15 +142,14 @@ class CommunityRemoteDataSourceImpl(
             }
             println("editCommunity response: $response")
             if (response.status == HttpStatusCode.OK) {
-                Results.success(Unit)
+                success(Unit)
             } else {
-                val error = response.body<DataError.Network>()
-                println("editCommunity error: $error")
-                Results.failure(error)
+                val serverError = response.body<CommunityError>()
+                error(serverError)
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            Results.failure(DataError.Network.NO_INTERNET_OR_SERVER_DOWN)
+            error(CommunityError.SERVER_ERROR)
         }
     }
 }

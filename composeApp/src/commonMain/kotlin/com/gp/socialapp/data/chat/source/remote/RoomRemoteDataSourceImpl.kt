@@ -5,6 +5,7 @@ import com.gp.socialapp.data.chat.model.Room
 import com.gp.socialapp.data.chat.model.UserRooms
 import com.gp.socialapp.data.chat.source.remote.model.RemoteRecentRoom
 import com.gp.socialapp.data.chat.source.remote.model.RemoteRoom
+import com.gp.socialapp.util.ChatError
 import com.gp.socialapp.util.LocalDateTimeUtil.now
 import com.gp.socialapp.util.Result
 import io.github.jan.supabase.SupabaseClient
@@ -27,13 +28,13 @@ class RoomRemoteDataSourceImpl(
         groupAvatarExtension: String,
         userIds: List<String>,
         creatorId: String
-    ): Result<Room> {
+    ): Result<Room,ChatError> {
         return try {
             if (groupAvatarByteArray.isNotEmpty()) {
                 uploadGroupAvatar(
                     groupAvatarByteArray, groupName, groupAvatarExtension
                 ).let { result ->
-                    if (result is Result.SuccessWithData) {
+                    if (result is Result.Success) {
                         val members = mutableMapOf(
                             creatorId to true, *userIds.map { it to false }.toTypedArray()
                         )
@@ -49,9 +50,9 @@ class RoomRemoteDataSourceImpl(
                         }.decodeSingle<RemoteRoom>().toRoom()
                         createRecentRoom(roomResult.id, roomResult.name, roomResult.picUrl)
                         updateUsersRooms(userIds.plus(creatorId), creatorId, roomResult.id)
-                        Result.SuccessWithData(roomResult)
+                        Result.Success(roomResult)
                     } else {
-                        Result.Error("Error uploading image: ${(result as Result.Error).message}")
+                        Result.Error(ChatError.SERVER_ERROR)
                     }
                 }
             } else {
@@ -68,14 +69,14 @@ class RoomRemoteDataSourceImpl(
                 }.decodeSingle<RemoteRoom>().toRoom()
                 createRecentRoom(roomResult.id, roomResult.name, roomResult.picUrl)
                 updateUsersRooms(userIds.plus(creatorId), creatorId, roomResult.id)
-                Result.SuccessWithData(roomResult)
+                Result.Success(roomResult)
             }
         } catch (e: Exception) {
-            Result.Error("Error creating group room: ${e.message}")
+            Result.Error(ChatError.SERVER_ERROR)
         }
     }
 
-    override suspend fun addGroupMembers(roomId: Long, userIds: List<String>): Result<Unit> {
+    override suspend fun addGroupMembers(roomId: Long, userIds: List<String>): Result<Unit,ChatError> {
         return try {
             val room = supabase.from(ROOMS).select {
                 filter {
@@ -90,27 +91,27 @@ class RoomRemoteDataSourceImpl(
                 }
             }
             updateUsersRooms(userIds, creatorId = "", roomId)
-            Result.Success
+            Result.Success(Unit)
         } catch (e: Exception) {
             e.printStackTrace()
-            Result.Error("Error adding group members: ${e.message}")
+            Result.Error(ChatError.SERVER_ERROR)
         }
     }
 
-    override suspend fun getRoom(roomId: Long): Result<Room> {
+    override suspend fun getRoom(roomId: Long): Result<Room,ChatError> {
         return try {
             val room = supabase.from(ROOMS).select {
                 filter {
                     eq("id", roomId)
                 }
             }.decodeSingle<RemoteRoom>().toRoom()
-            Result.SuccessWithData(room)
+            Result.Success(room)
         } catch (e: Exception) {
-            Result.Error("Error getting room: ${e.message}")
+            Result.Error(ChatError.SERVER_ERROR)
         }
     }
 
-    override suspend fun getPrivateRoom(currentUser: User, otherUser: User): Result<Room> {
+    override suspend fun getPrivateRoom(currentUser: User, otherUser: User): Result<Room,ChatError> {
         return try {
             val userPrivateChats = supabase.from(USERROOMS).select {
                 filter {
@@ -123,7 +124,7 @@ class RoomRemoteDataSourceImpl(
                         eq("id", userPrivateChats.getValue(otherUser.id))
                     }
                 }.decodeSingle<RemoteRoom>().toRoom()
-                Result.SuccessWithData(room)
+                Result.Success(room)
             } else {
                 val timestamp = nowLocal().format("yyyy-MM-dd'T'HH:mm:ss.SSSSSSX")
                 val remoteRoom = RemoteRoom(
@@ -153,15 +154,15 @@ class RoomRemoteDataSourceImpl(
                 )
                 updateUsersPrivateChats(currentUser.id, otherUser.id, createdRoom.id)
                 updateUsersPrivateChats(otherUser.id, currentUser.id, createdRoom.id)
-                Result.SuccessWithData(createdRoom.toRoom())
+                Result.Success(createdRoom.toRoom())
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            Result.Error("Error getting private room: ${e.message}")
+            Result.Error(ChatError.SERVER_ERROR)
         }
     }
 
-    override suspend fun removeMember(roomId: Long, userId: String): Result<Unit> {
+    override suspend fun removeMember(roomId: Long, userId: String): Result<Unit,ChatError> {
         return try {
             val room = supabase.from(ROOMS).select {
                 filter {
@@ -187,21 +188,21 @@ class RoomRemoteDataSourceImpl(
                     eq("userId", userId)
                 }
             }
-            Result.Success
+            Result.Success(Unit)
         } catch (e: Exception) {
             e.printStackTrace()
-            Result.Error("Error removing member: ${e.message}")
+            Result.Error(ChatError.SERVER_ERROR)
         }
     }
 
     override suspend fun updateRoomAvatar(
         roomId: Long, newAvatarByteArray: ByteArray, newAvatarExtension: String
-    ): Result<String> {
+    ): Result<String,ChatError> {
         return try {
             uploadGroupAvatar(
                 newAvatarByteArray, roomId.toString(), newAvatarExtension
             ).let { result ->
-                if (result is Result.SuccessWithData) {
+                if (result is Result.Success) {
                     supabase.from(ROOMS).update({
                         set("picUrl", result.data)
                     }) {
@@ -216,17 +217,17 @@ class RoomRemoteDataSourceImpl(
                             eq("roomId", roomId)
                         }
                     }
-                    Result.SuccessWithData(result.data)
+                    Result.Success(result.data)
                 } else {
-                    Result.Error("Error updating room avatar: ${(result as Result.Error).message}")
+                    Result.Error(ChatError.SERVER_ERROR)
                 }
             }
         } catch (e: Exception) {
-            Result.Error("Error updating room avatar: ${e.message}")
+            Result.Error(ChatError.SERVER_ERROR)
         }
     }
 
-    override suspend fun updateRoomName(roomId: Long, newName: String): Result<Unit> {
+    override suspend fun updateRoomName(roomId: Long, newName: String): Result<Unit,ChatError> {
         return try {
             supabase.from(ROOMS).update({
                 set("name", newName)
@@ -242,9 +243,9 @@ class RoomRemoteDataSourceImpl(
                     eq("roomId", roomId)
                 }
             }
-            Result.Success
+            Result.Success (Unit)
         } catch (e: Exception) {
-            Result.Error("Error updating room name: ${e.message}")
+            Result.Error(ChatError.SERVER_ERROR)
         }
     }
 
@@ -311,7 +312,7 @@ class RoomRemoteDataSourceImpl(
 
     private suspend fun uploadGroupAvatar(
         avatarByteArray: ByteArray, groupName: String, imageExtension: String
-    ): Result<String> {
+    ): Result<String,ChatError> {
         return try {
             val now = LocalDateTime.now().toInstant(TimeZone.UTC)
             val path = "${groupName.first()}/$groupName-${now.epochSeconds}.${imageExtension}"
@@ -319,10 +320,10 @@ class RoomRemoteDataSourceImpl(
             val key = bucket.upload(path, avatarByteArray, upsert = true)
             println("Key: $key")
             val url = supabase.storage.from("avatars").publicUrl(path)
-            Result.SuccessWithData(url)
+            Result.Success(url)
         } catch (e: Exception) {
             e.printStackTrace()
-            Result.Error(e.message ?: "An unknown error occurred while uploading group avatar")
+            Result.Error(ChatError.SERVER_ERROR)
         }
     }
 }

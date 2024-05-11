@@ -14,7 +14,6 @@ import com.gp.socialapp.presentation.post.feed.PostEvent
 import com.gp.socialapp.presentation.post.feed.ReplyEvent
 import com.gp.socialapp.util.DispatcherIO
 import com.gp.socialapp.util.Result
-import com.gp.socialapp.util.Results
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -32,7 +31,7 @@ class PostDetailsScreenModel(
         screenModelScope.launch(DispatcherIO) {
             authRepo.getSignedInUser().let { result ->
                 when (result) {
-                    is Result.SuccessWithData -> {
+                    is Result.Success -> {
                         _uiState.update { it.copy(post = post, currentUserId = result.data.id) }
                     }
 
@@ -52,7 +51,7 @@ class PostDetailsScreenModel(
         screenModelScope.launch(DispatcherIO) {
             replyRepo.getReplies(id).collect { result ->
                 when (result) {
-                    is Results.Success -> {
+                    is Result.Success -> {
                         val nestedReplies = result.data.toNestedReplies()
                         _uiState.update {
                             it.copy(
@@ -62,17 +61,17 @@ class PostDetailsScreenModel(
                         }
                     }
 
-                    is Results.Failure -> {
+                    is Result.Error -> {
                         _uiState.update {
                             it.copy(
                                 actionResult = PostDetailsActionResult.NetworkError(
-                                    result.error.userMessage
+                                    result.message.userMessage
                                 ), isLoading = false
                             )
                         }
                     }
 
-                    is Results.Loading -> {
+                    is Result.Loading -> {
                         _uiState.update { it.copy(isLoading = true) }
                     }
                 }
@@ -84,21 +83,21 @@ class PostDetailsScreenModel(
         screenModelScope.launch(DispatcherIO) {
             val result = replyRepo.insertReply(reply)
             when (result) {
-                is Results.Success -> {
+                is Result.Success -> {
                     getRepliesById(reply.postId)
                 }
 
-                is Results.Failure -> {
+                is Result.Error -> {
                     _uiState.update {
                         it.copy(
                             actionResult = PostDetailsActionResult.NetworkError(
-                                result.error.userMessage
+                                result.message.userMessage
                             )
                         )
                     }
                 }
 
-                Results.Loading -> {
+                Result.Loading -> {
                     // TODO
                 }
             }
@@ -109,21 +108,21 @@ class PostDetailsScreenModel(
         screenModelScope.launch(DispatcherIO) {
             val result = replyRepo.reportReply(reply.id, _uiState.value.currentUserId)
             when (result) {
-                is Results.Success -> {
+                is Result.Success -> {
                     _uiState.update { it.copy(actionResult = PostDetailsActionResult.ReplyReported) }
                 }
 
-                is Results.Failure -> {
+                is Result.Error -> {
                     _uiState.update {
                         it.copy(
                             actionResult = PostDetailsActionResult.NetworkError(
-                                result.error.userMessage
+                                result.message.userMessage
                             )
                         )
                     }
                 }
 
-                Results.Loading -> {
+                Result.Loading -> {
                     // TODO
                 }
             }
@@ -140,21 +139,21 @@ class PostDetailsScreenModel(
         screenModelScope.launch(DispatcherIO) {
             val result = postRepo.upvotePost(post, _uiState.value.currentUserId)
             when (result) {
-                is Results.Failure -> {
+                is Result.Error -> {
                     _uiState.update {
                         it.copy(
                             actionResult = PostDetailsActionResult.NetworkError(
-                                result.error.userMessage
+                                result.message.userMessage
                             )
                         )
                     }
                 }
 
-                Results.Loading -> {
+                Result.Loading -> {
                     // TODO
                 }
 
-                is Results.Success -> {
+                is Result.Success -> {
                     updatePost()
                 }
             }
@@ -165,21 +164,21 @@ class PostDetailsScreenModel(
         screenModelScope.launch(DispatcherIO) {
             val result = postRepo.downvotePost(post, _uiState.value.currentUserId)
             when (result) {
-                is Results.Success -> {
+                is Result.Success -> {
                     updatePost()
                 }
 
-                is Results.Failure -> {
+                is Result.Error -> {
                     _uiState.update {
                         it.copy(
                             actionResult = PostDetailsActionResult.NetworkError(
-                                result.error.userMessage
+                                result.message.userMessage
                             )
                         )
                     }
                 }
 
-                Results.Loading -> {
+                Result.Loading -> {
                     // TODO
                 }
             }
@@ -190,21 +189,21 @@ class PostDetailsScreenModel(
         screenModelScope.launch(DispatcherIO) {
             val result = postRepo.deletePost(post)
             when (result) {
-                is Results.Success -> {
+                is Result.Success -> {
                     _uiState.update { it.copy(actionResult = PostDetailsActionResult.PostDeleted) }
                 }
 
-                is Results.Failure -> {
+                is Result.Error -> {
                     _uiState.update {
                         it.copy(
                             actionResult = PostDetailsActionResult.NetworkError(
-                                result.error.userMessage
+                                result.message.userMessage
                             )
                         )
                     }
                 }
 
-                Results.Loading -> {
+                Result.Loading -> {
                     // TODO
 
                 }
@@ -216,22 +215,22 @@ class PostDetailsScreenModel(
         screenModelScope.launch(DispatcherIO) {
             val result = postRepo.updatePost(post)
             when (result) {
-                is Results.Success -> {
+                is Result.Success -> {
                     updatePost()
                     _uiState.update { it.copy(actionResult = PostDetailsActionResult.PostUpdated) }
                 }
 
-                is Results.Failure -> {
+                is Result.Error -> {
                     _uiState.update {
                         it.copy(
                             actionResult = PostDetailsActionResult.NetworkError(
-                                result.error.userMessage
+                                result.message.userMessage
                             )
                         )
                     }
                 }
 
-                Results.Loading -> {
+                Result.Loading -> {
                     // TODO
                 }
             }
@@ -243,21 +242,21 @@ class PostDetailsScreenModel(
             val result =
                 replyRepo.upvoteReply(reply.id, currentUserId = _uiState.value.currentUserId)
             when (result) {
-                is Results.Success -> {
+                is Result.Success -> {
                     getRepliesById(reply.postId)
                 }
 
-                is Results.Failure -> {
+                is Result.Error -> {
                     _uiState.update {
                         it.copy(
                             actionResult = PostDetailsActionResult.NetworkError(
-                                result.error.userMessage
+                                result.message.userMessage
                             )
                         )
                     }
                 }
 
-                Results.Loading -> {
+                Result.Loading -> {
                     // TODO
                 }
             }
@@ -268,21 +267,21 @@ class PostDetailsScreenModel(
         screenModelScope.launch(DispatcherIO) {
             val result = replyRepo.downvoteReply(reply.id, _uiState.value.currentUserId)
             when (result) {
-                is Results.Success -> {
+                is Result.Success -> {
                     getRepliesById(reply.postId)
                 }
 
-                is Results.Failure -> {
+                is Result.Error -> {
                     _uiState.update {
                         it.copy(
                             actionResult = PostDetailsActionResult.NetworkError(
-                                result.error.userMessage
+                                result.message.userMessage
                             )
                         )
                     }
                 }
 
-                Results.Loading -> {
+                Result.Loading -> {
                     // TODO
                 }
             }
@@ -293,22 +292,22 @@ class PostDetailsScreenModel(
         screenModelScope.launch(DispatcherIO) {
             val result = replyRepo.deleteReply(reply.id)
             when (result) {
-                is Results.Success -> {
+                is Result.Success -> {
                     getRepliesById(reply.postId)
                     _uiState.update { it.copy(actionResult = PostDetailsActionResult.ReplyDeleted) }
                 }
 
-                is Results.Failure -> {
+                is Result.Error -> {
                     _uiState.update {
                         it.copy(
                             actionResult = PostDetailsActionResult.NetworkError(
-                                result.error.userMessage
+                                result.message.userMessage
                             )
                         )
                     }
                 }
 
-                Results.Loading -> {
+                Result.Loading -> {
                     // TODO
                 }
             }
@@ -320,22 +319,22 @@ class PostDetailsScreenModel(
         screenModelScope.launch(DispatcherIO) {
             replyRepo.updateReply(reply.id, reply.content).let { result ->
                 when (result) {
-                    is Results.Success -> {
+                    is Result.Success -> {
                         getRepliesById(reply.postId)
                         _uiState.update { it.copy(actionResult = PostDetailsActionResult.ReplyUpdated) }
                     }
 
-                    is Results.Failure -> {
+                    is Result.Error -> {
                         _uiState.update {
                             it.copy(
                                 actionResult = PostDetailsActionResult.NetworkError(
-                                    result.error.userMessage
+                                    result.message.userMessage
                                 )
                             )
                         }
                     }
 
-                    Results.Loading -> {
+                    Result.Loading -> {
                         // TODO
                     }
                 }

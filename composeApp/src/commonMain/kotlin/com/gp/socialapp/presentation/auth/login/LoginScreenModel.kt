@@ -40,7 +40,7 @@ class LoginScreenModel(
         screenModelScope.launch {
             userRepo.getTheme().let { result ->
                 when (result) {
-                    is Result.SuccessWithData -> {
+                    is Result.Success -> {
                         _uiState.update { it.copy(theme = result.data) }
                     }
 
@@ -59,7 +59,7 @@ class LoginScreenModel(
             authRepo.getSignedInUser().let { result ->
                 Napier.e("getSignedInUserAll: $result")
                 when (result) {
-                    is Result.SuccessWithData -> {
+                    is Result.Success -> {
                         _uiState.update {
                             it.copy(
                                 signedInUser = result.data,
@@ -103,7 +103,7 @@ class LoginScreenModel(
             with(_uiState.value) {
                 authRepo.signInWithEmail(email, password).collect { result ->
                     when (result) {
-                        is Result.SuccessWithData -> {
+                        is Result.Success -> {
                             _uiState.update {
                                 it.copy(
                                     userId = result.data.id,
@@ -115,7 +115,7 @@ class LoginScreenModel(
 
                         is Result.Error -> {
                             _uiState.update {
-                                it.copy(error = ServerError(result.message))
+                                it.copy(error = ServerError(result.message.userMessage))
                             }
                         }
 
@@ -148,7 +148,7 @@ class LoginScreenModel(
         screenModelScope.launch(DispatcherIO) {
             authRepo.signInWithOAuth(provider).collect { result ->
                 when (result) {
-                    is Result.SuccessWithData -> {
+                    is Result.Success -> {
                         Napier.e("signInWithOAutht: ${result.data}")
                         _uiState.update {
                             it.copy(
@@ -163,7 +163,7 @@ class LoginScreenModel(
                         Napier.e("signInWithOAutht: ${result.message}")
 
                         _uiState.update {
-                            it.copy(error = ServerError(result.message))
+                            it.copy(error = ServerError(result.message.userMessage))
                         }
                     }
 

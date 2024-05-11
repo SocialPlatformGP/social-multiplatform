@@ -21,8 +21,8 @@ internal fun App() =
     withDI(appModuleK) {
         AppTheme {
             Navigator(
-                GradesMainScreen
-//                LoginScreen
+//                GradesMainScreen
+                LoginScreen
             )
 //            Navigator(
 //                ChatRoomScreen(
