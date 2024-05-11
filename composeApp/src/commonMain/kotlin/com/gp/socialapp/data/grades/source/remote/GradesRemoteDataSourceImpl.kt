@@ -42,26 +42,52 @@ class GradesRemoteDataSourceImpl(
         type: String,
         content: ByteArray,
         subject: String,
-        communityId: String
-    ) {
+        communityId: String,
+        creatorId: String
+    ): Result<Unit, GradesError> {
         val request = GradesRequest.UploadGradesFile(
             name = name,
             type = type,
             content = content,
             subject = subject,
-            communityId = communityId)
-        try {
+            communityId = communityId,
+            creatorId = creatorId
+        )
+       return try {
             val response = httpClient.post{
                 endPoint("uploadGradesFile")
                 setBody(request)
             }
             if(response.status == HttpStatusCode.OK) {
-                println("Grades uploaded successfully")
+                Result.Success(Unit)
             } else {
-                println("Error uploading grades")
+                Result.Error(GradesError.SERVER_ERROR)
             }
         } catch (e: Exception) {
             e.printStackTrace()
+            Result.Error(GradesError.SERVER_ERROR)
+        }
+    }
+
+    override fun getCreatorGrades(creatorId: String): Flow<Result<List<Grades>,GradesError>> {
+        return flow {
+            emit(Result.Loading)
+            try {
+                val response = httpClient.post {
+                    endPoint("getCreatorGrades")
+                    setBody(creatorId)
+                }
+                if(response.status == HttpStatusCode.OK) {
+                    val data = response.body<List<Grades>>()
+                    emit(Result.Success(data))
+                } else {
+                    val error = response.body<GradesError>()
+                    emit(Result.Error(error))
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                emit(Result.Error(GradesError.SERVER_ERROR))
+            }
         }
     }
 }

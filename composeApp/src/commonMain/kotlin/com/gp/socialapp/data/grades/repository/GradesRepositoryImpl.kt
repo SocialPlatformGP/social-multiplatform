@@ -19,8 +19,13 @@ class GradesRepositoryImpl (
         type: String,
         content: ByteArray,
         subject: String,
-        communityId: String
-    ) {
-        gradesRemoteDataSource.uploadGradesFile(name, type, content, subject, communityId)
+        communityId: String,
+        creatorId: String
+    ): Result<Unit, GradesError> {
+       return gradesRemoteDataSource.uploadGradesFile(name, type, content, subject, communityId, creatorId)
+    }
+
+    override fun getCreatorGrades(creatorId: String): Flow<Result<List<Grades>,GradesError>>{
+        return gradesRemoteDataSource.getCreatorGrades(creatorId)
     }
 }

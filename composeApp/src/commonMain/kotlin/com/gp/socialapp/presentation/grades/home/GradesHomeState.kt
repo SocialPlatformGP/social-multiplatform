@@ -1,4 +1,4 @@
-package com.gp.socialapp.presentation.grades
+package com.gp.socialapp.presentation.grades.home
 
 import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.data.grades.model.Grades

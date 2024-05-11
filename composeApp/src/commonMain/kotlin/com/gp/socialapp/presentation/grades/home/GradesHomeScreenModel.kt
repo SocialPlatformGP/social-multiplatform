@@ -1,4 +1,4 @@
-package com.gp.socialapp.presentation.grades
+package com.gp.socialapp.presentation.grades.home
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
@@ -60,21 +60,5 @@ class GradesHomeScreenModel(
         }
     }
 
-    fun uploadGradesFile(
-        name : String,
-        type : String,
-        content : ByteArray,
-        subject : String,
-        communityId : String
-    ) {
-        screenModelScope.launch {
-            gradesRepository.uploadGradesFile(
-                name = name,
-                type = type,
-                content = content,
-                subject = subject,
-                communityId = communityId
-            )
-        }
-    }
+
 }

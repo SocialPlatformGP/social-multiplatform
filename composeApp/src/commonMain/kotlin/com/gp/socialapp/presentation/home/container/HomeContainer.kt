@@ -218,7 +218,6 @@ data class HomeContainer(
                             BottomTabNavigationItem(tab = CalendarTab(onNavigation))
                             BottomTabNavigationItem(tab = GradesTab)
                         }
-
                     },
                 )
             }

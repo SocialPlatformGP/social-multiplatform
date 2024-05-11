@@ -25,7 +25,7 @@ import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.data.community.source.remote.model.Community
 import com.gp.socialapp.navigation.tabs.AssignmentsTab
 import com.gp.socialapp.navigation.tabs.CommunityMembersTab
-import com.gp.socialapp.navigation.tabs.CreatorAssignmentTab
+import com.gp.socialapp.navigation.tabs.CreatorGradesTab
 import com.gp.socialapp.navigation.tabs.MaterialTab
 import com.gp.socialapp.navigation.tabs.PostsTab
 import com.gp.socialapp.navigation.util.BottomTabNavigationItem
@@ -39,34 +39,28 @@ import kotlinx.coroutines.launch
 
 
 data class CommunityHomeContainer(
-    val communityId: String,
-    val startingTab: CommunityHomeTab = CommunityHomeTab.POSTS
+    val communityId: String, val startingTab: CommunityHomeTab = CommunityHomeTab.POSTS
 ) : Screen {
 
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = rememberScreenModel<CommunityHomeContainerScreenModel>()
-        LifecycleEffect(
-            onStarted = {
-                screenModel.init(communityId)
-            },
-            onDisposed = {
-                screenModel.dispose()
-            }
-        )
+        LifecycleEffect(onStarted = {
+            screenModel.init(communityId)
+        }, onDisposed = {
+            screenModel.dispose()
+        })
         val state by screenModel.uiState.collectAsState()
         if (state.isLoggedOut) {
             navigator.replaceAll(LoginScreen)
         }
-        CommunityHomeContainerContent(
-            currentUser = state.currentUser,
+        CommunityHomeContainerContent(currentUser = state.currentUser,
             userCommunities = state.userCommunities,
             onNavigateToHome = { navigator.replaceAll(HomeContainer()) },
             onNavigateToSearch = { navigator.push(SearchScreen) },
             onNavigateToSettings = { navigator.push(MainSettingsScreen) },
-            onLogout = { screenModel.logout() }
-        )
+            onLogout = { screenModel.logout() })
 
     }
 
@@ -108,43 +102,49 @@ data class CommunityHomeContainer(
                     }
                 }, topBar = {
                     if (isBarsVisible) {
-                        MainTopBar(
-                            onSearchClicked = {
-                                when (tabNavigator.current) {
-                                    is PostsTab -> {
-                                        onNavigateToSearch()
-                                        onNavigation(false)
-                                    }
-
-                                    is MaterialTab -> {
-                                        /*TODO*/
-                                    }
-
-                                    is CommunityMembersTab -> {
-                                        /*TODO*/
-                                    }
+                        MainTopBar(onSearchClicked = {
+                            when (tabNavigator.current) {
+                                is PostsTab -> {
+                                    onNavigateToSearch()
+                                    onNavigation(false)
                                 }
-                            },
-                            onNotificationClicked = { /*TODO*/ },
-                            onNavDrawerIconClicked = {
-                                scope.launch {
-                                    drawerState.apply {
-                                        if (isClosed) open() else close()
-                                    }
+
+                                is MaterialTab -> {/*TODO*/
                                 }
-                            })
+
+                                is CommunityMembersTab -> {/*TODO*/
+                                }
+                            }
+                        }, onNotificationClicked = { /*TODO*/ }, onNavDrawerIconClicked = {
+                            scope.launch {
+                                drawerState.apply {
+                                    if (isClosed) open() else close()
+                                }
+                            }
+                        })
                     }
                 }, bottomBar = {
                     if (isBarsVisible) {
                         NavigationBar {
                             BottomTabNavigationItem(tab = PostsTab(communityId, onNavigation))
                             BottomTabNavigationItem(tab = MaterialTab(communityId))
-                            if (userCommunities.find { it.id == communityId }?.members?.get(currentUser.id) == true ) {
+                            if (userCommunities.find { it.id == communityId }?.members?.get(
+                                    currentUser.id
+                                ) == true
+                            ) {
                                 BottomTabNavigationItem(
                                     tab = AssignmentsTab(onNavigation, communityId)
                                 )
                             }
                             BottomTabNavigationItem(tab = CommunityMembersTab(communityId))
+                            if (userCommunities.find { it.id == communityId }?.members?.get(
+                                    currentUser.id
+                                ) == true
+                            ) {
+                                BottomTabNavigationItem(
+                                    tab = CreatorGradesTab(communityId)
+                                )
+                            }
                         }
                     }
                 })
