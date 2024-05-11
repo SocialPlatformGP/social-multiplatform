@@ -5,5 +5,5 @@ import com.gp.socialapp.util.Result
 
 data class PasswordResetUiState(
     var email: String = "",
-    var sentState: Result<Unit,AuthError.SendPasswordResetEmail> = Result.idle()
+    var sentState: Result<Unit,AuthError> = Result.idle()
 )

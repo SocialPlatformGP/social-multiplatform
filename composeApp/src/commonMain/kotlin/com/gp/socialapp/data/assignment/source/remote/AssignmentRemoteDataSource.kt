@@ -9,21 +9,21 @@ import com.gp.socialapp.util.Result
 import kotlinx.coroutines.flow.Flow
 
 interface AssignmentRemoteDataSource {
-    suspend fun createAssignment(request: AssignmentRequest.CreateRequest): Result<String, AssignmentError.CreateAssignment>
-    fun getAttachments(userId: String, assignmentId: String): Flow<Result<UserAssignmentSubmission, AssignmentError.GetAttachments>>
+    suspend fun createAssignment(request: AssignmentRequest.CreateRequest): Result<String, AssignmentError>
+    fun getAttachments(userId: String, assignmentId: String): Flow<Result<UserAssignmentSubmission, AssignmentError>>
     suspend fun submitAssignment(
         assignmentId: String,
         userId: String,
         attachments: List<AssignmentAttachment>
-    ): Result<Boolean, AssignmentError.SubmitAssignment>
+    ): Result<Boolean, AssignmentError>
 
-    fun getAssignments(userId: String): Flow<Result<List<Assignment>, AssignmentError.GetAssignments>>
-    suspend fun getAssignmentById(request: AssignmentRequest.GetAssignmentById): Result<Assignment, AssignmentError.GetAssignment>
-    fun getSubmissions(request: AssignmentRequest.GetAssignmentSubmissions): Flow<Result<List<UserAssignmentSubmission>, AssignmentError.GetSubmissions>>
+    fun getAssignments(userId: String): Flow<Result<List<Assignment>, AssignmentError>>
+    suspend fun getAssignmentById(request: AssignmentRequest.GetAssignmentById): Result<Assignment, AssignmentError>
+    fun getSubmissions(request: AssignmentRequest.GetAssignmentSubmissions): Flow<Result<List<UserAssignmentSubmission>, AssignmentError>>
     suspend fun submitAssignmentSubmissionReview(
         request: AssignmentRequest.SubmitReview
-    ): Result<Boolean, AssignmentError.SubmitReview>
+    ): Result<Boolean, AssignmentError>
 
-    suspend fun turnInAssignments(userAssignmentId: String): Result<Boolean, AssignmentError.TurnInAssignments>
-    suspend fun unSubmitAssignment(userAssignmentId: String): Result<Boolean, AssignmentError.UnSubmitAssignment>
+    suspend fun turnInAssignments(userAssignmentId: String): Result<Boolean, AssignmentError>
+    suspend fun unSubmitAssignment(userAssignmentId: String): Result<Boolean, AssignmentError>
 }

@@ -5,6 +5,7 @@ import com.gp.socialapp.data.assignment.model.AssignmentAttachment
 import com.gp.socialapp.data.assignment.model.UserAssignmentSubmission
 import com.gp.socialapp.data.assignment.source.remote.model.request.AssignmentRequest
 import com.gp.socialapp.data.post.util.endPoint
+import com.gp.socialapp.util.AssignmentError
 import com.gp.socialapp.util.AssignmentError.*
 import com.gp.socialapp.util.Result
 import com.gp.socialapp.util.Result.Companion.success
@@ -19,7 +20,7 @@ import kotlinx.coroutines.flow.flow
 class AssignmentRemoteDataSourceImpl(
     private val httpClient: HttpClient,
 ) : AssignmentRemoteDataSource {
-    override suspend fun createAssignment(request: AssignmentRequest.CreateRequest): Result<String, CreateAssignment> {
+    override suspend fun createAssignment(request: AssignmentRequest.CreateRequest): Result<String, AssignmentError> {
         return try {
             val response = httpClient.post {
                 endPoint("createAssignment")
@@ -29,19 +30,19 @@ class AssignmentRemoteDataSourceImpl(
                 val assignmentId = response.body<String>()
                 success(assignmentId)
             } else {
-                val error = response.body<CreateAssignment>()
+                val error = response.body<AssignmentError>()
                 Result.Error(error)
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            Result.Error(CreateAssignment.SERVER_ERROR)
+            Result.Error(SERVER_ERROR)
         }
     }
 
     override fun getAttachments(
         userId: String,
         assignmentId: String
-    ): Flow<Result<UserAssignmentSubmission,GetAttachments>> = flow {
+    ): Flow<Result<UserAssignmentSubmission,AssignmentError>> = flow {
         try {
             val request = AssignmentRequest.GetUserAttachmentsRequest(userId, assignmentId)
             val response = httpClient.post {
@@ -53,12 +54,12 @@ class AssignmentRemoteDataSourceImpl(
                 val assignmentAttachments = response.body<UserAssignmentSubmission>()
                 emit(Result.Success(assignmentAttachments))
             } else {
-                val error = response.body<GetAttachments>()
+                val error = response.body<AssignmentError>()
                 error(error)
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            error(GetAttachments.SERVER_ERROR)
+            error(SERVER_ERROR)
         }
     }
 
@@ -66,7 +67,7 @@ class AssignmentRemoteDataSourceImpl(
         assignmentId: String,
         userId: String,
         attachments: List<AssignmentAttachment>
-    ): Result<Boolean, SubmitAssignment> {
+    ): Result<Boolean, AssignmentError> {
         return try {
             val request = AssignmentRequest.SubmitRequest(assignmentId, userId, attachments)
             val response = httpClient.post {
@@ -76,17 +77,17 @@ class AssignmentRemoteDataSourceImpl(
             if (response.status == HttpStatusCode.OK) {
                 Result.Success(true)
             } else {
-                val error = response.body<SubmitAssignment>()
+                val error = response.body<AssignmentError>()
                 Result.Error(error)
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            Result.Error(SubmitAssignment.SERVER_ERROR)
+            Result.Error(SERVER_ERROR)
         }
     }
 
 
-    override fun getAssignments(userId: String): Flow<Result<List<Assignment>,GetAssignments>> = flow {
+    override fun getAssignments(userId: String): Flow<Result<List<Assignment>,AssignmentError>> = flow {
         try {
             val response = httpClient.post {
                 endPoint("getAssignments")
@@ -96,16 +97,16 @@ class AssignmentRemoteDataSourceImpl(
                 val assignments = response.body<List<Assignment>>()
                 emit(Result.Success(assignments))
             } else {
-                val error = response.body<GetAssignments>()
+                val error = response.body<AssignmentError>()
                 Result.Error(error)
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            Result.Error(GetAssignments.SERVER_ERROR)
+            Result.Error(SERVER_ERROR)
         }
     }
 
-    override suspend fun getAssignmentById(request: AssignmentRequest.GetAssignmentById): Result<Assignment,GetAssignment> {
+    override suspend fun getAssignmentById(request: AssignmentRequest.GetAssignmentById): Result<Assignment,AssignmentError> {
         return try {
             val response = httpClient.post {
                 endPoint("getAssignmentById")
@@ -115,16 +116,16 @@ class AssignmentRemoteDataSourceImpl(
                 val assignment = response.body<Assignment>()
                 Result.Success(assignment)
             } else {
-                val error = response.body<GetAssignment>()
+                val error = response.body<AssignmentError>()
                 Result.Error(error)
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            Result.Error(GetAssignment.SERVER_ERROR)
+            Result.Error(SERVER_ERROR)
         }
     }
 
-    override fun getSubmissions(request: AssignmentRequest.GetAssignmentSubmissions): Flow<Result<List<UserAssignmentSubmission>,GetSubmissions>> =
+    override fun getSubmissions(request: AssignmentRequest.GetAssignmentSubmissions): Flow<Result<List<UserAssignmentSubmission>,AssignmentError>> =
         flow {
             emit(Result.Loading)
             try {
@@ -136,16 +137,16 @@ class AssignmentRemoteDataSourceImpl(
                     val submissions = response.body<List<UserAssignmentSubmission>>()
                     emit(Result.Success(submissions))
             } else {
-                val error = response.body<GetSubmissions>()
+                val error = response.body<AssignmentError>()
                 Result.Error(error)
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            Result.Error(GetSubmissions.SERVER_ERROR)
+            Result.Error(SERVER_ERROR)
         }
     }
 
-    override suspend fun submitAssignmentSubmissionReview(request: AssignmentRequest.SubmitReview): Result<Boolean,SubmitReview> {
+    override suspend fun submitAssignmentSubmissionReview(request: AssignmentRequest.SubmitReview): Result<Boolean,AssignmentError> {
         return try {
             val response = httpClient.post {
                 endPoint("submitReview")
@@ -154,16 +155,16 @@ class AssignmentRemoteDataSourceImpl(
             if (response.status == HttpStatusCode.OK) {
                 Result.Success(true)
             } else {
-                val error = response.body<SubmitReview>()
+                val error = response.body<AssignmentError>()
                 Result.Error(error)
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            Result.Error(SubmitReview.SERVER_ERROR)
+            Result.Error(SERVER_ERROR)
         }
     }
 
-    override suspend fun turnInAssignments(userAssignmentId: String): Result<Boolean,TurnInAssignments> {
+    override suspend fun turnInAssignments(userAssignmentId: String): Result<Boolean,AssignmentError> {
         return try {
             val response = httpClient.post {
                 endPoint("turnInAssignment")
@@ -172,16 +173,16 @@ class AssignmentRemoteDataSourceImpl(
             if (response.status == HttpStatusCode.OK) {
                 Result.Success(true)
             } else {
-                val error = response.body<TurnInAssignments>()
+                val error = response.body<AssignmentError>()
                 Result.Error(error)
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            Result.Error(TurnInAssignments.SERVER_ERROR)
+            Result.Error(SERVER_ERROR)
         }
     }
 
-    override suspend fun unSubmitAssignment(userAssignmentId: String): Result<Boolean,UnSubmitAssignment> {
+    override suspend fun unSubmitAssignment(userAssignmentId: String): Result<Boolean,AssignmentError> {
         return try {
             val response = httpClient.post {
                 endPoint("unSubmitAssignment")
@@ -190,12 +191,12 @@ class AssignmentRemoteDataSourceImpl(
             if (response.status == HttpStatusCode.OK) {
                 Result.Success(true)
             } else {
-                val error = response.body<UnSubmitAssignment>()
+                val error = response.body<AssignmentError>()
                 Result.Error(error)
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            Result.Error(UnSubmitAssignment.SERVER_ERROR)
+            Result.Error(SERVER_ERROR)
         }
     }
 }

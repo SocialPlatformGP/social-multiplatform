@@ -8,13 +8,13 @@ import kotlinx.coroutines.flow.Flow
 interface MaterialRepository {
     suspend fun getMaterialAtPath(
         path: String
-    ): Flow<Result<MaterialResponse.GetMaterialResponses, MaterialError.GetMaterial>>
+    ): Flow<Result<MaterialResponse.GetMaterialResponses, MaterialError>>
 
     suspend fun createFolder(
         name: String,
         path: String,
         communityId: String,
-    ): Flow<Result<MaterialResponse.GetMaterialResponses, MaterialError.CreateFolder>>
+    ): Flow<Result<MaterialResponse.GetMaterialResponses, MaterialError>>
 
     suspend fun createFile(
         name: String,
@@ -22,16 +22,16 @@ interface MaterialRepository {
         path: String,
         content: ByteArray,
         communityId: String
-    ): Flow<Result<MaterialResponse.GetMaterialResponses, MaterialError.CreateFile>>
+    ): Flow<Result<MaterialResponse.GetMaterialResponses, MaterialError>>
 
     suspend fun deleteFile(
         fileId: String,
         path: String
-    ): Flow<Result<MaterialResponse.GetMaterialResponses, MaterialError.DeleteFile>>
+    ): Flow<Result<MaterialResponse.GetMaterialResponses, MaterialError>>
 
     suspend fun deleteFolder(
         folderId: String
-    ): Flow<Result<MaterialResponse.GetMaterialResponses, MaterialError.DeleteFolder>>
+    ): Flow<Result<MaterialResponse.GetMaterialResponses, MaterialError>>
 
     suspend fun downloadFile(url: String, mimeType: String)
     suspend fun openFile(fileId: String, url: String, mimeType: String)
@@ -40,7 +40,7 @@ interface MaterialRepository {
     fun renameFolder(
         folderId: String,
         newName: String
-    ): Flow<Result<MaterialResponse.GetMaterialResponses, MaterialError.RenameFolder>>
+    ): Flow<Result<MaterialResponse.GetMaterialResponses, MaterialError>>
 
 }
 

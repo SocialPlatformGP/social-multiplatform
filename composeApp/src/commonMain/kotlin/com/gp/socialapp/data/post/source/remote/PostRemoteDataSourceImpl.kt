@@ -26,7 +26,7 @@ class PostRemoteDataSourceImpl(
     private val httpClient: HttpClient
 ) : PostRemoteDataSource {
 
-    override suspend fun createPost(request: PostRequest.CreateRequest): Flow<Result<Unit,PostError.CreatePost>> {
+    override suspend fun createPost(request: PostRequest.CreateRequest): Flow<Result<Unit,PostError>> {
         return flow {
             emit(Result.Loading)
             try {
@@ -39,12 +39,12 @@ class PostRemoteDataSourceImpl(
                 if (response.status == HttpStatusCode.OK) {
                     emit(Result.Success(Unit))
                 } else {
-                    val error = response.body<PostError.CreatePost>()
+                    val error = response.body<PostError>()
                     emit(Result.Error(error))
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                emit(Result.Error(PostError.CreatePost.SERVER_ERROR))
+                emit(Result.Error(PostError.SERVER_ERROR))
             }
         }
     }
@@ -91,7 +91,7 @@ class PostRemoteDataSourceImpl(
         }
     }
 
-    override suspend fun getUserPosts(userId: String): Result<List<Post>,PostError.GetUserPosts> {
+    override suspend fun getUserPosts(userId: String): Result<List<Post>,PostError> {
         return try {
             val response = httpClient.post {
                 endPoint("getUserPosts")
@@ -101,17 +101,17 @@ class PostRemoteDataSourceImpl(
                 val posts = response.body<List<Post>>()
                 success(posts)
             } else {
-                val serverError = response.body<PostError.GetUserPosts>()
+                val serverError = response.body<PostError>()
                 error(serverError)
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            error(PostError.GetUserPosts.SERVER_ERROR)
+            error(PostError.SERVER_ERROR)
         }
     }
 
 
-    override fun fetchPosts(request: FetchRequest): Flow<Result<List<Post>, PostError.GetPosts>> =
+    override fun fetchPosts(request: FetchRequest): Flow<Result<List<Post>, PostError>> =
         flow {
             emit(Result.Loading)
             try {
@@ -125,17 +125,17 @@ class PostRemoteDataSourceImpl(
                     val posts = response.body<List<Post>>()
                     emit(Result.Success(posts))
                 } else {
-                    val error = response.body<PostError.GetPosts>()
+                    val error = response.body<PostError>()
                     emit(Result.Error(error))
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                emit(Result.Error(PostError.GetPosts.SERVER_ERROR))
+                emit(Result.Error(PostError.SERVER_ERROR))
 
             }
         }
 
-    override fun fetchAllPosts(): Flow<Result<List<Post>, PostError.GetPosts>> = flow {
+    override fun fetchAllPosts(): Flow<Result<List<Post>, PostError>> = flow {
         emit(Result.Loading)
         try {
             val response = httpClient.get {
@@ -145,16 +145,16 @@ class PostRemoteDataSourceImpl(
                 val posts = response.body<List<Post>>()
                 emit(Result.Success(posts))
             } else {
-                val error = response.body<PostError.GetPosts>()
+                val error = response.body<PostError>()
                 emit(Result.Error(error))
             }
         } catch (e: Exception) {
-            emit(Result.Error(PostError.GetPosts.SERVER_ERROR))
+            emit(Result.Error(PostError.SERVER_ERROR))
             e.printStackTrace()
         }
     }
 
-    override fun searchByTitle(title: String): Flow<Result<List<Post>, PostError.SearchByTitle>> = flow {
+    override fun searchByTitle(title: String): Flow<Result<List<Post>, PostError>> = flow {
         emit(Result.Loading)
         try {
             val response = httpClient.get {
@@ -165,16 +165,16 @@ class PostRemoteDataSourceImpl(
                 val posts = response.body<List<Post>>()
                 emit(Result.Success(posts))
             } else {
-                val error = response.body<PostError.SearchByTitle>()
+                val error = response.body<PostError>()
                 emit(Result.Error(error))
             }
         } catch (e: Exception) {
-            emit(Result.Error(PostError.SearchByTitle.SERVER_ERROR))
+            emit(Result.Error(PostError.SERVER_ERROR))
             e.printStackTrace()
         }
     }
 
-    override fun searchByTag(tag: String): Flow<Result<List<Post>, PostError.SearchByTag>> = flow {
+    override fun searchByTag(tag: String): Flow<Result<List<Post>, PostError>> = flow {
         emit(Result.Loading)
         try {
             val response = httpClient.get {
@@ -185,16 +185,16 @@ class PostRemoteDataSourceImpl(
                 val posts = response.body<List<Post>>()
                 emit(Result.Success(posts))
             } else {
-                val error = response.body<PostError.SearchByTag>()
+                val error = response.body<PostError>()
                 emit(Result.Error(error))
             }
         } catch (e: Exception) {
-            emit(Result.Error(PostError.SearchByTag.SERVER_ERROR))
+            emit(Result.Error(PostError.SERVER_ERROR))
             e.printStackTrace()
         }
     }
 
-    override suspend fun updatePost(request: PostRequest.UpdateRequest): Result<Unit, PostError.UpdatePost> =
+    override suspend fun updatePost(request: PostRequest.UpdateRequest): Result<Unit, PostError> =
         try {
             val response = httpClient.post {
                 endPoint("updatePost")
@@ -205,16 +205,16 @@ class PostRemoteDataSourceImpl(
             if (response.status == HttpStatusCode.OK) {
                 Result.Success(Unit)
             } else {
-                val error = response.body<PostError.UpdatePost>()
+                val error = response.body<PostError>()
                 Result.Error(error)
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            Result.Error(PostError.UpdatePost.SERVER_ERROR)
+            Result.Error(PostError.SERVER_ERROR)
         }
 
 
-    override suspend fun deletePost(request: DeleteRequest): Result<Unit, PostError.DeletePost> =
+    override suspend fun deletePost(request: DeleteRequest): Result<Unit, PostError> =
         try {
             val response = httpClient.post {
                 endPoint("deletePost")
@@ -225,16 +225,16 @@ class PostRemoteDataSourceImpl(
             if (response.status == HttpStatusCode.OK) {
                 Result.Success(Unit)
             } else {
-                val error = response.body<PostError.DeletePost>()
+                val error = response.body<PostError>()
                 Result.Error(error)
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            Result.Error(PostError.DeletePost.SERVER_ERROR)
+            Result.Error(PostError.SERVER_ERROR)
         }
 
 
-    override suspend fun upvotePost(request: UpvoteRequest): Result<Unit, PostError.UpvotePost> =
+    override suspend fun upvotePost(request: UpvoteRequest): Result<Unit, PostError> =
         try {
             val response = httpClient.post {
                 endPoint("upvotePost")
@@ -246,16 +246,16 @@ class PostRemoteDataSourceImpl(
             if (response.status == HttpStatusCode.OK) {
                 Result.Success(Unit)
             } else {
-                val error = response.body<PostError.UpvotePost>()
+                val error = response.body<PostError>()
                 Result.Error(error)
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            Result.Error(PostError.UpvotePost.SERVER_ERROR)
+            Result.Error(PostError.SERVER_ERROR)
         }
 
 
-    override suspend fun downvotePost(request: DownvoteRequest): Result<Unit, PostError.DownvotePost> =
+    override suspend fun downvotePost(request: DownvoteRequest): Result<Unit, PostError> =
         try {
             val response = httpClient.post {
                 endPoint("downvotePost")
@@ -266,16 +266,16 @@ class PostRemoteDataSourceImpl(
             if (response.status == HttpStatusCode.OK) {
                 Result.Success(Unit)
             } else {
-                val error = response.body<PostError.DownvotePost>()
+                val error = response.body<PostError>()
                 Result.Error(error)
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            Result.Error(PostError.DownvotePost.SERVER_ERROR)
+            Result.Error(PostError.SERVER_ERROR)
         }
 
 
-    override suspend fun reportPost(request: PostRequest.ReportRequest): Result<Unit, PostError.ReportPost> =
+    override suspend fun reportPost(request: PostRequest.ReportRequest): Result<Unit, PostError> =
         try {
             val response = httpClient.post {
                 endPoint("reportPost")
@@ -286,12 +286,12 @@ class PostRemoteDataSourceImpl(
             if (response.status == HttpStatusCode.OK) {
                 Result.Success(Unit)
             } else {
-                val error = response.body<PostError.ReportPost>()
+                val error = response.body<PostError>()
                 Result.Error(error)
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            Result.Error(PostError.ReportPost.SERVER_ERROR)
+            Result.Error(PostError.SERVER_ERROR)
         }
 
 }

@@ -5,6 +5,7 @@ import com.gp.socialapp.data.chat.model.Message
 import com.gp.socialapp.data.chat.model.MessageAttachment
 import com.gp.socialapp.data.chat.source.remote.model.RemoteMessage
 import com.gp.socialapp.data.chat.source.remote.model.RemoteRecentRoom
+import com.gp.socialapp.util.ChatError
 import com.gp.socialapp.util.LocalDateTimeUtil.now
 import com.gp.socialapp.util.Result
 import io.github.jan.supabase.SupabaseClient
@@ -30,19 +31,19 @@ class MessageRemoteDataSourceImpl(
     @OptIn(SupabaseExperimental::class)
     override suspend fun fetchChatMessages(
         roomId: Long
-    ): Flow<Result<List<Message>>> = flow {
+    ): Flow<Result<List<Message>,ChatError>> = flow {
         emit(Result.Loading)
         try {
             supabase.from(MESSAGES).selectAsFlow(
                 RemoteMessage::id, filter = FilterOperation("roomId", FilterOperator.EQ, roomId)
             ).collect {
                 println("received data in remote source :$it")
-                emit(Result.SuccessWithData(it.map { it.toMessage() }
+                emit(Result.Success(it.map { it.toMessage() }
                     .sortedByDescending { it.createdAt }))
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            emit(Result.Error("Error fetching messages: ${e.message}"))
+            emit(Result.Error(ChatError.SERVER_ERROR))
         }
     }
 
@@ -53,7 +54,7 @@ class MessageRemoteDataSourceImpl(
         senderName: String,
         senderPfpUrl: String,
         attachment: MessageAttachment,
-    ): Result<Nothing> {
+    ): Result<Unit,ChatError> {
         try {
             if (attachment.type.isBlank()) {
                 val message = RemoteMessage(
@@ -79,10 +80,10 @@ class MessageRemoteDataSourceImpl(
                         eq("roomId", roomId)
                     }
                 }
-                return Result.Success
+                return Result.Success(Unit)
             } else {
                 uploadAttachment(roomId, senderId, attachment).let { result ->
-                    if (result is Result.SuccessWithData) {
+                    if (result is Result.Success) {
                         val newAttachment = result.data
                         val message = RemoteMessage(
                             content = messageContent,
@@ -112,21 +113,21 @@ class MessageRemoteDataSourceImpl(
                                 eq("roomId", roomId)
                             }
                         }
-                        return Result.Success
+                        return Result.Success(Unit)
                     } else {
-                        return Result.Error("Error uploading attachment: ${(result as Result.Error).message}")
+                        return Result.Error(ChatError.SERVER_ERROR)
                     }
                 }
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            return Result.Error("Error sending message: ${e.message}")
+            return Result.Error(ChatError.SERVER_ERROR)
         }
     }
 
     override suspend fun updateMessage(
         messageId: Long, roomId: Long, content: String
-    ): Result<Nothing> {
+    ): Result<Unit,ChatError> {
         return try {
             supabase.from(MESSAGES).update({
                 set("content", content)
@@ -149,14 +150,14 @@ class MessageRemoteDataSourceImpl(
                     }
                 }
             }
-            Result.Success
+            Result.Success(Unit)
         } catch (e: Exception) {
             e.printStackTrace()
-            Result.Error("Error updating message: ${e.message}")
+            Result.Error(ChatError.SERVER_ERROR)
         }
     }
 
-    override suspend fun deleteMessage(messageId: Long, roomId: Long): Result<Nothing> {
+    override suspend fun deleteMessage(messageId: Long, roomId: Long): Result<Unit,ChatError> {
         return try {
             supabase.from(MESSAGES).delete {
                 filter {
@@ -178,16 +179,16 @@ class MessageRemoteDataSourceImpl(
                 }
             }
 
-            Result.Success
+            Result.Success(Unit)
         } catch (e: Exception) {
             e.printStackTrace()
-            Result.Error("Error deleting message: ${e.message}")
+            Result.Error(ChatError.SERVER_ERROR)
         }
     }
 
     private suspend fun uploadAttachment(
         roomId: Long, senderId: String, attachment: MessageAttachment
-    ): Result<MessageAttachment> {
+    ): Result<MessageAttachment,ChatError> {
         return try {
             val epochSeconds = LocalDateTime.now().toInstant(TimeZone.UTC).epochSeconds
             val path = "${roomId}/$senderId/${epochSeconds}-${attachment.name}"
@@ -196,14 +197,14 @@ class MessageRemoteDataSourceImpl(
             print("attachment uploaded: $key")
             val url = supabase.storage.from("chat_attachments").publicUrl(path)
             println("attachment url: $url")
-            Result.SuccessWithData(
+            Result.Success(
                 attachment.copy(
                     url = url, byteArray = byteArrayOf(), path = path
                 )
             )
         } catch (e: Exception) {
             e.printStackTrace()
-            Result.Error("An error occurred uploading attachment: ${e.message}")
+            Result.Error(ChatError.SERVER_ERROR)
         }
 
     }

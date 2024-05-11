@@ -10,11 +10,11 @@ interface CommunityRepository {
     suspend fun createCommunity(
         community: Community,
         userId: String
-    ): Result<Community, CommunityError.CreateCommunity>
-    suspend fun acceptCommunityRequest(requestId: String): Result<Unit, CommunityError.AcceptCommunityRequest>
-    suspend fun declineCommunityRequest(requestId: String): Result<Unit, CommunityError.DeclineCommunityRequest>
-    fun fetchCommunity(communityId: String): Flow<Result<Community, CommunityError.GetCommunity>>
-    fun fetchCommunityMembersRequests(communityId: String): Flow<Result<List<CommunityMemberRequest>, CommunityError.GetCommunityMembers>>
-    suspend fun deleteCommunity(communityId: String): Result<Unit, CommunityError.DeleteCommunity>
-    suspend fun editCommunity(community: Community): Result<Unit, CommunityError.UpdateCommunity>
+    ): Result<Community, CommunityError>
+    suspend fun acceptCommunityRequest(requestId: String): Result<Unit, CommunityError>
+    suspend fun declineCommunityRequest(requestId: String): Result<Unit, CommunityError>
+    fun fetchCommunity(communityId: String): Flow<Result<Community, CommunityError>>
+    fun fetchCommunityMembersRequests(communityId: String): Flow<Result<List<CommunityMemberRequest>, CommunityError>>
+    suspend fun deleteCommunity(communityId: String): Result<Unit, CommunityError>
+    suspend fun editCommunity(community: Community): Result<Unit, CommunityError>
 }

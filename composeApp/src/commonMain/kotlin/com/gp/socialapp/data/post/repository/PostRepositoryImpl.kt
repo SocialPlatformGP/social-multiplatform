@@ -39,7 +39,7 @@ class PostRepositoryImpl(
             settings[AppConstants.StorageKeys.RECENT_SEARCHES.key] = value
         }
 
-    override suspend fun createPost(post: Post): Flow<Result<Unit, PostError.CreatePost>> {
+    override suspend fun createPost(post: Post): Flow<Result<Unit, PostError>> {
         val request = PostRequest.CreateRequest(post)
         return postRemoteSource.createPost(request)
     }
@@ -47,12 +47,12 @@ class PostRepositoryImpl(
     override suspend fun reportPost(
         postId: String,
         reporterId: String
-    ): Result<Unit, PostError.ReportPost> {
+    ): Result<Unit, PostError> {
         val request = PostRequest.ReportRequest(postId, reporterId)
         return postRemoteSource.reportPost(request)
     }
 
-    override fun searchByTitle(title: String): Flow<Result<List<Post>, PostError.SearchByTitle>> = flow {
+    override fun searchByTitle(title: String): Flow<Result<List<Post>, PostError>> = flow {
         emit(Result.Loading)
         val platform = getPlatform()
         try {
@@ -70,7 +70,7 @@ class PostRepositoryImpl(
                 }
             }
         } catch (e: Exception) {
-            emit(Result.Error(PostError.SearchByTitle.SERVER_ERROR))
+            emit(Result.Error(PostError.SERVER_ERROR))
         }
     }
 
@@ -78,7 +78,7 @@ class PostRepositoryImpl(
         postLocalSource.insertPost(post)
     }
 
-    override fun getPosts(): Flow<Result<List<Post>, PostError.GetPosts>> = flow {
+    override fun getPosts(): Flow<Result<List<Post>, PostError>> = flow {
         emit(Result.Loading)
         val platform = getPlatform()
         try {
@@ -104,11 +104,11 @@ class PostRepositoryImpl(
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            emit(Result.Error(PostError.GetPosts.SERVER_ERROR))
+            emit(Result.Error(PostError.SERVER_ERROR))
         }
     }
 
-    private fun getRemotePosts(): Flow<Result<List<Post>, PostError.GetPosts>> {
+    private fun getRemotePosts(): Flow<Result<List<Post>, PostError>> {
         println("getRemotePosts: $lastUpdated repo *********************1255")
         return postRemoteSource.fetchPosts(
             PostRequest.FetchRequest(
@@ -121,19 +121,19 @@ class PostRepositoryImpl(
         return postLocalSource.getAllPosts()
     }
 
-    override suspend fun updatePost(post: Post): Result<Unit,PostError.UpdatePost > {
+    override suspend fun updatePost(post: Post): Result<Unit,PostError > {
         val request = PostRequest.UpdateRequest(post)
         return postRemoteSource.updatePost(request)
     }
 
 
-    override suspend fun deletePost(post: Post): Result<Unit,PostError.DeletePost> {
+    override suspend fun deletePost(post: Post): Result<Unit,PostError> {
         val request = PostRequest.DeleteRequest(post.id)
         postLocalSource.deletePostById(post.id)
         return postRemoteSource.deletePost(request)
     }
 
-    override suspend fun upvotePost(post: Post, userId: String): Result<Unit, PostError.UpvotePost> {
+    override suspend fun upvotePost(post: Post, userId: String): Result<Unit, PostError> {
         val request = PostRequest.UpvoteRequest(
             post.id,
             userId
@@ -144,7 +144,7 @@ class PostRepositoryImpl(
     override suspend fun downvotePost(
         post: Post,
         userId: String
-    ): Result<Unit, PostError.DownvotePost> {
+    ): Result<Unit, PostError> {
         val request = PostRequest.DownvoteRequest(
             post.id,
             userId
@@ -163,7 +163,7 @@ class PostRepositoryImpl(
         postRemoteSource.insertTag(tag)
     }
 
-    override suspend fun getUserPosts(userId: String): Result<List<Post>,PostError.GetUserPosts> {
+    override suspend fun getUserPosts(userId: String): Result<List<Post>,PostError> {
         return postRemoteSource.getUserPosts(userId)
     }
 
@@ -185,7 +185,7 @@ class PostRepositoryImpl(
         println("recentSearches after: $recentSearches")
     }
 
-    override fun searchByTag(tag: Tag): Flow<Result<List<Post>, PostError.SearchByTag>> = flow {
+    override fun searchByTag(tag: Tag): Flow<Result<List<Post>, PostError>> = flow {
         emit(Result.Loading)
         val platform = getPlatform()
         try {
@@ -203,7 +203,7 @@ class PostRepositoryImpl(
                 }
             }
         } catch (e: Exception) {
-            emit(Result.Error(PostError.SearchByTag.SERVER_ERROR))
+            emit(Result.Error(PostError.SERVER_ERROR))
         }
     }
 

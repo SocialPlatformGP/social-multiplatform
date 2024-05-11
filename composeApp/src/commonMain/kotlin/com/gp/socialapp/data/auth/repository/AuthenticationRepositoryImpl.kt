@@ -17,21 +17,21 @@ class AuthenticationRepositoryImpl(
     override fun clearStorage() {
         localKeyValueStorage.cleanStorage()
     }
-    override fun signInWithOAuth(provider: OAuthProvider): Flow<Result<User,AuthError.SignInWithOAuth>> =
+    override fun signInWithOAuth(provider: OAuthProvider): Flow<Result<User,AuthError>> =
         remoteDataSource.signInWithOAuth(provider)
-    override fun signInWithEmail(email: String, password: String): Flow<Result<User,AuthError.SignInWithEmail>> =
+    override fun signInWithEmail(email: String, password: String): Flow<Result<User,AuthError>> =
         remoteDataSource.signInWithEmail(email, password)
-    override fun signUpWithEmail(email: String, password: String): Flow<Result<User,AuthError.SignUpWithEmail>> =
+    override fun signUpWithEmail(email: String, password: String): Flow<Result<User,AuthError>> =
         remoteDataSource.signUpWithEmail(email, password)
-    override suspend fun getSignedInUser(): Result<User,AuthError.GetSignedInUser> =
+    override suspend fun getSignedInUser(): Result<User,AuthError> =
         remoteDataSource.getSignedInUser()
 
-    override suspend fun logout(): Result<Unit, AuthError.Logout> {
+    override suspend fun logout(): Result<Unit, AuthError> {
         clearStorage()
         return remoteDataSource.logout()
     }
 
-    override suspend fun deleteAccount(userId: String): Result<Unit, AuthError.DeleteUser> {
+    override suspend fun deleteAccount(userId: String): Result<Unit, AuthError> {
         return remoteDataSource.deleteAccount(userId).also{
             if (it is Result.Success) {
                 logout()

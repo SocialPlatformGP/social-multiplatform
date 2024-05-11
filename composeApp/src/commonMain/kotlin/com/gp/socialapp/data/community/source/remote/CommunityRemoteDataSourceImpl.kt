@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.flow
 class CommunityRemoteDataSourceImpl(
     private val httpClient: HttpClient
 ) : CommunityRemoteDataSource {
-    override suspend fun createCommunity(request: CommunityRequest.CreateCommunity): Result<Community, CommunityError.CreateCommunity> {
+    override suspend fun createCommunity(request: CommunityRequest.CreateCommunity): Result<Community, CommunityError> {
         return try {
             val response = httpClient.post {
                 endPoint("createCommunity")
@@ -28,15 +28,15 @@ class CommunityRemoteDataSourceImpl(
                 val community = response.body<Community>()
                 success(community)
             } else {
-                val serverError = response.body<CommunityError.CreateCommunity>()
+                val serverError = response.body<CommunityError>()
                 error(serverError)
             }
         } catch (e: Exception) {
-            error(CommunityError.CreateCommunity.SERVER_ERROR)
+            error(CommunityError.SERVER_ERROR)
         }
     }
 
-    override suspend fun acceptCommunityRequest(request: CommunityRequest.AcceptCommunityRequest): Result<Unit, CommunityError.AcceptCommunityRequest> {
+    override suspend fun acceptCommunityRequest(request: CommunityRequest.AcceptCommunityRequest): Result<Unit, CommunityError> {
         return try {
             val response = httpClient.post {
                 endPoint("acceptCommunityRequest")
@@ -45,15 +45,15 @@ class CommunityRemoteDataSourceImpl(
             if (response.status == HttpStatusCode.OK) {
                 success(Unit)
             } else {
-                val serverError = response.body<CommunityError.AcceptCommunityRequest>()
+                val serverError = response.body<CommunityError>()
                 error(serverError)
             }
         } catch (e: Exception) {
-            error(CommunityError.AcceptCommunityRequest.SERVER_ERROR)
+            error(CommunityError.SERVER_ERROR)
         }
     }
 
-    override suspend fun declineCommunityRequest(request: CommunityRequest.DeclineCommunityRequest): Result<Unit, CommunityError.DeclineCommunityRequest> {
+    override suspend fun declineCommunityRequest(request: CommunityRequest.DeclineCommunityRequest): Result<Unit, CommunityError> {
         return try {
             val response = httpClient.post {
                 endPoint("declineCommunityRequest")
@@ -62,16 +62,16 @@ class CommunityRemoteDataSourceImpl(
             if (response.status == HttpStatusCode.OK) {
                 success(Unit)
             } else {
-                val serverError = response.body<CommunityError.DeclineCommunityRequest>()
+                val serverError = response.body<CommunityError>()
                 error(serverError)
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            error(CommunityError.DeclineCommunityRequest.SERVER_ERROR)
+            error(CommunityError.SERVER_ERROR)
         }
     }
 
-    override fun fetchCommunity(request: CommunityRequest.FetchCommunity): Flow<Result<Community, CommunityError.GetCommunity>> =
+    override fun fetchCommunity(request: CommunityRequest.FetchCommunity): Flow<Result<Community, CommunityError>> =
         flow {
             emit(Result.Loading)
             try {
@@ -83,16 +83,16 @@ class CommunityRemoteDataSourceImpl(
                     val community = response.body<Community>()
                     emit(success(community))
                 } else {
-                    val serverError = response.body<CommunityError.GetCommunity>()
+                    val serverError = response.body<CommunityError>()
                     emit(Result.Error(serverError))
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                emit(Result.Error(CommunityError.GetCommunity.SERVER_ERROR))
+                emit(Result.Error(CommunityError.SERVER_ERROR))
             }
         }
 
-    override fun fetchCommunityMembersRequests(request: CommunityRequest.FetchCommunityMembersRequests): Flow<Result<List<CommunityMemberRequest>, CommunityError.GetCommunityMembers>> =
+    override fun fetchCommunityMembersRequests(request: CommunityRequest.FetchCommunityMembersRequests): Flow<Result<List<CommunityMemberRequest>, CommunityError>> =
         flow {
             emit(Result.Loading)
             try {
@@ -104,16 +104,16 @@ class CommunityRemoteDataSourceImpl(
                     val community = response.body<List<CommunityMemberRequest>>()
                     emit(success(community))
                 } else {
-                    val serverError = response.body<CommunityError.GetCommunityMembers>()
+                    val serverError = response.body<CommunityError>()
                     emit(Result.Error(serverError))
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                emit(Result.Error(CommunityError.GetCommunityMembers.SERVER_ERROR))
+                emit(Result.Error(CommunityError.SERVER_ERROR))
             }
         }
 
-    override suspend fun deleteCommunity(request: CommunityRequest.DeleteCommunity): Result<Unit, CommunityError.DeleteCommunity> {
+    override suspend fun deleteCommunity(request: CommunityRequest.DeleteCommunity): Result<Unit, CommunityError> {
         return try {
             println("deleteCommunity request: $request")
             val response = httpClient.post {
@@ -124,16 +124,16 @@ class CommunityRemoteDataSourceImpl(
             if (response.status == HttpStatusCode.OK) {
                 success(Unit)
             } else {
-                val serverError = response.body<CommunityError.DeleteCommunity>()
+                val serverError = response.body<CommunityError>()
                 error(serverError)
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            error(CommunityError.DeleteCommunity.SERVER_ERROR)
+            error(CommunityError.SERVER_ERROR)
         }
     }
 
-    override suspend fun editCommunity(request: CommunityRequest.EditCommunity): Result<Unit, CommunityError.UpdateCommunity> {
+    override suspend fun editCommunity(request: CommunityRequest.EditCommunity): Result<Unit, CommunityError> {
         return try {
             println("editCommunity request: $request")
             val response = httpClient.post {
@@ -144,12 +144,12 @@ class CommunityRemoteDataSourceImpl(
             if (response.status == HttpStatusCode.OK) {
                 success(Unit)
             } else {
-                val serverError = response.body<CommunityError.UpdateCommunity>()
+                val serverError = response.body<CommunityError>()
                 error(serverError)
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            error(CommunityError.UpdateCommunity.SERVER_ERROR)
+            error(CommunityError.SERVER_ERROR)
         }
     }
 }

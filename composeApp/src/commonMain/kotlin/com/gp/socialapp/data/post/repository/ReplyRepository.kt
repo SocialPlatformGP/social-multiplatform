@@ -6,19 +6,19 @@ import com.gp.socialapp.util.Result
 import kotlinx.coroutines.flow.Flow
 
 interface ReplyRepository {
-    fun getReplies(postId: String): Flow<Result<List<Reply>, ReplyError.GetReplies>>
-    suspend fun updateReply(replyId: String, replyContent: String): Result<Unit, ReplyError.UpdateReply>
-    suspend fun deleteReply(replyId: String): Result<Unit, ReplyError.DeleteReply>
+    fun getReplies(postId: String): Flow<Result<List<Reply>, ReplyError>>
+    suspend fun updateReply(replyId: String, replyContent: String): Result<Unit, ReplyError>
+    suspend fun deleteReply(replyId: String): Result<Unit, ReplyError>
     suspend fun upvoteReply(
         replyId: String,
         currentUserId: String
-    ): Result<Unit, ReplyError.UpvoteReply>
+    ): Result<Unit, ReplyError>
 
     suspend fun downvoteReply(
         replyId: String,
         currentUserId: String
-    ): Result<Unit, ReplyError.DownvoteReply>
+    ): Result<Unit, ReplyError>
 
-    suspend fun insertReply(reply: Reply): Result<Unit, ReplyError.InsertReply>
-    suspend fun reportReply(replyId: String, reporterId: String): Result<Unit, ReplyError.ReportReply>
+    suspend fun insertReply(reply: Reply): Result<Unit, ReplyError>
+    suspend fun reportReply(replyId: String, reporterId: String): Result<Unit, ReplyError>
 }

@@ -19,7 +19,7 @@ class CalendarRemoteDataSourceImpl(
     private val supabaseClient: SupabaseClient,
     private val httpClient: HttpClient
 ) : CalendarRemoteDataSource {
-    override fun getUserEvents(request: CalendarRequest.GetUserEvents): Flow<Result<List<CalendarEvent>, CalendarError.GetEvents>> = flow {
+    override fun getUserEvents(request: CalendarRequest.GetUserEvents): Flow<Result<List<CalendarEvent>, CalendarError>> = flow {
         emit(Result.Loading)
         try{
             val response = httpClient.post {
@@ -30,16 +30,16 @@ class CalendarRemoteDataSourceImpl(
                 val data = response.body<List<CalendarEvent>>()
                 emit(success(data))
             } else {
-                val serverError = response.body<CalendarError.GetEvents>()
+                val serverError = response.body<CalendarError>()
                 emit(Result.Error(serverError))
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            emit(Result.Error(CalendarError.GetEvents.SERVER_ERROR))
+            emit(Result.Error(CalendarError.SERVER_ERROR))
         }
     }
 
-    override suspend fun createUserEvent(request: CalendarRequest.CreateEvent): Result<Unit,CalendarError.CreateEvent> {
+    override suspend fun createUserEvent(request: CalendarRequest.CreateEvent): Result<Unit,CalendarError> {
         return try{
             val response = httpClient.post {
                 endPoint("createUserEvent")
@@ -48,12 +48,12 @@ class CalendarRemoteDataSourceImpl(
             if(response.status == HttpStatusCode.OK) {
                 success(Unit)
             } else {
-                val serverError = response.body<CalendarError.CreateEvent>()
+                val serverError = response.body<CalendarError>()
                 error(serverError)
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            error(CalendarError.CreateEvent.SERVER_ERROR)
+            error(CalendarError.SERVER_ERROR)
         }
     }
 

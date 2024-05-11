@@ -26,10 +26,8 @@ class GradesHomeScreenModel(
             val result = authRepository.getSignedInUser()
             when(result){
                 is Result.Error -> {}
-                Result.Idle -> TODO()
                 Result.Loading -> {}
-                Result.Success -> TODO()
-                is Result.SuccessWithData -> {
+                is Result.Success -> {
                     _state.update {
                         it.copy(user = result.data)
                     }
@@ -43,7 +41,7 @@ class GradesHomeScreenModel(
         screenModelScope.launch {
             gradesRepository.getGrades(id).collect { result ->
                 when(result) {
-                    is Result.SuccessWithData -> {
+                    is Result.Success -> {
                         _state.value = _state.value.copy(
                             isLoading = false,
                             grades = result.data
@@ -52,13 +50,11 @@ class GradesHomeScreenModel(
                     is Result.Error -> {
                         _state.value = _state.value.copy(
                             isLoading = false,
-                            error = result.message ?: "Unknown error"
+                            error = result.message.userMessage ?: "Unknown error"
                         )
                     }
 
-                    Result.Idle -> TODO()
                     Result.Loading -> {}
-                    Result.Success -> TODO()
                 }
             }
         }

@@ -8,7 +8,6 @@ import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.data.chat.repository.RoomRepository
 import com.gp.socialapp.util.DispatcherIO
 import com.gp.socialapp.util.Result
-import com.gp.socialapp.util.Results
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -37,7 +36,7 @@ class GroupDetailsScreenModel(
         screenModelScope.launch(DispatcherIO) {
             authRepo.getSignedInUser().let { result ->
                 when (result) {
-                    is Result.SuccessWithData -> {
+                    is Result.Success -> {
                         _uiState.update {
                             it.copy(currentUser = result.data)
                         }
@@ -77,16 +76,16 @@ class GroupDetailsScreenModel(
         screenModelScope.launch(DispatcherIO) {
             userRepo.getUsersByIds(userIds.toList()).collect { result ->
                 when (result) {
-                    is Results.Failure -> {
+                    is Result.Error -> {
                         //todo handle error
-                        println("error: ${result.error}")
+                        println("error: ${result.message}")
                     }
 
-                    Results.Loading -> {
+                    Result.Loading -> {
                         //todo handle loading
                     }
 
-                    is Results.Success -> {
+                    is Result.Success -> {
                         _uiState.update { state ->
                             state.copy(
                                 members = result.data,

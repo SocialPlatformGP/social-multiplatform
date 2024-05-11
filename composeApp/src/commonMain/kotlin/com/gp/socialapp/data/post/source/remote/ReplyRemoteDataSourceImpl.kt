@@ -19,7 +19,7 @@ class ReplyRemoteDataSourceImpl(
     private val client: HttpClient
 ) : ReplyRemoteDataSource {
 
-    override suspend fun createReply(request: ReplyRequest.CreateRequest): Result<Unit, ReplyError.InsertReply> =
+    override suspend fun createReply(request: ReplyRequest.CreateRequest): Result<Unit, ReplyError> =
         try {
             val response = client.post {
                 endPoint("createReply")
@@ -30,17 +30,17 @@ class ReplyRemoteDataSourceImpl(
             if (response.status == HttpStatusCode.OK) {
                 success(Unit)
             } else {
-                val serverError = response.body<ReplyError.InsertReply>()
+                val serverError = response.body<ReplyError>()
                 error(serverError)
 
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            error(ReplyError.InsertReply.SERVER_ERROR)
+            error(ReplyError.SERVER_ERROR)
         }
 
 
-    override fun fetchReplies(request: ReplyRequest.FetchRequest): Flow<Result<List<Reply>, ReplyError.GetReplies>> =
+    override fun fetchReplies(request: ReplyRequest.FetchRequest): Flow<Result<List<Reply>, ReplyError>> =
         flow {
             emit(Result.Loading)
             try {
@@ -54,16 +54,16 @@ class ReplyRemoteDataSourceImpl(
                     val replies = response.body<List<Reply>>()
                     emit(Result.Success(replies))
                 } else {
-                    val error = response.body<ReplyError.GetReplies>()
+                    val error = response.body<ReplyError>()
                     emit(Result.Error(error))
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                emit(Result.Error(ReplyError.GetReplies.SERVER_ERROR))
+                emit(Result.Error(ReplyError.SERVER_ERROR))
             }
         }
 
-    override suspend fun updateReply(request: ReplyRequest.UpdateRequest): Result<Unit, ReplyError.UpdateReply> =
+    override suspend fun updateReply(request: ReplyRequest.UpdateRequest): Result<Unit, ReplyError> =
         try {
             val response = client.post {
                 endPoint("updateReply")
@@ -74,16 +74,16 @@ class ReplyRemoteDataSourceImpl(
             if (response.status == HttpStatusCode.OK) {
                 success(Unit)
             } else {
-                val serverError = response.body<ReplyError.UpdateReply>()
+                val serverError = response.body<ReplyError>()
                 error(serverError)
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            error(ReplyError.UpdateReply.SERVER_ERROR)
+            error(ReplyError.SERVER_ERROR)
         }
 
 
-    override suspend fun deleteReply(request: ReplyRequest.DeleteRequest): Result<Unit, ReplyError.DeleteReply> =
+    override suspend fun deleteReply(request: ReplyRequest.DeleteRequest): Result<Unit, ReplyError> =
         try {
             val response = client.post {
                 endPoint("deleteReply")
@@ -94,16 +94,16 @@ class ReplyRemoteDataSourceImpl(
             if (response.status == HttpStatusCode.OK) {
                 success(Unit)
             } else {
-                val message = response.body<ReplyError.DeleteReply>()
+                val message = response.body<ReplyError>()
                 error(message)
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            error(ReplyError.DeleteReply.SERVER_ERROR)
+            error(ReplyError.SERVER_ERROR)
         }
 
 
-    override suspend fun upvoteReply(request: ReplyRequest.UpvoteRequest): Result<Unit, ReplyError.UpvoteReply> =
+    override suspend fun upvoteReply(request: ReplyRequest.UpvoteRequest): Result<Unit, ReplyError> =
         try {
             val response = client.post {
                 endPoint("upvoteReply")
@@ -114,16 +114,16 @@ class ReplyRemoteDataSourceImpl(
             if (response.status == HttpStatusCode.OK) {
                 success(Unit)
             } else {
-                val serverError = response.body<ReplyError.UpvoteReply>()
+                val serverError = response.body<ReplyError>()
                 error(serverError)
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            error(ReplyError.UpvoteReply.SERVER_ERROR)
+            error(ReplyError.SERVER_ERROR)
         }
 
 
-    override suspend fun downvoteReply(request: ReplyRequest.DownvoteRequest): Result<Unit, ReplyError.DownvoteReply> =
+    override suspend fun downvoteReply(request: ReplyRequest.DownvoteRequest): Result<Unit, ReplyError> =
         try {
             val response = client.post {
                 endPoint("downvoteReply")
@@ -134,16 +134,16 @@ class ReplyRemoteDataSourceImpl(
             if (response.status == HttpStatusCode.OK) {
                 success(Unit)
             } else {
-                val serverError = response.body<ReplyError.DownvoteReply>()
+                val serverError = response.body<ReplyError>()
                 error(serverError)
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            error(ReplyError.DownvoteReply.SERVER_ERROR)
+            error(ReplyError.SERVER_ERROR)
         }
 
 
-    override suspend fun reportReply(request: ReplyRequest.ReportRequest): Result<Unit, ReplyError.ReportReply> =
+    override suspend fun reportReply(request: ReplyRequest.ReportRequest): Result<Unit, ReplyError> =
         try {
             val response = client.post {
                 endPoint("reportReply")
@@ -155,12 +155,12 @@ class ReplyRemoteDataSourceImpl(
             if (response.status == HttpStatusCode.OK) {
                 success(Unit)
             } else {
-                val serverError = response.body<ReplyError.ReportReply>()
+                val serverError = response.body<ReplyError>()
                 error(serverError)
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            error(ReplyError.ReportReply.SERVER_ERROR)
+            error(ReplyError.SERVER_ERROR)
         }
 
 }

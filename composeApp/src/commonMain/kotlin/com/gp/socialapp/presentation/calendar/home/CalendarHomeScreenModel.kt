@@ -39,8 +39,8 @@ class CalendarHomeScreenModel (
                         getUserEvents()
                     }
 
-                    is Result.Error -> TODO()
-                    Result.Loading -> TODO()
+                    is Result.Error -> {}
+                    Result.Loading -> {}
                 }
 
             }
@@ -57,8 +57,8 @@ class CalendarHomeScreenModel (
                         }
                     }
 
-                    is Result.Error -> TODO()
-                    Result.Loading -> TODO()
+                    is Result.Error -> {}
+                    Result.Loading -> {}
                 }
             }
         }

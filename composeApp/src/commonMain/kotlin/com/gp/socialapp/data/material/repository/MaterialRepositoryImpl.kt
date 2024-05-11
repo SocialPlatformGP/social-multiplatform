@@ -17,7 +17,7 @@ class MaterialRepositoryImpl(
     private val localDataSource: MaterialLocalDataSource,
     private val fileManager: FileManager
 ) : MaterialRepository {
-    override suspend fun getMaterialAtPath(path: String): Flow<Result<MaterialResponse.GetMaterialResponses,MaterialError.GetMaterial>> {
+    override suspend fun getMaterialAtPath(path: String): Flow<Result<MaterialResponse.GetMaterialResponses,MaterialError>> {
         return remoteDataSource.getMaterialAtPath(path)
     }
 
@@ -25,7 +25,7 @@ class MaterialRepositoryImpl(
         name: String,
         path: String,
         communityId: String,
-    ): Flow<Result<MaterialResponse.GetMaterialResponses, MaterialError.CreateFolder>> {
+    ): Flow<Result<MaterialResponse.GetMaterialResponses, MaterialError>> {
         return remoteDataSource.createFolder(name, path, communityId)
     }
     override suspend fun createFile(
@@ -34,18 +34,18 @@ class MaterialRepositoryImpl(
         path: String,
         content: ByteArray,
         communityId: String
-    ): Flow<Result<MaterialResponse.GetMaterialResponses, MaterialError.CreateFile>> {
+    ): Flow<Result<MaterialResponse.GetMaterialResponses, MaterialError>> {
         return remoteDataSource.createFile(name, type, path, content, communityId)
     }
 
     override suspend fun deleteFile(
         fileId: String,
         path: String
-    ): Flow<Result<MaterialResponse.GetMaterialResponses, MaterialError.DeleteFile>> {
+    ): Flow<Result<MaterialResponse.GetMaterialResponses, MaterialError>> {
         return remoteDataSource.deleteFile(fileId, path)
     }
 
-    override suspend fun deleteFolder(folderId: String): Flow<Result<MaterialResponse.GetMaterialResponses, MaterialError.DeleteFolder>> {
+    override suspend fun deleteFolder(folderId: String): Flow<Result<MaterialResponse.GetMaterialResponses, MaterialError>> {
         return remoteDataSource.deleteFolder(folderId)
     }
 
@@ -89,7 +89,7 @@ class MaterialRepositoryImpl(
     override fun renameFolder(
         folderId: String,
         newName: String
-    ): Flow<Result<MaterialResponse.GetMaterialResponses, MaterialError.RenameFolder>> {
+    ): Flow<Result<MaterialResponse.GetMaterialResponses, MaterialError>> {
         return remoteDataSource.renameFolder(folderId, newName)
     }
 

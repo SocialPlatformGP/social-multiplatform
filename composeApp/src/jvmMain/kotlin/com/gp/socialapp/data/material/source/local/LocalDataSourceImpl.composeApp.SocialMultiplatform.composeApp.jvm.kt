@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.flow
 class MaterialLocalDataSourceImpl(
     val realm: Realm
 ) : MaterialLocalDataSource {
-    override suspend fun getFilePath(fileId: String): Flow<Result<MaterialFile, MaterialError.GetLocalFile>> =
+    override suspend fun getFilePath(fileId: String): Flow<Result<MaterialFile, MaterialError>> =
         flow {
             try {
                 val file = realm.query(
@@ -29,7 +29,7 @@ class MaterialLocalDataSourceImpl(
                             if (data != null) {
                                 emit(Result.Success(data))
                             } else {
-                                emit(Result.Error(MaterialError.GetLocalFile.DATABASE_ERROR))
+                                emit(Result.Error(MaterialError.SERVER_ERROR))
                             }
                         }
 
@@ -38,19 +38,19 @@ class MaterialLocalDataSourceImpl(
                             if (data != null) {
                                 emit(Result.Success(data))
                             } else {
-                                emit(Result.Error(MaterialError.GetLocalFile.DATABASE_ERROR))
+                                emit(Result.Error(MaterialError.SERVER_ERROR))
                             }
                         }
                     }
                 }
             } catch (e: Exception) {
-                emit(Result.Error(MaterialError.GetLocalFile.DATABASE_ERROR))
+                emit(Result.Error(MaterialError.SERVER_ERROR))
                 e.printStackTrace()
             }
         }
 
 
-    override suspend fun insertFile(file: MaterialFile): Result<Unit,MaterialError.InsertLocalFile> {
+    override suspend fun insertFile(file: MaterialFile): Result<Unit,MaterialError> {
         return try {
             realm.write {
                 copyToRealm(
@@ -60,7 +60,7 @@ class MaterialLocalDataSourceImpl(
             }
             Result.Success(Unit)
         } catch (e: Exception) {
-            Result.Error(MaterialError.InsertLocalFile.DATABSE_ERROR)
+            Result.Error(MaterialError.SERVER_ERROR)
         }
     }
 }

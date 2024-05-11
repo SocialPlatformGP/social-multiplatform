@@ -7,6 +7,6 @@ import com.gp.socialapp.util.Result
 import kotlinx.coroutines.flow.Flow
 
 interface CalendarRemoteDataSource {
-    fun getUserEvents(request: CalendarRequest.GetUserEvents): Flow<Result<List<CalendarEvent>, CalendarError.GetEvents>>
-    suspend fun createUserEvent(request: CalendarRequest.CreateEvent): Result<Unit, CalendarError.CreateEvent>
+    fun getUserEvents(request: CalendarRequest.GetUserEvents): Flow<Result<List<CalendarEvent>, CalendarError>>
+    suspend fun createUserEvent(request: CalendarRequest.CreateEvent): Result<Unit, CalendarError>
 }

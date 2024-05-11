@@ -10,12 +10,12 @@ import kotlinx.coroutines.flow.Flow
 class CalendarRepositoryImpl(
     private val calendarRemoteDataSource: CalendarRemoteDataSource,
 ) : CalendarRepository {
-    override fun getUserEvents(userId: String): Flow<Result<List<CalendarEvent>,CalendarError.GetEvents>> {
+    override fun getUserEvents(userId: String): Flow<Result<List<CalendarEvent>,CalendarError>> {
         val request = CalendarRequest.GetUserEvents(userId)
         return calendarRemoteDataSource.getUserEvents(request)
     }
 
-    override suspend fun createUserEvent(userId: String, event: CalendarEvent): Result<Unit,CalendarError.CreateEvent> {
+    override suspend fun createUserEvent(userId: String, event: CalendarEvent): Result<Unit,CalendarError> {
         val request = CalendarRequest.CreateEvent(userId, event)
         return calendarRemoteDataSource.createUserEvent(request)
     }

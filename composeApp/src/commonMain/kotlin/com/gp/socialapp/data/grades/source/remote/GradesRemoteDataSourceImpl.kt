@@ -3,6 +3,7 @@ package com.gp.socialapp.data.grades.source.remote
 import com.gp.socialapp.data.grades.model.Grades
 import com.gp.socialapp.data.grades.source.remote.model.GradesRequest
 import com.gp.socialapp.data.post.util.endPoint
+import com.gp.socialapp.util.GradesError
 import com.gp.socialapp.util.Result
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -17,7 +18,7 @@ import kotlinx.coroutines.flow.flow
 class GradesRemoteDataSourceImpl(
     private val httpClient: HttpClient
 ) : GradesRemoteDataSource {
-    override fun getGrades(userName: String): Flow<Result<List<Grades>>> = flow{
+    override fun getGrades(userName: String): Flow<Result<List<Grades>,GradesError>> = flow{
         emit(Result.Loading)
         try {
             val response = httpClient.post {
@@ -26,13 +27,13 @@ class GradesRemoteDataSourceImpl(
             }
             if(response.status == HttpStatusCode.OK) {
                 val data = response.body<List<Grades>>()
-                emit(Result.SuccessWithData(data))
+                emit(Result.Success(data))
             } else {
-                emit(Result.Error("Server error: ${response.status.value} ${response.status.description}"))
+                emit(Result.Error(GradesError.SERVER_ERROR))
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            emit(Result.Error(e.message?: "An error occurred"))
+            emit(Result.Error(GradesError.SERVER_ERROR))
         }
     }
 
@@ -55,13 +56,12 @@ class GradesRemoteDataSourceImpl(
                 setBody(request)
             }
             if(response.status == HttpStatusCode.OK) {
-                Result.Success
+                println("Grades uploaded successfully")
             } else {
-                Result.Error("Server error: ${response.status.value} ${response.status.description}")
+                println("Error uploading grades")
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            Result.Error(e.message?: "An error occurred")
         }
     }
 }

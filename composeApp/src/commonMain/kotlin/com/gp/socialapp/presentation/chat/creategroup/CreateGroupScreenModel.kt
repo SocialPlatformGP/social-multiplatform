@@ -32,7 +32,7 @@ class CreateGroupScreenModel(
         screenModelScope.launch(DispatcherIO) {
             authRepo.getSignedInUser().let { result ->
                 when (result) {
-                    is Result.SuccessWithData -> {
+                    is Result.Success  -> {
                         currentUserId = result.data.id
                         getAllUsers()
                     }

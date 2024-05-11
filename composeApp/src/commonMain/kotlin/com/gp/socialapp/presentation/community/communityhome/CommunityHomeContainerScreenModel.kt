@@ -51,11 +51,11 @@ class CommunityHomeContainerScreenModel(
             userRepo.getUserCommunities(uiState.value.currentUser.id).collect {
                 when (it) {
                     is Result.Error -> {
-                        /*TODO*/
+                        println(it.message)
                     }
 
                     Result.Loading -> {
-                        /*TODO*/
+                        println("Loading")
                     }
 
                     is Result.Success -> {

@@ -16,41 +16,41 @@ class CommunityRepositoryImpl(
     override suspend fun createCommunity(
         community: Community,
         userId: String
-    ): Result<Community, CommunityError.CreateCommunity> {
+    ): Result<Community, CommunityError> {
         val request = CommunityRequest.CreateCommunity(community, userId)
         return communityRemoteDataSource.createCommunity(request)
     }
 
     override suspend fun acceptCommunityRequest(
         requestId: String
-    ): Result<Unit, CommunityError.AcceptCommunityRequest> {
+    ): Result<Unit, CommunityError> {
         val request = CommunityRequest.AcceptCommunityRequest(requestId)
         return communityRemoteDataSource.acceptCommunityRequest(request)
     }
 
     override suspend fun declineCommunityRequest(
         requestId: String
-    ): Result<Unit, CommunityError.DeclineCommunityRequest> {
+    ): Result<Unit, CommunityError> {
         val request = CommunityRequest.DeclineCommunityRequest(requestId)
         return communityRemoteDataSource.declineCommunityRequest(request)
     }
 
-    override fun fetchCommunity(communityId: String): Flow<Result<Community, CommunityError.GetCommunity>> {
+    override fun fetchCommunity(communityId: String): Flow<Result<Community, CommunityError>> {
         val request = CommunityRequest.FetchCommunity(communityId)
         return communityRemoteDataSource.fetchCommunity(request)
     }
 
-    override fun fetchCommunityMembersRequests(communityId: String): Flow<Result<List<CommunityMemberRequest>, CommunityError.GetCommunityMembers>> {
+    override fun fetchCommunityMembersRequests(communityId: String): Flow<Result<List<CommunityMemberRequest>, CommunityError>> {
         val request = CommunityRequest.FetchCommunityMembersRequests(communityId)
         return communityRemoteDataSource.fetchCommunityMembersRequests(request)
     }
 
-    override suspend fun deleteCommunity(communityId: String): Result<Unit, CommunityError.DeleteCommunity> {
+    override suspend fun deleteCommunity(communityId: String): Result<Unit, CommunityError> {
         val request = CommunityRequest.DeleteCommunity(communityId)
         return communityRemoteDataSource.deleteCommunity(request)
     }
 
-    override suspend fun editCommunity(community: Community): Result<Unit, CommunityError.UpdateCommunity> {
+    override suspend fun editCommunity(community: Community): Result<Unit, CommunityError> {
         val request = CommunityRequest.EditCommunity(community)
         println("CommunityRepositoryImpl editCommunity request: $request")
         return communityRemoteDataSource.editCommunity(request)
