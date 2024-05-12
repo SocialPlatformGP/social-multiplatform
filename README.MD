@@ -1,4 +1,3 @@
-
 # 🎓A Social Platform for Student Communication with AI-Powered Content Moderation
 
 **Welcome to the repository of our cross-platform application (Android, Desktop, and Web) for college students!** This comprehensive platform is designed to facilitate focused learning, efficient communication, and task management. Our goal is to save students time, minimize distractions, and enhance their overall academic experience.
@@ -21,7 +20,38 @@
 
 ## 📚 Libraries Used
 
-The project uses a variety of libraries such as calfFilePicker for picking files, korgeFoundation for the Korge game engine, supabase-client for interacting with Supabase, kodeinDiFrameworkCompose for dependency injection in Jetpack Compose, kotlin for the Kotlin standard library, compose for the Jetpack Compose UI toolkit, and many more. The libraries are listed in the `gradle/libs.versions.toml` file.
+| Library | Version | Functionality |
+| --- | --- | --- |
+| calfFilePicker | 0.4.0 | A library for picking files. |
+| korgeFoundation | 5.1.0 | A foundation library for the Korge game engine. |
+| supabase-client | 2.4.0 | A Kotlin client for interacting with Supabase. |
+| kodeinDiFrameworkCompose | 7.21.1 | A dependency injection framework for Jetpack Compose. |
+| kotlin | 1.9.22 | The Kotlin standard library. |
+| compose | 1.6.0 | The Jetpack Compose UI toolkit. |
+| agp | 8.2.2 | The Android Gradle plugin. |
+| androidx-appcompat | 1.6.1 | A library providing backward-compatible versions of Android components. |
+| androidx-activityCompose | 1.8.2 | A library for building Compose UIs within an Activity. |
+| compose-uitooling | 1.6.1 | Tools for building UIs with Jetpack Compose. |
+| realm | 1.13.0 | A mobile database that runs directly inside phones, tablets or wearables. |
+| voyager | 1.1.0-alpha03 | A navigation library for Jetpack Compose. |
+| composeImageLoader | 1.7.1 | An image loading library for Jetpack Compose. |
+| napier | 2.7.0 | A multiplatform logging library. |
+| buildConfig | 4.1.1 | A plugin for generating a BuildConfig class. |
+| kotlinx-coroutines | 1.7.3 | A library for writing asynchronous code using coroutines. |
+| moko-mvvm | 0.16.1 | A Model-View-ViewModel library for Kotlin Multiplatform. |
+| ktor-client | 2.3.10 | A Kotlin client for making HTTP requests. |
+| composeIcons | 1.1.0 | A library for using icons in Jetpack Compose. |
+| kotlinx-serialization | 1.6.2 | A library for serializing objects to and from JSON. |
+| kotlinx-datetime | 0.5.0 | A library for working with dates and times. |
+| multiplatformSettings | 1.1.1 | A library for working with settings on multiple platforms. |
+| kstore | 0.7.1 | A library for managing state in Kotlin. |
+| sqlDelight | 2.0.1 | A library for generating Kotlin APIs from SQL statements. |
+| apollo | 4.0.0-beta.4 | A GraphQL client. |
+| dotsIndicator | 5.0 | A library for showing dots as an indicator. |
+| undercouch-download | 5.6.0 | A plugin for downloading files. |
+| ktlint | 11.0.0 | A linter for Kotlin. |
+| bouquet | 1.1.2 | A library for managing state in Jetpack Compose. |
+| compose-pdf | 1.1.1 | A library for creating PDFs with Jetpack Compose. |
 
 ## 📸 Screenshots
 
@@ -49,13 +79,14 @@ The project uses a variety of libraries such as calfFilePicker for picking files
  Under construction
 
 </details>
-## 📸 Demo
+
+## 🎥 Demo
+
 ![Video](https://firebasestorage.googleapis.com/v0/b/social-platform-3e56e.appspot.com/o/Media1.mp4?alt=media&token=d8e38df0-98b4-4400-aa32-7ad9962a73d3)
 
 ## 📝 Contributing
 
 Contributions are welcome. 
-
 
 ## Before running!
  - install JDK 17 on your machine
@@ -74,4 +105,3 @@ Run the desktop application: `./gradlew :composeApp:run`
 
 ### Browser
 Run the browser application: `./gradlew :composeApp:jsBrowserDevelopmentRun`
-
