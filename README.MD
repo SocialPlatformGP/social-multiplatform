@@ -30,15 +30,15 @@ The project uses a variety of libraries such as calfFilePicker for picking files
 
 ### Chat Screen
 
-![Chat Screen](C:\Users\moham\Downloads\Picture2.png)
+![Chat Screen](D:\social-multiplatform532024\readme\Picture2.png)
 
 ### Academic Social Posts Screen
 
-![Academic Social Posts Screen](C:\Users\moham\Downloads\Picture1.png)
+![Academic Social Posts Screen](D:\social-multiplatform532024\readme\Picture1.png)
 
 ### Study Material Repository Screen
 
-![Study Material Repository Screen](C:\Users\moham\Downloads\Picture3.png)
+![Study Material Repository Screen](D:\social-multiplatform532024\readme\Picture3.png)
 
 ### Announcements Channel Screen
  Under construction
