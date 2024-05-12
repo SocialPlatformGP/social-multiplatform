@@ -53,13 +53,8 @@ The project uses a variety of libraries such as calfFilePicker for picking files
 
 ## 📝 Contributing
 
-Contributions are welcome. See the [Contributing Guidelines](link to your contributing guidelines).
+Contributions are welcome. 
 
-## 📜 License
-
-(Add the license of your project here)
-
-This README is a template and should be customized to fit the specifics of your project.
 
 ## Before running!
  - install JDK 17 on your machine
