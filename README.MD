@@ -29,25 +29,21 @@ The project uses a variety of libraries such as calfFilePicker for picking files
 <summary>Click to expand</summary>
 
 ### Chat Screen
-<img src="app/screens/chat.jpeg" alt="Chat Screen" width="210" height="450">
-
-### Group Chat Screen
-<img src="app/screens/group_chat.jpeg" alt="Group Chat Screen" width="210" height="450">
+<img src="C:\Users\moham\Downloads\Picture2.png" alt="Chat Screen" width="210" height="450">
 
 ### Academic Social Posts Screen
-<img src="app/screens/social_posts.jpeg" alt="Academic Social Posts Screen" width="210" height="450">
+<img src="C:\Users\moham\Downloads\Picture1.png" alt="Academic Social Posts Screen" width="210" height="450">
 
 ### Study Material Repository Screen
-<img src="app/screens/study_material.jpeg" alt="Study Material Repository Screen" width="210" height="450">
+<img src="C:\Users\moham\Downloads\Picture3.png" alt="Study Material Repository Screen" width="210" height="450">
 
 ### Announcements Channel Screen
-<img src="app/screens/announcements.jpeg" alt="Announcements Channel Screen" width="210" height="450">
+ Under construction
 
 ### Task and Deadline Management Screen
-<img src="app/screens/task_management.jpeg" alt="Task and Deadline Management Screen" width="210" height="450">
-
+ Under construction
 ### Grade Tracking Screen
-<img src="app/screens/grade_tracking.jpeg" alt="Grade Tracking Screen" width="210" height="450">
+ Under construction
 
 </details>
 
