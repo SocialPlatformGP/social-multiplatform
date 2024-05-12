@@ -80,10 +80,6 @@
 
 </details>
 
-## 🎥 Demo
-
-![Video](https://firebasestorage.googleapis.com/v0/b/social-platform-3e56e.appspot.com/o/Media1.mp4?alt=media&token=d8e38df0-98b4-4400-aa32-7ad9962a73d3)
-
 ## 📝 Contributing
 
 Contributions are welcome. 
