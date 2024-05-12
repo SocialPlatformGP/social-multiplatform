@@ -29,13 +29,16 @@ The project uses a variety of libraries such as calfFilePicker for picking files
 <summary>Click to expand</summary>
 
 ### Chat Screen
-<img src="C:\Users\moham\Downloads\Picture2.png" alt="Chat Screen" width="210" height="450">
+
+![Chat Screen](C:\Users\moham\Downloads\Picture2.png)
 
 ### Academic Social Posts Screen
-<img src="C:\Users\moham\Downloads\Picture1.png" alt="Academic Social Posts Screen" width="210" height="450">
+
+![Academic Social Posts Screen](C:\Users\moham\Downloads\Picture1.png)
 
 ### Study Material Repository Screen
-<img src="C:\Users\moham\Downloads\Picture3.png" alt="Study Material Repository Screen" width="210" height="450">
+
+![Study Material Repository Screen](C:\Users\moham\Downloads\Picture3.png)
 
 ### Announcements Channel Screen
  Under construction
