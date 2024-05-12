@@ -30,7 +30,7 @@ The project uses a variety of libraries such as calfFilePicker for picking files
 
 ### Chat Screen
 
-![Chat Screen](D:\social-multiplatform532024\readme\Picture2.png)
+![Chat Screen](https://firebasestorage.googleapis.com/v0/b/social-platform-3e56e.appspot.com/o/Picture2.png?alt=media&token=adb251eb-816d-4c12-8165-994ac57164ce)
 
 ### Academic Social Posts Screen
 
@@ -38,7 +38,7 @@ The project uses a variety of libraries such as calfFilePicker for picking files
 
 ### Study Material Repository Screen
 
-![Study Material Repository Screen](D:\social-multiplatform532024\readme\Picture3.png)
+![Study Material Repository Screen](https://firebasestorage.googleapis.com/v0/b/social-platform-3e56e.appspot.com/o/Picture3.png?alt=media&token=4d82f399-edc4-4716-90aa-596fb64de03b)
 
 ### Announcements Channel Screen
  Under construction
@@ -49,6 +49,8 @@ The project uses a variety of libraries such as calfFilePicker for picking files
  Under construction
 
 </details>
+## 📸 Demo
+![Video](https://firebasestorage.googleapis.com/v0/b/social-platform-3e56e.appspot.com/o/Media1.mp4?alt=media&token=d8e38df0-98b4-4400-aa32-7ad9962a73d3)
 
 ## 📝 Contributing
 
