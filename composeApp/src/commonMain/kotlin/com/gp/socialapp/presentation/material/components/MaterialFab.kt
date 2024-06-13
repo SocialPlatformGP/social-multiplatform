@@ -27,7 +27,10 @@ fun MaterialFab(
     Column {
         if (fabState) {
             FloatingActionButton(
-                onClick = onCreateFolderClicked
+                onClick = {
+                    fabState= fabState.not()
+                    onCreateFolderClicked()
+                }
             ) {
                 Image(
                     imageVector = Icons.Default.Folder,
@@ -38,6 +41,7 @@ fun MaterialFab(
             Spacer(modifier = Modifier.size(4.dp))
             FloatingActionButton(
                 onClick = {
+                    fabState = fabState.not()
                     filePicker.launch()
                 }
             ) {
