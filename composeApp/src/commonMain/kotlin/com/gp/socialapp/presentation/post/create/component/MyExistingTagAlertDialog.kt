@@ -38,31 +38,34 @@ fun MyExistingTagAlertDialog(
         onDismissRequest = { existingTagsDialogState(false) },
         title = { Text(text = "Select Tag") },
         text = {
-            FlowRow {
-                channelTags.toSet().forEach { tag ->
-                    AssistChip(
-                        onClick = {
-                            tempTags = if (tempTags.contains(tag)) {
-                                tempTags - tag
-                            } else {
-                                tempTags + tag
-                            }
-                        },
-                        label = { Text(text = tag.label) },
-                        colors = AssistChipDefaults.assistChipColors(
-                            containerColor = Color(tag.intColor)
-                        ),
-                        leadingIcon = {
-                            if (tempTags.contains(tag)) {
-                                Icon(
-                                    imageVector = Icons.Filled.Check,
-                                    contentDescription = null
-                                )
-                            }
-                        })
-                    Spacer(modifier = Modifier.width(8.dp))
+            if (channelTags.isEmpty()) {
+                Text(text = "No tags available")
+            } else
+                FlowRow {
+                    channelTags.toSet().forEach { tag ->
+                        AssistChip(
+                            onClick = {
+                                tempTags = if (tempTags.contains(tag)) {
+                                    tempTags - tag
+                                } else {
+                                    tempTags + tag
+                                }
+                            },
+                            label = { Text(text = tag.label) },
+                            colors = AssistChipDefaults.assistChipColors(
+                                containerColor = Color(tag.intColor)
+                            ),
+                            leadingIcon = {
+                                if (tempTags.contains(tag)) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Check,
+                                        contentDescription = null
+                                    )
+                                }
+                            })
+                        Spacer(modifier = Modifier.width(8.dp))
+                    }
                 }
-            }
         },
         confirmButton = {
             Button(onClick = {
