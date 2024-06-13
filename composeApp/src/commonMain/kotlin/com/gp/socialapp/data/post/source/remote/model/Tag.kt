@@ -9,13 +9,13 @@ data class Tag(
 ) {
     companion object {
         fun Tag.toDbString(): String {
-            return "$label|$intColor|$hexColor"
+            return "$label|$intColor|$hexColor|$communityID"
         }
 
         fun String.toTag(): Tag {
             val parts = this.split("|")
-            require(parts.size == 3) { "Invalid string format for Tag" }
-            return Tag(parts[0], parts[1].toInt(), parts[2])
+            require(parts.size == 4) { "Invalid string format for Tag" }
+            return Tag(parts[0], parts[1].toInt(), parts[2], parts[3])
         }
     }
 }
