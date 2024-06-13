@@ -191,10 +191,11 @@ class MaterialScreenModel(
         }
     }
 
-    private fun downloadFile(url: String, mimeType: MimeType) {
+    private fun downloadFile(id: String, url: String, mimeType: MimeType) {
         screenModelScope.launch(DispatcherIO) {
+            println("Downloading file screen model $url, $mimeType")
             val fullMimeType = getFullMimeType(mimeType)
-            materialRepo.downloadFile(url, fullMimeType)
+            materialRepo.downloadFile(id, url, fullMimeType)
         }
     }
 
@@ -208,7 +209,7 @@ class MaterialScreenModel(
             is MaterialAction.OnFolderClicked -> openFolder(event.folder)
             is MaterialAction.OnDeleteFileClicked -> deleteFile(event.fileId)
             is MaterialAction.OnDownloadFileClicked -> downloadFile(
-                event.url, getMimeTypeFromFileName(event.fileName)
+                event.id, event.url, getMimeTypeFromFileName(event.fileName)
             )
 
             is MaterialAction.OnRenameFolderClicked -> renameFolder(

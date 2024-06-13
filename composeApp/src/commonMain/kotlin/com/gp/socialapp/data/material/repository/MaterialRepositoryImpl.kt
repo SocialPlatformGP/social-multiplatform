@@ -49,8 +49,30 @@ class MaterialRepositoryImpl(
         return remoteDataSource.deleteFolder(folderId)
     }
 
-    override suspend fun downloadFile(url: String, mimeType: String) {
-        remoteDataSource.downloadFile(url)
+    override suspend fun downloadFile(fileId: String, url: String, mimeType: String) {
+        println("Downloading file from repo $url with mimeType $mimeType")
+        val data = remoteDataSource.downloadFile(url)
+        when (data) {
+            is Result.Error -> {
+                println(data.message)
+            }
+
+            Result.Loading -> {
+                //TODO
+            }
+
+            is Result.Success -> {
+                val localPath =
+                    fileManager.saveFile(data.data.data, data.data.fileName, mimeType)
+                localDataSource.insertFile(
+                    MaterialFile(
+                        id = fileId,
+                        localPath = localPath
+                    )
+                )
+                fileManager.openFile(localPath, mimeType)
+            }
+        }
     }
 
     override suspend fun openFile(fileId: String, url: String, mimeType: String) {

@@ -74,6 +74,7 @@ fun FileItem(
                     onDownload = {
                         action(
                             MaterialAction.OnDownloadFileClicked(
+                                file.id,
                                 file.url,
                                 file.name
                             )

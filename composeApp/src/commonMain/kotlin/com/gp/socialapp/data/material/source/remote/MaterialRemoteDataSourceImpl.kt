@@ -151,6 +151,7 @@ class MaterialRemoteDataSourceImpl(
 
     override suspend fun downloadFile(url: String): Result<MaterialResponse.DownloadFileResponse, MaterialError> {
         return try {
+            println("Downloading file from remote source $url")
             val response = client.post {
                 endPoint("download")
                 setBody(
@@ -159,8 +160,10 @@ class MaterialRemoteDataSourceImpl(
             }
             val data = response.body<MaterialResponse.DownloadFileResponse>()
             if (response.status == HttpStatusCode.OK) {
+                println("Success")
                 Result.Success(data)
             } else {
+                println("Error")
                 Result.Error(MaterialError.SERVER_ERROR)
             }
         } catch (e: Exception) {
