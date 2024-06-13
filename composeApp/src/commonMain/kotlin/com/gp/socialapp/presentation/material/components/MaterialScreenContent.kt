@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -22,10 +23,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.gp.socialapp.data.community.source.remote.model.isAdmin
 import com.gp.socialapp.data.material.model.MaterialFile
 import com.gp.socialapp.data.material.model.MaterialFolder
 import com.gp.socialapp.presentation.material.MaterialAction
@@ -52,6 +53,7 @@ fun MaterialScreenContent(
     var editFolderNameDialoge by remember { mutableStateOf(false) }
     var folderDetails by remember { mutableStateOf(MaterialFolder()) }
     val snackbarHostState = remember { SnackbarHostState() }
+    var selectedMode by rememberSaveable{ mutableStateOf(0) }
     if (state.error != null) {
         scope.launch {
             snackbarHostState.showSnackbar(
@@ -71,7 +73,12 @@ fun MaterialScreenContent(
 
     Scaffold(
         topBar = {
-            MaterialTopAppBar(state.listOfPreviousFolder, state.currentFolder, action)
+            MaterialTopAppBar(
+                paths = state.listOfPreviousFolder,
+                currentFolder = state.currentFolder,
+                action = action,
+                selectedMode = selectedMode,
+                onChangeSelectedMode = {newMode -> selectedMode = newMode})
         },
         floatingActionButton = {
             if(state.isAdmin){
@@ -114,46 +121,92 @@ fun MaterialScreenContent(
                 LinearProgressIndicator(
                     modifier = Modifier.fillMaxWidth(),
                 )
-            LazyVerticalGrid(
-                columns = GridCells.Adaptive(150.dp),
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                items(state.currentFolders) { folder ->
-                    FolderItem(
-                        isAdmin = state.isAdmin,
-                        folder = folder,
-                        action = {
-                            when (it) {
-                                is MaterialAction.OnFolderDetailsClicked -> {
-                                    folderDetialsDialogState = true
-                                    folderDetails = it.folder
-                                }
+            if (selectedMode == 0) {
+                LazyColumn (
+                    modifier = Modifier.fillMaxWidth(),
+                ){
+                    items(state.currentFolders.size) { index ->
+                        val folder = state.currentFolders[index]
+                        ListFolderItem(
+                            isAdmin = state.isAdmin,
+                            folder = folder,
+                            action = {
+                                when (it) {
+                                    is MaterialAction.OnFolderDetailsClicked -> {
+                                        folderDetialsDialogState = true
+                                        folderDetails = it.folder
+                                    }
 
-                                is MaterialAction.OnRenameFolderClicked -> {
-                                    editFolderNameDialoge = true
-                                    folderDetails = it.folder
-                                }
+                                    is MaterialAction.OnRenameFolderClicked -> {
+                                        editFolderNameDialoge = true
+                                        folderDetails = it.folder
+                                    }
 
-                                else -> action(it)
+                                    else -> action(it)
+                                }
                             }
-                        }
-                    )
+                        )
+                    }
+                    items(state.currentFiles.size) { index ->
+                        val file = state.currentFiles[index]
+                        ListFileItem(
+                            isAdmin = state.isAdmin,
+                            file = file,
+                            action = {
+                                when (it) {
+                                    is MaterialAction.OnDetailsClicked -> {
+                                        detialsDialogState = true
+                                        fileDetails = file
+                                    }
+
+                                    else -> action(it)
+                                }
+                            }
+                        )
+                    }
                 }
-                items(state.currentFiles) { file ->
-                    FileItem(
-                        isAdmin = state.isAdmin,
-                        file = file,
-                        action = {
-                            when (it) {
-                                is MaterialAction.OnDetailsClicked -> {
-                                    detialsDialogState = true
-                                    fileDetails = file
-                                }
+            } else {
+                LazyVerticalGrid(
+                    columns = GridCells.Adaptive(150.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    items(state.currentFolders) { folder ->
+                        GridFolderItem(
+                            isAdmin = state.isAdmin,
+                            folder = folder,
+                            action = {
+                                when (it) {
+                                    is MaterialAction.OnFolderDetailsClicked -> {
+                                        folderDetialsDialogState = true
+                                        folderDetails = it.folder
+                                    }
 
-                                else -> action(it)
+                                    is MaterialAction.OnRenameFolderClicked -> {
+                                        editFolderNameDialoge = true
+                                        folderDetails = it.folder
+                                    }
+
+                                    else -> action(it)
+                                }
                             }
-                        }
-                    )
+                        )
+                    }
+                    items(state.currentFiles) { file ->
+                        GridFileItem(
+                            isAdmin = state.isAdmin,
+                            file = file,
+                            action = {
+                                when (it) {
+                                    is MaterialAction.OnDetailsClicked -> {
+                                        detialsDialogState = true
+                                        fileDetails = file
+                                    }
+
+                                    else -> action(it)
+                                }
+                            }
+                        )
+                    }
                 }
             }
         }
