@@ -9,6 +9,8 @@ import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gp.socialapp.presentation.material.components.MaterialScreenContent
+import com.gp.socialapp.util.copyToClipboard
+import com.mohamedrejeb.calf.core.LocalPlatformContext
 
 data class MaterialScreen(
     val communityId: String,
@@ -17,13 +19,14 @@ data class MaterialScreen(
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = navigator.rememberNavigatorScreenModel<MaterialScreenModel>()
+        val context = LocalPlatformContext.current
         LifecycleEffect(
             onStarted = {
                 screenModel.init(communityId)
             },
             onDisposed = {}
         )
-        val state by screenModel.state.collectAsState()
+        val state by screenModel.uiState.collectAsState()
         MaterialScreenContent(
             state = state,
             action = {
@@ -34,7 +37,9 @@ data class MaterialScreen(
                         else
                             navigator.pop()
                     }
-
+                    is MaterialAction.OnCopyLinkClicked -> {
+                        context.copyToClipboard(it.url)
+                    }
                     else -> {
                         screenModel.handleUiEvent(it)
                     }

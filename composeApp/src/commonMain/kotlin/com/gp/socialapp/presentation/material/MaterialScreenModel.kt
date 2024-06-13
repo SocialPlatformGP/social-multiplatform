@@ -3,6 +3,8 @@ package com.gp.socialapp.presentation.material
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
+import com.gp.socialapp.data.auth.repository.AuthenticationRepository
+import com.gp.socialapp.data.community.repository.CommunityRepository
 import com.gp.socialapp.data.material.model.MaterialFolder
 import com.gp.socialapp.data.material.model.responses.MaterialResponse
 import com.gp.socialapp.data.material.repository.MaterialRepository
@@ -10,28 +12,72 @@ import com.gp.socialapp.data.material.repository.MaterialRepository
 import com.gp.socialapp.presentation.material.utils.MimeType
 import com.gp.socialapp.presentation.material.utils.MimeType.Companion.getFullMimeType
 import com.gp.socialapp.presentation.material.utils.MimeType.Companion.getMimeTypeFromFileName
+import com.gp.socialapp.presentation.post.feed.FeedError
 import com.gp.socialapp.util.DispatcherIO
 import com.gp.socialapp.util.Result
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class MaterialScreenModel(
-    private val materialRepo: MaterialRepository
+    private val materialRepo: MaterialRepository,
+    private val authRepo: AuthenticationRepository,
+    private val communityRepo: CommunityRepository
 ) : ScreenModel {
-    private val uiState = MutableStateFlow(MaterialUiState())
-    val state = uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(MaterialUiState())
+    val uiState = _uiState.asStateFlow()
     fun init(communityId: String) {
-        uiState.update {
-            it.copy(currentCommunityId = communityId)
+        screenModelScope.launch(DispatcherIO) {
+            authRepo.getSignedInUser().let { result ->
+                when (result) {
+                    is Result.Success -> {
+                        _uiState.update {
+                            it.copy(
+                                currentUser = result.data
+                            )
+                        }
+                        getCurrentCommunity(communityId)
+                        getMaterial()
+                    }
+
+                    is Result.Error -> {
+                        Napier.e("Error: ${result.message}")
+                    }
+
+                    else -> Unit
+                }
+            }
+
         }
-        getMaterial()
+    }
+    private fun getCurrentCommunity(communityId: String) {
+        screenModelScope.launch(DispatcherIO) {
+            communityRepo.fetchCommunity(communityId).collect { result ->
+                when (result) {
+                    is Result.Success -> {
+                        _uiState.update {
+                            it.copy(
+                                currentCommunity = result.data,
+                                isAdmin =result.data.members[_uiState.value.currentUser.id] == true
+                            )
+                        }
+                    }
+
+                    is Result.Error -> {
+                        println("Error: ${result.message.userMessage}")
+                    }
+
+                    else -> Unit
+                }
+            }
+        }
     }
 
     fun getMaterial() {
         screenModelScope.launch {
-            materialRepo.getMaterialAtPath(state.value.currentFolder.path).collect { result ->
+            materialRepo.getMaterialAtPath(uiState.value.currentFolder.path).collect { result ->
                 when (result) {
                     is Result.Error -> {
                         stopLoading()
@@ -60,8 +106,8 @@ class MaterialScreenModel(
         screenModelScope.launch {
             materialRepo.createFolder(
                 name = folderName,
-                path = state.value.currentFolder.path,
-                communityId = state.value.currentCommunityId
+                path = uiState.value.currentFolder.path,
+                communityId = uiState.value.currentCommunity.id
             ).collect { result ->
                 when (result) {
                     is Result.Error -> {
@@ -90,9 +136,9 @@ class MaterialScreenModel(
             materialRepo.createFile(
                 name = fileName,
                 type = fileType,
-                path = state.value.currentFolder.path,
+                path = uiState.value.currentFolder.path,
                 content = fileContent,
-                communityId = state.value.currentCommunityId
+                communityId = uiState.value.currentCommunity.id
             ).collect { result ->
                 when (result) {
                     is Result.Error -> {
@@ -118,9 +164,9 @@ class MaterialScreenModel(
         val newFolder = Folder(
             path = folder.id, name = folder.name
         )
-        uiState.update {
+        _uiState.update {
             it.copy(
-                listOfPreviousFolder = state.value.listOfPreviousFolder.plus(state.value.currentFolder),
+                listOfPreviousFolder = uiState.value.listOfPreviousFolder.plus(uiState.value.currentFolder),
                 currentFolder = newFolder,
 
                 )
@@ -130,14 +176,14 @@ class MaterialScreenModel(
     }
 
     fun closeFolder() {
-        uiState.update {
+        _uiState.update {
             it.copy(
-                currentFolder = state.value.listOfPreviousFolder.last(),
+                currentFolder = uiState.value.listOfPreviousFolder.last(),
             )
         }.also {
-            uiState.update {
+            _uiState.update {
                 it.copy(
-                    listOfPreviousFolder = state.value.listOfPreviousFolder.dropLast(1)
+                    listOfPreviousFolder = uiState.value.listOfPreviousFolder.dropLast(1)
                 )
             }.also {
                 getMaterial()
@@ -147,7 +193,7 @@ class MaterialScreenModel(
 
     private fun deleteFile(fileId: String) {
         screenModelScope.launch {
-            materialRepo.deleteFile(fileId, state.value.currentFolder.path).collect { result ->
+            materialRepo.deleteFile(fileId, uiState.value.currentFolder.path).collect { result ->
                 when (result) {
                     is Result.Error -> {
                         stopLoading()
@@ -220,8 +266,6 @@ class MaterialScreenModel(
             is MaterialAction.OnFileClicked -> openFile(
                 event.fileId, event.url, getMimeTypeFromFileName(event.fileName)
             )
-
-            is MaterialAction.OnShareLinkClicked -> shareLink(event.url)
             is MaterialAction.OnDeleteFolderClicked -> deleteFolder(event.folderId)
             is MaterialAction.OpenLink -> openLink(event.link)
             else -> Unit
@@ -258,12 +302,6 @@ class MaterialScreenModel(
         }
     }
 
-    private fun shareLink(url: String) {
-        screenModelScope.launch {
-            materialRepo.shareLink(url)
-        }
-    }
-
     private fun openFile(fileId: String, url: String, mimeType: MimeType) {
         screenModelScope.launch {
             val fullMimeType = getFullMimeType(mimeType)
@@ -272,7 +310,7 @@ class MaterialScreenModel(
     }
 
     private fun startLoading() {
-        uiState.update {
+        _uiState.update {
             it.copy(
                 isLoading = true
             )
@@ -280,7 +318,7 @@ class MaterialScreenModel(
     }
 
     private fun stopLoading() {
-        uiState.update {
+        _uiState.update {
             it.copy(
                 isLoading = false
             )
@@ -288,7 +326,7 @@ class MaterialScreenModel(
     }
 
     private fun showError(error: String) {
-        uiState.update {
+        _uiState.update {
             it.copy(
                 error = error
             )
@@ -296,7 +334,7 @@ class MaterialScreenModel(
     }
 
     private fun resetError() {
-        uiState.update {
+        _uiState.update {
             it.copy(
                 error = null
             )
@@ -304,10 +342,10 @@ class MaterialScreenModel(
     }
 
     private fun updateData(data: MaterialResponse.GetMaterialResponses) {
-        uiState.update {
+        _uiState.update {
             it.copy(
-                currentFiles = data.files.filter { it.communityId == state.value.currentCommunityId },
-                currentFolders = data.folders.filter { it.communityId == state.value.currentCommunityId }
+                currentFiles = data.files.filter { it.communityId == uiState.value.currentCommunity.id },
+                currentFolders = data.folders.filter { it.communityId == uiState.value.currentCommunity.id }
             )
         }
     }

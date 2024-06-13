@@ -25,6 +25,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.gp.socialapp.data.community.source.remote.model.isAdmin
 import com.gp.socialapp.data.material.model.MaterialFile
 import com.gp.socialapp.data.material.model.MaterialFolder
 import com.gp.socialapp.presentation.material.MaterialAction
@@ -73,8 +74,10 @@ fun MaterialScreenContent(
             MaterialTopAppBar(state.listOfPreviousFolder, state.currentFolder, action)
         },
         floatingActionButton = {
-            MaterialFab(filePicker) {
-                dialogState = true
+            if(state.isAdmin){
+                MaterialFab(filePicker) {
+                    dialogState = true
+                }
             }
         },
         snackbarHost = {
@@ -117,6 +120,7 @@ fun MaterialScreenContent(
             ) {
                 items(state.currentFolders) { folder ->
                     FolderItem(
+                        isAdmin = state.isAdmin,
                         folder = folder,
                         action = {
                             when (it) {
@@ -137,6 +141,7 @@ fun MaterialScreenContent(
                 }
                 items(state.currentFiles) { file ->
                     FileItem(
+                        isAdmin = state.isAdmin,
                         file = file,
                         action = {
                             when (it) {

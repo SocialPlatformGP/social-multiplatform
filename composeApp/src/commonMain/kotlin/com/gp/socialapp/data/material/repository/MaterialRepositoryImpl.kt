@@ -115,11 +115,6 @@ class MaterialRepositoryImpl(
         return remoteDataSource.renameFolder(folderId, newName)
     }
 
-    override suspend fun shareLink(url: String) {
-        if (getPlatform() != Platform.JS) {
-            fileManager.shareLink(url)
-        }
-    }
 
     override suspend fun openLink(url: String) {
         if (getPlatform() != Platform.JS) {

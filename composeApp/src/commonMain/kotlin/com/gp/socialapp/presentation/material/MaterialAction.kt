@@ -17,7 +17,7 @@ sealed interface MaterialAction {
 
     data class OnDownloadFileClicked(val id: String, val url: String, val fileName: String) : MaterialAction
     data class OnDetailsClicked(val file: MaterialFile) : MaterialAction
-    data class OnShareLinkClicked(val url: String) : MaterialAction
+    data class OnCopyLinkClicked(val url: String) : MaterialAction
     data class OpenLink(val link: String) : MaterialAction
     data class OnRenameFileClicked(val fileId: String, val newName: String) : MaterialAction
     data class OnRenameFolderClicked(val folder: MaterialFolder) : MaterialAction

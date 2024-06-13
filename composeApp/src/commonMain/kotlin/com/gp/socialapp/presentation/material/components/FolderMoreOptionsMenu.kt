@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 
 @Composable
 fun FolderMoreOptionsMenu(
+    isAdmin: Boolean,
     isExpanded: Boolean,
     onCloseMenu: () -> Unit,
     onDelete: () -> Unit,
@@ -26,20 +27,22 @@ fun FolderMoreOptionsMenu(
                     onCloseMenu()
                 }
             )
-            DropdownMenuItem(
-                text = { Text("Delete") },
-                onClick = {
-                    onDelete()
-                    onCloseMenu()
-                }
-            )
-            DropdownMenuItem(
-                text = { Text("Rename") },
-                onClick = {
-                    onRename()
-                    onCloseMenu()
-                }
-            )
+            if(isAdmin){
+                DropdownMenuItem(
+                    text = { Text("Delete") },
+                    onClick = {
+                        onDelete()
+                        onCloseMenu()
+                    }
+                )
+                DropdownMenuItem(
+                    text = { Text("Rename") },
+                    onClick = {
+                        onRename()
+                        onCloseMenu()
+                    }
+                )
+            }
             DropdownMenuItem(
                 text = { Text("Details") },
                 onClick = {

@@ -43,22 +43,6 @@ class FileManagerImpl(
         INSTANCE.startActivity(intent)
     }
 
-    override suspend fun shareLink(url: String) {
-        val link = "$BASE_URL$url"
-        val sendIntent: Intent = Intent(
-            Intent.ACTION_SEND
-        ).apply {
-            putExtra(Intent.EXTRA_SUBJECT, "Link From EduLink MultiPlatform App")
-            putExtra(
-                Intent.EXTRA_TEXT,
-                " I've found a file in edulink app that might be interested you $link"
-            )
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            type = "text/plain"
-        }
-        INSTANCE.startActivity(sendIntent)
-    }
-
     override suspend fun openLink(url: String) {
         val link = "$BASE_URL$url"
         val intent = Intent(Intent.ACTION_VIEW).apply {

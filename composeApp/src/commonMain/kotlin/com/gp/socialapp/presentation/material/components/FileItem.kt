@@ -26,7 +26,9 @@ import com.gp.socialapp.presentation.material.utils.getFileImageVector
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FileItem(
-    file: MaterialFile, action: (MaterialAction) -> Unit
+    isAdmin: Boolean,
+    file: MaterialFile,
+    action: (MaterialAction) -> Unit
 ) {
     var isMenuExpanded by remember { mutableStateOf(false) }
     Card(modifier = Modifier.fillMaxWidth().padding(4.dp).combinedClickable(
@@ -58,7 +60,8 @@ fun FileItem(
                 softWrap = false
             )
             if (isMenuExpanded) {
-                MoreOptionsMenu(
+                FileMoreOptionsMenu(
+                    isAdmin = isAdmin,
                     isExpanded = true,
                     onCloseMenu = { isMenuExpanded = false },
                     onDelete = { action(MaterialAction.OnDeleteFileClicked(file.id)) },
@@ -83,8 +86,8 @@ fun FileItem(
                     onDetails = {
                         action(MaterialAction.OnDetailsClicked(file))
                     },
-                    onShareFileClicked = {
-                        action(MaterialAction.OnShareLinkClicked(file.url))
+                    onCopyLinkClicked = {
+                        action(MaterialAction.OnCopyLinkClicked(file.url))
                     }
                 )
             }

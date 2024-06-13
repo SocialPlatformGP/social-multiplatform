@@ -35,7 +35,6 @@ interface MaterialRepository {
 
     suspend fun downloadFile(fileId: String, url: String, mimeType: String)
     suspend fun openFile(fileId: String, url: String, mimeType: String)
-    suspend fun shareLink(url: String)
     suspend fun openLink(url: String)
     fun renameFolder(
         folderId: String,

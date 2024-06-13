@@ -106,7 +106,7 @@ val screenModelModuleK = DI.Module("screenModelModule") {
             instance()
         )
     }
-    bind<MaterialScreenModel>() with singleton { MaterialScreenModel(instance()) }
+    bind<MaterialScreenModel>() with singleton { MaterialScreenModel(instance(), instance(), instance()) }
     bind<HomeScreenModel>() with singleton { HomeScreenModel(instance(), instance(), instance()) }
 
     bind<CreateCommunityScreenModel>() with singleton {

@@ -11,9 +11,6 @@ object DummyFileManager : FileManager {
         TODO("Not yet implemented")
     }
 
-    override suspend fun shareLink(url: String) {
-        TODO("Not yet implemented")
-    }
 
     override suspend fun openLink(url: String) {
         TODO("Not yet implemented")

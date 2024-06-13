@@ -80,8 +80,7 @@ data class FeedScreen(val communityId: String) : Screen {
 
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = rememberScreenModel<FeedScreenModel>()
-        LaunchedEffect(true)
-        { screenModel.initScreen(communityId) }
+        LaunchedEffect(true) { screenModel.initScreen(communityId) }
 
         var currentAttachments by remember { mutableStateOf(emptyList<PostAttachment>()) }
         val scope = rememberCoroutineScope()
@@ -95,12 +94,10 @@ data class FeedScreen(val communityId: String) : Screen {
         val tabItems = listOf(
             TabItem(stringResource(resource = Res.string.general), Icons.Filled.AllInclusive),
             TabItem(
-                stringResource(resource = Res.string.spotlight),
-                Icons.Filled.NotificationImportant
+                stringResource(resource = Res.string.spotlight), Icons.Filled.NotificationImportant
             ),
         )
-        FeedContent(
-            state = state,
+        FeedContent(state = state,
             currentUserID = state.currentUserID,
             onPostEvent = { action ->
                 when (action) {
@@ -209,20 +206,16 @@ data class FeedScreen(val communityId: String) : Screen {
                 SnackbarHost(hostState = snackbarHostState)
             },
             floatingActionButton = {
-                if (!currentUserIsAdmin(
-                        state.currentUser.id,
-                        state.currentCommunity.members
-                    ) && selectedTabIndex == 1
-                )
-                else
-                    FloatingActionButton(
-                        onClick = { onPostEvent(PostEvent.OnAddPost) }
-                    ) {
+                if (currentUserIsAdmin(
+                        state.currentUser.id, state.currentCommunity.members
+                    ) || selectedTabIndex != 1
+                ) {
+                    FloatingActionButton(onClick = { onPostEvent(PostEvent.OnAddPost) }) {
                         Icon(
-                            imageVector = Icons.Filled.Add,
-                            contentDescription = null
+                            imageVector = Icons.Filled.Add, contentDescription = null
                         )
                     }
+                }
             },
         ) { paddingValues ->
             if (state.error !is FeedError.NoError) {
@@ -240,21 +233,16 @@ data class FeedScreen(val communityId: String) : Screen {
                     .fillMaxSize()
             ) {
                 TabRow(
-                    modifier = Modifier
-                        .height(40.dp)
-                        .fillMaxWidth().clip(
+                    modifier = Modifier.height(40.dp).fillMaxWidth().clip(
                             RoundedCornerShape(
-                                bottomStart = 8.dp,
-                                bottomEnd = 8.dp
+                                bottomStart = 8.dp, bottomEnd = 8.dp
                             )
                         ),
                     selectedTabIndex = selectedTabIndex,
                     indicator = { tabPositions ->
                         SecondaryIndicator(
-                            modifier = Modifier
-                                .tabIndicatorOffset(tabPositions[selectedTabIndex])
-                                .padding(horizontal = 50.dp)
-                                .clip(CircleShape)
+                            modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex])
+                                .padding(horizontal = 50.dp).clip(CircleShape)
                                 .align(Alignment.CenterHorizontally),
                             height = 8.dp,
                             color = MaterialTheme.colorScheme.onPrimary
@@ -283,9 +271,7 @@ data class FeedScreen(val communityId: String) : Screen {
                     }
                 }
                 HorizontalPager(
-                    state = pagerState,
-                    modifier = Modifier
-                        .fillMaxWidth()
+                    state = pagerState, modifier = Modifier.fillMaxWidth()
                 ) { index ->
                     when (index) {
                         0 -> {
@@ -333,9 +319,7 @@ data class FeedScreen(val communityId: String) : Screen {
 
     @Composable
     fun FeedPosts(
-        posts: List<Post>,
-        onPostEvent: (PostEvent) -> Unit,
-        currentUserID: String
+        posts: List<Post>, onPostEvent: (PostEvent) -> Unit, currentUserID: String
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             LazyColumn(
@@ -343,9 +327,7 @@ data class FeedScreen(val communityId: String) : Screen {
             ) {
                 items(posts) { post ->
                     FeedPostItem(
-                        post = post,
-                        onPostEvent = onPostEvent,
-                        currentUserID = currentUserID
+                        post = post, onPostEvent = onPostEvent, currentUserID = currentUserID
                     )
                     Spacer(modifier = Modifier.size(6.dp))
                 }

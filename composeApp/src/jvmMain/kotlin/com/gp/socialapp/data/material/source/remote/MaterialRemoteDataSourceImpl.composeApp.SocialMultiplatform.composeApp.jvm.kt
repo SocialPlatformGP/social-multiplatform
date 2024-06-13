@@ -30,9 +30,6 @@ class FileManagerImpl() : FileManager {
         }
     }
 
-    override suspend fun shareLink(url: String) {
-
-    }
 
     override suspend fun openLink(url: String) {
         val link = "$BASE_URL$url".replace(" ", "%20")

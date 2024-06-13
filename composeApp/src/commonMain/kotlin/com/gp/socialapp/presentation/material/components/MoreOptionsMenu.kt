@@ -6,14 +6,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 
 @Composable
-fun MoreOptionsMenu(
+fun FileMoreOptionsMenu(
+    isAdmin: Boolean,
     isExpanded: Boolean,
     onCloseMenu: () -> Unit,
     onDelete: () -> Unit,
     onOpenFile: () -> Unit,
     onDownload: () -> Unit,
     onDetails: () -> Unit,
-    onShareFileClicked: () -> Unit
+    onCopyLinkClicked: () -> Unit
 ) {
     if (isExpanded) {
         DropdownMenu(
@@ -27,17 +28,19 @@ fun MoreOptionsMenu(
                     onCloseMenu()
                 }
             )
+            if(isAdmin){
+                DropdownMenuItem(
+                    text = { Text("Delete") },
+                    onClick = {
+                        onDelete()
+                        onCloseMenu()
+                    }
+                )
+            }
             DropdownMenuItem(
-                text = { Text("Delete") },
+                text = { Text("Copy Link") },
                 onClick = {
-                    onDelete()
-                    onCloseMenu()
-                }
-            )
-            DropdownMenuItem(
-                text = { Text("Share") },
-                onClick = {
-                    onShareFileClicked()
+                    onCopyLinkClicked()
                     onCloseMenu()
                 }
             )

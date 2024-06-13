@@ -1,5 +1,7 @@
 package com.gp.socialapp.presentation.material
 
+import com.gp.socialapp.data.auth.source.remote.model.User
+import com.gp.socialapp.data.community.source.remote.model.Community
 import com.gp.socialapp.data.material.model.MaterialFile
 import com.gp.socialapp.data.material.model.MaterialFolder
 
@@ -11,8 +13,9 @@ data class MaterialUiState(
     val error: String? = null,
     val currentFolder: Folder = Folder("root", "root"),
     val listOfPreviousFolder: List<Folder> = listOf(),
-    val currentCommunityId: String = ""
-
+    val currentUser: User = User(),
+    val currentCommunity: Community = Community(),
+    val isAdmin: Boolean = false
 )
 
 data class Folder(

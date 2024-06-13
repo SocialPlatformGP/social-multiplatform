@@ -26,6 +26,7 @@ import com.gp.socialapp.presentation.material.components.imageVectors.materialic
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FolderItem(
+    isAdmin: Boolean,
     folder: MaterialFolder,
     action: (MaterialAction) -> Unit
 ) {
@@ -61,6 +62,7 @@ fun FolderItem(
             )
             if (isMenuExpanded) {
                 FolderMoreOptionsMenu(
+                    isAdmin = isAdmin,
                     isExpanded = true,
                     onCloseMenu = { isMenuExpanded = false },
                     onDelete = { action(MaterialAction.OnDeleteFolderClicked(folder.id)) },
