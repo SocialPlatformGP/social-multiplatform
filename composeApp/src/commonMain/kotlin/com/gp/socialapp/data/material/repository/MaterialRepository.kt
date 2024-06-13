@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface MaterialRepository {
     suspend fun getMaterialAtPath(
+        communityId: String,
         path: String
     ): Flow<Result<MaterialResponse.GetMaterialResponses, MaterialError>>
 

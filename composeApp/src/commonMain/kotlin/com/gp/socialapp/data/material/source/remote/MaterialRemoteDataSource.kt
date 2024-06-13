@@ -11,6 +11,7 @@ interface MaterialRemoteDataSource {
         path: String,
     ): Result<MaterialResponse.DownloadChatAttachment, ChatError>
     suspend fun getMaterialAtPath(
+        communityId: String,
         path: String
     ): Flow<Result<MaterialResponse.GetMaterialResponses, MaterialError>>
 

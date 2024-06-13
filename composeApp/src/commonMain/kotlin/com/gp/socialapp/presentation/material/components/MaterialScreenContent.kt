@@ -1,7 +1,12 @@
 package com.gp.socialapp.presentation.material.components
 
+import androidx.compose.animation.core.EaseInOutCubic
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -25,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.gp.socialapp.data.material.model.MaterialFile
@@ -38,6 +44,7 @@ import com.mohamedrejeb.calf.picker.FilePickerSelectionMode
 import com.mohamedrejeb.calf.picker.rememberFilePickerLauncher
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MaterialScreenContent(
     state: MaterialUiState,
@@ -53,7 +60,7 @@ fun MaterialScreenContent(
     var editFolderNameDialoge by remember { mutableStateOf(false) }
     var folderDetails by remember { mutableStateOf(MaterialFolder()) }
     val snackbarHostState = remember { SnackbarHostState() }
-    var selectedMode by rememberSaveable{ mutableStateOf(0) }
+    var selectedMode by rememberSaveable { mutableStateOf(0) }
     if (state.error != null) {
         scope.launch {
             snackbarHostState.showSnackbar(
@@ -78,10 +85,10 @@ fun MaterialScreenContent(
                 currentFolder = state.currentFolder,
                 action = action,
                 selectedMode = selectedMode,
-                onChangeSelectedMode = {newMode -> selectedMode = newMode})
+                onChangeSelectedMode = { newMode -> selectedMode = newMode })
         },
         floatingActionButton = {
-            if(state.isAdmin){
+            if (state.isAdmin) {
                 MaterialFab(filePicker) {
                     dialogState = true
                 }
@@ -117,17 +124,46 @@ fun MaterialScreenContent(
         Column(
             modifier = Modifier.padding(paddingValues).fillMaxSize()
         ) {
+            if (selectedMode == 0) {
+                Row(
+                    modifier = Modifier.padding(4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Name",
+                        modifier = Modifier.weight(1f).padding(horizontal = 8.dp)
+                    )
+                    Text(
+                        text = "Created At",
+                        modifier = Modifier.weight(0.5f).padding(horizontal = 8.dp)
+                    )
+                    Text(
+                        text = "Size",
+                        modifier = Modifier.weight(0.4f).padding(horizontal = 8.dp)
+                    )
+                    Spacer(modifier = Modifier.weight(0.1f).padding(horizontal = 8.dp))
+                }
+            }
             if (state.isLoading)
                 LinearProgressIndicator(
                     modifier = Modifier.fillMaxWidth(),
                 )
             if (selectedMode == 0) {
-                LazyColumn (
+                LazyColumn(
                     modifier = Modifier.fillMaxWidth(),
-                ){
-                    items(state.currentFolders.size) { index ->
+                ) {
+                    items(
+                        count = state.currentFolders.size,
+                        key = { it }
+                    ) { index ->
                         val folder = state.currentFolders[index]
                         ListFolderItem(
+                            modifier = Modifier.animateItemPlacement(
+                                animationSpec = tween(
+                                    durationMillis = 800,
+                                    easing = EaseInOutCubic,
+                                )
+                            ),
                             isAdmin = state.isAdmin,
                             folder = folder,
                             action = {
@@ -147,9 +183,18 @@ fun MaterialScreenContent(
                             }
                         )
                     }
-                    items(state.currentFiles.size) { index ->
+                    items(
+                        count = state.currentFiles.size,
+                        key = { it + state.currentFolders.size}
+                    ) { index ->
                         val file = state.currentFiles[index]
                         ListFileItem(
+                            modifier = Modifier.animateItemPlacement(
+                                animationSpec = tween(
+                                    durationMillis = 800,
+                                    easing = EaseInOutCubic,
+                                )
+                            ),
                             isAdmin = state.isAdmin,
                             file = file,
                             action = {
@@ -170,8 +215,17 @@ fun MaterialScreenContent(
                     columns = GridCells.Adaptive(150.dp),
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    items(state.currentFolders) { folder ->
+                    items(
+                        items = state.currentFolders,
+                        key = { it }
+                    ) { folder ->
                         GridFolderItem(
+                            modifier = Modifier.animateItemPlacement(
+                                animationSpec = tween(
+                                    durationMillis = 800,
+                                    easing = EaseInOutCubic,
+                                )
+                            ),
                             isAdmin = state.isAdmin,
                             folder = folder,
                             action = {
@@ -191,8 +245,17 @@ fun MaterialScreenContent(
                             }
                         )
                     }
-                    items(state.currentFiles) { file ->
+                    items(
+                        items = state.currentFiles,
+                        key = { it }
+                    ) { file ->
                         GridFileItem(
+                            modifier = Modifier.animateItemPlacement(
+                                animationSpec = tween(
+                                    durationMillis = 800,
+                                    easing = EaseInOutCubic,
+                                )
+                            ),
                             isAdmin = state.isAdmin,
                             file = file,
                             action = {

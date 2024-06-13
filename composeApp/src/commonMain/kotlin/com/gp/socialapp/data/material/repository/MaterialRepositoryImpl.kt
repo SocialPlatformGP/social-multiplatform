@@ -17,8 +17,8 @@ class MaterialRepositoryImpl(
     private val localDataSource: MaterialLocalDataSource,
     private val fileManager: FileManager
 ) : MaterialRepository {
-    override suspend fun getMaterialAtPath(path: String): Flow<Result<MaterialResponse.GetMaterialResponses,MaterialError>> {
-        return remoteDataSource.getMaterialAtPath(path)
+    override suspend fun getMaterialAtPath(communityId: String, path: String): Flow<Result<MaterialResponse.GetMaterialResponses,MaterialError>> {
+        return remoteDataSource.getMaterialAtPath(communityId, path)
     }
 
     override suspend fun createFolder(

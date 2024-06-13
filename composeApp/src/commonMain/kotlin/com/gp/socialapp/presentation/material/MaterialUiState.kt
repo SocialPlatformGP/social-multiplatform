@@ -11,7 +11,7 @@ data class MaterialUiState(
     val currentFiles: List<MaterialFile> = emptyList(),
     val currentFolders: List<MaterialFolder> = emptyList(),
     val error: String? = null,
-    val currentFolder: Folder = Folder("root", "root"),
+    val currentFolder: Folder = Folder("Home", "Home"),
     val listOfPreviousFolder: List<Folder> = listOf(),
     val currentUser: User = User(),
     val currentCommunity: Community = Community(),

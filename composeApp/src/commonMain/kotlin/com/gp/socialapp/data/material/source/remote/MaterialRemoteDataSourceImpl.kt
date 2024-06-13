@@ -37,8 +37,8 @@ class MaterialRemoteDataSourceImpl(
 
     }
 
-    override suspend fun getMaterialAtPath(path: String): Flow<Result<MaterialResponse.GetMaterialResponses, MaterialError>> {
-        val request = MaterialRequest.GetMaterialRequest(path)
+    override suspend fun getMaterialAtPath(communityId: String, path: String): Flow<Result<MaterialResponse.GetMaterialResponses, MaterialError>> {
+        val request = MaterialRequest.GetMaterialRequest(communityId, path)
         return flow {
             emit(Result.Loading)
             try {

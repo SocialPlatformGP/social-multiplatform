@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 sealed class MaterialRequest {
     @Serializable
     data class GetMaterialRequest(
+        val communityId: String,
         val path: String = ""
     ) : MaterialRequest()
 

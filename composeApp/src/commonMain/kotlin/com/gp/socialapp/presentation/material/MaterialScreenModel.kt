@@ -77,7 +77,7 @@ class MaterialScreenModel(
 
     fun getMaterial() {
         screenModelScope.launch {
-            materialRepo.getMaterialAtPath(uiState.value.currentFolder.path).collect { result ->
+            materialRepo.getMaterialAtPath(uiState.value.currentCommunity.id, uiState.value.currentFolder.path).collect { result ->
                 when (result) {
                     is Result.Error -> {
                         stopLoading()
@@ -344,8 +344,8 @@ class MaterialScreenModel(
     private fun updateData(data: MaterialResponse.GetMaterialResponses) {
         _uiState.update {
             it.copy(
-                currentFiles = data.files.filter { it.communityId == uiState.value.currentCommunity.id },
-                currentFolders = data.folders.filter { it.communityId == uiState.value.currentCommunity.id }
+                currentFiles = data.files,
+                currentFolders = data.folders
             )
         }
     }

@@ -38,6 +38,14 @@ object LocalDateTimeUtil {
             localDateTime.date.daysUntil(today) < 7 -> localDateTime.date.dayOfWeek.name
             else -> localDateTime.toDDMMYYYY()
         }
+    }fun LocalDateTime.getDateHeader(): String {
+        val today = LocalDateTime.now().date
+        return when {
+            this.date == today -> "Today"
+            this.date == today.minus(1, DateTimeUnit.DAY) -> "Yesterday"
+            this.date.daysUntil(today) < 7 -> this.date.dayOfWeek.name
+            else -> this.toDDMMYYYY()
+        }
     }
     fun DateTimeTz.getDateHeader(): String {
         val today = DateTimeTz.nowLocal()
