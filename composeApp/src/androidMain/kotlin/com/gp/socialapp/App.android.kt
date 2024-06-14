@@ -8,7 +8,6 @@ import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.ContextCompat
-import androidx.window.layout.WindowInfoTracker
 import com.gp.socialapp.di.HandleDeepLink
 import com.gp.socialapp.di.platformModule
 import com.gp.socialapp.presentation.app.App

@@ -1,5 +1,7 @@
 package com.gp.socialapp.presentation.material
 
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -15,11 +17,13 @@ import com.mohamedrejeb.calf.core.LocalPlatformContext
 data class MaterialScreen(
     val communityId: String,
 ) : Screen {
+    @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = navigator.rememberNavigatorScreenModel<MaterialScreenModel>()
         val context = LocalPlatformContext.current
+        val windowSizeClass = calculateWindowSizeClass()
         LifecycleEffect(
             onStarted = {
                 screenModel.init(communityId)
@@ -28,6 +32,7 @@ data class MaterialScreen(
         )
         val state by screenModel.uiState.collectAsState()
         MaterialScreenContent(
+            windowSizeClass = windowSizeClass,
             state = state,
             action = {
                 when (it) {
