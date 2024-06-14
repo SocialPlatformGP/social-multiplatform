@@ -46,17 +46,7 @@ kotlin {
     }
     jvm()
 
-    js {
-        browser()
-        binaries.executable()
-        browser {
-            commonWebpackConfig {
-                cssSupport {
-                    enabled.set(true)
-                }
-            }
-        }
-    }
+
 
     sourceSets {
         all {
@@ -97,6 +87,8 @@ kotlin {
             implementation(libs.supabase.storage)
             implementation(libs.supabase.realtime)
             implementation(libs.supabase.postgrest)
+            implementation(libs.window.size.multiplatform)
+
         }
 
         commonTest.dependencies {
@@ -128,13 +120,6 @@ kotlin {
             implementation(libs.compose.pdf)
         }
 
-        jsMain.dependencies {
-            implementation(compose.html.core)
-            implementation(libs.ktor.client.js)
-        }
-//        jsMain.configure {
-//            resources.srcDir(layout.buildDirectory.dir("sqlite"))
-//        }
 
     }
 }
@@ -181,14 +166,7 @@ compose.desktop {
         }
     }
 }
-compose.experimental {
-    web.application {}
-}
 
-//buildConfig {
-//    // BuildConfig configuration here.
-//    // https://github.com/gmazzo/gradle-buildconfig-plugin#usage-in-kts
-//}
 
 sqldelight {
     databases {
@@ -199,10 +177,4 @@ sqldelight {
         }
     }
 }
-//apollo {
-//    service("api") {
-//        // GraphQL configuration here.
-//        // https://www.apollographql.com/docs/kotlin/advanced/plugin-configuration/
-//        packageName.set("com.gp.socialapp.graphql")
-//    }
-//}
+
