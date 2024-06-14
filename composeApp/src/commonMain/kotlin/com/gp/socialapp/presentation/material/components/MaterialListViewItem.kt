@@ -1,6 +1,7 @@
 package com.gp.socialapp.presentation.material.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -8,9 +9,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -30,26 +34,32 @@ fun RowScope.MaterialListViewItem(
     createdAt: LocalDateTime,
     onMoreClicked: () -> Unit
 ) {
-    Image(
-        imageVector = if (isFolder) MaterialIcon.Folder else getFileImageVector(
-            MimeType.getMimeTypeFromFileName(
-                name
-            )
-        ),
-        contentDescription = "Folder",
-        modifier = Modifier.size(24.dp)
-    )
-    Text(
-        text = name,
-        fontSize = 14.sp,
-        maxLines = 1,
-        textAlign = TextAlign.Start,
-        overflow = TextOverflow.Ellipsis,
-        modifier = Modifier.weight(1f).padding(horizontal = 8.dp)
-    )
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.weight(1f)
+    ) {
+        Icon(
+            imageVector = if (isFolder) MaterialIcon.Folder else getFileImageVector(
+                MimeType.getMimeTypeFromFileName(
+                    name
+                )
+            ),
+            tint = Color.Unspecified,
+            contentDescription = "Folder",
+            modifier = Modifier.size(36.dp)
+        )
+        Text(
+            text = name,
+            style = MaterialTheme.typography.bodyMedium,
+            maxLines = 1,
+            textAlign = TextAlign.Start,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.padding(horizontal = 8.dp)
+        )
+    }
     Text(
         text = createdAt.getDateHeader(),
-        fontSize = 12.sp,
+        style = MaterialTheme.typography.bodySmall,
         maxLines = 1,
         textAlign = TextAlign.Start,
         overflow = TextOverflow.Ellipsis,
@@ -58,7 +68,7 @@ fun RowScope.MaterialListViewItem(
     )
     Text(
         text = size,
-        fontSize = 12.sp,
+        style = MaterialTheme.typography.bodySmall,
         maxLines = 1,
         textAlign = TextAlign.Start,
         overflow = TextOverflow.Ellipsis,
