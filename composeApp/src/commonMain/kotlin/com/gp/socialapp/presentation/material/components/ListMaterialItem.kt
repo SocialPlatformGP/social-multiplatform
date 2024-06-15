@@ -229,7 +229,7 @@ fun ListMaterialItem(
                         trailingContent = {
                             IconButton(
                                 onClick = onMoreClicked,
-                                modifier = Modifier.weight(0.1f).padding(horizontal = 8.dp)
+                                modifier = Modifier.padding(horizontal = 8.dp)
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.MoreVert,

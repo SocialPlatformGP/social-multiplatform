@@ -3,12 +3,20 @@ package com.gp.socialapp.presentation.material.components
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreHoriz
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
@@ -17,7 +25,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -28,6 +40,7 @@ import com.gp.socialapp.presentation.material.components.imageVectors.MaterialIc
 import com.gp.socialapp.presentation.material.components.imageVectors.materialicon.Folder
 import com.gp.socialapp.presentation.material.utils.MimeType
 import com.gp.socialapp.presentation.material.utils.getFileImageVector
+import com.gp.socialapp.util.LocalDateTimeUtil.getDateHeader
 
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
@@ -51,18 +64,26 @@ fun GridMaterialItem(
         Column(
             modifier = Modifier.padding(4.dp)
         ) {
-            Image(
-                imageVector = MaterialIcon.Folder,
-                contentDescription = "Folder",
-                modifier = Modifier.fillMaxWidth().size(100.dp)
-            )
-            Text(
-                text = folder.name,
-                fontSize = 14.sp,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-                softWrap = false
-            )
+            when(windowWidthSizeClass){
+                WindowWidthSizeClass.Compact -> {
+                    CompactGridMaterialItem(
+                        imageVector = MaterialIcon.Folder,
+                        name = folder.name,
+                        onMoreClicked = {
+                            isMenuExpanded = !isMenuExpanded
+                        }
+                    )
+                }
+                else -> {
+                    ExpandedGridMaterialItem(
+                        isFolder = true,
+                        name = folder.name,
+                        onMoreClicked = {
+                            isMenuExpanded = !isMenuExpanded
+                        }
+                    )
+                }
+            }
             if (isMenuExpanded) {
                 MaterialMoreMenu(
                     isAdmin = isAdmin,
@@ -95,6 +116,89 @@ fun GridMaterialItem(
     }
 }
 
+@Composable
+fun ExpandedGridMaterialItem(
+    modifier: Modifier = Modifier,
+    isFolder: Boolean,
+    name: String,
+    onMoreClicked: () -> Unit
+) {
+    ListItem(
+        modifier = modifier,
+        leadingContent = {
+            Icon(
+                imageVector = if(isFolder) MaterialIcon.Folder else getFileImageVector(
+                    MimeType.getMimeTypeFromFileName(
+                        name
+                    )
+                ),
+                contentDescription = null,
+                tint = Color.Unspecified,
+                modifier = Modifier.size(24.dp)
+            )
+        },
+        headlineContent = {
+            Text(
+                text = name,
+                style = MaterialTheme.typography.bodyMedium,
+                maxLines = 1,
+                textAlign = TextAlign.Start,
+                overflow = TextOverflow.Ellipsis,
+                softWrap = false
+            )
+        },
+        trailingContent = {
+            IconButton(
+                onClick = onMoreClicked,
+                modifier = Modifier.padding(horizontal = 8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.MoreVert,
+                    contentDescription = "dropdown menu"
+                )
+            }
+        }
+    )
+}
+@Composable
+fun CompactGridMaterialItem(
+    modifier: Modifier = Modifier,
+    imageVector: ImageVector,
+    name: String,
+    onMoreClicked: () -> Unit
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Image(
+            imageVector = imageVector,
+            contentDescription = null,
+            modifier = Modifier.fillMaxWidth().size(64.dp)
+        )
+        Box(
+            modifier = Modifier.padding(8.dp)
+        ){
+            Text(
+                text = name,
+                style = MaterialTheme.typography.bodyMedium,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.align(Alignment.Center)
+            )
+            IconButton(
+                onClick = onMoreClicked,
+                modifier = Modifier.align(Alignment.TopEnd)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.MoreHoriz,
+                    contentDescription = null
+                )
+            }
+        }
+    }
+}
+
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun GridMaterialItem(
@@ -114,20 +218,26 @@ fun GridMaterialItem(
         Column(
             modifier = Modifier.padding(4.dp)
         ) {
-            Image(
-                imageVector = getFileImageVector(
-                    MimeType.getMimeTypeFromFileName(
-                        file.name
+            when(windowWidthSizeClass){
+                WindowWidthSizeClass.Compact -> {
+                    CompactGridMaterialItem(
+                        imageVector = getFileImageVector(MimeType.getMimeTypeFromFileName(file.name)),
+                        name = file.name,
+                        onMoreClicked = {
+                            isMenuExpanded = !isMenuExpanded
+                        }
                     )
-                ), contentDescription = "File", modifier = Modifier.fillMaxWidth().size(100.dp)
-            )
-            Text(
-                text = file.name,
-                fontSize = 14.sp,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-                softWrap = false
-            )
+                }
+                else -> {
+                    ExpandedGridMaterialItem(
+                        isFolder = false,
+                        name = file.name,
+                        onMoreClicked = {
+                            isMenuExpanded = !isMenuExpanded
+                        }
+                    )
+                }
+            }
             if (isMenuExpanded) {
                 MaterialMoreMenu(isExpanded = true,
                     isAdmin = isAdmin,

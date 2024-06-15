@@ -42,12 +42,12 @@ fun FileDetailsItem(
             Text(
                 text = title,
                 modifier = Modifier.padding(start = 8.dp),
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleSmall,
             )
             Text(
                 text = value,
                 modifier = Modifier.padding(start = 8.dp),
-                style = MaterialTheme.typography.labelMedium,
+                style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Normal,
                 color = MaterialTheme.colorScheme.surfaceTint
             )

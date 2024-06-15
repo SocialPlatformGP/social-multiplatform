@@ -28,7 +28,7 @@ import kotlinx.serialization.json.JsonNull.content
 
 @Composable
 fun MaterialFab(
-    filePicker: FilePickerLauncher,
+    onUploadFileClicked: () -> Unit,
     windowWidthSizeClass: WindowWidthSizeClass,
     onCreateFolderClicked: () -> Unit
 ) {
@@ -61,7 +61,7 @@ fun MaterialFab(
                 windowWidthSizeClass = windowWidthSizeClass,
                 onClick = {
                     fabState = fabState.not()
-                    filePicker.launch()
+                    onUploadFileClicked()
                 },
                 compactContent = {
                     Icon(

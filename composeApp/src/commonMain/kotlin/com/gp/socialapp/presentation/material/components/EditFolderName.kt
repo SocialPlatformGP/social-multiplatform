@@ -3,11 +3,14 @@ package com.gp.socialapp.presentation.material.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -49,17 +52,8 @@ fun EditFolderName(
                 modifier = Modifier.padding(16.dp).fillMaxWidth(),
                 verticalArrangement = Arrangement.Center,
             ) {
-                Text(
-                    text = "Enter new folder name",
-                    style = MaterialTheme.typography.headlineSmall,
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Center
-                )
-                HorizontalDivider(
-                    modifier = Modifier.padding(8.dp),
-                    thickness = 1.dp,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
+                Text(text = "New folder name", style = MaterialTheme.typography.headlineSmall)
+                Spacer(modifier = Modifier.size(8.dp))
                 OutlinedTextField(
                     value = text,
                     onValueChange = {
@@ -68,23 +62,28 @@ fun EditFolderName(
                     label = { Text("Folder Name") },
                     modifier = Modifier.fillMaxWidth()
                 )
-                Row {
+                Row (
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End,
+                ) {
                     TextButton(
+                        onClick = {
+                            onDismissRequest()
+                        },
+                        modifier = Modifier.padding(8.dp),
+                    ) {
+                        Text("Cancel")
+                    }
+                    Button(
                         onClick = {
                             onRenameFolderClicked(text)
                             onDismissRequest()
                         },
-                        modifier = Modifier.padding(8.dp)
+                        enabled = text.isNotBlank(),
+                        modifier = Modifier.padding(8.dp).padding(end = 8.dp)
                     ) {
                         Text("Rename")
-                    }
-                    TextButton(
-                        onClick = {
-                            onDismissRequest()
-                        },
-                        modifier = Modifier.padding(8.dp)
-                    ) {
-                        Text("Cancel")
                     }
                 }
 

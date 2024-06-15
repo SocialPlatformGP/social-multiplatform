@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.ShieldMoon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -17,6 +18,9 @@ import com.gp.socialapp.data.assignment.model.UserAssignmentSubmission
 import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.data.community.model.CommunityMemberRequest
 import com.gp.socialapp.presentation.app.App
+import com.gp.socialapp.presentation.material.MaterialUiState
+import com.gp.socialapp.presentation.material.components.CreateFolderDialog
+import com.gp.socialapp.presentation.material.components.MaterialScreenContent
 import com.gp.socialapp.theme.AppTheme
 import com.gp.socialapp.util.LocalDateTimeUtil.now
 import kotlinx.datetime.LocalDateTime
@@ -44,7 +48,11 @@ val submissions = listOf(
 @Composable
 fun PreviewApp() {
     AppTheme {
+        Column {
 
+            CreateFolderDialog {
 
+            }
+        }
     }
 }

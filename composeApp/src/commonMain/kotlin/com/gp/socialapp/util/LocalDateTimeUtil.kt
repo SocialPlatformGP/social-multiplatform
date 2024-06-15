@@ -17,6 +17,7 @@ import kotlinx.datetime.daysUntil
 import kotlinx.datetime.minus
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
+import java.time.format.TextStyle
 
 object LocalDateTimeUtil {
     fun LocalDateTime.Companion.now() = Clock.System.now().toLocalDateTime(TimeZone.UTC)
@@ -38,12 +39,13 @@ object LocalDateTimeUtil {
             localDateTime.date.daysUntil(today) < 7 -> localDateTime.date.dayOfWeek.name
             else -> localDateTime.toDDMMYYYY()
         }
-    }fun LocalDateTime.getDateHeader(): String {
+    }
+    fun LocalDateTime.getDateHeader(): String {
         val today = LocalDateTime.now().date
         return when {
             this.date == today -> "Today"
             this.date == today.minus(1, DateTimeUnit.DAY) -> "Yesterday"
-            this.date.daysUntil(today) < 7 -> this.date.dayOfWeek.name
+            this.date.daysUntil(today) < 7 -> "Last "+this.date.dayOfWeek.getDisplayName(TextStyle.FULL, java.util.Locale.getDefault())
             else -> this.toDDMMYYYY()
         }
     }

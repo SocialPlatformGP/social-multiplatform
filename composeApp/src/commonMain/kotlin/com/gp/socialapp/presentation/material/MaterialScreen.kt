@@ -32,7 +32,7 @@ data class MaterialScreen(
         )
         val state by screenModel.uiState.collectAsState()
         MaterialScreenContent(
-            windowSizeClass = windowSizeClass,
+            windowWidthSizeClass = windowSizeClass.widthSizeClass,
             state = state,
             action = {
                 when (it) {

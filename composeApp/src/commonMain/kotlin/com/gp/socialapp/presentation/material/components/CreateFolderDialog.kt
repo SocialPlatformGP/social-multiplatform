@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -54,12 +55,13 @@ fun CreateFolderDialog(
                 OutlinedTextField(
                     value = textValue,
                     onValueChange = { textValue = it },
-                    placeholder = { Text(text = "Folder Name") }
+                    placeholder = { Text(text = "Folder Name") },
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
                 )
                 Row(
                     modifier = Modifier
                         .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceAround,
+                    horizontalArrangement = Arrangement.End,
                 ) {
                     TextButton(
                         onClick = onDismissRequest,
@@ -67,15 +69,15 @@ fun CreateFolderDialog(
                     ) {
                         Text("Cancel")
                     }
-                    TextButton(
+                    Button(
                         onClick = {
                             onConfirmation(textValue)
                             onDismissRequest()
                         },
                         enabled = textValue.isNotBlank(),
-                        modifier = Modifier.padding(8.dp),
+                        modifier = Modifier.padding(8.dp).padding(end = 8.dp),
                     ) {
-                        Text("Confirm")
+                        Text("Create")
                     }
                 }
             }

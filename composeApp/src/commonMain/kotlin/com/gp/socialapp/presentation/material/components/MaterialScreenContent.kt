@@ -3,6 +3,8 @@ package com.gp.socialapp.presentation.material.components
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.EaseInOutCubic
 import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
@@ -56,7 +58,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun MaterialScreenContent(
-    windowSizeClass: WindowSizeClass,
+    windowWidthSizeClass: WindowWidthSizeClass,
     state: MaterialUiState,
     action: (MaterialAction) -> Unit,
 ) {
@@ -95,14 +97,24 @@ fun MaterialScreenContent(
                 paths = state.listOfPreviousFolder,
                 currentFolder = state.currentFolder,
                 action = action,
+                isAdmin = state.isAdmin,
+                windowWidthSizeClass = windowWidthSizeClass,
                 selectedMode = selectedMode,
+                onUploadFileClicked = { filePicker.launch() },
+                onCreateFolderClicked = { dialogState = true },
                 onChangeSelectedMode = { newMode -> selectedMode = newMode })
         },
         floatingActionButton = {
-            if (state.isAdmin) {
-                MaterialFab(filePicker, windowSizeClass.widthSizeClass) {
-                    dialogState = true
-                }
+            if (state.isAdmin && windowWidthSizeClass == WindowWidthSizeClass.Compact) {
+                MaterialFab(
+                    onUploadFileClicked = {
+                        filePicker.launch()
+                    },
+                    windowWidthSizeClass = windowWidthSizeClass,
+                    onCreateFolderClicked = {
+                        dialogState = true
+                    }
+                )
             }
         },
         snackbarHost = {
@@ -135,7 +147,7 @@ fun MaterialScreenContent(
         Column(
             modifier = Modifier.padding(paddingValues).fillMaxSize()
         ) {
-            if (selectedMode == 0 && windowSizeClass.widthSizeClass != WindowWidthSizeClass.Compact) {
+            if (selectedMode == 0 && windowWidthSizeClass != WindowWidthSizeClass.Compact) {
                 Row(
                     modifier = Modifier.padding(4.dp),
                     verticalAlignment = Alignment.CenterVertically
@@ -170,7 +182,7 @@ fun MaterialScreenContent(
                     ) { index ->
                         val animatable = remember { Animatable(0.5f) }
                         LaunchedEffect(key1 = true) {
-                            animatable.animateTo(1f, tween(350, easing = FastOutSlowInEasing))
+                            animatable.animateTo(1f, spring(Spring.DampingRatioNoBouncy, Spring.StiffnessVeryLow))
                         }
                         val folder = state.currentFolders[index]
                         ListMaterialItem(
@@ -179,7 +191,7 @@ fun MaterialScreenContent(
                                 this.scaleY = animatable.value
                             },
                             sheetState = sheetState,
-                            windowWidthSizeClass = windowSizeClass.widthSizeClass,
+                            windowWidthSizeClass = windowWidthSizeClass,
                             isAdmin = state.isAdmin,
                             folder = folder,
                             action = {
@@ -214,7 +226,7 @@ fun MaterialScreenContent(
                                 this.scaleY = animatable.value
                             },
                             sheetState = sheetState,
-                            windowWidthSizeClass = windowSizeClass.widthSizeClass,
+                            windowWidthSizeClass = windowWidthSizeClass,
                             isAdmin = state.isAdmin,
                             file = file,
                             action = {
@@ -247,7 +259,7 @@ fun MaterialScreenContent(
                                 )
                             ),
                             sheetState = sheetState,
-                            windowWidthSizeClass = windowSizeClass.widthSizeClass,
+                            windowWidthSizeClass = windowWidthSizeClass,
                             isAdmin = state.isAdmin,
                             folder = folder,
                             action = {
@@ -279,7 +291,7 @@ fun MaterialScreenContent(
                                 )
                             ),
                             sheetState = sheetState,
-                            windowWidthSizeClass = windowSizeClass.widthSizeClass,
+                            windowWidthSizeClass = windowWidthSizeClass,
                             isAdmin = state.isAdmin,
                             file = file,
                             action = {

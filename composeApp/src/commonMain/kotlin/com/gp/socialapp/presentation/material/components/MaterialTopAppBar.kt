@@ -4,17 +4,24 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ViewList
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.CreateNewFolder
 import androidx.compose.material.icons.filled.GridView
+import androidx.compose.material.icons.filled.UploadFile
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,10 +33,14 @@ import com.gp.socialapp.presentation.material.MaterialAction
 @Composable
 fun MaterialTopAppBar(
     modifier: Modifier = Modifier,
+    isAdmin: Boolean,
+    windowWidthSizeClass: WindowWidthSizeClass,
     paths: List<Folder>,
     currentFolder: Folder,
     selectedMode: Int,
     onChangeSelectedMode: (Int) -> Unit,
+    onUploadFileClicked: () -> Unit,
+    onCreateFolderClicked: () -> Unit,
     action: (MaterialAction) -> Unit
 ) {
 
@@ -46,8 +57,41 @@ fun MaterialTopAppBar(
         }
         val names = paths.map { it.name }
         Spacer(modifier = Modifier.width(16.dp))
-        Text(if(names.isEmpty()) "Home" else names.joinToString(separator = " > ") + " > " + currentFolder.name)
+        Text(if (names.isEmpty()) "Home" else names.joinToString(separator = " > ") + " > " + currentFolder.name)
         Spacer(modifier = Modifier.weight(1f))
+        if (isAdmin && windowWidthSizeClass != WindowWidthSizeClass.Compact) {
+            TextButton(
+                onClick = {
+                    onCreateFolderClicked()
+                },
+                modifier = Modifier.padding(end = 4.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.CreateNewFolder,
+                    contentDescription = "Add Folder",
+                )
+                Text(
+                    "Create Folder",
+                    modifier = Modifier.padding(start = 4.dp)
+                )
+            }
+            Button(
+                onClick = {
+                    onUploadFileClicked()
+                },
+                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier.padding(start = 4.dp, end = 16.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.UploadFile,
+                    contentDescription = "Add Folder",
+                )
+                Text(
+                    "Upload File",
+                    modifier = Modifier.padding(start = 4.dp)
+                )
+            }
+        }
         SingleChoiceSegmentedButtonRow {
             SegmentedButton(
                 selected = selectedMode == 0,
