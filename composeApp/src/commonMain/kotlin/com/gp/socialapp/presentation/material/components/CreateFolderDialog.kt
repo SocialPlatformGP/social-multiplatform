@@ -50,7 +50,7 @@ fun CreateFolderDialog(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Text(text = "New Folder", style = MaterialTheme.typography.headlineSmall)
+                Text(text = "New Folder", style = MaterialTheme.typography.headlineSmall, modifier = Modifier.align(Alignment.Start))
                 Spacer(modifier = Modifier.size(8.dp))
                 OutlinedTextField(
                     value = textValue,

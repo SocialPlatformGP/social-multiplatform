@@ -218,7 +218,7 @@ fun MaterialScreenContent(
                         val file = state.currentFiles[index]
                         val animatable = remember { Animatable(0.5f) }
                         LaunchedEffect(key1 = true) {
-                            animatable.animateTo(1f, tween(350, easing = FastOutSlowInEasing))
+                            animatable.animateTo(1f, spring(Spring.DampingRatioNoBouncy, Spring.StiffnessVeryLow))
                         }
                         ListMaterialItem(
                             modifier = Modifier.graphicsLayer {
@@ -243,21 +243,29 @@ fun MaterialScreenContent(
                     }
                 }
             } else {
+                val minSize = when(windowWidthSizeClass) {
+                    WindowWidthSizeClass.Compact -> 150.dp
+                    WindowWidthSizeClass.Medium -> 190.dp
+                    WindowWidthSizeClass.Expanded -> 225.dp
+                    else -> 200.dp
+                }
                 LazyVerticalGrid(
-                    columns = GridCells.Adaptive(150.dp),
+                    columns = GridCells.Adaptive(minSize = minSize),
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     items(
                         items = state.currentFolders,
                         key = { it }
                     ) { folder ->
+                        val animatable = remember { Animatable(0.5f) }
+                        LaunchedEffect(key1 = true) {
+                            animatable.animateTo(1f, spring(Spring.DampingRatioNoBouncy, Spring.StiffnessVeryLow))
+                        }
                         GridMaterialItem(
-                            modifier = Modifier.animateItemPlacement(
-                                animationSpec = tween(
-                                    durationMillis = 800,
-                                    easing = EaseInOutCubic,
-                                )
-                            ),
+                            modifier = Modifier.graphicsLayer {
+                                this.scaleX = animatable.value
+                                this.scaleY = animatable.value
+                            },
                             sheetState = sheetState,
                             windowWidthSizeClass = windowWidthSizeClass,
                             isAdmin = state.isAdmin,
@@ -283,13 +291,15 @@ fun MaterialScreenContent(
                         items = state.currentFiles,
                         key = { it }
                     ) { file ->
+                        val animatable = remember { Animatable(0.5f) }
+                        LaunchedEffect(key1 = true) {
+                            animatable.animateTo(1f, spring(Spring.DampingRatioNoBouncy, Spring.StiffnessVeryLow))
+                        }
                         GridMaterialItem(
-                            modifier = Modifier.animateItemPlacement(
-                                animationSpec = tween(
-                                    durationMillis = 800,
-                                    easing = EaseInOutCubic,
-                                )
-                            ),
+                            modifier = Modifier.graphicsLayer {
+                                this.scaleX = animatable.value
+                                this.scaleY = animatable.value
+                            },
                             sheetState = sheetState,
                             windowWidthSizeClass = windowWidthSizeClass,
                             isAdmin = state.isAdmin,
