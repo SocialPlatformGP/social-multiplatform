@@ -1,26 +1,14 @@
 import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.ShieldMoon
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.gp.socialapp.data.assignment.model.UserAssignmentSubmission
-import com.gp.socialapp.data.auth.source.remote.model.User
-import com.gp.socialapp.data.community.model.CommunityMemberRequest
+import com.gp.socialapp.data.community.source.remote.model.Community
 import com.gp.socialapp.presentation.app.App
+import com.gp.socialapp.presentation.home.components.ConfirmLeaveCommunityDialog
 import com.gp.socialapp.theme.AppTheme
-import com.gp.socialapp.util.LocalDateTimeUtil.now
-import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.Month
 import java.awt.Dimension
 import java.awt.Window
 
@@ -44,7 +32,15 @@ val submissions = listOf(
 @Composable
 fun PreviewApp() {
     AppTheme {
-
-
+        val community = Community(
+            id = "1",
+            name = "Test Community",
+            description = "Test Description",
+            members = mapOf("1" to true, "2" to false, "3" to false),
+        )
+        ConfirmLeaveCommunityDialog(
+            onDismiss = {},
+            onConfirm = {}
+        )
     }
 }

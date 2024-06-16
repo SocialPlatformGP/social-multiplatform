@@ -54,7 +54,7 @@ fun JoinCommunityDialog(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Text(text = "Enter the code here", style = MaterialTheme.typography.headlineSmall)
+                Text(text = "Enter the community code", style = MaterialTheme.typography.headlineSmall)
                 Spacer(modifier = Modifier.size(8.dp))
                 OutlinedTextField(
                     value = codeValue,

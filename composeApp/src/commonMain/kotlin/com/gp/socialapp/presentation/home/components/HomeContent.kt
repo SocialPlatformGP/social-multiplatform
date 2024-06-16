@@ -17,6 +17,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -26,67 +27,52 @@ import com.gp.socialapp.presentation.home.screen.HomeUiAction
 
 @Composable
 fun HomeContent(
-    communities: List<Community>, action: (HomeUiAction) -> Unit, modifier: Modifier
+    modifier: Modifier,
+    windowWidthSizeClass: WindowWidthSizeClass,
+    communities: List<Community>,
+    action: (HomeUiAction) -> Unit
 ) {
     Column(
         modifier = modifier.fillMaxSize()
     ) {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            items(communities) { community ->
-                Card(
-                    onClick = {
-                        action(HomeUiAction.OnCommunityClicked(community.id))
+        Text(
+            text = "Your communities",
+            style = MaterialTheme.typography.titleMedium,
+            textAlign = TextAlign.Start,
+            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+            modifier = Modifier.fillMaxWidth().padding(16.dp)
+        )
+        when(windowWidthSizeClass) {
+            WindowWidthSizeClass.Compact -> {
+                CompactCommunityList(
+                    modifier = Modifier.fillMaxWidth(),
+                    communities = communities,
+                    onCommunityClicked = { communityId ->
+                        action(HomeUiAction.OnCommunityClicked(communityId))
                     },
-                    modifier = Modifier.padding(8.dp).fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                ) {
-                    Column(
-                        modifier = Modifier.padding(8.dp),
-                        verticalArrangement = Arrangement.Center,
-
-                        ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                        ) {
-                            IconButton(
-                                onClick = {
-                                    action(HomeUiAction.OnOptionsMenuClicked(community))
-                                }
-                            ) {
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Filled.More,
-                                    contentDescription = "Options Menu"
-                                )
-                            }
-                            Text(
-                                text = community.name,
-                                modifier = Modifier.padding(8.dp).weight(1f),
-                                textAlign = TextAlign.Center,
-                                style = MaterialTheme.typography.headlineMedium
-                            )
-                            IconButton(onClick = {
-                                action(HomeUiAction.OnCommunityLogout(community.id))
-                            }) {
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Filled.Logout,
-                                    contentDescription = "Logout"
-                                )
-                            }
-                        }
-                        Text(
-                            text = community.description,
-                            modifier = Modifier.padding(8.dp).fillMaxWidth(),
-                            textAlign = TextAlign.Start,
-                            style = MaterialTheme.typography.bodyLarge
-                        )
+                    onOptionsMenuClicked = { community ->
+                        action(HomeUiAction.OnOptionsMenuClicked(community))
                     }
+                )
+            }
 
-                }
+            else -> {
+                GridCommunityList(
+                    modifier = Modifier.fillMaxWidth(),
+                    communities = communities,
+                    onCommunityClicked = { communityId ->
+                        action(HomeUiAction.OnCommunityClicked(communityId))
+                    },
+                    onOptionsMenuClicked = { community ->
+                        action(HomeUiAction.OnOptionsMenuClicked(community))
+                    },
+                    onCommunityMaterialClicked = { communityId ->
+                        action(HomeUiAction.OnCommunityMaterialClicked(communityId))
+                    },
+                    onCommunityMembersClicked = { communityId ->
+                        action(HomeUiAction.OnCommunityMembersClicked(communityId))
+                    }
+                )
             }
         }
     }
