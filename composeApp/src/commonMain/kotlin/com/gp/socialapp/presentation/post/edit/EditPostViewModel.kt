@@ -90,9 +90,12 @@ class EditPostScreenModel(
     }
 
     fun onAddTags(tags: Set<Tag>) {
-        val commTags = tags.map { it.copy(communityID = uiState.value.post.communityID) }
-        screenModelScope.launch {
-            _uiState.update { it.copy(postTags = it.postTags + commTags) }
+        if (uiState.value.postTags.contains(tags.first())) onRemoveTags(tags)
+        else {
+            val commTags = tags.map { it.copy(communityID = uiState.value.post.communityID) }
+            screenModelScope.launch {
+                _uiState.update { it.copy(postTags = it.postTags + commTags) }
+            }
         }
     }
 

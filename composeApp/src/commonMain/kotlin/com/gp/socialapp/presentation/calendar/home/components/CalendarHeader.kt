@@ -1,9 +1,11 @@
 package com.gp.socialapp.presentation.calendar.home.components
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
@@ -30,7 +32,13 @@ fun CalendarHeader(
     ) {
         IconButton(onClick = {
             onPreviousMonth()
-        }) {
+        },
+                    modifier = Modifier.border(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.12f),
+            shape = CircleShape
+        )
+            ) {
             Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Previous Month")
         }
         Text(
@@ -40,7 +48,12 @@ fun CalendarHeader(
         )
         IconButton(onClick = {
             onNextMonth()
-        }) {
+        },
+                    modifier = Modifier.border(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.12f),
+            shape = CircleShape
+        )) {
             Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "Next Month")
         }
     }

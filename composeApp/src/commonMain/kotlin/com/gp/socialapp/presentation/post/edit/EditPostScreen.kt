@@ -1,11 +1,17 @@
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -16,21 +22,20 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.lifecycle.LifecycleEffect
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.kodein.rememberNavigatorScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gp.socialapp.data.post.source.remote.model.Post
-import com.gp.socialapp.presentation.post.create.component.BottomOptionRow
 import com.gp.socialapp.presentation.post.create.component.CreatePostTopBar
 import com.gp.socialapp.presentation.post.create.component.FilesRow
-import com.gp.socialapp.presentation.post.create.component.MyBottomSheet
-import com.gp.socialapp.presentation.post.create.component.MyExistingTagAlertDialog
-import com.gp.socialapp.presentation.post.create.component.MyTextField
+import com.gp.socialapp.presentation.post.create.component.MyTextFieldBody
+import com.gp.socialapp.presentation.post.create.component.MyTextFieldTitle
 import com.gp.socialapp.presentation.post.create.component.NewTagAlertDialog
 import com.gp.socialapp.presentation.post.create.component.TagsRow
-import com.gp.socialapp.presentation.post.create.uploadPostFiles
+import com.gp.socialapp.presentation.post.create.component.uploadPostFiles
 import com.gp.socialapp.presentation.post.edit.EditPostAction
 import com.gp.socialapp.presentation.post.edit.EditPostScreenModel
 import com.gp.socialapp.presentation.post.edit.EditPostUIState
@@ -38,7 +43,6 @@ import com.mohamedrejeb.calf.core.LocalPlatformContext
 import com.mohamedrejeb.calf.picker.FilePickerFileType
 import com.mohamedrejeb.calf.picker.FilePickerSelectionMode
 import com.mohamedrejeb.calf.picker.rememberFilePickerLauncher
-import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import socialmultiplatform.composeapp.generated.resources.Res
 import socialmultiplatform.composeapp.generated.resources.edit_post
@@ -84,28 +88,24 @@ private fun EditPostContent(
     val bottomSheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = skipPartiallyExpanded
     )
-    var existingTagsDialogState by remember { mutableStateOf(false) }
     var newTagDialogState by remember { mutableStateOf(false) }
     val context = LocalPlatformContext.current
     var pickedFileType: FilePickerFileType by remember { mutableStateOf(FilePickerFileType.All) }
     val filePicker = rememberFilePickerLauncher(
         type = pickedFileType,
-        selectionMode = FilePickerSelectionMode.Multiple,
-        onResult = { files ->
-            uploadPostFiles(
-                scope,
-                files,
-                context,
-                { action(EditPostAction.OnFileAdded(it)) },
-            )
-            pickedFileType = FilePickerFileType.All
-        }
-    )
+        selectionMode = FilePickerSelectionMode.Multiple
+    ) { files ->
+        uploadPostFiles(
+            scope,
+            files,
+            context,
+        ) { action(EditPostAction.OnFileAdded(it)) }
+        pickedFileType = FilePickerFileType.All
+    }
     Scaffold(
         topBar = {
             CreatePostTopBar(
                 onBackClick = { action(EditPostAction.NavigateBack) },
-                onPostClick = { action(EditPostAction.OnApplyEditClicked) },
                 stringResource(Res.string.edit_post)
             )
         }
@@ -115,7 +115,22 @@ private fun EditPostContent(
                 .padding(it)
                 .fillMaxSize()
         ) {
-            MyTextField(
+
+
+            Spacer(modifier = Modifier.height(8.dp))
+            FilesRow(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                state.postAttachments,
+                onFileDelete = { file ->
+                    action(EditPostAction.OnFileRemoved(file))
+                },
+                onAddFile = {
+                    filePicker.launch()
+                }
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            MyTextFieldTitle(
                 value = state.title,
                 label = "Title",
                 onValueChange = { newTitle ->
@@ -123,79 +138,48 @@ private fun EditPostContent(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(0.2f)
+                    .padding(horizontal = 16.dp)
             )
-            MyTextField(
+            Spacer(modifier = Modifier.height(8.dp))
+
+            MyTextFieldBody(
                 value = state.body,
                 label = "Body",
                 onValueChange = { newBody ->
                     action(EditPostAction.OnContentChanged(newBody))
                 },
+                tags = state.postTags.toList(),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
+                    .fillMaxHeight(0.5f)
+                    .padding(horizontal = 16.dp)
             )
+            Spacer(modifier = Modifier.weight(1f))
             TagsRow(
-                tags = state.postTags.toList(),
+                allTags = state.channelTags.toList(),
+                selectedTags = state.postTags.toList(),
                 onTagClick = { tag ->
-                    action(EditPostAction.OnTagRemoved(tag))
+                    action(EditPostAction.OnTagAdded(setOf(tag)))
+                },
+                onAddNewTagClick = {
+                    newTagDialogState = true
                 }
             )
-            FilesRow(
-                modifier = Modifier.fillMaxWidth(),
-                state.postAttachments,
-                onFileDelete = { file ->
-                    action(EditPostAction.OnFileRemoved(file))
-                }
-            )
-            HorizontalDivider()
-            BottomOptionRow(
-                modifier = Modifier.fillMaxWidth(),
-                onAddFileClicked = {
-                    filePicker.launch()
+            Button(
+                onClick = {
+                    action(EditPostAction.OnApplyEditClicked)
                 },
-                onAddImageClicked = {
-                    pickedFileType = FilePickerFileType.Image
-                    filePicker.launch()
-                },
-                onAddTagClicked = {
-                    scope.launch { bottomSheetState.show() }.invokeOnCompletion {
-                        if (bottomSheetState.isVisible) {
-                            openBottomSheet = true
-                        }
-                    }
-                },
-                onAddVideoClicked = {
-                    pickedFileType = FilePickerFileType.Video
-                    filePicker.launch()
-                },
-                pickedFileType = state.postAttachments.firstOrNull()?.type ?: ""
-            )
-        }
-        if (openBottomSheet) {
-            MyBottomSheet(
-                openBottomSheet = { value ->
-                    openBottomSheet = value
-                },
-                bottomSheetState = bottomSheetState,
-                existingTagsDialogState = { value ->
-                    existingTagsDialogState = value
-                },
-                newTagDialogState = { value ->
-                    newTagDialogState = value
-                },
-            )
-        }
-        if (existingTagsDialogState) {
-            MyExistingTagAlertDialog(
-                existingTagsDialogState = { value ->
-                    existingTagsDialogState = value
-                },
-                channelTags = state.channelTags.toList(),
-                selectedTags = {
-                    action(EditPostAction.OnTagAdded(it))
-                },
-            )
+                modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                enabled = state.title.isNotBlank() && state.body.isNotBlank(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            ) {
+                Text(
+                    text = "+ Post"
+                )
+            }
         }
         if (newTagDialogState) {
             NewTagAlertDialog(
