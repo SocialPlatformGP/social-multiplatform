@@ -1,4 +1,3 @@
-import org.gradle.internal.impldep.org.junit.experimental.categories.Categories.CategoryFilter.exclude
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 allprojects {
@@ -18,7 +17,8 @@ plugins {
     alias(libs.plugins.apollo)
     alias(libs.plugins.undercouch.download)
     alias(libs.plugins.ktlint)
-    id("io.realm.kotlin") version "1.13.0"
+    alias(libs.plugins.compose.compiler)
+    id("io.realm.kotlin") version "2.0.0"
 
 }
 //ktlint {
@@ -41,7 +41,7 @@ kotlin {
                 jvmTarget = "17"
             }
         }
-        configurations.all{
+        configurations.all {
             exclude(group = "com.soywiz.korlibs.krypto", module = "krypto-android")
         }
     }
