@@ -7,6 +7,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -19,8 +20,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.contentColorFor
@@ -46,7 +50,6 @@ enum class MultiFabState {
 class FabItem(
     val icon: ImageVector,
     val label: String,
-    val backgroundColor: Color,
     val onFabItemClicked: () -> Unit
 )
 
@@ -54,17 +57,20 @@ class FabItem(
 fun MultiFloatingActionButton(
     fabIcon: ImageVector,
     items: List<FabItem>,
-    backgroundColor: Color,
     showLabels: Boolean = true,
+    onStateChanged: ((state: MultiFabState) -> Unit)? = null
 ) {
     var currentState by remember { mutableStateOf(MultiFabState.COLLAPSED) }
     val stateTransition: Transition<MultiFabState> =
         updateTransition(targetState = currentState, label = "")
+    // State Change
     val stateChange: () -> Unit = {
         currentState = if (stateTransition.currentState == MultiFabState.EXPANDED) {
             MultiFabState.COLLAPSED
         } else MultiFabState.EXPANDED
+        onStateChanged?.invoke(currentState)
     }
+    // Fab Rotation Animation
     val rotation: Float by stateTransition.animateFloat(
         transitionSpec = {
             if (targetState == MultiFabState.EXPANDED) {
@@ -77,59 +83,30 @@ fun MultiFloatingActionButton(
     ) { state ->
         if (state == MultiFabState.EXPANDED) 45f else 0f
     }
-    val isEnable = currentState == MultiFabState.EXPANDED
 
-//    BackHandler(isEnable) {
-//        currentState = MultiFabState.COLLAPSED
-//    }
-
-
-    val modifier = if (currentState == MultiFabState.EXPANDED)
-        Modifier
-            .fillMaxSize()
-            .clickable(indication = null,
-                interactionSource = remember { MutableInteractionSource() }) {
-                currentState = MultiFabState.COLLAPSED
-            } else Modifier.fillMaxSize()
-
-    Box(modifier = modifier, contentAlignment = Alignment.BottomEnd) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(400.dp),
-            contentAlignment = Alignment.BottomEnd
-        ) {
-            Column(
-                horizontalAlignment = Alignment.End,
-                verticalArrangement = Arrangement.Bottom,
-            ) {
-                items.forEach { item ->
-                    SmallFloatingActionButtonRow(
-                        item = item,
-                        stateTransition = stateTransition,
-                        showLabel = showLabels,
-                        backgroundColor = backgroundColor
-                    )
-                    Spacer(modifier = Modifier.height(20.dp))
-                }
-                FloatingActionButton(
-                    shape = CircleShape,
-                    containerColor = backgroundColor,
-                    onClick = {
-                        stateChange()
-                    }) {
-                    Icon(
-                        imageVector = fabIcon,
-                        contentDescription = null,
-                        tint = contentColorFor(backgroundColor),
-                        modifier = Modifier.rotate(rotation)
-                    )
-                }
+    Column(
+        horizontalAlignment = Alignment.End,
+    ) {
+        if(currentState == MultiFabState.EXPANDED){
+            items.forEach { item ->
+                SmallFloatingActionButtonRow(
+                    item = item,
+                    stateTransition = stateTransition,
+                    showLabel = showLabels
+                )
+                Spacer(modifier = Modifier.height(20.dp))
             }
-
+        }
+        FloatingActionButton(onClick = {
+            stateChange()
+        }) {
+            Icon(
+                imageVector = fabIcon,
+                contentDescription = "",
+                modifier = Modifier.rotate(rotation)
+            )
         }
     }
-
 }
 
 
@@ -137,9 +114,9 @@ fun MultiFloatingActionButton(
 fun SmallFloatingActionButtonRow(
     item: FabItem,
     showLabel: Boolean,
-    backgroundColor: Color,
     stateTransition: Transition<MultiFabState>
 ) {
+    // Mini Fab Alpha Animation
     val alpha: Float by stateTransition.animateFloat(
         transitionSpec = {
             tween(durationMillis = 50)
@@ -147,6 +124,7 @@ fun SmallFloatingActionButtonRow(
     ) { state ->
         if (state == MultiFabState.EXPANDED) 1f else 0f
     }
+    // Mini Fab Scale Animation
     val scale: Float by stateTransition.animateFloat(
         label = ""
     ) { state ->
@@ -155,31 +133,37 @@ fun SmallFloatingActionButtonRow(
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
-            .alpha(animateFloatAsState((alpha), label = "").value)
-            .scale(animateFloatAsState(targetValue = scale, label = "").value)
+            .alpha(animateFloatAsState((alpha)).value)
+            .scale(animateFloatAsState(targetValue = scale).value)
     ) {
         if (showLabel) {
+            val backgroundColor = MaterialTheme.colorScheme.primaryContainer
             Text(
                 text = item.label,
+                color = contentColorFor(backgroundColor = backgroundColor),
                 modifier = Modifier
+                    .background(
+                        color = backgroundColor,
+                        shape = RoundedCornerShape(12.0.dp)
+                    )
                     .padding(start = 6.dp, end = 6.dp, top = 4.dp, bottom = 4.dp)
-                    .clickable(onClick = { item.onFabItemClicked() }),
-                color = Color.White
+                    .clickable(onClick = { item.onFabItemClicked() })
             )
         }
         SmallFloatingActionButton(
-            shape = CircleShape,
             modifier = Modifier
                 .padding(4.dp),
             onClick = { item.onFabItemClicked() },
-            containerColor = backgroundColor,
-            contentColor = Color.White
+            elevation = FloatingActionButtonDefaults.elevation(
+                defaultElevation = 2.dp,
+                hoveredElevation = 4.dp
+            )
         ) {
             Icon(
                 imageVector = item.icon,
-                tint = contentColorFor(backgroundColor = backgroundColor),
                 contentDescription = item.label
             )
         }
+
     }
 }

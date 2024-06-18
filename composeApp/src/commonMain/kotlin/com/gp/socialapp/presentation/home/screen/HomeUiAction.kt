@@ -4,7 +4,9 @@ import com.gp.socialapp.data.community.source.remote.model.Community
 
 sealed interface HomeUiAction {
     data class OnCommunityClicked(val communityId: String) : HomeUiAction
-    data class OnCommunityLogout(val id: String) : HomeUiAction
+    data class OnCommunityMembersClicked(val communityId: String) : HomeUiAction
+    data class OnCommunityMaterialClicked(val communityId: String) : HomeUiAction
+    data class OnLeaveCommunityClicked(val id: String) : HomeUiAction
     data class OnShareJoinCodeClicked(val code: String) : HomeUiAction
     data class OnManageMembersClicked(val communityId: String) : HomeUiAction
     data class OnViewMembersClicked(val communityId: String) : HomeUiAction

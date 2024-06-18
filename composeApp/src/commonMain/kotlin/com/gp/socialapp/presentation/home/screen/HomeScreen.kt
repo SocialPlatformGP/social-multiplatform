@@ -2,10 +2,16 @@ package com.gp.socialapp.presentation.home.screen
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Login
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.GroupAdd
+import androidx.compose.material.icons.filled.Login
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -27,11 +33,14 @@ import com.gp.socialapp.presentation.community.communityhome.CommunityHomeContai
 import com.gp.socialapp.presentation.community.communityhome.CommunityHomeTab
 import com.gp.socialapp.presentation.community.createcommunity.CreateCommunityScreen
 import com.gp.socialapp.presentation.community.editcommunity.EditCommunityScreen
-import com.gp.socialapp.presentation.home.components.CommunityOptionsBottomSheet
-import com.gp.socialapp.presentation.home.components.ConfirmLogoutDialog
+import com.gp.socialapp.presentation.home.components.CommunityOptionsCompactMenu
+import com.gp.socialapp.presentation.home.components.CommunityOptionsExpandedMenu
+import com.gp.socialapp.presentation.home.components.ConfirmLeaveCommunityDialog
+import com.gp.socialapp.presentation.home.components.FabItem
 import com.gp.socialapp.presentation.home.components.HomeContent
 import com.gp.socialapp.presentation.home.components.HomeFab
 import com.gp.socialapp.presentation.home.components.JoinCommunityDialog
+import com.gp.socialapp.presentation.home.components.MultiFloatingActionButton
 import com.gp.socialapp.presentation.home.components.OptionItem
 import com.gp.socialapp.util.copyToClipboard
 import com.mohamedrejeb.calf.core.LocalPlatformContext
@@ -74,7 +83,7 @@ data class HomeScreen(
                         )
                     }
 
-                    is HomeUiAction.OnCommunityLogout -> {
+                    is HomeUiAction.OnLeaveCommunityClicked -> {
                         screenModel.communityLogout(it.id)
                     }
 
@@ -122,36 +131,52 @@ data class HomeScreen(
                         )
                     }
 
+                    is HomeUiAction.OnCommunityMaterialClicked -> {
+                        navigator.push(
+                            CommunityHomeContainer(
+                                communityId = it.communityId,
+                                startingTab = CommunityHomeTab.MATERIALS,
+                            )
+                        )
+                    }
+                    is HomeUiAction.OnCommunityMembersClicked -> {
+                        navigator.push(
+                            CommunityHomeContainer(
+                                communityId = it.communityId,
+                                startingTab = CommunityHomeTab.MEMBERS,
+                            )
+                        )
+                    }
                     else -> Unit
                 }
             })
     }
 
-    @OptIn(ExperimentalMaterial3Api::class)
+    @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3WindowSizeClassApi::class)
     @Composable
     fun HomeScreenContent(
         state: HomeUiState, onAction: (HomeUiAction) -> Unit
     ) {
         val scope = rememberCoroutineScope()
         val sheetState = rememberModalBottomSheetState()
-        var showBottomSheet by remember { mutableStateOf(false) }
+        var showOptionsMenu by remember { mutableStateOf(false) }
         var joinCommunityDialogState by remember { mutableStateOf(false) }
         var confirmLogoutDialogState by remember { mutableStateOf(false) }
         var communityId by remember { mutableStateOf("") }
         var clickedCommunity by remember { mutableStateOf(Community()) }
+        val windowSizeClass = calculateWindowSizeClass()
         var newOnAction: (HomeUiAction) -> Unit = {
             when (it) {
-                is HomeUiAction.OnCommunityLogout -> {
+                is HomeUiAction.OnLeaveCommunityClicked -> {
                     confirmLogoutDialogState = true
                     communityId = it.id
                 }
 
                 is HomeUiAction.OnOptionsMenuClicked -> {
                     clickedCommunity = it.community
-                    showBottomSheet = true
+                    showOptionsMenu = true
                     scope.launch { sheetState.show() }
                 }
-
                 else -> onAction(it)
             }
         }
@@ -167,7 +192,7 @@ data class HomeScreen(
                     newOnAction(HomeUiAction.OnEditCommunityClicked(clickedCommunity))
                 },
                 OptionItem("Leave Community") {
-                    newOnAction(HomeUiAction.OnCommunityLogout(clickedCommunity.id))
+                    newOnAction(HomeUiAction.OnLeaveCommunityClicked(clickedCommunity.id))
                 },
                 OptionItem("Delete Community") {
                     newOnAction(HomeUiAction.OnDeleteCommunityClicked(clickedCommunity.id))
@@ -182,40 +207,58 @@ data class HomeScreen(
                     newOnAction(HomeUiAction.OnViewMembersClicked(clickedCommunity.id))
                 },
                 OptionItem("Leave Community") {
-                    newOnAction(HomeUiAction.OnCommunityLogout(clickedCommunity.id))
+                    newOnAction(HomeUiAction.OnLeaveCommunityClicked(clickedCommunity.id))
                 }
             )
         }
         var fabState = remember { mutableStateOf(false) }
         Scaffold(
             floatingActionButton = {
-                if (!fabState.value) SingleFab(
-                    fabState, Icons.Default.Add
-                )
-                else {
-                    HomeFab(
-                        fabState,
-                        onCreateCommunityClicked = {
+                val fabItems = listOf(
+                    FabItem(
+                        label = "Create Community",
+                        icon = Icons.Default.GroupAdd,
+                        onFabItemClicked = {
                             newOnAction(HomeUiAction.OnCreateCommunityClicked)
-                        },
-                        onJoinCommunityClicked = {
+                        }
+                    ),
+                    FabItem(
+                        label = "Join Community",
+                        icon = Icons.AutoMirrored.Filled.Login,
+                        onFabItemClicked = {
                             joinCommunityDialogState = true
                         }
                     )
-                }
-            }) { padding ->
-            if (showBottomSheet) {
-                CommunityOptionsBottomSheet(
-                    sheetState = sheetState,
-                    options = options,
-                    onDismiss = {
-                        scope.launch { sheetState.hide() }.invokeOnCompletion {
-                            if (!sheetState.isVisible) {
-                                showBottomSheet = false
-                            }
-                        }
-                    }
                 )
+                MultiFloatingActionButton(
+                    fabIcon = Icons.Default.Add,
+                    items = fabItems,
+                )
+            }) { padding ->
+            if (showOptionsMenu) {
+                when(windowSizeClass.widthSizeClass){
+                    WindowWidthSizeClass.Compact -> {
+                        CommunityOptionsCompactMenu(
+                            sheetState = sheetState,
+                            options = options,
+                            onDismiss = {
+                                scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                    if (!sheetState.isVisible) {
+                                        showOptionsMenu = false
+                                    }
+                                }
+                            }
+                        )
+                    }
+                    else -> {
+                        CommunityOptionsExpandedMenu(
+                            options = options,
+                            onDismiss = {
+                                showOptionsMenu = false
+                            }
+                        )
+                    }
+                }
             }
             if (joinCommunityDialogState) {
                 JoinCommunityDialog(onDismiss = {
@@ -226,17 +269,18 @@ data class HomeScreen(
                 })
             }
             if (confirmLogoutDialogState) {
-                ConfirmLogoutDialog(onDismiss = {
+                ConfirmLeaveCommunityDialog(onDismiss = {
                     confirmLogoutDialogState = false
                 }, onConfirm = {
-                    onAction(HomeUiAction.OnCommunityLogout(communityId))
+                    onAction(HomeUiAction.OnLeaveCommunityClicked(communityId))
                     confirmLogoutDialogState = false
                 })
             }
             HomeContent(
                 modifier = Modifier.padding(padding),
                 communities = state.communities,
-                action = newOnAction
+                action = newOnAction,
+                windowWidthSizeClass = windowSizeClass.widthSizeClass
             )
         }
     }
