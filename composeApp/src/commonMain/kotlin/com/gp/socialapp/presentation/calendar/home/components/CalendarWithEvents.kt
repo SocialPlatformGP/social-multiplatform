@@ -2,6 +2,7 @@ package com.gp.socialapp.presentation.calendar.home.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -27,7 +28,7 @@ fun CalendarWithEvents(
     val selectedDateEvents = remember { mutableStateOf<List<CalendarEvent>>(listOf()) }
     HorizontalPager(
         modifier = Modifier.fillMaxWidth().then(modifier),
-        state = rememberPagerState(initialPage = Int.MAX_VALUE / 2, pageCount = {Int.MAX_VALUE}),
+        state = rememberPagerState(initialPage = Int.MAX_VALUE / 2, pageCount = { Int.MAX_VALUE }),
     ) { page ->
         Column(
             modifier = Modifier
@@ -45,12 +46,14 @@ fun CalendarWithEvents(
                 }
             )
             CalendarGrid(
+                modifier = Modifier.weight(0.75f),
                 events = events,
                 currentYearMonth = currentYearMonth.value,
                 selectedDateEvents = selectedDateEvents,
             )
-            //TODO event list
+            Spacer(modifier = Modifier.padding(4.dp))
             EventList(
+                modifier = Modifier.weight(0.25f),
                 events = selectedDateEvents.value
             )
         }

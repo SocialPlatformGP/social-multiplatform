@@ -13,10 +13,6 @@ import androidx.compose.ui.Modifier
 fun BottomOptionRow(
     modifier: Modifier = Modifier,
     onAddTagClicked: () -> Unit,
-    onAddImageClicked: () -> Unit,
-    onAddVideoClicked: () -> Unit,
-    onAddFileClicked: () -> Unit,
-    pickedFileType: String,
 ) {
     Row(
         modifier = modifier,
@@ -24,30 +20,10 @@ fun BottomOptionRow(
     ) {
         MyOutlinedTextButton(
             onClick = {
-                println("MyOutlinedTextButtonBOR: onClick")
                 onAddTagClicked()
             },
-            label = "add tags"
+            label = "Tags"
         )
-//        if (pickedFileType.isBlank() || pickedFileType == FilePickerFileType.ImageContentType) {
-        MyIconButton(
-            onClick = onAddImageClicked,
-            icon = Icons.Filled.Image,
-        )
-//        }
-//        if (pickedFileType.isBlank() || pickedFileType == FilePickerFileType.VideoContentType) {
-        MyIconButton(
-            onClick = onAddVideoClicked,
-            icon = Icons.Filled.VideoFile,
-        )
-//        }
-//        if (pickedFileType.isBlank() || pickedFileType == FilePickerFileType.AllContentType) {
-        MyIconButton(
-            onClick = onAddFileClicked,
-            icon = Icons.Filled.AttachFile,
-        )
-//        }
-
     }
 
 }

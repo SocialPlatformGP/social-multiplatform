@@ -4,6 +4,8 @@ import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.navigator.Navigator
 import com.gp.socialapp.di.appModuleK
 import com.gp.socialapp.presentation.auth.login.LoginScreen
+import com.gp.socialapp.presentation.post.create.CreatePostScreen
+import com.gp.socialapp.presentation.post.feed.FeedTab
 import com.gp.socialapp.theme.AppTheme
 import org.kodein.di.compose.withDI
 
@@ -12,8 +14,7 @@ internal fun App() =
     withDI(appModuleK) {
         AppTheme {
             Navigator(
-//                GradesMainScreen
-                LoginScreen
+            LoginScreen
             )
 //            Navigator(
 //                ChatRoomScreen(

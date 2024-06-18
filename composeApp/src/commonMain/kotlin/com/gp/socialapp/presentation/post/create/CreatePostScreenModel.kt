@@ -48,14 +48,20 @@ class CreatePostScreenModel(
                 postRepository.insertTag(it)
             }
         }
-        _uiState.update { it.copy(tags = (uiState.value.tags + commTags)) }
+        onAddTag(tags.first())
     }
 
-    fun onAddTags(tags: Set<Tag>) {
-        val commTags = tags.map { it.copy(communityID = uiState.value.communityId) }
-        screenModelScope.launch {
-            _uiState.update { it.copy(tags = it.tags + commTags) }
+    fun onAddTag(tag: Tag) {
+        println("Adding tag")
+        if (uiState.value.tags.contains(tag)) onRemoveTags(setOf(tag))
+        else {
+            val commTags = tag.copy(communityID = uiState.value.communityId)
+            screenModelScope.launch {
+                _uiState.update { it.copy(tags = it.tags + commTags) }
+            }
         }
+
+
     }
 
     fun onRemoveTags(tags: Set<Tag>) {

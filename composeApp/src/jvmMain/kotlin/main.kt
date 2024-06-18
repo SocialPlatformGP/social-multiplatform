@@ -28,7 +28,7 @@ lateinit var CURRENT_WINDOW: Window
 fun main() = application {
     Window(
         title = "EduLink",
-        state = rememberWindowState(width = 800.dp, height = 600.dp),
+        state = rememberWindowState(width = 1080.dp, height = 1080.dp),
         onCloseRequest = ::exitApplication,
     ) {
         CURRENT_WINDOW = window
