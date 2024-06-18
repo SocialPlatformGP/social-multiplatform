@@ -3,6 +3,7 @@ package com.gp.socialapp.presentation.home.container
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -51,7 +52,6 @@ import com.gp.socialapp.navigation.util.BottomTabNavigationItem
 import com.gp.socialapp.presentation.auth.login.LoginScreen
 import com.gp.socialapp.presentation.auth.userinfo.UserInformationScreen
 import com.gp.socialapp.presentation.home.components.HomeTopBar
-import com.gp.socialapp.presentation.home.screen.HomeUiAction
 import com.gp.socialapp.presentation.settings.MainSettingsScreen
 import com.seiko.imageloader.ui.AutoSizeImage
 import kotlinx.coroutines.launch
@@ -69,7 +69,7 @@ data class HomeContainer(
         var barsVisibility by remember { mutableStateOf(true) }
         LifecycleEffect(
             onStarted = { screenModel.init() },
-            onDisposed = { screenModel.onDispose()})
+            onDisposed = { screenModel.onDispose() })
         if (!state.currentUser.isDataComplete && state.currentUser.id.isNotBlank()) {
             navigator.replaceAll(UserInformationScreen(state.currentUser))
         }
@@ -101,7 +101,7 @@ data class HomeContainer(
                                     .background(Color.Red)
                             ) {
                                 Text(
-                                    text = if(state.currentUser.name.isNotBlank()) state.currentUser.name[0].toString() else "u"
+                                    text = if (state.currentUser.name.isNotBlank()) state.currentUser.name[0].toString() else "u"
                                         .uppercase(),
                                     fontSize = 24.sp,
                                     color = Color.White,
@@ -188,8 +188,13 @@ data class HomeContainer(
                 Scaffold(
                     content = {
                         Column(
-                            modifier = Modifier.padding(it)
-                        ) {
+                            modifier = Modifier.padding(
+                                if (barsVisibility) it else PaddingValues(
+                                    0.dp
+                                )
+                            ),
+
+                            ) {
                             CurrentTab()
                         }
                     },

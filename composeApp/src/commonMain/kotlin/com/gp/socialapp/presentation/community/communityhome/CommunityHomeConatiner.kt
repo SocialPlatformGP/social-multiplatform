@@ -1,6 +1,7 @@
 package com.gp.socialapp.presentation.community.communityhome
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.NavigationBar
@@ -14,6 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.lifecycle.LifecycleEffect
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.kodein.rememberScreenModel
@@ -95,8 +97,10 @@ data class CommunityHomeContainer(
         ) {
             TabNavigator(defaultTab) { tabNavigator ->
                 Scaffold(content = { paddingValues ->
+
                     Column(
-                        modifier = Modifier.padding(paddingValues)
+                        modifier = Modifier.padding(if (isBarsVisible) paddingValues else PaddingValues(0.dp)),
+
                     ) {
                         CurrentTab()
                     }

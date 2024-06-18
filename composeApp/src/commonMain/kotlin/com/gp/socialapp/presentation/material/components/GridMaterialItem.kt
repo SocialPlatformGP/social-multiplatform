@@ -64,7 +64,7 @@ fun GridMaterialItem(
 
     ) {
         Column(
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
+            modifier = Modifier.padding( 4.dp)
         ) {
             when (windowWidthSizeClass) {
                 WindowWidthSizeClass.Compact -> {
@@ -184,7 +184,7 @@ fun CompactGridMaterialItem(
                 text = name,
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Normal,
-                maxLines = 2,
+                maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.weight(4f)
             )

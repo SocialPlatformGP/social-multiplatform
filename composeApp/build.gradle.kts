@@ -1,3 +1,4 @@
+import org.gradle.internal.impldep.org.junit.experimental.categories.Categories.CategoryFilter.exclude
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 allprojects {
@@ -40,9 +41,9 @@ kotlin {
                 jvmTarget = "17"
             }
         }
-//        configurations.all{
-//            exclude(group = "com.github.UstadMobile.door", module = "room-annotations")
-//        }
+        configurations.all{
+            exclude(group = "com.soywiz.korlibs.krypto", module = "krypto-android")
+        }
     }
     jvm()
 

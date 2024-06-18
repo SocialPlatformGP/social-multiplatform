@@ -29,6 +29,7 @@ fun CalendarWithEvents(
     HorizontalPager(
         modifier = Modifier.fillMaxWidth().then(modifier),
         state = rememberPagerState(initialPage = Int.MAX_VALUE / 2, pageCount = { Int.MAX_VALUE }),
+        userScrollEnabled = false,
     ) { page ->
         Column(
             modifier = Modifier

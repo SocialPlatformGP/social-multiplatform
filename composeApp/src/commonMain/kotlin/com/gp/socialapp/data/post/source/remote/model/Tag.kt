@@ -13,7 +13,9 @@ data class Tag(
         }
 
         fun String.toTag(): Tag {
+            println("this: $this")
             val parts = this.split("|")
+            println("parts: $parts")
             require(parts.size == 4) { "Invalid string format for Tag" }
             return Tag(parts[0], parts[1].toInt(), parts[2], parts[3])
         }

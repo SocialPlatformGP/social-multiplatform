@@ -66,7 +66,8 @@ fun CalendarGrid(
             columns = GridCells.Fixed(7),
             verticalArrangement = Arrangement.SpaceEvenly,
             horizontalArrangement = Arrangement.SpaceEvenly,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            userScrollEnabled = false
         ) {
             items(allDays.size) { index ->
                 val day = allDays[index]

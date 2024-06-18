@@ -255,7 +255,7 @@ fun MaterialScreenContent(
                 ) {
                     items(
                         items = state.currentFolders,
-                        key = { it }
+                        key = { it.id }
                     ) { folder ->
                         val animatable = remember { Animatable(0.5f) }
                         LaunchedEffect(key1 = true) {
@@ -289,7 +289,7 @@ fun MaterialScreenContent(
                     }
                     items(
                         items = state.currentFiles,
-                        key = { it }
+                        key = { it.id }
                     ) { file ->
                         val animatable = remember { Animatable(0.5f) }
                         LaunchedEffect(key1 = true) {
