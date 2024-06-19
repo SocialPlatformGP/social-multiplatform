@@ -40,7 +40,7 @@ fun HomeContent(
             style = MaterialTheme.typography.titleMedium,
             textAlign = TextAlign.Start,
             color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
-            modifier = Modifier.fillMaxWidth().padding(16.dp)
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
         )
         when(windowWidthSizeClass) {
             WindowWidthSizeClass.Compact -> {

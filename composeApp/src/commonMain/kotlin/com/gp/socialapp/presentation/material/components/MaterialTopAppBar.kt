@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.gp.socialapp.presentation.material.Folder
 import com.gp.socialapp.presentation.material.MaterialAction
+import java.io.File.separator
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,8 +57,9 @@ fun MaterialTopAppBar(
             }
         }
         val names = paths.map { it.name }
+        val title = if (names.isEmpty()) "Home" else if (names.size > 3) names.first()+" > .... > "+currentFolder.name else names.joinToString(separator = " > ") + " > " + currentFolder.name
         Spacer(modifier = Modifier.width(16.dp))
-        Text(if (names.isEmpty()) "Home" else names.joinToString(separator = " > ") + " > " + currentFolder.name)
+        Text(title)
         Spacer(modifier = Modifier.weight(1f))
         if (isAdmin && windowWidthSizeClass != WindowWidthSizeClass.Compact) {
             TextButton(
