@@ -59,7 +59,7 @@ data class CommunityHomeContainer(
         }
         CommunityHomeContainerContent(currentUser = state.currentUser,
             userCommunities = state.userCommunities,
-            onNavigateToHome = { navigator.replaceAll(HomeContainer()) },
+            onNavigateToHome = { navigator.replaceAll(HomeContainer(communityId=communityId)) },
             onNavigateToSearch = { navigator.push(SearchScreen) },
             onNavigateToSettings = { navigator.push(MainSettingsScreen) },
             onLogout = { screenModel.logout() })

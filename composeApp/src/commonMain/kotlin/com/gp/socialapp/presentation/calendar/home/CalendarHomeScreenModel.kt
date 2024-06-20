@@ -5,7 +5,6 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import com.gp.socialapp.data.auth.repository.AuthenticationRepository
 import com.gp.socialapp.data.calendar.model.CalendarEvent
 import com.gp.socialapp.data.calendar.repository.CalendarRepository
-import com.gp.socialapp.presentation.calendar.home.components.EventType
 import com.gp.socialapp.util.DispatcherIO
 import com.gp.socialapp.util.LocalDateTimeUtil.now
 import com.gp.socialapp.util.Result

@@ -57,7 +57,8 @@ import com.seiko.imageloader.ui.AutoSizeImage
 import kotlinx.coroutines.launch
 
 data class HomeContainer(
-    val startingTab: HomeTab = HomeTab.COMMUNITIES
+    val startingTab: HomeTab = HomeTab.COMMUNITIES,
+    val communityId : String = ""
 ) : Screen {
     @Composable
     override fun Content() {
@@ -181,7 +182,7 @@ data class HomeContainer(
                 HomeTab.CHAT -> ChatTab(onNavigation)
                 HomeTab.ASSIGNMENTS -> AssignmentsTab(onNavigation)
                 HomeTab.COMMUNITIES -> CommunitiesTab(onNavigation)
-                HomeTab.CALENDAR -> CalendarTab(onNavigation)
+                HomeTab.CALENDAR -> CalendarTab(onNavigation,communityId=communityId)
                 HomeTab.GRADES -> GradesTab
             }
             TabNavigator(defaultTab) {
@@ -220,7 +221,7 @@ data class HomeContainer(
                                     onNavigation
                                 )
                             )
-                            BottomTabNavigationItem(tab = CalendarTab(onNavigation))
+                            BottomTabNavigationItem(tab = CalendarTab(onNavigation, communityId))
                             BottomTabNavigationItem(tab = GradesTab)
                         }
                     },

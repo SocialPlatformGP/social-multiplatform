@@ -98,8 +98,8 @@ object LocalDateTimeUtil {
     }
 
     fun convertEpochToTime(epoch: Long): String {
-        val localDateTime = Instant.fromEpochMilliseconds(epoch).toLocalDateTime(TimeZone.UTC)
-        val hour = (localDateTime.hour + 2)
+        val localDateTime = Instant.fromEpochMilliseconds(epoch).toLocalDateTime(TimeZone.currentSystemDefault())
+        val hour = (localDateTime.hour)
         val minute = localDateTime.minute
         val amOrPm = if (hour < 12) "AM" else "PM"
         val hourIn12HrFormat = if (hour > 12) hour - 12 else hour
