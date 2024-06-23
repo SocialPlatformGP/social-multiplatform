@@ -71,7 +71,6 @@ kotlin {
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.moko.mvvm)
             implementation(libs.ktor.core)
-            implementation(libs.composeIcons.featherIcons)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.kotlinx.datetime)
             implementation(libs.multiplatformSettings)
@@ -89,6 +88,11 @@ kotlin {
             implementation(libs.supabase.realtime)
             implementation(libs.supabase.postgrest)
             implementation(libs.window.size.multiplatform)
+            implementation(libs.kottie)
+            implementation(libs.compose.placeholder.material3)
+            implementation(libs.composeIcons.feather)
+            implementation(libs.composeIcons.fontAwesome)
+            implementation(libs.composeIcons.tablerIcons)
 
         }
 
