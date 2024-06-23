@@ -1,6 +1,7 @@
 package com.gp.socialapp.presentation.chat.chatroom.components
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
@@ -14,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -32,13 +34,14 @@ import com.mohamedrejeb.calf.picker.FilePickerFileType
 @Composable
 fun MessageFileAttachment(
     fileName: String,
+    size: Long,
     onFileClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
 
     Surface(
-        color = Color(0f, 0f, 0f, 0.15f),
-        shape = RoundedCornerShape(20.dp, 20.dp, 20.dp, 20.dp),
+        color = Color(0f, 0f, 0f, 0.08f),
+        shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -53,12 +56,21 @@ fun MessageFileAttachment(
                 modifier = Modifier.size(32.dp)
             )
             Spacer(modifier = Modifier.size(4.dp))
-            Text(
-                text = fileName,
-                fontSize = 12.sp,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-            )
+            Column{
+                Text(
+                    text = fileName.adaptive(17),
+                    fontSize = 12.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Text(
+                    text = size.toReadableSize()+" - "+fileName.substringAfterLast('.').uppercase(),
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Light,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
         }
     }
 }
@@ -75,4 +87,15 @@ fun getFileImageVector(fileType: String): ImageVector {
         FilePickerFileType.ExcelSpreadsheetContentType -> FileTypeIcons.Excel
         else -> FileTypeIcons.File
     }
+}
+fun String.adaptive(maxLength: Int) = if (this.length > maxLength) {
+    this.substring(0, maxLength-3) + "..."
+} else {
+    this
+}
+fun Long.toReadableSize(): String {
+    if (this <= 0) return "0"
+    val units = arrayOf("B", "KB", "MB", "GB", "TB")
+    val digitGroups = (Math.log10(this.toDouble()) / Math.log10(1024.0)).toInt()
+    return String.format("%.1f %s", this / Math.pow(1024.0, digitGroups.toDouble()), units[digitGroups])
 }

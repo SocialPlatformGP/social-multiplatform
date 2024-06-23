@@ -33,10 +33,14 @@ import cafe.adriel.voyager.kodein.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gp.socialapp.data.auth.source.remote.model.User
+import com.gp.socialapp.data.chat.model.RecentRoom
 import com.gp.socialapp.presentation.chat.chatroom.ChatRoomScreen
 import com.gp.socialapp.presentation.chat.creategroup.components.ChooseGroupMembersSection
 import com.gp.socialapp.presentation.chat.creategroup.components.GroupNameSection
 import com.gp.socialapp.presentation.chat.creategroup.components.ModifiableAvatarSection
+import com.gp.socialapp.presentation.chat.home.ChatHomeScreen
+import com.gp.socialapp.util.Platform
+import com.gp.socialapp.util.getPlatform
 
 object CreateGroupScreen : Screen {
     @Composable
@@ -52,15 +56,35 @@ object CreateGroupScreen : Screen {
                 screenModel.onDispose()
             }
         )
+        val platform = getPlatform()
         if (state.isCreated) {
-            navigator.replace(
-                ChatRoomScreen(
-                    roomId = state.groupId,
-                    roomTitle = state.groupName,
-                    roomAvatarUrl = state.groupAvatarUrl,
-                    isPrivate = false
-                )
-            )
+            when(platform){
+                Platform.ANDROID -> {
+                    navigator.replace(
+                        ChatRoomScreen(
+                            roomId = state.groupId,
+                            roomTitle = state.groupName,
+                            roomAvatarUrl = state.groupAvatarUrl,
+                            isPrivate = false
+                        )
+                    )
+                }
+                Platform.JVM -> {
+                    val recentRoom = RecentRoom(
+                        isPrivate = false,
+                        roomId = state.groupId,
+                        senderName = state.groupName,
+                        senderPicUrl = state.groupAvatarUrl
+                    )
+                    navigator.push(
+                        ChatHomeScreen(
+                            startingChatRecentRoom = recentRoom
+                        )
+                    )
+                }
+                else -> Unit
+            }
+
         }
         CreateGroupScreenContent(
             onAction = {

@@ -14,7 +14,7 @@ import com.gp.socialapp.presentation.calendar.home.CalendarHomeScreenModel
 import com.gp.socialapp.presentation.chat.addmembers.AddMembersScreenModel
 import com.gp.socialapp.presentation.chat.chatroom.ChatRoomScreenModel
 import com.gp.socialapp.presentation.chat.creategroup.CreateGroupScreenModel
-import com.gp.socialapp.presentation.chat.createprivate.CreatePrivateChatScreenModel
+import com.gp.socialapp.presentation.chat.createchat.CreateChatScreenModel
 import com.gp.socialapp.presentation.chat.groupdetails.GroupDetailsScreenModel
 import com.gp.socialapp.presentation.chat.home.ChatHomeScreenModel
 import com.gp.socialapp.presentation.community.communityhome.CommunityHomeContainerScreenModel
@@ -73,8 +73,8 @@ val screenModelModuleK = DI.Module("screenModelModule") {
         )
     }
     bind<ChatHomeScreenModel>() with singleton { ChatHomeScreenModel(instance(), instance()) }
-    bind<CreatePrivateChatScreenModel>() with singleton {
-        CreatePrivateChatScreenModel(
+    bind<CreateChatScreenModel>() with singleton {
+        CreateChatScreenModel(
             instance(),
             instance(),
             instance()
@@ -84,6 +84,7 @@ val screenModelModuleK = DI.Module("screenModelModule") {
         ChatRoomScreenModel(
             instance(),
             instance(),
+            instance()
         )
     }
     bind<GroupDetailsScreenModel>() with singleton {

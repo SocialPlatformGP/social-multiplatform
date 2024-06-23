@@ -27,4 +27,9 @@ interface MessageRepository {
     ): Result<Unit,ChatError>
 
     suspend fun openAttachment(path: String, name: String, mimeType: String)
+    suspend fun reportMessage(
+        messageId: Long,
+        roomId: Long,
+        reporterId: String
+    ): Result<Unit, ChatError>
 }

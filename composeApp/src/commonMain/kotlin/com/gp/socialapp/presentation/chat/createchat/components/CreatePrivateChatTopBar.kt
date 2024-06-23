@@ -1,4 +1,4 @@
-package com.gp.socialapp.presentation.chat.createprivate.components
+package com.gp.socialapp.presentation.chat.createchat.components
 
 
 import androidx.compose.foundation.layout.padding
@@ -44,7 +44,7 @@ fun CreatePrivateChatTopBar(
                 contentDescription = "Search",
             )
         }
-    }, modifier = modifier
+    }, modifier = modifier.padding(4.dp)
     )
 
 }

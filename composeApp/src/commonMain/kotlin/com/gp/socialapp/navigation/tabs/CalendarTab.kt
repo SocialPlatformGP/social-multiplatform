@@ -18,7 +18,6 @@ import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import cafe.adriel.voyager.transitions.SlideTransition
 import com.gp.socialapp.presentation.calendar.home.CalendarHomeScreen
-import com.gp.socialapp.presentation.chat.home.ChatHomeScreen
 import kotlin.jvm.Transient
 
 data class CalendarTab(

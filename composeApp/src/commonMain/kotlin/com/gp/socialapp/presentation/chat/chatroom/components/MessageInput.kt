@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -36,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.unit.dp
 import com.gp.socialapp.data.chat.model.MessageAttachment
 import com.gp.socialapp.presentation.chat.chatroom.ChatRoomAction
@@ -45,6 +47,7 @@ import com.mohamedrejeb.calf.picker.FilePickerFileType
 fun MessageInput(
     onAction: (ChatRoomAction) -> Unit,
     attachment: MessageAttachment,
+    isLoading: Boolean,
     modifier: Modifier = Modifier,
 ) {
     var isExpanded by remember { mutableStateOf(false) }
@@ -65,13 +68,14 @@ fun MessageInput(
     Column(
         modifier = modifier.padding(horizontal = 8.dp, vertical = 2.dp).fillMaxWidth()
     ) {
-        if (attachment.type.isNotEmpty()) {
+        if (attachment.type.isNotEmpty() && !isLoading) {
             Box(
                 modifier = Modifier.padding(8.dp).fillMaxWidth()
             ) {
                 MessageFileAttachment(
                     fileName = attachment.name,
                     onFileClicked = { /**/ },
+                    size = attachment.size,
                     modifier = Modifier.padding(2.dp).fillMaxWidth().align(Alignment.CenterStart)
                 )
                 IconButton(
@@ -86,6 +90,11 @@ fun MessageInput(
                 }
             }
         }
+        if(isLoading){
+            LinearProgressIndicator(
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(
@@ -97,13 +106,28 @@ fun MessageInput(
                 placeholder = { Text("Type your message") },
                 modifier = Modifier.weight(1F).clip(RoundedCornerShape(32.dp)),
                 leadingIcon = {
-                    IconButton(onClick = { isExpanded = !isExpanded }) {
-                        Icon(
-                            imageVector = Icons.Filled.Add,
-                            contentDescription = null,
-                            tint = if (isExpanded) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
-                            modifier = Modifier.rotate(rotation)
-                        )
+                    Row{
+                        IconButton(
+                            modifier = Modifier.padding(start = 4.dp),
+                            onClick = {
+                            onAction(ChatRoomAction.OnAttachClicked(FilePickerFileType.All))
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.AttachFile,
+                                contentDescription = "Attach file",
+                                tint = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                        IconButton(
+                            modifier = Modifier.padding(end = 4.dp),
+                            onClick = { onAction(ChatRoomAction.OnAttachClicked(FilePickerFileType.Image)) }) {
+                            Icon(
+                                imageVector = Icons.Default.AddPhotoAlternate,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+
                     }
                 },
                 colors = TextFieldDefaults.colors(

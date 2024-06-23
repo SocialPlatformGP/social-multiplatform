@@ -38,6 +38,9 @@ import com.gp.socialapp.presentation.chat.groupdetails.components.GroupDetailsNa
 import com.gp.socialapp.presentation.chat.groupdetails.components.GroupMembersSection
 import com.gp.socialapp.presentation.chat.groupdetails.components.UserClickedDialog
 import com.gp.socialapp.presentation.chat.home.ChatHomeScreen
+import com.gp.socialapp.presentation.userprofile.UserProfileScreen
+import com.gp.socialapp.util.Platform
+import com.gp.socialapp.util.getPlatform
 import org.jetbrains.compose.resources.stringResource
 import socialmultiplatform.composeapp.generated.resources.Res
 import socialmultiplatform.composeapp.generated.resources.confirm_member_removal
@@ -55,15 +58,26 @@ data class GroupDetailsScreen(
             screenModel.onDispose()
         })
         val state by screenModel.uiState.collectAsState()
-        if (state.privateRoom != null) {
-            navigator.push(
-                ChatRoomScreen(
-                    roomId = state.privateRoom!!.id,
-                    roomTitle = state.privateRoom!!.name,
-                    roomAvatarUrl = state.privateRoom!!.picUrl,
-                    isPrivate = true
-                )
-            )
+        val platform = getPlatform()
+        if (state.privateRoom != null && state.privateRecentRoom != null) {
+            when(platform){
+                Platform.ANDROID -> {
+                    val room = state.privateRoom!!
+                    navigator.replace(
+                        ChatRoomScreen(
+                            roomId = room.id, isPrivate = true, roomAvatarUrl = room.picUrl, roomTitle = room.name
+                        )
+                    )
+                }
+                Platform.JVM -> {
+                    navigator.replace(
+                        ChatHomeScreen(
+                            startingChatRecentRoom = state.privateRecentRoom!!
+                        )
+                    )
+                }
+                else -> Unit
+            }
             navigator.popUntil { it is ChatHomeScreen }
         } else {
             GroupDetailsContent(
@@ -79,7 +93,7 @@ data class GroupDetailsScreen(
                         }
 
                         is GroupDetailsAction.OnViewUserProfile -> {
-                            //todo navigate to user profile
+                            navigator.push(UserProfileScreen(action.userId))
                         }
 
                         is GroupDetailsAction.OnBackClicked -> {

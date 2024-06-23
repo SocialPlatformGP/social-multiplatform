@@ -1,6 +1,7 @@
 package com.gp.socialapp.data.chat.repository
 
 import com.gp.socialapp.data.auth.source.remote.model.User
+import com.gp.socialapp.data.chat.model.RecentRoom
 import com.gp.socialapp.data.chat.model.Room
 import com.gp.socialapp.util.ChatError
 import com.gp.socialapp.util.Result
@@ -37,7 +38,7 @@ interface RoomRepository {
     suspend fun getPrivateRoom(
         currentUser: User,
         otherUser: User
-    ): Result<Room,ChatError>
+    ): Result<Pair<RecentRoom, Room>,ChatError>
 
     suspend fun updateRoomName(
         roomId: Long,

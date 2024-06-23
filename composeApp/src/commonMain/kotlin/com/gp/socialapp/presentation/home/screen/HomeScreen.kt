@@ -5,7 +5,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Login
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.GroupAdd
-import androidx.compose.material.icons.filled.Login
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -28,7 +27,6 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gp.socialapp.data.community.source.remote.model.Community
 import com.gp.socialapp.presentation.auth.login.LoginScreen
 import com.gp.socialapp.presentation.auth.userinfo.UserInformationScreen
-import com.gp.socialapp.presentation.chat.home.components.SingleFab
 import com.gp.socialapp.presentation.community.communityhome.CommunityHomeContainer
 import com.gp.socialapp.presentation.community.communityhome.CommunityHomeTab
 import com.gp.socialapp.presentation.community.createcommunity.CreateCommunityScreen
@@ -38,7 +36,6 @@ import com.gp.socialapp.presentation.home.components.CommunityOptionsExpandedMen
 import com.gp.socialapp.presentation.home.components.ConfirmLeaveCommunityDialog
 import com.gp.socialapp.presentation.home.components.FabItem
 import com.gp.socialapp.presentation.home.components.HomeContent
-import com.gp.socialapp.presentation.home.components.HomeFab
 import com.gp.socialapp.presentation.home.components.JoinCommunityDialog
 import com.gp.socialapp.presentation.home.components.MultiFloatingActionButton
 import com.gp.socialapp.presentation.home.components.OptionItem
@@ -139,6 +136,7 @@ data class HomeScreen(
                             )
                         )
                     }
+
                     is HomeUiAction.OnCommunityMembersClicked -> {
                         navigator.push(
                             CommunityHomeContainer(
@@ -147,6 +145,7 @@ data class HomeScreen(
                             )
                         )
                     }
+
                     else -> Unit
                 }
             })
@@ -177,6 +176,7 @@ data class HomeScreen(
                     showOptionsMenu = true
                     scope.launch { sheetState.show() }
                 }
+
                 else -> onAction(it)
             }
         }
@@ -211,7 +211,6 @@ data class HomeScreen(
                 }
             )
         }
-        var fabState = remember { mutableStateOf(false) }
         Scaffold(
             floatingActionButton = {
                 val fabItems = listOf(
@@ -236,7 +235,7 @@ data class HomeScreen(
                 )
             }) { padding ->
             if (showOptionsMenu) {
-                when(windowSizeClass.widthSizeClass){
+                when (windowSizeClass.widthSizeClass) {
                     WindowWidthSizeClass.Compact -> {
                         CommunityOptionsCompactMenu(
                             sheetState = sheetState,
@@ -250,6 +249,7 @@ data class HomeScreen(
                             }
                         )
                     }
+
                     else -> {
                         CommunityOptionsExpandedMenu(
                             options = options,

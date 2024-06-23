@@ -1,6 +1,7 @@
 package com.gp.socialapp.data.chat.source.remote
 
 import com.gp.socialapp.data.auth.source.remote.model.User
+import com.gp.socialapp.data.chat.model.RecentRoom
 import com.gp.socialapp.data.chat.model.Room
 import com.gp.socialapp.data.chat.model.UserRooms
 import com.gp.socialapp.data.chat.source.remote.model.RemoteRecentRoom
@@ -111,7 +112,7 @@ class RoomRemoteDataSourceImpl(
         }
     }
 
-    override suspend fun getPrivateRoom(currentUser: User, otherUser: User): Result<Room,ChatError> {
+    override suspend fun getPrivateRoom(currentUser: User, otherUser: User): Result<Pair<RecentRoom, Room>,ChatError> {
         return try {
             val userPrivateChats = supabase.from(USERROOMS).select {
                 filter {
@@ -124,7 +125,12 @@ class RoomRemoteDataSourceImpl(
                         eq("id", userPrivateChats.getValue(otherUser.id))
                     }
                 }.decodeSingle<RemoteRoom>().toRoom()
-                Result.Success(room)
+                val recentRoom = supabase.from(RECENTROOMS).select {
+                    filter {
+                        eq("roomId", room.id)
+                    }
+                }.decodeSingle<RemoteRecentRoom>().toRecentRoom()
+                Result.Success(Pair(recentRoom, room))
             } else {
                 val timestamp = nowLocal().format("yyyy-MM-dd'T'HH:mm:ss.SSSSSSX")
                 val remoteRoom = RemoteRoom(
@@ -148,13 +154,15 @@ class RoomRemoteDataSourceImpl(
                     receiverPicUrl = otherUser.profilePictureURL,
                     lastMessageTime = timestamp
                 )
-                supabase.from(RECENTROOMS).insert(remoteRecentRoom)
+                val createdRecentRoom = supabase.from(RECENTROOMS).insert(remoteRecentRoom){
+                    select()
+                }.decodeSingle<RemoteRecentRoom>()
                 updateUsersRooms(
                     listOf(currentUser.id, otherUser.id), creatorId = currentUser.id, createdRoom.id
                 )
                 updateUsersPrivateChats(currentUser.id, otherUser.id, createdRoom.id)
                 updateUsersPrivateChats(otherUser.id, currentUser.id, createdRoom.id)
-                Result.Success(createdRoom.toRoom())
+                Result.Success(Pair(createdRecentRoom.toRecentRoom(),createdRoom.toRoom()))
             }
         } catch (e: Exception) {
             e.printStackTrace()

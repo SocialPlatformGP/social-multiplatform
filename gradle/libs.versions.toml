@@ -1,6 +1,7 @@
 [versions]
 
 calfFilePicker = "0.4.0"
+componentsSplitpaneDesktop = "1.6.10"
 korgeFoundation = "5.4.0"
 material3WindowSizeClassMultiplatform = "0.5.0"
 supabase-client = "2.4.0"
@@ -38,6 +39,7 @@ androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "a
 androidx-activityCompose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
 androidx-window = { module = "androidx.window:window", version.ref = "window" }
 calf-file-picker = { module = "com.mohamedrejeb.calf:calf-file-picker", version.ref = "calfFilePicker" }
+components-splitpane-desktop = { module = "org.jetbrains.compose.components:components-splitpane-desktop", version.ref = "componentsSplitpaneDesktop" }
 compose-uitooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose-uitooling" }
 korge-foundation = { module = "com.soywiz.korge:korge-foundation", version.ref = "korgeFoundation" }
 

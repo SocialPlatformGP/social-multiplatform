@@ -34,7 +34,7 @@ data class ChatTab(
 
     @Composable
     override fun Content() {
-        Navigator(screen = ChatHomeScreen) { navigator ->
+        Navigator(screen = ChatHomeScreen()) { navigator ->
             LaunchedEffect(navigator.lastItem) {
                 onNavigation(navigator.lastItem is ChatHomeScreen)
             }

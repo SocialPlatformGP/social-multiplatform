@@ -1,8 +1,9 @@
-package com.gp.socialapp.presentation.chat.createprivate.components
+package com.gp.socialapp.presentation.chat.createchat.components
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -10,6 +11,7 @@ import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -32,23 +34,17 @@ fun CreatePrivateChatSearchBar(
     Row(
         modifier = modifier.fillMaxWidth().padding(8.dp)
     ) {
-        IconButton(
-            onClick = { onBackPressed() },
-            modifier = Modifier.padding(horizontal = 8.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Default.ArrowBackIosNew,
-                contentDescription = "Back",
-            )
-        }
         TextField(
+            shape = RoundedCornerShape(32.dp),
             value = searchQuery,
             placeholder = { Text("Search...") },
             leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = "Search",
-                )
+                IconButton(onClick = { onBackPressed() }){
+                    Icon(
+                        imageVector = Icons.Default.ArrowBackIosNew,
+                        contentDescription = "Search",
+                    )
+                }
             },
             onValueChange = {
                 searchQuery = it

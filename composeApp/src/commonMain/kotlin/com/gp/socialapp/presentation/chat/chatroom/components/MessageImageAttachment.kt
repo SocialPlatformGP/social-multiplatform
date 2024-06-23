@@ -42,7 +42,7 @@ fun MessageImageAttachment(
                     ),
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
-                        modifier = modifier.fillMaxWidth().heightIn(max = maxHeight)
+                        modifier = modifier.heightIn(max = maxHeight)
                             .clickable { onImageClicked() })
                 }
 
