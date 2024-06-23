@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -44,10 +45,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.lifecycle.LifecycleEffect
@@ -82,6 +81,17 @@ import socialmultiplatform.composeapp.generated.resources.date_of_birth
 import socialmultiplatform.composeapp.generated.resources.name
 import socialmultiplatform.composeapp.generated.resources.phone_number
 import socialmultiplatform.composeapp.generated.resources.select
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Dp
+import com.gp.socialapp.presentation.auth.signup.Responsive
 
 data class UserInformationScreen(
     val signedInUser: User,
@@ -91,42 +101,48 @@ data class UserInformationScreen(
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = navigator.rememberNavigatorScreenModel<UserInformationScreenModel>()
         val state by screenModel.uiState.collectAsState()
-        LifecycleEffect(
-            onStarted = {
-                println("UserInformationScreen started")
-                screenModel.onScreenStart(signedInUser)
-            },
-            onDisposed = {
-                screenModel.onDispose()
+        var deviceWidth by remember { mutableStateOf(0.dp) }
+        var deviceHeight by remember { mutableStateOf(0.dp) }
+        val isMobile by remember { derivedStateOf { deviceWidth < 600.dp } }
+        val isTablet by remember { derivedStateOf { deviceWidth in 600.dp..1100.dp } }
+        val isDesktop by remember { derivedStateOf { deviceWidth > 1100.dp } }
+
+        BoxWithConstraints(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+        ) {
+            LaunchedEffect(this.maxWidth, this.maxHeight) {
+                deviceWidth = this@BoxWithConstraints.maxWidth
+                deviceHeight = this@BoxWithConstraints.maxHeight
             }
-        )
-        val scope = rememberCoroutineScope()
-        val context = LocalPlatformContext.current
-        val pickerLauncher = rememberFilePickerLauncher(
-            type = FilePickerFileType.Image,
-            selectionMode = FilePickerSelectionMode.Single,
-            onResult = { files ->
-                scope.launch {
-                    files.firstOrNull()?.let { file ->
-                        val image = file.readByteArray(context)
-                        screenModel.onImageChange(image)
+            val scope = rememberCoroutineScope()
+            val context = LocalPlatformContext.current
+            val pickerLauncher = rememberFilePickerLauncher(
+                type = FilePickerFileType.Image,
+                selectionMode = FilePickerSelectionMode.Single,
+                onResult = { files ->
+                    scope.launch {
+                        files.firstOrNull()?.let { file ->
+                            val image = file.readByteArray(context)
+                            screenModel.onImageChange(image)
+                        }
                     }
                 }
-            }
-        )
-        if (state.createdState is Result.Success) {
-            navigator.replaceAll(HomeContainer())
-        }
-        Scaffold { paddingValues ->
+            )
+
             UserInformationContent(
-                paddingValues = paddingValues,
+                paddingValues = PaddingValues(),
                 state = state,
                 onNameChange = { screenModel.onNameChange(it) },
                 onProfileImageClicked = { pickerLauncher.launch() },
                 onPhoneNumberChange = { screenModel.onPhoneNumberChange(it) },
                 onBioChange = { screenModel.onBioChange(it) },
                 onDateOfBirthChange = { screenModel.onBirthDateChange(it) },
-                onContinueClicked = { screenModel.onCompleteAccount() }
+                onContinueClicked = { screenModel.onCompleteAccount() },
+                responsive = Responsive(isMobile = isMobile, isTablet = isTablet, isDesktop = isDesktop),
+                deviceWidth = deviceWidth,
+                deviceHeight = deviceHeight
             )
         }
     }
@@ -142,6 +158,9 @@ data class UserInformationScreen(
         onDateOfBirthChange: (LocalDateTime) -> Unit = {},
         onBioChange: (String) -> Unit = {},
         onContinueClicked: () -> Unit = {},
+        responsive: Responsive,
+        deviceWidth: Dp,
+        deviceHeight: Dp
     ) {
         var isDateDialogOpen by remember { mutableStateOf(false) }
         var pickedDate by remember { mutableStateOf(LocalDateTime.now()) }
@@ -152,6 +171,9 @@ data class UserInformationScreen(
         }
         val scope = rememberCoroutineScope()
         val snackbarHostState = remember { SnackbarHostState() }
+        val paddingSize = with(LocalDensity.current) { deviceWidth.toPx() / 20 }.dp
+        val textSize = with(LocalDensity.current) { deviceWidth.toPx() / 40 }.sp
+        val componentHeight = with(LocalDensity.current) { deviceHeight.toPx() / 15 }.dp
 
         Scaffold(
             snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
@@ -166,8 +188,12 @@ data class UserInformationScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .widthIn(max = 600.dp)
-                    .padding(8.dp),
+                    .widthIn(max = when {
+                        responsive.isMobile -> deviceWidth * 0.9f
+                        responsive.isTablet -> deviceWidth * 0.7f
+                        else -> deviceWidth * 0.5f
+                    })
+                    .padding(paddingSize),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
@@ -175,7 +201,8 @@ data class UserInformationScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentWidth(align = Alignment.CenterHorizontally),
-                    fontSize = MaterialTheme.typography.headlineMedium.fontSize,
+                    fontSize = textSize,
+                    color = MaterialTheme.colorScheme.primary
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Box(
@@ -212,6 +239,7 @@ data class UserInformationScreen(
                         Icon(
                             imageVector = Icons.Rounded.Create,
                             contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSecondaryContainer
                         )
                     }
                 }
@@ -228,7 +256,6 @@ data class UserInformationScreen(
                                 fontSize = 12.sp
                             )
                         }
-
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -269,7 +296,6 @@ data class UserInformationScreen(
                             .clickable {
                                 isDateDialogOpen = true
                             },
-
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Filled.CalendarMonth,
@@ -312,7 +338,12 @@ data class UserInformationScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 16.dp)
-                        .height(52.dp)
+                        .height(componentHeight),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    ),
+                    shape = RoundedCornerShape(12.dp)
                 ) {
                     Text(
                         text = stringResource(Res.string.complete_profile),

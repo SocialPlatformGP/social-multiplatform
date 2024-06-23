@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.flow
 class MessageLocalDataSourceImpl(
     private val realm: Realm
 ) : MessageLocalDataSource {
-    override fun getMessagesFlow(roomId: String): Flow<Result<List<Message>,ChatError.Temp>> =
+    override fun getMessagesFlow(roomId: String): Flow<Result<List<Message>,ChatError>> =
         flow {
             try {
                 val messagesFlow = realm.query(
@@ -41,11 +41,11 @@ class MessageLocalDataSourceImpl(
                     }
                 }
             } catch (e: Exception) {
-                emit(Result.Error(ChatError.Temp.SERVER_ERROR))
+                emit(Result.Error(ChatError.SERVER_ERROR))
             }
         }
 
-    override suspend fun insertMessages(vararg messages: Message): Result<Unit,ChatError.Temp> {
+    override suspend fun insertMessages(vararg messages: Message): Result<Unit,ChatError> {
         return try {
             realm.write {
                 messages.forEach { message ->
@@ -58,11 +58,11 @@ class MessageLocalDataSourceImpl(
             }
             Result.Success(Unit)
         } catch (e: Exception) {
-            Result.Error(ChatError.Temp.SERVER_ERROR)
+            Result.Error(ChatError.SERVER_ERROR)
         }
     }
 
-    override suspend fun deleteMessage(messageId: String): Result<Unit,ChatError.Temp> {
+    override suspend fun deleteMessage(messageId: String): Result<Unit,ChatError> {
         return try {
             realm.write {
                 val messageToDelete: MessageEntity =
@@ -72,11 +72,11 @@ class MessageLocalDataSourceImpl(
             }
             Result.Success(Unit)
         } catch (e: Exception) {
-            Result.Error(ChatError.Temp.SERVER_ERROR)
+            Result.Error(ChatError.SERVER_ERROR)
         }
     }
 
-    override suspend fun updateMessage(message: Message): Result<Unit,ChatError.Temp> {
+    override suspend fun updateMessage(message: Message): Result<Unit,ChatError> {
         return try {
             realm.write {
                 val messageToUpdate =
@@ -85,11 +85,11 @@ class MessageLocalDataSourceImpl(
             }
             Result.Success(Unit)
         } catch (e: Exception) {
-            Result.Error(ChatError.Temp.SERVER_ERROR)
+            Result.Error(ChatError.SERVER_ERROR)
         }
     }
 
-    override suspend fun getLastLocalMessage(chatId: String): Result<Message,ChatError.Temp> {
+    override suspend fun getLastLocalMessage(chatId: String): Result<Message,ChatError> {
         return try {
             val messageEntity = realm.query(
                 clazz = MessageEntity::class,
@@ -101,7 +101,7 @@ class MessageLocalDataSourceImpl(
             ).find().first()
             Result.Success(messageEntity.toMessage())
         } catch(e: Exception) {
-            Result.Error(ChatError.Temp.SERVER_ERROR)
+            Result.Error(ChatError.SERVER_ERROR)
         }
     }
 }
