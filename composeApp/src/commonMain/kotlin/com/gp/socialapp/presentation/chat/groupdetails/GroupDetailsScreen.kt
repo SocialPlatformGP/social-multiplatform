@@ -2,7 +2,6 @@ package com.gp.socialapp.presentation.chat.groupdetails
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
@@ -13,7 +12,12 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -38,6 +42,7 @@ import com.gp.socialapp.presentation.chat.groupdetails.components.GroupDetailsNa
 import com.gp.socialapp.presentation.chat.groupdetails.components.GroupMembersSection
 import com.gp.socialapp.presentation.chat.groupdetails.components.UserClickedDialog
 import com.gp.socialapp.presentation.chat.home.ChatHomeScreen
+import com.gp.socialapp.presentation.home.components.OptionItem
 import com.gp.socialapp.presentation.userprofile.UserProfileScreen
 import com.gp.socialapp.util.Platform
 import com.gp.socialapp.util.getPlatform
@@ -48,6 +53,7 @@ import socialmultiplatform.composeapp.generated.resources.confirm_member_removal
 data class GroupDetailsScreen(
     private val roomId: Long, private val roomTitle: String, private val roomAvatarUrl: String
 ) : Screen {
+    @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
@@ -59,16 +65,21 @@ data class GroupDetailsScreen(
         })
         val state by screenModel.uiState.collectAsState()
         val platform = getPlatform()
+        val windowSizeClass = calculateWindowSizeClass()
         if (state.privateRoom != null && state.privateRecentRoom != null) {
-            when(platform){
+            when (platform) {
                 Platform.ANDROID -> {
                     val room = state.privateRoom!!
                     navigator.replace(
                         ChatRoomScreen(
-                            roomId = room.id, isPrivate = true, roomAvatarUrl = room.picUrl, roomTitle = room.name
+                            roomId = room.id,
+                            isPrivate = true,
+                            roomAvatarUrl = room.picUrl,
+                            roomTitle = room.name
                         )
                     )
                 }
+
                 Platform.JVM -> {
                     navigator.replace(
                         ChatHomeScreen(
@@ -76,6 +87,7 @@ data class GroupDetailsScreen(
                         )
                     )
                 }
+
                 else -> Unit
             }
             navigator.popUntil { it is ChatHomeScreen }
@@ -109,6 +121,7 @@ data class GroupDetailsScreen(
                 members = state.members,
                 admins = state.admins,
                 currentUserId = state.currentUser.id,
+                windowWidthSizeClass = windowSizeClass.widthSizeClass
             )
         }
     }
@@ -117,6 +130,7 @@ data class GroupDetailsScreen(
     @Composable
     private fun GroupDetailsContent(
         modifier: Modifier = Modifier,
+        windowWidthSizeClass: WindowWidthSizeClass,
         avatarURL: String,
         isAdmin: Boolean,
         onAction: (GroupDetailsAction) -> Unit,
@@ -128,11 +142,50 @@ data class GroupDetailsScreen(
         var clickedUser by remember { mutableStateOf(User()) }
         var isUserClickedDialogOpen by remember { mutableStateOf(false) }
         var isRemoveMemberDialogOpen by rememberSaveable { mutableStateOf(false) }
+        val sheetState = rememberModalBottomSheetState()
+        val clickedUserOptions = mutableListOf<OptionItem>().apply {
+            if (currentUserId != clickedUser.id) {
+                add(
+                    OptionItem(
+                        label = "Message ${clickedUser.name.trim().substringBefore(" ")}",
+                        onClick = {
+                            onAction(GroupDetailsAction.OnMessageUser(clickedUser))
+                            isUserClickedDialogOpen = false
+                        }
+                    )
+                )
+            }
+            add(
+                OptionItem(
+                    label = "View ${clickedUser.name.trim().substringBefore(" ")}'s profile",
+                    onClick = {
+                        onAction(GroupDetailsAction.OnViewUserProfile(clickedUser.id))
+                        isUserClickedDialogOpen = false
+                    }
+                )
+            )
+            if (isAdmin && clickedUser.id != currentUserId) {
+                add(
+                    OptionItem(
+                        label = "Remove ${clickedUser.name.trim().substringBefore(" ")} from group",
+                        onClick = {
+                            isRemoveMemberDialogOpen = true
+                            isUserClickedDialogOpen = false
+                        }
+                    )
+                )
+            }
+        }
         Scaffold(
             modifier = modifier,
             topBar = {
                 TopAppBar(
-                    title = {},
+                    title = {
+                        Text(
+                            text = "Group Details",
+                            style = MaterialTheme.typography.headlineSmall,
+                        )
+                    },
                     navigationIcon = {
                         IconButton(onClick = {
                             onAction(GroupDetailsAction.OnBackClicked)
@@ -148,36 +201,50 @@ data class GroupDetailsScreen(
             },
         ) {
             Surface(
-                modifier = Modifier.padding(it), color = MaterialTheme.colorScheme.inverseOnSurface
+                modifier = Modifier.padding(it),
+                color = MaterialTheme.colorScheme.inverseOnSurface.copy(alpha = 0.2f)
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.fillMaxSize().padding(16.dp)
                 ) {
-                    ModifiableAvatarSection(avatarURL = avatarURL,
+                    ModifiableAvatarSection(
+                        avatarURL = avatarURL,
                         isModifiable = isAdmin,
                         onImagePicked = { array, extension ->
-                            onAction(GroupDetailsAction.OnChangeAvatar(array, extension))
-                        })
-                    GroupDetailsNameSection(name = name,
+                            onAction(
+                                GroupDetailsAction.OnChangeAvatar(
+                                    array,
+                                    extension
+                                )
+                            )
+                        }
+                    )
+                    GroupDetailsNameSection(
+                        name = name,
                         isModifiable = isAdmin,
                         onChangeName = { newName ->
                             onAction(GroupDetailsAction.OnChangeName(newName))
-                        })
-                    HorizontalDivider(modifier = Modifier.height(2.dp))
-                    GroupMembersSection(members = members,
+                        }
+                    )
+                    HorizontalDivider(thickness = 2.dp)
+                    GroupMembersSection(
+                        modifier = Modifier.padding(16.dp),
+                        members = members,
                         admins = admins,
                         isAdmin = isAdmin,
                         onAddMembersClicked = { onAction(GroupDetailsAction.OnAddMembersClicked) },
                         onUserClicked = {
                             clickedUser = it
                             isUserClickedDialogOpen = true
-                        })
+                        }
+                    )
                 }
                 if (isRemoveMemberDialogOpen) {
-                    ConfirmActionAlertDialog(onDismissRequest = {
-                        isRemoveMemberDialogOpen = false
-                    },
+                    ConfirmActionAlertDialog(
+                        onDismissRequest = {
+                            isRemoveMemberDialogOpen = false
+                        },
                         onConfirmation = {
                             onAction(GroupDetailsAction.OnRemoveMember(clickedUser.id))
                             isRemoveMemberDialogOpen = false
@@ -186,20 +253,12 @@ data class GroupDetailsScreen(
                     )
                 }
                 if (isUserClickedDialogOpen) {
-                    UserClickedDialog(isAdmin = isAdmin,
-                        isCurrentUser = clickedUser.id == currentUserId,
-                        clickedUser = clickedUser,
-                        onRemoveMember = {
-                            isRemoveMemberDialogOpen = true
-                            isUserClickedDialogOpen = false
-                        },
-                        onMessageUser = {
-                            onAction(GroupDetailsAction.OnMessageUser(it))
-                        },
+                    UserClickedDialog(
+                        options = clickedUserOptions,
                         onDismiss = { isUserClickedDialogOpen = false },
-                        onViewProfile = {
-                            onAction(GroupDetailsAction.OnViewUserProfile(it))
-                        })
+                        sheetState = sheetState,
+                        windowWidthSizeClass = windowWidthSizeClass
+                    )
                 }
             }
         }

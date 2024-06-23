@@ -86,6 +86,7 @@ fun ModifiableAvatarSection(
                         Image(
                             rememberImageSuccessPainter(action),
                             contentDescription = null,
+                            contentScale = ContentScale.Crop,
                             modifier = imageModifier,
                         )
                     }
@@ -110,7 +111,7 @@ fun ModifiableAvatarSection(
             IconButton(
                 onClick = { imagePicker.launch() },
                 modifier = Modifier.offset(x = 38.dp, y = 38.dp)
-                    .background(MaterialTheme.colorScheme.secondaryContainer, CircleShape)
+                    .background(MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f), CircleShape)
                     .size(32.dp)
             ) {
                 Icon(

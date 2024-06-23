@@ -137,7 +137,7 @@ object CreateGroupScreen : Screen {
             modifier = modifier
         ) {
             Surface(
-                color = MaterialTheme.colorScheme.inverseOnSurface,
+                color = MaterialTheme.colorScheme.surface,
                 modifier = Modifier.fillMaxSize().padding(it)
             ) {
                 Column(
@@ -159,7 +159,7 @@ object CreateGroupScreen : Screen {
                             },
                         )
                         Spacer(modifier = Modifier.height(4.dp))
-                        GroupNameSection(name = groupName,
+                        GroupNameSection(
                             onUpdateName = { name -> onAction(CreateGroupAction.OnUpdateName(name)) },
                             isError = isError,
                             onChangeError = { value -> onAction(CreateGroupAction.OnSetError(value)) })
@@ -191,11 +191,6 @@ object CreateGroupScreen : Screen {
                             },
                             shape = RoundedCornerShape(32.dp),
                             modifier = Modifier.fillMaxWidth().padding(8.dp).height(54.dp),
-
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                                contentColor = MaterialTheme.colorScheme.onPrimary
-                            ),
                         ) {
                             Text(
                                 text = "Create Group",

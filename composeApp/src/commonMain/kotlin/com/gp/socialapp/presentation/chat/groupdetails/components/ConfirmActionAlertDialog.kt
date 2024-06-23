@@ -1,6 +1,7 @@
 package com.gp.socialapp.presentation.chat.groupdetails.components
 
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -19,7 +20,7 @@ fun ConfirmActionAlertDialog(
     }, onDismissRequest = {
         onDismissRequest()
     }, confirmButton = {
-        TextButton(onClick = {
+        Button(onClick = {
             onConfirmation()
         }) {
             Text("Confirm")
