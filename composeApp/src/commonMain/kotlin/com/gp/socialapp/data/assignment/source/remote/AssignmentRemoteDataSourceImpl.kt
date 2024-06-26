@@ -55,11 +55,11 @@ class AssignmentRemoteDataSourceImpl(
                 emit(Result.Success(assignmentAttachments))
             } else {
                 val error = response.body<AssignmentError>()
-                error(error)
+                Result.Error(error)
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            error(SERVER_ERROR)
+            Result.Error(SERVER_ERROR)
         }
     }
 

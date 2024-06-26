@@ -19,12 +19,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Assignment
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -38,6 +37,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.lifecycle.LifecycleEffect
 import cafe.adriel.voyager.core.screen.Screen
@@ -46,11 +47,13 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gp.socialapp.data.assignment.model.Assignment
 import com.gp.socialapp.data.assignment.model.UserAssignmentSubmission
-import com.gp.socialapp.presentation.assignment.homeassignment.AssignmentHomeUiAction
-import com.gp.socialapp.presentation.assignment.homeassignment.AssignmentHomeUiState
-import com.gp.socialapp.presentation.assignment.homeassignment.AssignmentItem
 import com.gp.socialapp.presentation.assignment.submissionreview.SubmissionReviewScreen
 import com.gp.socialapp.util.LocalDateTimeUtil.convertEpochToTime
+import com.gp.socialapp.util.LocalDateTimeUtil.now
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
+import java.awt.SystemColor.text
 
 data class SubmissionsScreen(
     val assignment: Assignment,
@@ -83,16 +86,18 @@ data class SubmissionsScreen(
     }
 
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SubmissionsScreenContent(
     state: SubmissionsScreenUiState,
     onBack: () -> Unit,
-    action: (SubmissionsScreenUiAction) -> Unit) {
+    action: (SubmissionsScreenUiAction) -> Unit
+) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = "Submissions") },
+                title = { Text(text = " Student Submissions") },
                 navigationIcon = {
                     IconButton(
                         onClick = onBack
@@ -106,10 +111,45 @@ fun SubmissionsScreenContent(
                 }
             )
         }
-    ){ paddingValues ->
+    ) { paddingValues ->
         Column(
             modifier = Modifier.padding(paddingValues).fillMaxSize()
         ) {
+            Row(
+                Modifier.fillMaxWidth().padding(
+                    start = 8.dp,
+                    end = 8.dp,
+                    top = 4.dp,
+                    bottom = 4.dp
+                ).padding(8.dp)
+            ) {
+                Text(
+                    text = "Student",
+                    textAlign = TextAlign.Start,
+                    modifier = Modifier.weight(1f)
+                )
+                Text(
+                    text = "Status",
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.weight(1f)
+                )
+                Text(
+                    text = "Submit in",
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.Center
+                )
+                Text(
+                    text = "Grade",
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+            HorizontalDivider(
+                modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp, horizontal = 8.dp),
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                thickness = 2.dp
+            )
+
             LazyColumn(
                 modifier = Modifier.fillMaxSize()
             ) {
@@ -138,7 +178,7 @@ fun SubmissionItem(
     submission: UserAssignmentSubmission,
     action: (SubmissionsScreenUiAction) -> Unit
 ) {
-    Card(
+    OutlinedCard(
         onClick = { action(SubmissionsScreenUiAction.SubmissionClick(submission)) },
         modifier = modifier
             .fillMaxWidth()
@@ -147,42 +187,52 @@ fun SubmissionItem(
                 end = 8.dp,
                 top = 4.dp,
                 bottom = 4.dp
-            )
+            ),
+
     ) {
         Row(
             modifier = modifier
-                .fillMaxWidth()
-                .padding(4.dp),
+                .fillMaxWidth().padding(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Image(
-                imageVector = Icons.AutoMirrored.Filled.Assignment,
-                contentDescription = "Assignment",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.size(64.dp).padding(4.dp).clip(CircleShape)
-                    .border(2.dp, Color.Gray, CircleShape)
-            )
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxHeight()
-                    .padding(start = 8.dp, end = 8.dp),
-                horizontalAlignment = Alignment.Start
-            ) {
-                Row(
-                    Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = submission.userName
-                    )
-                    Spacer(modifier = Modifier.weight(1f))
-                    Text(
-                        text = convertEpochToTime(submission.submittedAt),
-                        modifier = Modifier.padding(end = 8.dp)
-                    )
-                }
-
+            val status = when  {
+                submission.isReviewed -> "Reviewed"
+                else -> "Not Reviewed"
             }
+            val stateColor = when {
+                submission.isReviewed -> Color.Green
+                else -> Color.Red
+            }
+            val submitTime = ((LocalDateTime.now().toInstant(TimeZone.UTC).toEpochMilliseconds()-submission.submittedAt)/ 1000 / 60 / 60 / 24).toString() + " days"
+            Text(
+                text = submission.userName,
+                modifier = Modifier.weight(1f),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.Start
+            )
+            Text(
+                text = status,
+                modifier = Modifier.weight(1f),
+                maxLines = 1,
+                textAlign = TextAlign.Center,
+                color = stateColor,
+                overflow = TextOverflow.Ellipsis
+            )
+            Text(
+                text = submitTime,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.weight(1f),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Text(
+                text = submission.grade.toString(),
+                modifier = Modifier.weight(1f),
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
         }
     }
 }
