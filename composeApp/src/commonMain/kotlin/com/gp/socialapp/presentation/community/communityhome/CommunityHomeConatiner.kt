@@ -1,12 +1,25 @@
 package com.gp.socialapp.presentation.community.communityhome
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.snap
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberDrawerState
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -15,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.lifecycle.LifecycleEffect
 import cafe.adriel.voyager.core.screen.Screen
@@ -32,11 +46,13 @@ import com.gp.socialapp.navigation.tabs.MaterialTab
 import com.gp.socialapp.navigation.tabs.PostsTab
 import com.gp.socialapp.navigation.util.BottomTabNavigationItem
 import com.gp.socialapp.presentation.auth.login.LoginScreen
-import com.gp.socialapp.presentation.community.communityhome.components.CommunityHomeNavDrawer
+import com.gp.socialapp.presentation.community.communityhome.components.CommunitySideMenu
 import com.gp.socialapp.presentation.community.communityhome.components.MainTopBar
+import com.gp.socialapp.presentation.home.components.SideMenu
 import com.gp.socialapp.presentation.home.container.HomeContainer
 import com.gp.socialapp.presentation.post.search.SearchScreen
 import com.gp.socialapp.presentation.settings.MainSettingsScreen
+import com.gp.socialapp.util.clickableWithoutRipple
 import kotlinx.coroutines.launch
 
 
@@ -66,6 +82,7 @@ data class CommunityHomeContainer(
 
     }
 
+    @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     @Composable
     fun CommunityHomeContainerContent(
         modifier: Modifier = Modifier,
@@ -76,8 +93,6 @@ data class CommunityHomeContainer(
         onNavigateToSearch: () -> Unit,
         onLogout: () -> Unit,
     ) {
-        val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-        val scope = rememberCoroutineScope()
         var isBarsVisible by remember { mutableStateOf(true) }
         val onNavigation: (Boolean) -> Unit = { isBarsVisible = it }
         val defaultTab = when (startingTab) {
@@ -85,23 +100,21 @@ data class CommunityHomeContainer(
             CommunityHomeTab.MATERIALS -> MaterialTab(communityId)
             CommunityHomeTab.MEMBERS -> CommunityMembersTab(communityId)
         }
-        CommunityHomeNavDrawer(
-            modifier = modifier,
-            drawerState = drawerState,
-            user = currentUser,
-            communityId = communityId,
-            communities = userCommunities,
-            onNavigateToHome = onNavigateToHome,
-            onNavigateToSettings = onNavigateToSettings,
-            onLogout = onLogout
-        ) {
+        val windowSizeClass = calculateWindowSizeClass()
+        val isDesktop = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Expanded
+        var showDrawer by remember { mutableStateOf(false) }
+        val mainContentAlpha by animateFloatAsState(if (showDrawer) 0.6f else 1f)
+        val MainContent: @Composable () -> Unit = {
             TabNavigator(defaultTab) { tabNavigator ->
-                Scaffold(content = { paddingValues ->
+                Scaffold(
+                    modifier = Modifier.fillMaxSize().alpha(mainContentAlpha)
+                        .clickableWithoutRipple { showDrawer = false },
+                    content = { paddingValues ->
 
                     Column(
                         modifier = Modifier.padding(if (isBarsVisible) paddingValues else PaddingValues(0.dp)),
 
-                    ) {
+                        ) {
                         CurrentTab()
                     }
                 }, topBar = {
@@ -120,11 +133,7 @@ data class CommunityHomeContainer(
                                 }
                             }
                         }, onNotificationClicked = { /*TODO*/ }, onNavDrawerIconClicked = {
-                            scope.launch {
-                                drawerState.apply {
-                                    if (isClosed) open() else close()
-                                }
-                            }
+                            showDrawer = !showDrawer
                         })
                     }
                 }, bottomBar = {
@@ -152,6 +161,47 @@ data class CommunityHomeContainer(
                         }
                     }
                 })
+            }
+        }
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Row {
+                if (isDesktop && isBarsVisible) {
+                    CommunitySideMenu(
+                        user = currentUser,
+                        onLogout = onLogout,
+                        communityId = communityId,
+                        communities = userCommunities,
+                        onNavigateToSettings = {
+                            onNavigateToSettings()
+                        },
+                        onNavigateToHome = {
+                            onNavigateToHome()
+                        },
+                        windowWidthSizeClass = windowSizeClass.widthSizeClass
+                    )
+                }
+                MainContent()
+            }
+            AnimatedVisibility(
+                visible = showDrawer,
+                enter = slideInHorizontally(animationSpec = tween()) { -it },
+                exit = slideOutHorizontally(animationSpec = if (isDesktop) snap() else spring()) { -it }
+            ) {
+                CommunitySideMenu(
+                    user = currentUser,
+                    onLogout = onLogout,
+                    communityId = communityId,
+                    communities = userCommunities,
+                    onNavigateToSettings = {
+                        onNavigateToSettings()
+                    },
+                    onNavigateToHome = {
+                        onNavigateToHome()
+                    },
+                    windowWidthSizeClass = windowSizeClass.widthSizeClass
+                )
             }
         }
     }

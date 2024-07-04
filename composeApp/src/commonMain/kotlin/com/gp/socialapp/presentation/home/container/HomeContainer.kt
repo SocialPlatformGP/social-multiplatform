@@ -1,41 +1,36 @@
 package com.gp.socialapp.presentation.home.container
 
-import androidx.compose.foundation.background
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.snap
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.ModalDrawerSheet
-import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationDrawerItem
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.lifecycle.LifecycleEffect
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.kodein.rememberScreenModel
@@ -52,21 +47,29 @@ import com.gp.socialapp.navigation.util.BottomTabNavigationItem
 import com.gp.socialapp.presentation.auth.login.LoginScreen
 import com.gp.socialapp.presentation.auth.userinfo.UserInformationScreen
 import com.gp.socialapp.presentation.home.components.HomeTopBar
+import com.gp.socialapp.presentation.home.components.SideMenu
 import com.gp.socialapp.presentation.settings.MainSettingsScreen
-import com.seiko.imageloader.ui.AutoSizeImage
-import kotlinx.coroutines.launch
+import com.gp.socialapp.util.clickableWithoutRipple
 
 data class HomeContainer(
     val startingTab: HomeTab = HomeTab.COMMUNITIES
 ) : Screen {
+    @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     @Composable
     override fun Content() {
         var navigator = LocalNavigator.currentOrThrow
         val screenModel = rememberScreenModel<HomeContainerScreenModel>()
         val state by screenModel.uiState.collectAsState()
-        val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-        val scope = rememberCoroutineScope()
         var barsVisibility by remember { mutableStateOf(true) }
+        val windowSizeClass = calculateWindowSizeClass()
+        val isDesktop = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Expanded
+        var showDrawer by remember { mutableStateOf(false) }
+        val mainContentAlpha by animateFloatAsState(if (showDrawer) 0.6f else 1f)
+        LaunchedEffect(key1 = isDesktop) {
+            if (isDesktop) {
+                showDrawer = false
+            }
+        }
         LifecycleEffect(
             onStarted = { screenModel.init() },
             onDisposed = { screenModel.onDispose() })
@@ -77,115 +80,18 @@ data class HomeContainer(
         if (state.isLoggedOut) {
             navigator.replaceAll(LoginScreen)
         }
-        ModalNavigationDrawer(
-            drawerState = drawerState,
-            drawerContent = {
-                ModalDrawerSheet {
-                    Column(
-                        modifier = Modifier.padding(8.dp).fillMaxSize()
-                    ) {
-                        if (state.currentUser.profilePictureURL.isNotBlank())
-                            AutoSizeImage(
-                                url = state.currentUser.profilePictureURL,
-                                contentDescription = "user image",
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier.padding(top = 16.dp)
-                                    .align(Alignment.CenterHorizontally)
-                                    .size(64.dp).clip(CircleShape)
-                            )
-                        else
-                            Box(
-                                modifier = Modifier.padding(top = 16.dp)
-                                    .align(Alignment.CenterHorizontally)
-                                    .size(64.dp).clip(CircleShape)
-                                    .background(Color.Red)
-                            ) {
-                                Text(
-                                    text = if (state.currentUser.name.isNotBlank()) state.currentUser.name[0].toString() else "u"
-                                        .uppercase(),
-                                    fontSize = 24.sp,
-                                    color = Color.White,
-                                    modifier = Modifier.align(Alignment.Center)
-                                )
-                            }
-                        Spacer(modifier = Modifier.padding(8.dp))
-                        Text(
-                            state.currentUser.name,
-                            fontSize = 24.sp,
-                            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
-                            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                        Spacer(modifier = Modifier.padding(4.dp))
-                        Text(
-                            state.currentUser.email,
-                            fontSize = 12.sp,
-                            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                        Spacer(modifier = Modifier.padding(4.dp))
-                        HorizontalDivider(
-                            modifier = Modifier.padding(vertical = 8.dp)
-                        )
-                        NavigationDrawerItem(
-                            label = { Text(text = "Home") },
-                            selected = true,
-                            onClick = {}
-                        )
-                        Spacer(modifier = Modifier.weight(1f))
-
-
-                        HorizontalDivider(
-                            modifier = Modifier.padding(vertical = 8.dp)
-                        )
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-
-                            OutlinedButton(
-                                onClick = {
-                                    screenModel.logout()
-                                    navigator.replaceAll(LoginScreen)
-                                },
-                                modifier = Modifier.weight(1f).padding(8.dp)
-                            ) {
-                                Text(
-                                    text = "Logout",
-                                    modifier = Modifier.fillMaxWidth(),
-                                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                                )
-                            }
-
-                            Button(
-                                onClick = {
-                                    navigator.push(MainSettingsScreen)
-                                },
-                                modifier = Modifier.weight(1f).padding(8.dp)
-
-                            ) {
-                                Text(
-                                    text = "Settings",
-                                    modifier = Modifier.fillMaxWidth(),
-                                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                                )
-                            }
-                        }
-                    }
-                }
-            })
-        {
-
-
-            val defaultTab = when (startingTab) {
-                HomeTab.CHAT -> ChatTab(onNavigation)
-                HomeTab.ASSIGNMENTS -> AssignmentsTab(onNavigation)
-                HomeTab.COMMUNITIES -> CommunitiesTab(onNavigation)
-                HomeTab.CALENDAR -> CalendarTab(onNavigation)
-                HomeTab.GRADES -> GradesTab
-            }
+        val defaultTab = when (startingTab) {
+            HomeTab.CHAT -> ChatTab(onNavigation)
+            HomeTab.ASSIGNMENTS -> AssignmentsTab(onNavigation)
+            HomeTab.COMMUNITIES -> CommunitiesTab(onNavigation)
+            HomeTab.CALENDAR -> CalendarTab(onNavigation)
+            HomeTab.GRADES -> GradesTab
+        }
+        val MainContent: @Composable () -> Unit = {
             TabNavigator(defaultTab) {
                 Scaffold(
+                    modifier = Modifier.fillMaxSize().alpha(mainContentAlpha)
+                        .clickableWithoutRipple { showDrawer = false },
                     content = {
                         Column(
                             modifier = Modifier.padding(
@@ -201,12 +107,9 @@ data class HomeContainer(
                     topBar = {
                         if (barsVisibility)
                             HomeTopBar(
+                                isDesktop = isDesktop,
                                 onDrawerIconClicked = {
-                                    scope.launch {
-                                        drawerState.apply {
-                                            if (isClosed) open() else close()
-                                        }
-                                    }
+                                    showDrawer = !showDrawer
                                 })
                     },
 
@@ -227,7 +130,47 @@ data class HomeContainer(
                 )
             }
         }
-
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Row {
+                if (isDesktop && barsVisibility) {
+                    SideMenu(
+                        userProfilePictureUrl = state.currentUser.profilePictureURL,
+                        userName = state.currentUser.name,
+                        userEmail = state.currentUser.email,
+                        onLogOut = {
+                            screenModel.logout()
+                            navigator.replaceAll(LoginScreen)
+                        },
+                        onNavigateToSettings = {
+                            navigator.push(MainSettingsScreen)
+                        },
+                        windowWidthSizeClass = windowSizeClass.widthSizeClass
+                    )
+                }
+                MainContent()
+            }
+            AnimatedVisibility(
+                visible = showDrawer,
+                enter = slideInHorizontally(animationSpec = tween()) { -it },
+                exit = slideOutHorizontally(animationSpec = if (isDesktop) snap() else spring()) { -it }
+            ) {
+                SideMenu(
+                    userProfilePictureUrl = state.currentUser.profilePictureURL,
+                    userName = state.currentUser.name,
+                    userEmail = state.currentUser.email,
+                    onLogOut = {
+                        screenModel.logout()
+                        navigator.replaceAll(LoginScreen)
+                    },
+                    onNavigateToSettings = {
+                        navigator.push(MainSettingsScreen)
+                    },
+                    windowWidthSizeClass = windowSizeClass.widthSizeClass
+                )
+            }
+        }
     }
 }
 

@@ -22,6 +22,7 @@ import com.gp.socialapp.presentation.home.screen.HomeUiAction
 @Composable
 fun HomeTopBar(
     onDrawerIconClicked: () -> Unit,
+    isDesktop: Boolean,
     onNotificationClicked: () -> Unit = {}
 ) {
     Row(
@@ -34,14 +35,16 @@ fun HomeTopBar(
             .padding(16.dp)
 
     ) {
-        IconButton(onClick = {
-            onDrawerIconClicked()
-        }) {
-            Icon(
-                imageVector = Icons.Default.Menu,
-                contentDescription = "nav drawer",
-                tint = MaterialTheme.colorScheme.onPrimary
-            )
+        if(!isDesktop){
+            IconButton(onClick = {
+                onDrawerIconClicked()
+            }) {
+                Icon(
+                    imageVector = Icons.Default.Menu,
+                    contentDescription = "nav drawer",
+                    tint = MaterialTheme.colorScheme.onPrimary
+                )
+            }
         }
         Text(
             text = "EduLink",
