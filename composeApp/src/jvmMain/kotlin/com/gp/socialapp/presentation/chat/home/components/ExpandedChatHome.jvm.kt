@@ -46,6 +46,8 @@ import com.gp.socialapp.data.chat.model.RecentRoom
 import com.gp.socialapp.presentation.chat.chatroom.ChatRoomScreen
 import com.gp.socialapp.presentation.chat.home.ChatHomeUiEvent
 import com.gp.socialapp.presentation.chat.home.ChatHomeUiState
+import compose.icons.TablerIcons
+import compose.icons.tablericons.MessagePlus
 import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
 import org.jetbrains.compose.splitpane.HorizontalSplitPane
 import org.jetbrains.compose.splitpane.rememberSplitPaneState
@@ -135,7 +137,7 @@ actual fun ExpandedChatHome(
                                                 event(ChatHomeUiEvent.OnCreateChatClick)
                                             }) {
                                                 Icon(
-                                                    imageVector = Icons.Default.AddComment,
+                                                    imageVector = TablerIcons.MessagePlus,
                                                     contentDescription = null
                                                 )
                                             }

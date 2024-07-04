@@ -29,6 +29,9 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import compose.icons.FeatherIcons
+import compose.icons.feathericons.Edit2
+import compose.icons.feathericons.Edit3
 
 @Composable
 fun GroupDetailsNameSection(
@@ -130,7 +133,7 @@ fun GroupDetailsNameSection(
                 }, modifier = Modifier.padding(start = 8.dp)
             ) {
                 Icon(
-                    imageVector = Icons.Rounded.Create, contentDescription = null
+                    imageVector = FeatherIcons.Edit3, contentDescription = null
                 )
             }
         }

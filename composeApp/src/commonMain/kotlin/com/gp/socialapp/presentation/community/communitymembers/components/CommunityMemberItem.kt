@@ -24,6 +24,9 @@ import androidx.compose.ui.unit.sp
 import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.presentation.chat.creategroup.components.CircleCheckbox
 import com.gp.socialapp.presentation.chat.creategroup.components.CircularAvatar
+import compose.icons.FontAwesomeIcons
+import compose.icons.fontawesomeicons.Solid
+import compose.icons.fontawesomeicons.solid.UserCircle
 
 @Composable
 fun CommunityMemberItem(
@@ -44,7 +47,7 @@ fun CommunityMemberItem(
         CircularAvatar(
             imageURL = user.profilePictureURL,
             size = 55.dp,
-            placeHolderImageVector = Icons.Filled.AccountCircle
+            placeHolderImageVector = FontAwesomeIcons.Solid.UserCircle
         )
         Spacer(modifier = modifier.width(12.dp))
         Column(

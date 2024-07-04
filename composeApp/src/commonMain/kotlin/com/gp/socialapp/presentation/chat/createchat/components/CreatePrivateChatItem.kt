@@ -20,6 +20,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.presentation.chat.creategroup.components.CircularAvatar
+import compose.icons.FontAwesomeIcons
+import compose.icons.fontawesomeicons.Solid
+import compose.icons.fontawesomeicons.solid.UserCircle
 
 @Composable
 fun CreatePrivateChatItem(
@@ -31,7 +34,7 @@ fun CreatePrivateChatItem(
             CircularAvatar(
                 imageURL = user.profilePictureURL,
                 size = 48.dp,
-                placeHolderImageVector = Icons.Filled.AccountCircle,
+                placeHolderImageVector = FontAwesomeIcons.Solid.UserCircle,
             )
         },
         headlineContent = {

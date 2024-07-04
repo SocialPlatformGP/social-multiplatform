@@ -13,6 +13,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import compose.icons.FeatherIcons
+import compose.icons.feathericons.CheckCircle
+import compose.icons.feathericons.Circle
 
 
 @Composable
@@ -23,7 +26,7 @@ fun CircleCheckbox(
     onChecked: () -> Unit
 ) {
     val colors = MaterialTheme.colorScheme
-    val imageVector = if (selected) Icons.Filled.CheckCircle else Icons.Default.RadioButtonUnchecked
+    val imageVector = if (selected) FeatherIcons.CheckCircle else FeatherIcons.Circle
     val background = if (selected) colors.primaryContainer else Color.Transparent
     IconButton(
         onClick = { onChecked() },

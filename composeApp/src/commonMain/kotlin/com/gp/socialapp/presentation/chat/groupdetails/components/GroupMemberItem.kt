@@ -3,6 +3,7 @@ package com.gp.socialapp.presentation.chat.groupdetails.components
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Shield
@@ -17,6 +18,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.presentation.chat.creategroup.components.CircularAvatar
+import compose.icons.FontAwesomeIcons
+import compose.icons.fontawesomeicons.Solid
+import compose.icons.fontawesomeicons.solid.ShieldAlt
+import compose.icons.fontawesomeicons.solid.UserCircle
 
 @Composable
 fun GroupMemberItem(
@@ -31,7 +36,7 @@ fun GroupMemberItem(
             CircularAvatar(
                 imageURL = user.profilePictureURL,
                 size = 48.dp,
-                placeHolderImageVector = Icons.Filled.AccountCircle,
+                placeHolderImageVector = FontAwesomeIcons.Solid.UserCircle,
             )
         },
         headlineContent = {
@@ -43,8 +48,9 @@ fun GroupMemberItem(
         trailingContent = {
             if (isAdmin) {
                 Icon(
-                    imageVector = Icons.Default.Shield,
+                    imageVector = FontAwesomeIcons.Solid.ShieldAlt,
                     contentDescription = "Admin",
+                    modifier = Modifier.size(24.dp)
                 )
             }
         },

@@ -34,6 +34,8 @@ import com.mohamedrejeb.calf.picker.toImageBitmap
 import com.seiko.imageloader.model.ImageAction
 import com.seiko.imageloader.rememberImageSuccessPainter
 import com.seiko.imageloader.ui.AutoSizeBox
+import compose.icons.FeatherIcons
+import compose.icons.feathericons.Edit2
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -115,7 +117,7 @@ fun ModifiableAvatarSection(
                     .size(32.dp)
             ) {
                 Icon(
-                    imageVector = Icons.Rounded.Create,
+                    imageVector = FeatherIcons.Edit2,
                     contentDescription = null,
                 )
             }
