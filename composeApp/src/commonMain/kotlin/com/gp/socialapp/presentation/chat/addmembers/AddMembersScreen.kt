@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -31,6 +32,11 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.presentation.chat.creategroup.SelectableUser
 import com.gp.socialapp.presentation.chat.creategroup.components.ChooseGroupMembersSection
+import compose.icons.AllIcons
+import compose.icons.FontAwesomeIcons
+import compose.icons.fontawesomeicons.Regular
+import compose.icons.fontawesomeicons.Solid
+import compose.icons.fontawesomeicons.solid.Check
 import org.jetbrains.compose.resources.stringResource
 import socialmultiplatform.composeapp.generated.resources.Res
 import socialmultiplatform.composeapp.generated.resources.add_selected_members
@@ -58,7 +64,6 @@ data class AddMembersScreen(
             onAddMember = screenModel::addMember,
             onAddMembersClicked = {
                 screenModel.submitGroupUsers()
-                navigator.pop()
             },
             onBackClicked = {
                 navigator.pop()
@@ -79,7 +84,7 @@ data class AddMembersScreen(
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = {},
+                    title = {Text("Add Members")},
                     navigationIcon = {
                         IconButton(
                             onClick = onBackClicked
@@ -90,12 +95,24 @@ data class AddMembersScreen(
                             )
                         }
                     },
-                    actions = {},
+                    actions = {
+                        IconButton(
+                            onClick = onAddMembersClicked,
+                            enabled = selectedUsers.isNotEmpty(),
+                            modifier = Modifier.padding(horizontal = 16.dp)
+                        ){
+                            Icon(
+                                imageVector = Icons.Default.Check,
+                                contentDescription = null,
+                            )
+                        }
+                    },
                 )
             },
         ) {
             Surface(
                 color = MaterialTheme.colorScheme.inverseOnSurface,
+                modifier = Modifier.padding(it)
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -117,21 +134,6 @@ data class AddMembersScreen(
                                 onAddMember(selectableUser.user.id)
                             }
                         })
-                    Spacer(modifier = Modifier.size(8.dp))
-                    Button(
-                        onClick = onAddMembersClicked,
-                        enabled = selectedUsers.isNotEmpty(),
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary,
-                            contentColor = MaterialTheme.colorScheme.onPrimary
-                        )
-                    ) {
-                        Text(
-                            text = stringResource(resource = Res.string.add_selected_members),
-                            style = MaterialTheme.typography.labelLarge,
-                        )
-                    }
                 }
             }
         }
