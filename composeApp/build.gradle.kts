@@ -123,6 +123,7 @@ kotlin {
             implementation(libs.realm.base)
             implementation(libs.realm.sync)
             implementation(libs.compose.pdf)
+            implementation(libs.components.splitpane.desktop)
         }
 
 

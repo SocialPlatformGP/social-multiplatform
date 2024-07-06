@@ -7,7 +7,6 @@ import com.gp.socialapp.data.material.source.remote.MaterialRemoteDataSource
 import com.gp.socialapp.data.material.utils.FileManager
 import com.gp.socialapp.util.ChatError
 import com.gp.socialapp.util.Result
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 
 class MessageRepositoryImpl(
@@ -17,7 +16,7 @@ class MessageRepositoryImpl(
 ) : MessageRepository {
     override suspend fun fetchChatMessages(
         roomId: Long
-    ): Flow<Result<List<Message>,ChatError>> {
+    ): Flow<Result<List<Message>, ChatError>> {
         return messageRemoteDataSource.fetchChatMessages(roomId)
     }
 
@@ -28,7 +27,7 @@ class MessageRepositoryImpl(
         senderName: String,
         senderPfpUrl: String,
         attachment: MessageAttachment
-    ): Result<Unit,ChatError> {
+    ): Result<Unit, ChatError> {
         return messageRemoteDataSource.sendMessage(
             messageContent, roomId, senderId, senderName, senderPfpUrl, attachment
         )
@@ -36,11 +35,11 @@ class MessageRepositoryImpl(
 
     override suspend fun updateMessage(
         messageId: Long, roomId: Long, content: String
-    ): Result<Unit,ChatError> {
+    ): Result<Unit, ChatError> {
         return messageRemoteDataSource.updateMessage(messageId, roomId, content)
     }
 
-    override suspend fun deleteMessage(messageId: Long, roomId: Long): Result<Unit,ChatError> {
+    override suspend fun deleteMessage(messageId: Long, roomId: Long): Result<Unit, ChatError> {
         return messageRemoteDataSource.deleteMessage(messageId, roomId)
     }
 
@@ -64,6 +63,14 @@ class MessageRepositoryImpl(
         } catch (e: Exception) {
             e.printStackTrace()
         }
+    }
+
+    override suspend fun reportMessage(
+        messageId: Long,
+        roomId: Long,
+        reporterId: String
+    ): Result<Unit, ChatError> {
+        return messageRemoteDataSource.reportMessage(messageId, roomId, reporterId)
     }
 
 

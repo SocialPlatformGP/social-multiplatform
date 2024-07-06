@@ -131,7 +131,7 @@ fun CommunityGridItem(
                         style = MaterialTheme.typography.labelLarge,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        color = Color.White.copy(alpha = 0.7f),
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
                         modifier = Modifier.weight(2.5f),
                     )
                 }
@@ -141,7 +141,7 @@ fun CommunityGridItem(
                     modifier = Modifier.weight(1f),
                     textAlign = if(community.description.isNotBlank()) TextAlign.End else TextAlign.Start,
                     maxLines = 1,
-                    color = Color.White.copy(alpha = 0.7f),
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.labelLarge
                 )

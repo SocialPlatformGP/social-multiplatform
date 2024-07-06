@@ -38,7 +38,7 @@ fun ImageMessageWithTimestamp(
     var width by remember { mutableStateOf(0f) }
     var height by remember { mutableStateOf(0f) }
     Card(
-        shape = RoundedCornerShape(20.dp), modifier = modifier
+        shape = RoundedCornerShape(8.dp), modifier = modifier
     ) {
         Box {
             MessageImageAttachment(imageURL = imageURL,

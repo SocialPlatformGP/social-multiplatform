@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -49,6 +50,7 @@ fun EditMessageDialog(
                 Spacer(modifier = Modifier.size(8.dp))
                 OutlinedTextField(value = textValue,
                     onValueChange = { textValue = it },
+                    modifier = Modifier.fillMaxWidth(),
                     placeholder = { Text(text = "Message") })
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -60,7 +62,7 @@ fun EditMessageDialog(
                     ) {
                         Text("Cancel")
                     }
-                    TextButton(
+                    Button(
                         onClick = { onConfirmation(textValue) },
                         enabled = textValue.isNotBlank(),
                         modifier = Modifier.padding(8.dp),

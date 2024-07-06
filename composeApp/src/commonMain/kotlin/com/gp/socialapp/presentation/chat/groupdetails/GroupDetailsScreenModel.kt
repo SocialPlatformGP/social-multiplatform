@@ -126,7 +126,8 @@ class GroupDetailsScreenModel(
                 result.onSuccessWithData { data ->
                     _uiState.update { oldState ->
                         oldState.copy(
-                            privateRoom = data
+                            privateRecentRoom = data.first,
+                            privateRoom = data.second
                         )
                     }
                 }.onFailure {

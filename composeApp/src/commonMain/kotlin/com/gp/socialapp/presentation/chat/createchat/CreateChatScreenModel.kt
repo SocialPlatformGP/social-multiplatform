@@ -1,4 +1,4 @@
-package com.gp.socialapp.presentation.chat.createprivate
+package com.gp.socialapp.presentation.chat.createchat
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
@@ -13,13 +13,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class CreatePrivateChatScreenModel(
+class CreateChatScreenModel(
     private val userRepository: UserRepository,
     private val roomRepository: RoomRepository,
     private val authenticationRepository: AuthenticationRepository
 
 ) : ScreenModel {
-    private val state = MutableStateFlow(CreatePrivateChatUiState())
+    private val state = MutableStateFlow(CreateChatUiState())
     val uiState = state
 
     fun init() {
@@ -76,7 +76,8 @@ class CreatePrivateChatScreenModel(
                 result.onSuccessWithData { data ->
                     state.update { oldState ->
                         oldState.copy(
-                            room = data
+                            recentRoom = data.first,
+                            room = data.second
                         )
                     }
                 }.onFailure {
@@ -88,7 +89,7 @@ class CreatePrivateChatScreenModel(
 
     override fun onDispose() {
         super.onDispose()
-        state.value = CreatePrivateChatUiState()
+        state.value = CreateChatUiState()
     }
 
     fun onSearchQueryChanged(s: String) {

@@ -186,6 +186,14 @@ class MessageRemoteDataSourceImpl(
         }
     }
 
+    override suspend fun reportMessage(
+        messageId: Long,
+        roomId: Long,
+        reporterId: String
+    ): Result<Unit, ChatError> {
+        TODO("Not yet implemented")
+    }
+
     private suspend fun uploadAttachment(
         roomId: Long, senderId: String, attachment: MessageAttachment
     ): Result<MessageAttachment,ChatError> {

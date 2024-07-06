@@ -124,22 +124,26 @@ class CreateGroupScreenModel(
     private fun createGroup() {
         screenModelScope.launch(DispatcherIO) {
             with(uiState.value) {
-                roomRepo.createGroupRoom(
-                    groupName = groupName,
-                    groupAvatarByteArray = groupAvatarByteArray,
-                    groupAvatarExtension = groupAvatarExtension,
-                    userIds = selectedUsers.map { it.id },
-                    creatorId = currentUserId
-                ).let { result ->
-                    result.onSuccessWithData { room ->
-                        _uiState.update {
-                            it.copy(
-                                isCreated = true, groupId = room.id, groupAvatarUrl = room.picUrl
-                            )
+                if(!isError && groupName.isNotBlank()){
+                    roomRepo.createGroupRoom(
+                        groupName = groupName,
+                        groupAvatarByteArray = groupAvatarByteArray,
+                        groupAvatarExtension = groupAvatarExtension,
+                        userIds = selectedUsers.map { it.id },
+                        creatorId = currentUserId
+                    ).let { result ->
+                        result.onSuccessWithData { room ->
+                            _uiState.update {
+                                it.copy(
+                                    isCreated = true, groupId = room.id, groupAvatarUrl = room.picUrl
+                                )
+                            }
+                        }.onFailure {
+                            println("Error: $it")
                         }
-                    }.onFailure {
-                        println("Error: $it")
                     }
+                } else if(groupName.isBlank()){
+                    updateError(true)
                 }
             }
         }

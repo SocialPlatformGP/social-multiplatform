@@ -11,6 +11,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.gp.socialapp.presentation.chat.creategroup.components.CircularAvatar
+import compose.icons.FontAwesomeIcons
+import compose.icons.fontawesomeicons.Solid
+import compose.icons.fontawesomeicons.solid.UserCircle
 
 @Composable
 fun RowScope.MessageUserAvatar(
@@ -25,7 +28,7 @@ fun RowScope.MessageUserAvatar(
             imageURL = imageURL,
             size = 32.dp,
             onClick = { onUserClicked() },
-            placeHolderImageVector = Icons.Filled.AccountCircle,
+            placeHolderImageVector = FontAwesomeIcons.Solid.UserCircle,
             modifier = Modifier.align(Alignment.Top).padding(horizontal = 8.dp)
         )
     } else if (!isCurrentUser && isSameSender && !isPrivateChat) {

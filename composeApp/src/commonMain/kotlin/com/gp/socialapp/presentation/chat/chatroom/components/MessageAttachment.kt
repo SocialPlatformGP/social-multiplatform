@@ -14,12 +14,13 @@ fun MessageAttachment(
     modifier: Modifier = Modifier,
     fileUrl: String,
     fileName: String,
+    fileSize: Long,
     maxHeight: Dp,
     onFileClicked: () -> Unit = {},
     onImageClicked: () -> Unit = {},
 ) {
     Surface(
-        shape = RoundedCornerShape(20.dp), color = Color.Transparent
+        shape = RoundedCornerShape(8.dp), color = Color.Transparent
     ) {
         when {
             MimeType.getMimeTypeFromFileName(fileName) is MimeType.Image -> {
@@ -36,6 +37,7 @@ fun MessageAttachment(
                     fileName = fileName,
                     onFileClicked = { onFileClicked() },
                     modifier = modifier,
+                    size = fileSize,
                 )
             }
         }

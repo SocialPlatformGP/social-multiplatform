@@ -1,6 +1,7 @@
 package com.gp.socialapp.data.chat.repository
 
 import com.gp.socialapp.data.auth.source.remote.model.User
+import com.gp.socialapp.data.chat.model.RecentRoom
 import com.gp.socialapp.data.chat.model.Room
 import com.gp.socialapp.data.chat.source.remote.RoomRemoteDataSource
 import com.gp.socialapp.util.ChatError
@@ -45,7 +46,7 @@ class RoomRepositoryImpl(
         return remoteDataSource.updateRoomAvatar(roomId, newAvatarByteArray, newAvatarExtension)
     }
 
-    override suspend fun getPrivateRoom(currentUser: User, otherUser: User): Result<Room,ChatError> {
+    override suspend fun getPrivateRoom(currentUser: User, otherUser: User): Result<Pair<RecentRoom, Room>,ChatError> {
         return remoteDataSource.getPrivateRoom(currentUser, otherUser)
     }
 

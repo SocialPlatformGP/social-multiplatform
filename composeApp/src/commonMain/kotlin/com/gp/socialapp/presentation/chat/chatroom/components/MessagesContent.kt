@@ -4,12 +4,14 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.gp.socialapp.data.chat.model.Message
 import com.gp.socialapp.presentation.chat.chatroom.ChatRoomAction
+import java.awt.SystemColor.window
 
 @Composable
 fun MessagesContent(
@@ -22,6 +24,7 @@ fun MessagesContent(
     dropDownItems: List<DropDownItem>,
     maxScreenWidthDP: Dp,
     maxScreenHeightDP: Dp,
+    windowWidthSizeClass: WindowWidthSizeClass,
 ) {
     LazyColumn(
         modifier = modifier.fillMaxSize(),
@@ -52,6 +55,7 @@ fun MessagesContent(
                 },
                 maxScreenWidthDP = maxScreenWidthDP,
                 maxScreenHeightDP = maxScreenHeightDP,
+                windowWidthSizeClass = windowWidthSizeClass
             )
             if (previousMessage?.createdAt?.year != message.createdAt.year || previousMessage.createdAt.dayOfYear != message.createdAt.dayOfYear) {
                 DateHeader(

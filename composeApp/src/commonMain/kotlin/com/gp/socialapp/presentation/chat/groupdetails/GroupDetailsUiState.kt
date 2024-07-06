@@ -1,6 +1,7 @@
 package com.gp.socialapp.presentation.chat.groupdetails
 
 import com.gp.socialapp.data.auth.source.remote.model.User
+import com.gp.socialapp.data.chat.model.RecentRoom
 import com.gp.socialapp.data.chat.model.Room
 
 data class GroupDetailsUiState(
@@ -11,4 +12,5 @@ data class GroupDetailsUiState(
     val currentUser: User = User(),
     val isAdmin: Boolean = false,
     val privateRoom: Room? = null,
+    val privateRecentRoom: RecentRoom? = null
 )

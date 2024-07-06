@@ -23,6 +23,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.presentation.chat.creategroup.SelectableUser
+import compose.icons.FontAwesomeIcons
+import compose.icons.TablerIcons
+import compose.icons.fontawesomeicons.Solid
+import compose.icons.fontawesomeicons.solid.ShieldAlt
+import compose.icons.fontawesomeicons.solid.UserCircle
+import compose.icons.tablericons.Shield
 
 @Composable
 fun GroupMemberItem(
@@ -45,7 +51,7 @@ fun GroupMemberItem(
         CircularAvatar(
             imageURL = selectableUser.user.profilePictureURL,
             size = 55.dp,
-            placeHolderImageVector = Icons.Filled.AccountCircle
+            placeHolderImageVector = FontAwesomeIcons.Solid.UserCircle
         )
         Spacer(modifier = modifier.width(12.dp))
         Column(
@@ -78,7 +84,7 @@ fun GroupMemberItem(
                 )
             } else if (isAdmin) {
                 Icon(
-                    imageVector = Icons.Default.Shield,
+                    imageVector = FontAwesomeIcons.Solid.ShieldAlt,
                     contentDescription = "Admin",
                     modifier = Modifier.align(Alignment.CenterEnd)
                 )

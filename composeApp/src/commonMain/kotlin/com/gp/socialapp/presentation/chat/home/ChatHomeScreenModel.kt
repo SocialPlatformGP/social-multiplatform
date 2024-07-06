@@ -23,13 +23,12 @@ class ChatHomeScreenModel(
     fun init() {
         getCurrentUser()
     }
-
-
     fun getCurrentUser() {
         screenModelScope.launch(DispatcherIO) {
             authenticationRepository.getSignedInUser().let { result ->
                 when (result) {
                     is Result.Success -> {
+                        Napier.d("Success: ${result.data}", tag = "Seerde")
                         state.update {
                             it.copy(currentUser = result.data)
                         }
@@ -51,7 +50,9 @@ class ChatHomeScreenModel(
         screenModelScope.launch(DispatcherIO) {
             recentRoomRepository.fetchRecentRooms(id).collect { result ->
                 result.onSuccessWithData { data ->
-                    state.value = ChatHomeUiState(recentRooms = data)
+                    state.update{
+                        it.copy(recentRooms = data)
+                    }
                 }.onFailure {
                     //TODO Handle error
                 }

@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import com.seiko.imageloader.model.ImageAction
 import com.seiko.imageloader.rememberImageSuccessPainter
@@ -86,6 +87,7 @@ fun CircularAvatar(
                     Image(
                         rememberImageSuccessPainter(action),
                         contentDescription = null,
+                        contentScale = ContentScale.Crop,
                         modifier = avatarModifier,
                     )
                 }

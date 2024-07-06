@@ -121,7 +121,9 @@ class AddMembersScreenModel(
     fun submitGroupUsers() {
         screenModelScope.launch {
             val selectedUserIds = _uiState.value.selectedUsers.map { it.id }
+            println("Selected User IDs: $selectedUserIds")
             roomRepo.addGroupMembers(roomId, selectedUserIds).onSuccess {
+                println("Received Success")
                 _uiState.update { it.copy(isDone = true) }
             }.onFailure {
                 //TODO handle error

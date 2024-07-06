@@ -20,6 +20,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.gp.socialapp.data.auth.source.remote.model.User
+import compose.icons.FontAwesomeIcons
+import compose.icons.TablerIcons
+import compose.icons.fontawesomeicons.Solid
+import compose.icons.fontawesomeicons.solid.UserCircle
+import compose.icons.tablericons.CircleX
 
 @Composable
 fun SelectedMemberItem(
@@ -38,7 +43,7 @@ fun SelectedMemberItem(
             CircularAvatar(
                 imageURL = user.profilePictureURL,
                 size = 50.dp,
-                placeHolderImageVector = Icons.Filled.AccountCircle
+                placeHolderImageVector = FontAwesomeIcons.Solid.UserCircle
             )
             IconButton(
                 onClick = { onUnselect(user.id) },
@@ -48,7 +53,7 @@ fun SelectedMemberItem(
                     .size(20.dp)
             ) {
                 Icon(
-                    imageVector = Icons.Filled.Cancel,
+                    imageVector = TablerIcons.CircleX,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.outline
                 )

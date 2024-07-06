@@ -1,12 +1,16 @@
 package com.gp.socialapp.presentation.chat.home.components
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import com.gp.socialapp.data.chat.model.RecentRoom
 import com.gp.socialapp.presentation.chat.creategroup.components.CircularAvatar
+import compose.icons.FontAwesomeIcons
+import compose.icons.fontawesomeicons.Solid
+import compose.icons.fontawesomeicons.solid.UserCircle
 
 @Composable
 fun RecentChatImage(currentUserId: String, recentRoom: RecentRoom) {
@@ -15,14 +19,14 @@ fun RecentChatImage(currentUserId: String, recentRoom: RecentRoom) {
             if (recentRoom.senderId == currentUserId) recentRoom.receiverPicUrl else recentRoom.senderPicUrl
         CircularAvatar(
             imageURL = imageUrl,
-            size = 64.dp,
-            placeHolderImageVector = Icons.Default.Person,
+            size = 48.dp,
+            placeHolderImageVector = FontAwesomeIcons.Solid.UserCircle,
         )
     } else {
         CircularAvatar(
             imageURL = recentRoom.senderPicUrl,
-            size = 64.dp,
-            placeHolderImageVector = Icons.Default.Groups,
+            size = 48.dp,
+            placeHolderImageVector = Icons.Filled.Groups,
         )
     }
 
