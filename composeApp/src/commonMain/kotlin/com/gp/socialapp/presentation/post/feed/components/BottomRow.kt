@@ -161,6 +161,7 @@ fun BottomRow(
         OutlinedButton(
             onClick = { },
             contentPadding = PaddingValues(),
+            enabled = false,
             border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outline),
 
             ) {
