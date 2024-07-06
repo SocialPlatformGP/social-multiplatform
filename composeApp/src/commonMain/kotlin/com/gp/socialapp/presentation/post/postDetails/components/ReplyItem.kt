@@ -38,8 +38,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gp.socialapp.data.post.source.remote.model.NestedReply
 import com.gp.socialapp.data.post.source.remote.model.Reply
+import com.gp.socialapp.presentation.chat.creategroup.components.CircularAvatar
 import com.gp.socialapp.presentation.post.feed.ReplyEvent
-import com.gp.socialapp.presentation.post.feed.components.UserImage
+import compose.icons.FontAwesomeIcons
+import compose.icons.fontawesomeicons.Solid
+import compose.icons.fontawesomeicons.solid.UserCircle
 import org.jetbrains.compose.resources.stringResource
 import socialmultiplatform.composeapp.generated.resources.Res
 import socialmultiplatform.composeapp.generated.resources.delete
@@ -58,7 +61,8 @@ fun ReplyItem(
     val padding = with(LocalDensity.current) { 16.dp.toPx() }
     Column {
         val color = androidx.compose.material3.MaterialTheme.colorScheme.onPrimaryContainer
-        androidx.compose.material3.Card(modifier = Modifier.drawBehind {
+        androidx.compose.material3.Card(
+            modifier = Modifier.drawBehind {
                 repeat(level + 1) {
                     drawLine(
                         color = color.copy(alpha = 1f),
@@ -83,23 +87,27 @@ fun ReplyItem(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    UserImage(imageLink = nestedReply.reply?.authorImageLink ?: "",
+                    CircularAvatar(
+                        modifier = Modifier.padding(start = 8.dp, end = 8.dp),
+                        imageURL = nestedReply.reply?.authorImageLink ?: "",
                         size = 26.dp,
+                        placeHolderImageVector = FontAwesomeIcons.Solid.UserCircle,
                         onClick = {
                             replyEvent(
                                 ReplyEvent.OnReplyAuthorClicked(
                                     nestedReply.reply?.authorID ?: ""
                                 )
                             )
-                        })
+                        }
+                    )
                     Text(text = nestedReply.reply?.authorName?.run {
                         if (this.length > 10) this.substring(
                             0, 10
                         ) else this
                     } ?: " ",
                         modifier = Modifier.padding(
-                                start = 8.dp, end = 4.dp
-                            ),
+                            start = 8.dp, end = 4.dp
+                        ),
                         overflow = if ((nestedReply.reply?.authorName?.length
                                 ?: 0) > 10
                         ) TextOverflow.Ellipsis else TextOverflow.Clip,
@@ -107,8 +115,8 @@ fun ReplyItem(
                         color = androidx.compose.material3.MaterialTheme.colorScheme.onPrimaryContainer)
                     Text(
                         text = nestedReply.reply?.createdAt.toString(), modifier = Modifier.padding(
-                                start = 4.dp, end = 8.dp
-                            ), color = Color.Gray,
+                            start = 4.dp, end = 8.dp
+                        ), color = Color.Gray,
 //                        overflow = if ((nestedReply.reply.createdAt.length ?: 0) > 10) {
 //                            TextOverflow.Ellipsis
 //                        } else TextOverflow.Clip,
@@ -120,15 +128,15 @@ fun ReplyItem(
                 Text(
                     text = nestedReply.reply?.content ?: "",
                     modifier = Modifier.padding(
-                            start = 8.dp, end = 4.dp, top = 4.dp
-                        ),
+                        start = 8.dp, end = 4.dp, top = 4.dp
+                    ),
                     fontSize = 14.sp,
                 )
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(
-                            start = 4.dp,
-                            end = 4.dp,
-                        ).sizeIn(maxHeight = 28.dp),
+                        start = 4.dp,
+                        end = 4.dp,
+                    ).sizeIn(maxHeight = 28.dp),
                     horizontalArrangement = Arrangement.End,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
