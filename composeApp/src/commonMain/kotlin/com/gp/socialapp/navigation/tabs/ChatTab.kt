@@ -11,6 +11,8 @@ import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import cafe.adriel.voyager.transitions.SlideTransition
 import com.gp.socialapp.presentation.chat.home.ChatHomeScreen
+import compose.icons.TablerIcons
+import compose.icons.tablericons.Message
 import kotlin.jvm.Transient
 
 data class ChatTab(
@@ -21,11 +23,11 @@ data class ChatTab(
         @Composable
         get() {
             val title = "Chat"
-            val icon = rememberVectorPainter(Icons.AutoMirrored.Filled.Chat)
+            val icon = rememberVectorPainter(TablerIcons.Message)
 
             return remember {
                 TabOptions(
-                    index = 0u,
+                    index = 1u,
                     title = title,
                     icon = icon
                 )
