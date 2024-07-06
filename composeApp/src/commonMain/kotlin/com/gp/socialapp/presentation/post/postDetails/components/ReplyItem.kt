@@ -53,24 +53,21 @@ fun ReplyItem(
     nestedReply: NestedReply,
     currentUserId: String,
     level: Int,
-    replyEvent: (ReplyEvent) -> Unit
+    replyEvent: (ReplyEvent) -> Unit,
 ) {
     val padding = with(LocalDensity.current) { 16.dp.toPx() }
     Column {
         val color = androidx.compose.material3.MaterialTheme.colorScheme.onPrimaryContainer
-        androidx.compose.material3.Card(
-            modifier = Modifier
-                .drawBehind {
-                    repeat(level + 1) {
-                        drawLine(
-                            color = color.copy(alpha = 1f),
-                            start = Offset(it * padding, 0f),
-                            end = Offset(it * padding, size.height),
-                            strokeWidth = 2f
-                        )
-                    }
+        androidx.compose.material3.Card(modifier = Modifier.drawBehind {
+                repeat(level + 1) {
+                    drawLine(
+                        color = color.copy(alpha = 1f),
+                        start = Offset(it * padding, 0f),
+                        end = Offset(it * padding, size.height),
+                        strokeWidth = 2f
+                    )
                 }
-                .padding(start = (16.dp * level) + 8.dp, end = 8.dp),
+            }.padding(start = (16.dp * level) + 8.dp, end = 8.dp),
             shape = ShapeDefaults.Medium,
             border = BorderStroke(1.dp, Color.Gray),
             colors = CardDefaults.cardColors(
@@ -80,44 +77,38 @@ fun ReplyItem(
 
         ) {
             Column(
-                modifier = Modifier
-                    .padding(4.dp)
+                modifier = Modifier.padding(4.dp)
             ) {
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    UserImage(
-                        imageLink = nestedReply.reply?.authorImageLink ?: "",
-                        size = 26.dp
-                    )
-                    Text(
-                        text = nestedReply.reply?.authorName?.run {
-                            if (this.length > 10) this.substring(
-                                0,
-                                10
-                            ) else this
-                        } ?: " ",
-                        modifier = Modifier
-                            .padding(
-                                start = 8.dp,
-                                end = 4.dp
+                    UserImage(imageLink = nestedReply.reply?.authorImageLink ?: "",
+                        size = 26.dp,
+                        onClick = {
+                            replyEvent(
+                                ReplyEvent.OnReplyAuthorClicked(
+                                    nestedReply.reply?.authorID ?: ""
+                                )
+                            )
+                        })
+                    Text(text = nestedReply.reply?.authorName?.run {
+                        if (this.length > 10) this.substring(
+                            0, 10
+                        ) else this
+                    } ?: " ",
+                        modifier = Modifier.padding(
+                                start = 8.dp, end = 4.dp
                             ),
                         overflow = if ((nestedReply.reply?.authorName?.length
                                 ?: 0) > 10
                         ) TextOverflow.Ellipsis else TextOverflow.Clip,
                         fontSize = 12.sp,
-                        color = androidx.compose.material3.MaterialTheme.colorScheme.onPrimaryContainer
-                    )
+                        color = androidx.compose.material3.MaterialTheme.colorScheme.onPrimaryContainer)
                     Text(
-                        text = nestedReply.reply?.createdAt.toString(),
-                        modifier = Modifier
-                            .padding(
-                                start = 4.dp,
-                                end = 8.dp
-                            ),
-                        color = Color.Gray,
+                        text = nestedReply.reply?.createdAt.toString(), modifier = Modifier.padding(
+                                start = 4.dp, end = 8.dp
+                            ), color = Color.Gray,
 //                        overflow = if ((nestedReply.reply.createdAt.length ?: 0) > 10) {
 //                            TextOverflow.Ellipsis
 //                        } else TextOverflow.Clip,
@@ -128,137 +119,111 @@ fun ReplyItem(
 
                 Text(
                     text = nestedReply.reply?.content ?: "",
-                    modifier = Modifier
-                        .padding(
-                            start = 8.dp,
-                            end = 4.dp,
-                            top = 4.dp
+                    modifier = Modifier.padding(
+                            start = 8.dp, end = 4.dp, top = 4.dp
                         ),
                     fontSize = 14.sp,
                 )
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(
+                    modifier = Modifier.fillMaxWidth().padding(
                             start = 4.dp,
                             end = 4.dp,
-                        )
-                        .sizeIn(maxHeight = 28.dp),
+                        ).sizeIn(maxHeight = 28.dp),
                     horizontalArrangement = Arrangement.End,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Box {
                         var visible by remember { mutableStateOf(false) }
-                        IconButton(
-                            onClick = {
-                                visible = true
-                            }
-                        ) {
+                        IconButton(onClick = {
+                            visible = true
+                        }) {
                             Icon(
                                 imageVector = Icons.Filled.MoreVert,
                                 contentDescription = "More options"
                             )
                         }
                         val dropDownItems = if (nestedReply.reply?.authorID == currentUserId) {
-                            listOf(
-                                ReplyDropDownItem(stringResource(Res.string.edit)) {
-                                    replyEvent(
-                                        ReplyEvent.OnEditReply(
-                                            reply = nestedReply.reply ?: Reply()
-                                        )
+                            listOf(ReplyDropDownItem(stringResource(Res.string.edit)) {
+                                replyEvent(
+                                    ReplyEvent.OnEditReply(
+                                        reply = nestedReply.reply ?: Reply()
                                     )
-                                },
-                                ReplyDropDownItem(stringResource(Res.string.delete)) {
-                                    replyEvent(
-                                        ReplyEvent.OnReplyDeleted(
-                                            reply = nestedReply.reply ?: Reply()
-                                        )
+                                )
+                            }, ReplyDropDownItem(stringResource(Res.string.delete)) {
+                                replyEvent(
+                                    ReplyEvent.OnReplyDeleted(
+                                        reply = nestedReply.reply ?: Reply()
                                     )
-                                },
-                                ReplyDropDownItem(stringResource(Res.string.share)) {
-                                    replyEvent(
-                                        ReplyEvent.OnShareReply(
-                                            reply = nestedReply.reply ?: Reply()
-                                        )
+                                )
+                            }, ReplyDropDownItem(stringResource(Res.string.share)) {
+                                replyEvent(
+                                    ReplyEvent.OnShareReply(
+                                        reply = nestedReply.reply ?: Reply()
                                     )
-                                },
-                                ReplyDropDownItem(stringResource(Res.string.report)) {
-                                    replyEvent(
-                                        ReplyEvent.OnReportReply(
-                                            reply = nestedReply.reply ?: Reply()
-                                        )
+                                )
+                            }, ReplyDropDownItem(stringResource(Res.string.report)) {
+                                replyEvent(
+                                    ReplyEvent.OnReportReply(
+                                        reply = nestedReply.reply ?: Reply()
                                     )
-                                }
-                            )
+                                )
+                            })
                         } else {
-                            listOf(
-                                ReplyDropDownItem(stringResource(Res.string.share)) {
-                                    replyEvent(
-                                        ReplyEvent.OnShareReply(
-                                            reply = nestedReply.reply ?: Reply()
-                                        )
+                            listOf(ReplyDropDownItem(stringResource(Res.string.share)) {
+                                replyEvent(
+                                    ReplyEvent.OnShareReply(
+                                        reply = nestedReply.reply ?: Reply()
                                     )
-                                },
-                                ReplyDropDownItem(stringResource(Res.string.report)) {
-                                    replyEvent(
-                                        ReplyEvent.OnReportReply(
-                                            reply = nestedReply.reply ?: Reply()
-                                        )
+                                )
+                            }, ReplyDropDownItem(stringResource(Res.string.report)) {
+                                replyEvent(
+                                    ReplyEvent.OnReportReply(
+                                        reply = nestedReply.reply ?: Reply()
                                     )
-                                }
-                            )
+                                )
+                            })
                         }
                         DropdownMenu(
                             expanded = visible,
                             onDismissRequest = { visible = false },
                         ) {
                             dropDownItems.forEach { item ->
-                                DropdownMenuItem(
-                                    text = { Text(text = item.text) },
-                                    onClick = {
-                                        item.onClick()
-                                        visible = false
-                                    })
+                                DropdownMenuItem(text = { Text(text = item.text) }, onClick = {
+                                    item.onClick()
+                                    visible = false
+                                })
                             }
                         }
                     }
-                    IconButton(
-                        onClick = {
-                            replyEvent(ReplyEvent.OnAddReply(reply = nestedReply.reply ?: Reply()))
-                        }
-                    ) {
+                    IconButton(onClick = {
+                        replyEvent(ReplyEvent.OnAddReply(reply = nestedReply.reply ?: Reply()))
+                    }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.Comment,
                             contentDescription = "Add a comment"
                         )
                     }
-                    IconButton(
-                        onClick = {
-                            replyEvent(
-                                ReplyEvent.OnReplyUpVoted(
-                                    reply = nestedReply.reply ?: Reply()
-                                )
+                    IconButton(onClick = {
+                        replyEvent(
+                            ReplyEvent.OnReplyUpVoted(
+                                reply = nestedReply.reply ?: Reply()
                             )
-                        }
-                    ) {
+                        )
+                    }) {
                         Icon(
-                            imageVector = Icons.Filled.ThumbUp,
-                            contentDescription = "Like"
+                            imageVector = Icons.Filled.ThumbUp, contentDescription = "Like"
                         )
                     }
                     Text(text = (nestedReply.reply?.votes ?: 0).toString())
-                    IconButton(
-                        onClick = {
-                            replyEvent(
-                                ReplyEvent.OnReplyDownVoted(
-                                    reply = nestedReply.reply ?: Reply()
-                                )
+                    IconButton(onClick = {
+                        replyEvent(
+                            ReplyEvent.OnReplyDownVoted(
+                                reply = nestedReply.reply ?: Reply()
                             )
-                        }
-                    ) {
+                        )
+                    }) {
                         Icon(
-                            imageVector = Icons.Filled.ThumbDown,
-                            contentDescription = "Share"
+                            imageVector = Icons.Filled.ThumbDown, contentDescription = "Share"
                         )
                     }
                 }
@@ -269,6 +234,5 @@ fun ReplyItem(
 }
 
 data class ReplyDropDownItem(
-    val text: String,
-    val onClick: () -> Unit
+    val text: String, val onClick: () -> Unit
 )

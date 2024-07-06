@@ -12,15 +12,18 @@ import com.gp.socialapp.data.post.source.remote.model.Post
 fun SearchResultList(
     modifier: Modifier = Modifier,
     posts: List<Post>,
-    onPostClicked: (Post) -> Unit
+    onPostClicked: (Post) -> Unit,
+    onPostAuthorClicked: (String) -> Unit
 ) {
     LazyColumn(
         contentPadding = PaddingValues(8.dp),
-        modifier = modifier.fillMaxSize()){
+        modifier = modifier.fillMaxSize()
+    ) {
         items(posts.size) { index ->
             SearchResultItem(
                 item = posts[index],
-                onPostClicked = onPostClicked
+                onPostClicked = onPostClicked,
+                onPostAuthorClicked = onPostAuthorClicked
             )
         }
     }

@@ -14,18 +14,20 @@ fun TopRow(
     userName: String,
     publishedAt: String,
     onEditPostClicked: () -> Unit,
-    onDeletePostClicked: () -> Unit
+    onDeletePostClicked: () -> Unit,
+    onUserClick: () -> Unit
 ) {
     Row(
         modifier = Modifier.background(Color.Transparent),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        UserImage(imageUrl)
+        UserImage(imageLink = imageUrl, onClick = onUserClick)
         Row(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             UserName(
                 userName = userName,
+                onClick = onUserClick,
             )
             PostDate(
                 publishedAt = publishedAt,
@@ -33,8 +35,7 @@ fun TopRow(
         }
         Spacer(modifier = Modifier.weight(1f))
         OptionButton(
-            onEditPostClicked = onEditPostClicked,
-            onDeletePostClicked = onDeletePostClicked
+            onEditPostClicked = onEditPostClicked, onDeletePostClicked = onDeletePostClicked
         )
     }
 }

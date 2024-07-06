@@ -5,7 +5,8 @@ import com.gp.socialapp.data.post.source.remote.model.PostAttachment
 import com.gp.socialapp.data.post.source.remote.model.Reply
 import com.gp.socialapp.data.post.source.remote.model.Tag
 
-sealed class PostEvent() {
+sealed class PostEvent {
+    data class OnPostAuthorClicked(val userId: String) : PostEvent()
     data class OnPostClicked(val post: Post) : PostEvent()
     data class OnPostDeleted(val post: Post) : PostEvent()
     data class OnPostEdited(val post: Post) : PostEvent()
@@ -39,9 +40,9 @@ sealed class ReplyEvent {
     data class OnReplyUpVoted(val reply: Reply) : ReplyEvent()
     data class OnReplyDownVoted(val reply: Reply) : ReplyEvent()
     data class OnAddReply(val reply: Reply) : ReplyEvent()
+    data class OnReplyAuthorClicked(val userId: String) : ReplyEvent()
     object Initial : ReplyEvent()
     data class OnReplyAdded(
-        val text: String,
-        val reply: Reply
+        val text: String, val reply: Reply
     ) : ReplyEvent()
 }

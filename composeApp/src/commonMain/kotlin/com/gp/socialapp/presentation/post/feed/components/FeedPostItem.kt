@@ -23,34 +23,26 @@ import kotlinx.datetime.toLocalDateTime
 
 @Composable
 fun FeedPostItem(
-    post: Post,
-    onPostEvent: (PostEvent) -> Unit,
-    currentUserID: String
+    post: Post, onPostEvent: (PostEvent) -> Unit, currentUserID: String
 ) {
     Card(
         onClick = { onPostEvent(PostEvent.OnPostClicked(post)) },
         shape = RoundedCornerShape(4.dp),
-        modifier = Modifier
-            .fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onSecondary)
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
+            modifier = Modifier.fillMaxWidth().wrapContentHeight()
         ) {
-            TopRow(
-                imageUrl = post.authorPfp,
+            TopRow(imageUrl = post.authorPfp,
                 userName = post.authorName,
                 publishedAt = Instant.fromEpochSeconds(post.createdAt).toLocalDateTime(TimeZone.UTC)
                     .toYYYYMMDD(),
                 onEditPostClicked = { onPostEvent(PostEvent.OnPostEdited(post)) },
-                onDeletePostClicked = { onPostEvent(PostEvent.OnPostDeleted(post)) }
-            )
-            TagsFlowRow(
-                selectedTags = post.tags.toSet(),
-                onTagClicked = { onPostEvent(PostEvent.OnTagClicked(it)) }
-            )
+                onDeletePostClicked = { onPostEvent(PostEvent.OnPostDeleted(post)) },
+                onUserClick = { onPostEvent(PostEvent.OnPostAuthorClicked(post.authorID)) })
+            TagsFlowRow(selectedTags = post.tags.toSet(),
+                onTagClicked = { onPostEvent(PostEvent.OnTagClicked(it)) })
             PostContent(
                 title = post.title,
                 body = post.body,
@@ -59,16 +51,11 @@ fun FeedPostItem(
                 onPostEvent = onPostEvent
             )
             HorizontalDivider(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
+                modifier = Modifier.fillMaxWidth().padding(
                         start = 8.dp, end = 8.dp, bottom = 8.dp
-                    ),
-                thickness = 0.5.dp,
-                color = Color.Gray
+                    ), thickness = 0.5.dp, color = Color.Gray
             )
-            BottomRow(
-                upVotes = post.upvoted,
+            BottomRow(upVotes = post.upvoted,
                 downVotes = post.downvoted,
                 commentCount = post.replyCount,
                 votes = post.votes,
@@ -80,8 +67,7 @@ fun FeedPostItem(
                 filesCount = (post.attachments.filter { MimeType.getMimeTypeFromFileName(it.name) !is MimeType.Image }).size,
                 currentUserID = currentUserID,
                 onShowFilesClicked = { onPostEvent(PostEvent.OnViewFilesAttachmentClicked(post.attachments)) },
-                onShareClicked = { onPostEvent(PostEvent.OnPostShareClicked(post)) }
-            )
+                onShareClicked = { onPostEvent(PostEvent.OnPostShareClicked(post)) })
         }
     }
 
