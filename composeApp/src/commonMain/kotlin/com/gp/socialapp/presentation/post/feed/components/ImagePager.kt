@@ -23,6 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -40,6 +41,10 @@ import com.gp.socialapp.util.AppConstants.BASE_URL
 import com.seiko.imageloader.model.ImageAction
 import com.seiko.imageloader.rememberImageSuccessPainter
 import com.seiko.imageloader.ui.AutoSizeBox
+import compose.icons.FontAwesomeIcons
+import compose.icons.TablerIcons
+import compose.icons.fontawesomeicons.Solid
+import compose.icons.fontawesomeicons.solid.ExclamationTriangle
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -50,7 +55,7 @@ fun ImagePager(
     onImageClicked: (PostAttachment) -> Unit
 ) {
     Box(
-        modifier = Modifier.size(height = 300.dp, width = width)
+        modifier = Modifier.size(height = 300.dp, width = width).background(MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f))
     ) {
         val pagerState = rememberPagerState(
             pageCount = { pageCount },
@@ -101,15 +106,14 @@ fun ImagePager(
                         }
 
                         is ImageAction.Loading -> {
-                            CircularProgressIndicator()
+                            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                         }
 
                         is ImageAction.Failure -> {
-                            println("\n\n\n\nImage loading failed url: $imageURL, error: ${action.error}\n\n\n\n")
                             Icon(
-                                imageVector = Icons.Filled.Error,
+                                imageVector = FontAwesomeIcons.Solid.ExclamationTriangle,
                                 contentDescription = null,
-                                modifier = Modifier.align(Alignment.Center),
+                                modifier = Modifier.size(36.dp).align(Alignment.Center),
                             )
                         }
 
