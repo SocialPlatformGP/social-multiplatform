@@ -19,6 +19,8 @@ import cafe.adriel.voyager.navigator.tab.TabOptions
 import cafe.adriel.voyager.transitions.SlideTransition
 import com.gp.socialapp.presentation.calendar.home.CalendarHomeScreen
 import com.gp.socialapp.presentation.chat.home.ChatHomeScreen
+import compose.icons.TablerIcons
+import compose.icons.tablericons.CalendarEvent
 import kotlin.jvm.Transient
 
 data class CalendarTab(
@@ -29,7 +31,7 @@ data class CalendarTab(
     @Composable
     get() {
         val title = "Calendar"
-        val icon = rememberVectorPainter(Icons.Rounded.CalendarMonth)
+        val icon = rememberVectorPainter(TablerIcons.CalendarEvent)
 
         return remember {
             TabOptions(

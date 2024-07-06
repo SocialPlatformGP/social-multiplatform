@@ -88,7 +88,7 @@ kotlin {
             implementation(libs.supabase.realtime)
             implementation(libs.supabase.postgrest)
             implementation(libs.window.size.multiplatform)
-            implementation(libs.kottie)
+//            implementation(libs.kottie)
             implementation(libs.compose.placeholder.material3)
             implementation(libs.composeIcons.feather)
             implementation(libs.composeIcons.fontAwesome)

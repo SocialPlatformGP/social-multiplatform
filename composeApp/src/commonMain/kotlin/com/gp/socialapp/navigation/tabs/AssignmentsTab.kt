@@ -18,6 +18,8 @@ import cafe.adriel.voyager.navigator.tab.TabOptions
 import cafe.adriel.voyager.transitions.SlideTransition
 import com.gp.socialapp.presentation.assignment.homeassignment.AssignmentHomeScreen
 import com.gp.socialapp.presentation.home.screen.HomeScreen
+import compose.icons.TablerIcons
+import compose.icons.tablericons.ListCheck
 import kotlin.jvm.Transient
 
 data class AssignmentsTab(
@@ -29,7 +31,7 @@ data class AssignmentsTab(
         @Composable
         get() {
             val title = "Assignments"
-            val icon = rememberVectorPainter(Icons.AutoMirrored.Filled.Assignment)
+            val icon = rememberVectorPainter(TablerIcons.ListCheck)
 
             return remember {
                 TabOptions(

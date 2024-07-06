@@ -13,13 +13,15 @@ import cafe.adriel.voyager.transitions.SlideTransition
 import com.gp.socialapp.presentation.assignment.homeassignment.AssignmentHomeScreen
 import com.gp.socialapp.presentation.grades.creator.GradesCreatorScreen
 import com.gp.socialapp.presentation.grades.home.GradesMainScreen
+import compose.icons.TablerIcons
+import compose.icons.tablericons.ReportAnalytics
 
 data class CreatorGradesTab(val communityId:String) : Tab {
     override val options: TabOptions
         @Composable
         get() {
-            val title = "Assignments"
-            val icon = rememberVectorPainter(Icons.AutoMirrored.Filled.Grading)
+            val title = "Grades"
+            val icon = rememberVectorPainter(TablerIcons.ReportAnalytics)
 
             return remember {
                 TabOptions(
