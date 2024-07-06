@@ -159,7 +159,7 @@ fun BottomRow(
         }
         Spacer(modifier = Modifier.weight(1f))
         OutlinedButton(
-            onClick = { },
+            onClick = onShareClicked,
             contentPadding = PaddingValues(),
             enabled = false,
             border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outline),
