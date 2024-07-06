@@ -13,6 +13,7 @@ fun TopRow(
     imageUrl: String,
     userName: String,
     publishedAt: String,
+    isAuthor: Boolean,
     onEditPostClicked: () -> Unit,
     onDeletePostClicked: () -> Unit,
     onUserClick: () -> Unit
@@ -35,7 +36,9 @@ fun TopRow(
         }
         Spacer(modifier = Modifier.weight(1f))
         OptionButton(
-            onEditPostClicked = onEditPostClicked, onDeletePostClicked = onDeletePostClicked
+            onEditPostClicked = onEditPostClicked,
+            onDeletePostClicked = onDeletePostClicked,
+            isAuthor = isAuthor
         )
     }
 }

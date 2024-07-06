@@ -34,13 +34,16 @@ fun FeedPostItem(
         Column(
             modifier = Modifier.fillMaxWidth().wrapContentHeight()
         ) {
-            TopRow(imageUrl = post.authorPfp,
+            TopRow(
+                imageUrl = post.authorPfp,
                 userName = post.authorName,
                 publishedAt = Instant.fromEpochSeconds(post.createdAt).toLocalDateTime(TimeZone.UTC)
                     .toYYYYMMDD(),
                 onEditPostClicked = { onPostEvent(PostEvent.OnPostEdited(post)) },
                 onDeletePostClicked = { onPostEvent(PostEvent.OnPostDeleted(post)) },
-                onUserClick = { onPostEvent(PostEvent.OnPostAuthorClicked(post.authorID)) })
+                onUserClick = { onPostEvent(PostEvent.OnPostAuthorClicked(post.authorID)) },
+                isAuthor = post.authorID == currentUserID
+            )
             TagsFlowRow(selectedTags = post.tags.toSet(),
                 onTagClicked = { onPostEvent(PostEvent.OnTagClicked(it)) })
             PostContent(
@@ -52,8 +55,8 @@ fun FeedPostItem(
             )
             HorizontalDivider(
                 modifier = Modifier.fillMaxWidth().padding(
-                        start = 8.dp, end = 8.dp, bottom = 8.dp
-                    ), thickness = 0.5.dp, color = Color.Gray
+                    start = 8.dp, end = 8.dp, bottom = 8.dp
+                ), thickness = 0.5.dp, color = Color.Gray
             )
             BottomRow(upVotes = post.upvoted,
                 downVotes = post.downvoted,

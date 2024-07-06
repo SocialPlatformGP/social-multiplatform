@@ -25,7 +25,8 @@ import socialmultiplatform.composeapp.generated.resources.edit
 @Composable
 fun OptionButton(
     onEditPostClicked: () -> Unit,
-    onDeletePostClicked: () -> Unit
+    onDeletePostClicked: () -> Unit,
+    isAuthor: Boolean
 ) {
     var expanded by remember { mutableStateOf(false) }
     Box {
@@ -54,24 +55,26 @@ fun OptionButton(
 
             )
         ) {
-            DropdownMenuItem(
-                onClick = {
-                    onEditPostClicked()
-                    expanded = false
-                },
-                text = {
-                    Text(text = stringResource(Res.string.edit))
-                }
-            )
-            DropdownMenuItem(
-                onClick = {
-                    onDeletePostClicked()
-                    expanded = false
-                },
-                text = {
-                    Text(text = stringResource(Res.string.delete))
-                }
-            )
+            if(isAuthor){
+                DropdownMenuItem(
+                    onClick = {
+                        onEditPostClicked()
+                        expanded = false
+                    },
+                    text = {
+                        Text(text = stringResource(Res.string.edit))
+                    }
+                )
+                DropdownMenuItem(
+                    onClick = {
+                        onDeletePostClicked()
+                        expanded = false
+                    },
+                    text = {
+                        Text(text = stringResource(Res.string.delete))
+                    }
+                )
+            }
         }
     }
 }
