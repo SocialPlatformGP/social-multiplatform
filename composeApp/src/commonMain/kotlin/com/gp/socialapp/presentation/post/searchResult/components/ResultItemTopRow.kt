@@ -18,17 +18,20 @@ fun ResultItemTopRow(
     imageUrl: String,
     userName: String,
     publishedAt: String,
+    onPostAuthorClicked: () -> Unit
 ) {
     Row(
         modifier = Modifier.background(Color.Transparent),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        UserImage(imageUrl)
+        UserImage(
+            imageLink = imageUrl, onClick = onPostAuthorClicked
+        )
         Row(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             UserName(
-                userName = userName,
+                userName = userName, onPostAuthorClicked
             )
             PostDate(
                 publishedAt = publishedAt,

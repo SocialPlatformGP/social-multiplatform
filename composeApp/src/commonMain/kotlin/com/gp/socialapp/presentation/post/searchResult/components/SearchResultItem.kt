@@ -1,6 +1,5 @@
 package com.gp.socialapp.presentation.post.searchResult.components
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -19,6 +18,7 @@ fun SearchResultItem(
     modifier: Modifier = Modifier,
     item: Post,
     onPostClicked: (Post) -> Unit,
+    onPostAuthorClicked: (String) -> Unit
 ) {
     Card(
         onClick = { onPostClicked(item) },
@@ -37,6 +37,7 @@ fun SearchResultItem(
                 imageUrl = item.authorPfp,
                 userName = item.authorName,
                 publishedAt = item.createdAt.toString(),
+                onPostAuthorClicked = { onPostAuthorClicked(item.authorID) }
             )
             ResultItemContent(
                 title = item.title,

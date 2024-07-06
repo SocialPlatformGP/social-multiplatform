@@ -65,6 +65,7 @@ import com.gp.socialapp.presentation.post.feed.components.FilesBottomSheet
 import com.gp.socialapp.presentation.post.postDetails.PostDetailsScreen
 import com.gp.socialapp.presentation.post.search.SearchScreen
 import com.gp.socialapp.presentation.post.searchResult.SearchResultScreen
+import com.gp.socialapp.presentation.userprofile.UserProfileScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -97,7 +98,8 @@ data class FeedScreen(val communityId: String) : Screen {
                 stringResource(resource = Res.string.spotlight), Icons.Filled.NotificationImportant
             ),
         )
-        FeedContent(state = state,
+        FeedContent(
+            state = state,
             currentUserID = state.currentUserID,
             onPostEvent = { action ->
                 when (action) {
@@ -146,6 +148,10 @@ data class FeedScreen(val communityId: String) : Screen {
 
                     is PostEvent.OnPostShareClicked -> {
                         screenModel.logout()
+                    }
+
+                    is PostEvent.OnPostAuthorClicked -> {
+                        navigator.push(UserProfileScreen(action.userId))
                     }
 
                     else -> {}
@@ -234,10 +240,10 @@ data class FeedScreen(val communityId: String) : Screen {
             ) {
                 TabRow(
                     modifier = Modifier.height(40.dp).fillMaxWidth().clip(
-                            RoundedCornerShape(
-                                bottomStart = 8.dp, bottomEnd = 8.dp
-                            )
-                        ),
+                        RoundedCornerShape(
+                            bottomStart = 8.dp, bottomEnd = 8.dp
+                        )
+                    ),
                     selectedTabIndex = selectedTabIndex,
                     indicator = { tabPositions ->
                         SecondaryIndicator(

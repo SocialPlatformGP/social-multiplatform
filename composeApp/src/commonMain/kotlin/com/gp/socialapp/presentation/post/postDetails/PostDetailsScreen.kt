@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -43,6 +43,7 @@ import com.gp.socialapp.presentation.post.feed.components.FeedPostItem
 import com.gp.socialapp.presentation.post.postDetails.components.AddReplySheet
 import com.gp.socialapp.presentation.post.postDetails.components.RepliesList
 import com.gp.socialapp.presentation.post.searchResult.SearchResultScreen
+import com.gp.socialapp.presentation.userprofile.UserProfileScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -95,6 +96,10 @@ data class PostDetailsScreen(val post: Post) : Screen {
                         navigator.push(SearchResultScreen(searchTag = postEvent.tag, isTag = true))
                     }
 
+                    is PostEvent.OnPostAuthorClicked -> {
+                        navigator.push(UserProfileScreen(postEvent.userId))
+                    }
+
                     else -> screenModel.handlePostEvent(postEvent)
                 }
             },
@@ -116,6 +121,7 @@ data class PostDetailsScreen(val post: Post) : Screen {
                             }
                         }
                     }
+
                     is ReplyEvent.OnEditReply -> {
                         scope.launch {
                             if (bottomSheetState.isVisible) {
@@ -128,6 +134,10 @@ data class PostDetailsScreen(val post: Post) : Screen {
                                 bottomSheetState.show()
                             }
                         }
+                    }
+
+                    is ReplyEvent.OnReplyAuthorClicked -> {
+                        navigator.push(UserProfileScreen(replyEvent.userId))
                     }
 
                     else -> screenModel.handleReplyEvent(replyEvent)
@@ -177,20 +187,15 @@ data class PostDetailsScreen(val post: Post) : Screen {
         onBackPressed: () -> Unit
     ) {
         val snackbarHostState = remember { SnackbarHostState() }
-        Scaffold(
-            snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
-            topBar = {
-                TopAppBar(
-                    title = { Text("Post Details") },
-                    navigationIcon = {
-                        IconButton(onClick = {
-                            onBackPressed()
-                        }) {
-                            Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-                        }
-                    }
-                )
-            }, modifier = modifier
+        Scaffold(snackbarHost = { SnackbarHost(hostState = snackbarHostState) }, topBar = {
+            TopAppBar(title = { Text("Post Details") }, navigationIcon = {
+                IconButton(onClick = {
+                    onBackPressed()
+                }) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                }
+            })
+        }, modifier = modifier
         ) {
             if (actionResult !is PostDetailsActionResult.NoActionResult) {
                 val message = when (actionResult) {
@@ -253,9 +258,9 @@ data class PostDetailsScreen(val post: Post) : Screen {
                 if (bottomSheetState.isVisible) {
                     AddReplySheet(
                         onDismiss = onDismissAddReplyBottomSheet,
-                        initialValue = if(isEditingReply) clickedReply?.content.orEmpty() else "",
+                        initialValue = if (isEditingReply) clickedReply?.content.orEmpty() else "",
                         onDone = { textReply ->
-                            if(isEditingReply && clickedReply != null) {
+                            if (isEditingReply && clickedReply != null) {
                                 onReplyEvent(ReplyEvent.OnReplyEdited(clickedReply.copy(content = textReply)))
                                 onReplyEvent(ReplyEvent.OnEditReply(clickedReply))
                             } else if (clickedReply == null) {
@@ -265,7 +270,8 @@ data class PostDetailsScreen(val post: Post) : Screen {
                                 onReplyEvent(ReplyEvent.OnAddReply(clickedReply))
                             }
                             onDismissAddReplyBottomSheet()
-                        }, bottomSheetState = bottomSheetState
+                        },
+                        bottomSheetState = bottomSheetState
                     )
                 }
             }

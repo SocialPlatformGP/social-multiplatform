@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -27,25 +26,27 @@ import com.gp.socialapp.data.post.source.remote.model.Tag
 import com.gp.socialapp.presentation.post.postDetails.PostDetailsScreen
 import com.gp.socialapp.presentation.post.searchResult.components.SearchResultHeader
 import com.gp.socialapp.presentation.post.searchResult.components.SearchResultList
+import com.gp.socialapp.presentation.userprofile.UserProfileScreen
 
 data class SearchResultScreen(
     val searchTerm: String = "",
     val searchTag: Tag = Tag(),
     val isTag: Boolean = false
-): Screen{
+) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = navigator.rememberNavigatorScreenModel<SearchResultScreenModel>()
         val state by screenModel.uiState.collectAsState()
         val isScreenModelInitialized by remember { mutableStateOf(false) }
-        if(!isScreenModelInitialized){
-            screenModel.initScreenModel(searchTerm,searchTag, isTag)
+        if (!isScreenModelInitialized) {
+            screenModel.initScreenModel(searchTerm, searchTag, isTag)
         }
         SearchResultContent(
             posts = state.posts,
             onPostClicked = { navigator.push(PostDetailsScreen(it)) },
-            onBackPressed = { navigator.pop() }
+            onBackPressed = { navigator.pop() },
+            onPostAuthorClicked = { navigator.push(UserProfileScreen(it)) }
         )
     }
 
@@ -54,15 +55,16 @@ data class SearchResultScreen(
         modifier: Modifier = Modifier,
         posts: List<Post>,
         onPostClicked: (Post) -> Unit,
-        onBackPressed: () -> Unit
-        ) {
-        Scaffold (
+        onBackPressed: () -> Unit,
+        onPostAuthorClicked: (String) -> Unit,
+    ) {
+        Scaffold(
             modifier = modifier.fillMaxSize(),
             topBar = {
-                Row (
+                Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth()
-                ){
+                ) {
                     IconButton(
                         onClick = {
                             onBackPressed()
@@ -80,13 +82,14 @@ data class SearchResultScreen(
                     )
                 }
             }
-        ){
-            Column  (
+        ) {
+            Column(
                 modifier = Modifier.fillMaxSize().padding(it)
-            ){
+            ) {
                 SearchResultList(
                     posts = posts,
-                    onPostClicked = onPostClicked
+                    onPostClicked = onPostClicked,
+                    onPostAuthorClicked = onPostAuthorClicked
                 )
             }
         }

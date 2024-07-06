@@ -1,6 +1,7 @@
 package com.gp.socialapp.presentation.post.feed.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -19,18 +20,17 @@ import com.seiko.imageloader.ui.AutoSizeBox
 
 @Composable
 fun UserImage(
-    imageLink: String,
-    size: Dp =36.dp
+    imageLink: String, size: Dp = 36.dp, onClick: () -> Unit
 ) {
+    val imageModifier = Modifier.padding(start = 8.dp, end = 8.dp).size(size).clip(CircleShape)
+        .clickable { onClick() }
     AutoSizeBox(imageLink) { action ->
         when (action) {
             is ImageAction.Success -> {
                 Image(
                     rememberImageSuccessPainter(action),
                     contentDescription = "User Avatar",
-                    modifier = Modifier.padding(start = 8.dp, end = 8.dp)
-                        .size(size)
-                        .clip(CircleShape),
+                    modifier = imageModifier,
                     contentScale = ContentScale.Crop
                 )
             }
@@ -39,8 +39,7 @@ fun UserImage(
                 Icon(
                     imageVector = Icons.Filled.AccountCircle,
                     contentDescription = null,
-                    modifier = Modifier.padding(start = 8.dp, end = 8.dp)
-                        .size(size)
+                    modifier = imageModifier.padding(start = 8.dp, end = 8.dp).size(size)
                         .clip(CircleShape)
                 )
             }
