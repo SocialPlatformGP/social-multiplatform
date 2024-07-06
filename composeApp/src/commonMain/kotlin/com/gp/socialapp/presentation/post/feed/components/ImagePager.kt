@@ -118,52 +118,53 @@ fun ImagePager(
                 }
             }
         }
-        LazyRow(
-            state = indicatorScrollState,
-            modifier = Modifier
-                .offset(y = (-16).dp)
-                .height(25.dp)
-                .width(((6 + 16) * 2 + 3 * (10 + 16)).dp)
-                .background(Color.LightGray.copy(alpha = 0.6f), RoundedCornerShape(16.dp))
-                .align(Alignment.BottomCenter),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            repeat(pageCount) { iteration ->
-                val color =
-                    if (pagerState.currentPage == iteration) Color.DarkGray else Color.LightGray
-                item(key = "item$iteration") {
-                    val currentPage = pagerState.currentPage
-                    val firstVisibleIndex by remember { derivedStateOf { indicatorScrollState.firstVisibleItemIndex } }
-                    val lastVisibleIndex =
-                        indicatorScrollState.layoutInfo.visibleItemsInfo.lastOrNull()?.index
-                            ?: 0
-                    val size by animateDpAsState(
-                        targetValue = when (iteration) {
-                            currentPage -> {
-                                10.dp
-                            }
+        if(images.size > 1){
+            LazyRow(
+                state = indicatorScrollState,
+                modifier = Modifier
+                    .offset(y = (-16).dp)
+                    .height(25.dp)
+                    .width(((6 + 16) * 2 + 3 * (10 + 16)).dp)
+                    .background(Color.LightGray.copy(alpha = 0.6f), RoundedCornerShape(16.dp))
+                    .align(Alignment.BottomCenter),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                repeat(pageCount) { iteration ->
+                    val color =
+                        if (pagerState.currentPage == iteration) Color.DarkGray else Color.LightGray
+                    item(key = "item$iteration") {
+                        val currentPage = pagerState.currentPage
+                        val firstVisibleIndex by remember { derivedStateOf { indicatorScrollState.firstVisibleItemIndex } }
+                        val lastVisibleIndex =
+                            indicatorScrollState.layoutInfo.visibleItemsInfo.lastOrNull()?.index
+                                ?: 0
+                        val size by animateDpAsState(
+                            targetValue = when (iteration) {
+                                currentPage -> {
+                                    10.dp
+                                }
 
-                            in firstVisibleIndex + 1..<lastVisibleIndex -> {
-                                10.dp
-                            }
+                                in firstVisibleIndex + 1..<lastVisibleIndex -> {
+                                    10.dp
+                                }
 
-                            else -> {
-                                6.dp
-                            }
-                        }, label = ""
-                    )
-                    Box(
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .background(color, CircleShape)
-                            .size(
-                                size
-                            )
-                    )
+                                else -> {
+                                    6.dp
+                                }
+                            }, label = ""
+                        )
+                        Box(
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .background(color, CircleShape)
+                                .size(
+                                    size
+                                )
+                        )
+                    }
                 }
             }
         }
-
     }
 }
