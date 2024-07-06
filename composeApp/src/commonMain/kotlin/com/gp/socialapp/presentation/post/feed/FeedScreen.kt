@@ -153,7 +153,9 @@ data class FeedScreen(val communityId: String) : Screen {
                     is PostEvent.OnPostAuthorClicked -> {
                         navigator.push(UserProfileScreen(action.userId))
                     }
-
+                    is PostEvent.OnCommentClicked -> {
+                        navigator.push(PostDetailsScreen(action.post))
+                    }
                     else -> {}
                 }
             },

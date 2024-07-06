@@ -65,7 +65,7 @@ fun FeedPostItem(
                 onUpVoteClicked = { onPostEvent(PostEvent.OnPostUpVoted(post)) },
                 onDownVoteClicked = { onPostEvent(PostEvent.OnPostDownVoted(post)) },
                 onCommentClicked = {
-                    onPostEvent(PostEvent.OnCommentClicked(post.id))
+                    onPostEvent(PostEvent.OnCommentClicked(post))
                 },
                 filesCount = (post.attachments.filter { MimeType.getMimeTypeFromFileName(it.name) !is MimeType.Image }).size,
                 currentUserID = currentUserID,
