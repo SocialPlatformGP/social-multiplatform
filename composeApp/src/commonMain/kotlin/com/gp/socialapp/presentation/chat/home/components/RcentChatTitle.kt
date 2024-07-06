@@ -10,7 +10,6 @@ fun RecentChatTitle(title: String) {
     Text(
         text = title,
         style = MaterialTheme.typography.titleLarge,
-        fontWeight = FontWeight.Bold,
         color = MaterialTheme.colorScheme.onBackground
     )
 }
