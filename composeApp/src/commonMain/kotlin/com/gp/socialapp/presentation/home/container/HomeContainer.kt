@@ -13,10 +13,8 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
@@ -26,7 +24,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -37,6 +34,7 @@ import cafe.adriel.voyager.kodein.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.CurrentTab
+import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabNavigator
 import com.gp.socialapp.navigation.tabs.AssignmentsTab
 import com.gp.socialapp.navigation.tabs.CalendarTab
@@ -77,6 +75,13 @@ data class HomeContainer(
             navigator.replaceAll(UserInformationScreen(state.currentUser))
         }
         val onNavigation: (Boolean) -> Unit = { barsVisibility = it }
+        val menuTabs = listOf(
+            CommunitiesTab(onNavigation),
+            ChatTab(onNavigation),
+            AssignmentsTab(onNavigation),
+            CalendarTab(onNavigation),
+            GradesTab
+        )
         if (state.isLoggedOut) {
             navigator.replaceAll(LoginScreen)
         }
@@ -88,7 +93,6 @@ data class HomeContainer(
             HomeTab.GRADES -> GradesTab
         }
         val MainContent: @Composable () -> Unit = {
-            TabNavigator(defaultTab) {
                 Scaffold(
                     modifier = Modifier.fillMaxSize().alpha(mainContentAlpha)
                         .clickableWithoutRipple { showDrawer = false },
@@ -115,26 +119,43 @@ data class HomeContainer(
 
                     bottomBar = {
 
-                        if (barsVisibility) NavigationBar {
-                            BottomTabNavigationItem(tab = ChatTab(onNavigation))
-                            BottomTabNavigationItem(tab = AssignmentsTab(onNavigation))
-                            BottomTabNavigationItem(
-                                tab = CommunitiesTab(
-                                    onNavigation
-                                )
-                            )
-                            BottomTabNavigationItem(tab = CalendarTab(onNavigation))
-                            BottomTabNavigationItem(tab = GradesTab)
+                        if (barsVisibility && !isDesktop) NavigationBar {
+                            menuTabs.forEach{
+                                BottomTabNavigationItem(it)
+                            }
                         }
                     },
                 )
-            }
         }
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Row {
-                if (isDesktop && barsVisibility) {
+        TabNavigator(defaultTab) {
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Row {
+                    if (isDesktop && barsVisibility) {
+                        SideMenu(
+                            userProfilePictureUrl = state.currentUser.profilePictureURL,
+                            userName = state.currentUser.name,
+                            userEmail = state.currentUser.email,
+                            onLogOut = {
+                                screenModel.logout()
+                                navigator.replaceAll(LoginScreen)
+                            },
+                            onNavigateToSettings = {
+                                navigator.push(MainSettingsScreen)
+                            },
+                            windowWidthSizeClass = windowSizeClass.widthSizeClass,
+                            menuTabs = menuTabs,
+                            isDesktop = true,
+                        )
+                    }
+                    MainContent()
+                }
+                AnimatedVisibility(
+                    visible = showDrawer,
+                    enter = slideInHorizontally(animationSpec = tween()) { -it },
+                    exit = slideOutHorizontally(animationSpec = if (isDesktop) snap() else spring()) { -it }
+                ) {
                     SideMenu(
                         userProfilePictureUrl = state.currentUser.profilePictureURL,
                         userName = state.currentUser.name,
@@ -149,26 +170,6 @@ data class HomeContainer(
                         windowWidthSizeClass = windowSizeClass.widthSizeClass
                     )
                 }
-                MainContent()
-            }
-            AnimatedVisibility(
-                visible = showDrawer,
-                enter = slideInHorizontally(animationSpec = tween()) { -it },
-                exit = slideOutHorizontally(animationSpec = if (isDesktop) snap() else spring()) { -it }
-            ) {
-                SideMenu(
-                    userProfilePictureUrl = state.currentUser.profilePictureURL,
-                    userName = state.currentUser.name,
-                    userEmail = state.currentUser.email,
-                    onLogOut = {
-                        screenModel.logout()
-                        navigator.replaceAll(LoginScreen)
-                    },
-                    onNavigateToSettings = {
-                        navigator.push(MainSettingsScreen)
-                    },
-                    windowWidthSizeClass = windowSizeClass.widthSizeClass
-                )
             }
         }
     }

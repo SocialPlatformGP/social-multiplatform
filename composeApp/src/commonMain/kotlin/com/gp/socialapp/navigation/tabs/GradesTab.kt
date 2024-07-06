@@ -9,13 +9,15 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import com.gp.socialapp.presentation.grades.home.GradesMainScreen
+import compose.icons.TablerIcons
+import compose.icons.tablericons.ReportAnalytics
 
 object GradesTab : Tab {
     override val options: TabOptions
         @Composable
         get() {
             val title = "Grades"
-            val icon = rememberVectorPainter(Icons.Rounded.Description)
+            val icon = rememberVectorPainter(TablerIcons.ReportAnalytics)
 
             return remember {
                 TabOptions(

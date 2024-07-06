@@ -36,10 +36,12 @@ import cafe.adriel.voyager.kodein.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.CurrentTab
+import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabNavigator
 import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.data.community.source.remote.model.Community
 import com.gp.socialapp.navigation.tabs.AssignmentsTab
+import com.gp.socialapp.navigation.tabs.CommunitiesTab
 import com.gp.socialapp.navigation.tabs.CommunityMembersTab
 import com.gp.socialapp.navigation.tabs.CreatorGradesTab
 import com.gp.socialapp.navigation.tabs.MaterialTab
@@ -104,70 +106,101 @@ data class CommunityHomeContainer(
         val isDesktop = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Expanded
         var showDrawer by remember { mutableStateOf(false) }
         val mainContentAlpha by animateFloatAsState(if (showDrawer) 0.6f else 1f)
-        val MainContent: @Composable () -> Unit = {
-            TabNavigator(defaultTab) { tabNavigator ->
-                Scaffold(
-                    modifier = Modifier.fillMaxSize().alpha(mainContentAlpha)
-                        .clickableWithoutRipple { showDrawer = false },
-                    content = { paddingValues ->
-
-                    Column(
-                        modifier = Modifier.padding(if (isBarsVisible) paddingValues else PaddingValues(0.dp)),
-
-                        ) {
-                        CurrentTab()
-                    }
-                }, topBar = {
-                    if (isBarsVisible) {
-                        MainTopBar(onSearchClicked = {
-                            when (tabNavigator.current) {
-                                is PostsTab -> {
-                                    onNavigateToSearch()
-                                    onNavigation(false)
-                                }
-
-                                is MaterialTab -> {/*TODO*/
-                                }
-
-                                is CommunityMembersTab -> {/*TODO*/
-                                }
-                            }
-                        }, onNotificationClicked = { /*TODO*/ }, onNavDrawerIconClicked = {
-                            showDrawer = !showDrawer
-                        })
-                    }
-                }, bottomBar = {
-                    if (isBarsVisible) {
-                        NavigationBar {
-                            BottomTabNavigationItem(tab = PostsTab(communityId, onNavigation))
-                            BottomTabNavigationItem(tab = MaterialTab(communityId))
-                            if (userCommunities.find { it.id == communityId }?.members?.get(
-                                    currentUser.id
-                                ) == true
-                            ) {
-                                BottomTabNavigationItem(
-                                    tab = AssignmentsTab(onNavigation, communityId)
-                                )
-                            }
-                            BottomTabNavigationItem(tab = CommunityMembersTab(communityId))
-                            if (userCommunities.find { it.id == communityId }?.members?.get(
-                                    currentUser.id
-                                ) == true
-                            ) {
-                                BottomTabNavigationItem(
-                                    tab = CreatorGradesTab(communityId)
-                                )
-                            }
-                        }
-                    }
-                })
+        val menuTabs = mutableListOf<Tab>().apply{
+            add(PostsTab(communityId, onNavigation))
+            add(MaterialTab(communityId))
+            if(userCommunities.find { it.id == communityId }?.members?.get(currentUser.id) == true){
+                add(AssignmentsTab(onNavigation, communityId))
+            }
+            add(CommunityMembersTab(communityId))
+            if(userCommunities.find { it.id == communityId }?.members?.get(currentUser.id) == true) {
+                add(CreatorGradesTab(communityId))
             }
         }
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Row {
-                if (isDesktop && isBarsVisible) {
+
+        TabNavigator(defaultTab) { tabNavigator ->
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Row {
+                    if (isDesktop) {
+                        CommunitySideMenu(
+                            user = currentUser,
+                            onLogout = onLogout,
+                            communityId = communityId,
+                            communities = userCommunities,
+                            onNavigateToSettings = {
+                                onNavigateToSettings()
+                            },
+                            onNavigateToHome = {
+                                onNavigateToHome()
+                            },
+                            windowWidthSizeClass = windowSizeClass.widthSizeClass,
+                            menuTabs = menuTabs,
+                            isDesktop = true
+                        )
+                    }
+                    Scaffold(
+                        modifier = Modifier.fillMaxSize().alpha(mainContentAlpha)
+                            .clickableWithoutRipple { showDrawer = false },
+                        content = { paddingValues ->
+
+                            Column(
+                                modifier = Modifier.padding(if (isBarsVisible) paddingValues else PaddingValues(0.dp)),
+
+                                ) {
+                                CurrentTab()
+                            }
+                        }, topBar = {
+                            if (isBarsVisible) {
+                                MainTopBar(onSearchClicked = {
+                                    when (tabNavigator.current) {
+                                        is PostsTab -> {
+                                            onNavigateToSearch()
+                                            onNavigation(false)
+                                        }
+
+                                        is MaterialTab -> {/*TODO*/
+                                        }
+
+                                        is CommunityMembersTab -> {/*TODO*/
+                                        }
+                                    }
+                                }, onNotificationClicked = { /*TODO*/ }, onNavDrawerIconClicked = {
+                                    showDrawer = !showDrawer
+                                })
+                            }
+                        }, bottomBar = {
+                            if (isBarsVisible && !isDesktop){
+                                NavigationBar {
+                                    BottomTabNavigationItem(tab = PostsTab(communityId, onNavigation))
+                                    BottomTabNavigationItem(tab = MaterialTab(communityId))
+                                    if (userCommunities.find { it.id == communityId }?.members?.get(
+                                            currentUser.id
+                                        ) == true
+                                    ) {
+                                        BottomTabNavigationItem(
+                                            tab = AssignmentsTab(onNavigation, communityId)
+                                        )
+                                    }
+                                    BottomTabNavigationItem(tab = CommunityMembersTab(communityId))
+                                    if (userCommunities.find { it.id == communityId }?.members?.get(
+                                            currentUser.id
+                                        ) == true
+                                    ) {
+                                        BottomTabNavigationItem(
+                                            tab = CreatorGradesTab(communityId)
+                                        )
+                                    }
+                                }
+                            }
+                        })
+                }
+                AnimatedVisibility(
+                    visible = showDrawer,
+                    enter = slideInHorizontally(animationSpec = tween()) { -it },
+                    exit = slideOutHorizontally(animationSpec = if (isDesktop) snap() else spring()) { -it }
+                ) {
                     CommunitySideMenu(
                         user = currentUser,
                         onLogout = onLogout,
@@ -182,26 +215,6 @@ data class CommunityHomeContainer(
                         windowWidthSizeClass = windowSizeClass.widthSizeClass
                     )
                 }
-                MainContent()
-            }
-            AnimatedVisibility(
-                visible = showDrawer,
-                enter = slideInHorizontally(animationSpec = tween()) { -it },
-                exit = slideOutHorizontally(animationSpec = if (isDesktop) snap() else spring()) { -it }
-            ) {
-                CommunitySideMenu(
-                    user = currentUser,
-                    onLogout = onLogout,
-                    communityId = communityId,
-                    communities = userCommunities,
-                    onNavigateToSettings = {
-                        onNavigateToSettings()
-                    },
-                    onNavigateToHome = {
-                        onNavigateToHome()
-                    },
-                    windowWidthSizeClass = windowSizeClass.widthSizeClass
-                )
             }
         }
     }

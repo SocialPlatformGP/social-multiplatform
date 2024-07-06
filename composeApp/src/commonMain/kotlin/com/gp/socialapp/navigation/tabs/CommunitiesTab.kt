@@ -12,6 +12,13 @@ import cafe.adriel.voyager.navigator.tab.TabOptions
 import cafe.adriel.voyager.transitions.SlideTransition
 import com.gp.socialapp.presentation.home.screen.HomeScreen
 import com.gp.socialapp.presentation.home.screen.HomeUiAction
+import compose.icons.FontAwesomeIcons
+import compose.icons.TablerIcons
+import compose.icons.fontawesomeicons.Solid
+import compose.icons.fontawesomeicons.solid.Users
+import compose.icons.tablericons.Home
+import compose.icons.tablericons.User
+import compose.icons.tablericons.Users
 import kotlin.jvm.Transient
 
 data class CommunitiesTab(
@@ -22,10 +29,10 @@ data class CommunitiesTab(
         @Composable
         get() {
             val title = "Communities"
-            val icon = rememberVectorPainter(Icons.Default.Diversity3)
+            val icon = rememberVectorPainter(TablerIcons.Users)
             return remember {
                 TabOptions(
-                    index = 2u,
+                    index = 0u,
                     title = title,
                     icon = icon
                 )
