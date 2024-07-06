@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import com.gp.socialapp.data.post.source.remote.model.Post
 import com.gp.socialapp.presentation.material.utils.MimeType
 import com.gp.socialapp.presentation.post.feed.PostEvent
+import com.gp.socialapp.util.LocalDateTimeUtil.getPostDate
 import com.gp.socialapp.util.LocalDateTimeUtil.toYYYYMMDD
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
@@ -37,8 +38,7 @@ fun FeedPostItem(
             TopRow(
                 imageUrl = post.authorPfp,
                 userName = post.authorName,
-                publishedAt = Instant.fromEpochSeconds(post.createdAt).toLocalDateTime(TimeZone.UTC)
-                    .toYYYYMMDD(),
+                publishedAt = post.createdAt.getPostDate(),
                 onEditPostClicked = { onPostEvent(PostEvent.OnPostEdited(post)) },
                 onDeletePostClicked = { onPostEvent(PostEvent.OnPostDeleted(post)) },
                 onUserClick = { onPostEvent(PostEvent.OnPostAuthorClicked(post.authorID)) },

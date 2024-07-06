@@ -100,6 +100,7 @@ class CreatePostScreenModel(
                         Result.Loading -> {
                             //TODO
                         }
+                        else -> {}
                     }
                 }
             }

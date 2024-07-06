@@ -19,6 +19,7 @@ import kotlinx.datetime.minus
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import java.time.format.TextStyle
+import kotlin.time.Duration
 
 object LocalDateTimeUtil {
     fun LocalDateTime.Companion.now() = Clock.System.now().toLocalDateTime(TimeZone.UTC)
@@ -39,6 +40,24 @@ object LocalDateTimeUtil {
             localDateTime.date == today.minus(1, DateTimeUnit.DAY) -> "Yesterday"
             localDateTime.date.daysUntil(today) < 7 -> localDateTime.date.dayOfWeek.name
             else -> localDateTime.toDDMMYYYY()
+        }
+    }
+    fun Long.getPostDate(): String{
+        val then = DateTimeTz.fromUnix(this)
+        val now = DateTimeTz.nowLocal()
+        val hoursDifference = now.hours - then.hours
+        val minutesDifference = now.minutes - then.minutes
+        return when {
+            then.dayOfYear == now.dayOfYear && then.year == now.year -> {
+                when {
+                    hoursDifference > 0 -> "${hoursDifference}h"
+                    minutesDifference > 0 -> "${minutesDifference}m"
+                    else -> "just now"
+                }
+            }
+            then.dayOfYear == (now - 1.days).dayOfYear && then.year == (now - 1.days).year-> "Yesterday"
+            then.dayOfYear == (now - 7.days).dayOfYear && then.year == (now - 7.days).year -> "Last "+then.dayOfWeek.name
+            else -> then.month.localShortName+" "+then.dayOfMonth+", "+then.year.year
         }
     }
     fun LocalDateTime.getDateHeader(): String {
