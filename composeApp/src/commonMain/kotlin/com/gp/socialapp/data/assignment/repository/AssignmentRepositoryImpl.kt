@@ -29,8 +29,8 @@ class AssignmentRepositoryImpl(
         return remoteDataSource.submitAssignment(assignmentId, userId, attachments)
     }
 
-    override suspend fun turnInAssignments(userAssignmentId: String): Result<Boolean, AssignmentError> {
-        return remoteDataSource.turnInAssignments(userAssignmentId)
+    override suspend fun turnInAssignments(request: AssignmentRequest.TurnInAssignments): Result<Boolean, AssignmentError> {
+        return remoteDataSource.turnInAssignments(request)
     }
 
     override suspend fun unSubmitAssignment(userAssignmentId: String): Result<Boolean, AssignmentError> {

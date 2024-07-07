@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.UploadFile
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
@@ -43,6 +44,7 @@ import com.mohamedrejeb.calf.io.getName
 import com.mohamedrejeb.calf.io.readByteArray
 import com.mohamedrejeb.calf.picker.rememberFilePickerLauncher
 import kotlinx.coroutines.launch
+import java.awt.SystemColor.text
 
 data class GradesCreatorScreen(val communityId: String) : Screen {
     @Composable
@@ -129,10 +131,10 @@ fun GradesCreatorContent(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(32.dp)
+
             ) {
                 LazyRow(
-                    Modifier.fillMaxWidth().padding(8.dp)
+                    Modifier.fillMaxWidth()
                 ) {
                     items(subjects) { subject ->
                         FilterChip(
@@ -148,7 +150,7 @@ fun GradesCreatorContent(
                 }
             }
             LazyColumn(
-                Modifier.fillMaxWidth().padding(8.dp)
+                Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 2.dp)
             ) {
 
                 data = state.grades.filter { it.course == selectedSubject }
@@ -174,8 +176,8 @@ fun GradesCreatorContent(
                 }
                 items(data) { grades ->
 
-                    Column {
-                        Row {
+                    Card (modifier = Modifier.padding(4.dp)) {
+                        Row (modifier = Modifier.padding(4.dp)) {
                             Text(
                                 text = grades.userName,
                                 Modifier.weight(3f),

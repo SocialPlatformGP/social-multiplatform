@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Article
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -26,7 +27,8 @@ fun CreateEventDescription(
         onDescriptionChanged(it)
     }, leadingIcon = {
         Icon(
-            imageVector = Icons.AutoMirrored.Filled.Article, contentDescription = null
+            imageVector = Icons.AutoMirrored.Filled.Article, contentDescription = null,
+            tint = MaterialTheme.colorScheme.outline
         )
     }, placeholder = { Text("Description") }, modifier = modifier.fillMaxWidth().padding(8.dp)
     )

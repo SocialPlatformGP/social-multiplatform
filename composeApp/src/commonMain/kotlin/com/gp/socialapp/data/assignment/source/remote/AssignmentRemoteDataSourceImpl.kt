@@ -55,11 +55,11 @@ class AssignmentRemoteDataSourceImpl(
                 emit(Result.Success(assignmentAttachments))
             } else {
                 val error = response.body<AssignmentError>()
-                error(error)
+                Result.Error(error)
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            error(SERVER_ERROR)
+            Result.Error(SERVER_ERROR)
         }
     }
 
@@ -164,11 +164,11 @@ class AssignmentRemoteDataSourceImpl(
         }
     }
 
-    override suspend fun turnInAssignments(userAssignmentId: String): Result<Boolean,AssignmentError> {
+    override suspend fun turnInAssignments(request: AssignmentRequest.TurnInAssignments): Result<Boolean,AssignmentError> {
         return try {
             val response = httpClient.post {
                 endPoint("turnInAssignment")
-                setBody(userAssignmentId)
+                setBody(request)
             }
             if (response.status == HttpStatusCode.OK) {
                 Result.Success(true)

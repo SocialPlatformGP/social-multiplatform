@@ -3,6 +3,7 @@ package com.gp.socialapp.data.assignment.repository
 import com.gp.socialapp.data.assignment.model.Assignment
 import com.gp.socialapp.data.assignment.model.AssignmentAttachment
 import com.gp.socialapp.data.assignment.model.UserAssignmentSubmission
+import com.gp.socialapp.data.assignment.source.remote.model.request.AssignmentRequest
 import com.gp.socialapp.util.AssignmentError
 import com.gp.socialapp.util.Result
 import kotlinx.coroutines.flow.Flow
@@ -29,6 +30,6 @@ interface AssignmentRepository {
         feedback: String,
     ): Result<Boolean, AssignmentError>
 
-    suspend fun turnInAssignments(userAssignmentId: String):Result<Boolean,AssignmentError>
+    suspend fun turnInAssignments(request: AssignmentRequest.TurnInAssignments):Result<Boolean,AssignmentError>
     suspend fun unSubmitAssignment(userAssignmentId: String): Result<Boolean,AssignmentError>
 }

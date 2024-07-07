@@ -7,5 +7,10 @@ data class CreateEventUiState(
     val title: String = "",
     val description: String = "",
     val date: Long = 0L,
-    val isCreated: Boolean = false
+    val time: Long = 0L,
+    val isCreated: Boolean = false,
+    val location : String = "",
+    val type : String = "Event",
+    val communityId: String = "",
+    val isPrivate : Boolean = true
 )

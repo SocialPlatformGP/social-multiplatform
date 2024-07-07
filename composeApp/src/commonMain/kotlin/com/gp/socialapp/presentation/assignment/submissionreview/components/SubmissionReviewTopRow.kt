@@ -72,35 +72,10 @@ fun SubmissionReviewTopRow(
                     value = currentSubmission.userName,
                     onValueChange = {},
                     readOnly = true,
-                    trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(isExpanded)
-                    },
                     colors = ExposedDropdownMenuDefaults.textFieldColors(),
                     modifier = Modifier.menuAnchor()
                 )
-                ExposedDropdownMenu(
-                    expanded = isExpanded,
-                    onDismissRequest = { isExpanded = false}
-                ) {
-                    LazyColumn(
-                        modifier = Modifier.heightIn(max = 300.dp),
-                        contentPadding = PaddingValues(8.dp)
-                    ) {
-                        items(submissions.size) { index ->
-                            DropdownMenuItem(
-                                text = {
-                                   Text(text = submissions[index].userName)
-                                },
-                                onClick = {
-                                    onSubmissionSelected(submissions[index].id)
-                                    isExpanded = false
-                                }
-                            )
-                        }
-                    }
-                }
             }
-
             IconButton(
                 onClick = onNextClicked,
             ) {
@@ -115,7 +90,7 @@ fun SubmissionReviewTopRow(
             modifier = Modifier.align(Alignment.CenterEnd)
         ) {
             Text(
-                text = "Submit Review"
+                text = if(currentSubmission.isReviewed) "Update Review" else "Submit Review"
             )
         }
     }

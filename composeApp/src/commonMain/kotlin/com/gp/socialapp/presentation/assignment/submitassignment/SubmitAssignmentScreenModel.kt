@@ -6,6 +6,7 @@ import com.gp.socialapp.data.assignment.model.Assignment
 import com.gp.socialapp.data.assignment.model.AssignmentAttachment
 import com.gp.socialapp.data.assignment.model.UserAssignmentSubmission
 import com.gp.socialapp.data.assignment.repository.AssignmentRepository
+import com.gp.socialapp.data.assignment.source.remote.model.request.AssignmentRequest
 import com.gp.socialapp.data.auth.repository.AuthenticationRepository
 import com.gp.socialapp.util.Result
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -127,7 +128,7 @@ class SubmitAssignmentScreenModel(
 
     private fun turnInAssignment(userAssignmentId: String, assignmentId: String) {
         screenModelScope.launch {
-            when(val result = assignmentRepository.turnInAssignments(userAssignmentId)){
+            when(val result = assignmentRepository.turnInAssignments(request = AssignmentRequest.TurnInAssignments(userAssignmentId,assignmentId))){
                 is Result.Error -> println(result.message)
                 Result.Loading -> {}
                 is Result.Success -> {

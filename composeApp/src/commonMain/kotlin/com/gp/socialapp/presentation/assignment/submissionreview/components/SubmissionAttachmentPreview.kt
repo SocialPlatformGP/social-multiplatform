@@ -66,7 +66,7 @@ fun SubmissionAttachmentPreview(
         Box {
             if (attachment == null) {
                 Text(
-                    text = attachment?.name ?: "No attachment selected",
+                    text = attachment?.name ?: "",
                     style = MaterialTheme.typography.headlineMedium,
                     modifier = Modifier.align(Alignment.Center)
                 )
@@ -78,11 +78,10 @@ fun SubmissionAttachmentPreview(
                         ImagePreview(attachment = attachment.copy(url = BASE_URL + attachment.url))
                     }
 
-                    is MimeType.Application -> {
-                        if (mimetype == MimeType.Application.PDF)
-                            PdfPreview(
-                                attachment = attachment.copy(url = BASE_URL + attachment.url)
-                            )
+                    MimeType.Application.PDF -> {
+                        PdfPreview(
+                            attachment = attachment.copy(url = BASE_URL + attachment.url)
+                        )
                     }
 
                     else -> {
@@ -116,14 +115,14 @@ fun DefaultAttachmentPreview(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
-                    text = "No preview available for this attachment type.",
+                    text = "No preview available for this attachment type. Download to view.",
                     style = MaterialTheme.typography.headlineSmall,
                     modifier = Modifier.padding(8.dp)
                 )
                 Spacer(Modifier.size(16.dp))
-                Row (
+                Row(
                     modifier = Modifier.fillMaxWidth()
-                ){
+                ) {
                     Spacer(Modifier.weight(1f))
                     Button(
                         onClick = { onDownloadClicked(attachment) },

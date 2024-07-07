@@ -7,9 +7,15 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class CalendarEvent(
-    val date: Long,
-    val title: String,
-    val type: String,
-    val description: String,
+    val date: Long=0L,
+    val title: String = "",
+    val time : Long = 0L,
+    val type: String = "Event",
+    val description: String = "",
+    val location : String = "Online",
+    val user: String = "",
+    val communityId: String = "",
+    val isPrivate: Boolean = true,
+
 )
 

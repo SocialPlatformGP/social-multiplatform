@@ -35,6 +35,7 @@ class AssignmentHomeScreenModel(
         }
     }
 
+
     private fun getAssignments(id: String, communityId: String) {
         screenModelScope.launch {
             assignmentRepo.getAssignments(id).collect { result ->
