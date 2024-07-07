@@ -45,6 +45,9 @@ data class SubmissionReviewScreen(
         val uiState by screenModel.uiState.collectAsState()
         LifecycleEffect(onStarted = { screenModel.init(assignmentId, submissionId) },
             onDisposed = { screenModel.onDispose() })
+        if (uiState.submissions.isEmpty()) {
+            return
+        }
         SubmissionReviewContent(
             onAction = { action ->
                 when (action) {
@@ -52,6 +55,7 @@ data class SubmissionReviewScreen(
                     else -> screenModel.submitAction(action)
                 }
             },
+            initialSubmissionId = submissionId,
             assignmentTitle = uiState.currentAssignment.title,
             maxAssignmentGrade = uiState.currentAssignment.maxPoints,
             submissions = uiState.submissions,
@@ -66,36 +70,41 @@ data class SubmissionReviewScreen(
         onAction: (action: SubmissionReviewUiAction) -> Unit,
         assignmentTitle: String,
         maxAssignmentGrade: Int,
+        initialSubmissionId: String,
         submissions: List<UserAssignmentSubmission>,
         currentPreviewedAttachmentId: String,
         scope: CoroutineScope = rememberCoroutineScope()
     ) {
+
         val pagerState = rememberPagerState(
-            initialPage = submissions.indexOfFirst { it.id == submissionId }.let { if (it == -1) 0 else it },
+            initialPage = submissions.indexOfFirst { it.id == initialSubmissionId },
             pageCount = { submissions.size },
         )
-        val currentSubmission = submissions.getOrNull(pagerState.currentPage)?:UserAssignmentSubmission()
-        Scaffold(modifier = modifier, topBar = {
-            TopAppBar(title = {
-                Text(
-                    text = assignmentTitle,
-                    maxLines = 1,
-                    style = MaterialTheme.typography.headlineSmall
-                )
-            }, navigationIcon = {
-                IconButton(onClick = { onAction(SubmissionReviewUiAction.BackPressed) }) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowBackIosNew,
-                        contentDescription = "Back"
+        val currentSubmission =
+            submissions.getOrNull(pagerState.currentPage) ?: UserAssignmentSubmission()
+        Scaffold(
+            modifier = modifier,
+            topBar = {
+                TopAppBar(title = {
+                    Text(
+                        text = assignmentTitle,
+                        maxLines = 1,
+                        style = MaterialTheme.typography.headlineSmall
                     )
-                }
-            })
-        }) { paddingValues ->
+                }, navigationIcon = {
+                    IconButton(onClick = { onAction(SubmissionReviewUiAction.BackPressed) }) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBackIosNew,
+                            contentDescription = "Back"
+                        )
+                    }
+                })
+            }) { paddingValues ->
             Column(
                 modifier = Modifier.padding(paddingValues)
             ) {
-                //Top Row (newt, previous , user dropdown menu, submit grade)
-                SubmissionReviewTopRow(currentSubmission = currentSubmission,
+                SubmissionReviewTopRow(
+                    currentSubmission = currentSubmission,
                     submissions = submissions,
                     onSubmitReviewClicked = {
                         onAction(SubmissionReviewUiAction.SubmitReview)
@@ -109,24 +118,24 @@ data class SubmissionReviewScreen(
                     },
                     onPreviousClicked = {
                         scope.launch {
-                            if (pagerState.currentPage > 0) {
-                                pagerState.animateScrollToPage(pagerState.currentPage - 1)
-                                onAction(SubmissionReviewUiAction.ViewPrevious(submissions[pagerState.currentPage - 1].id))
-                            }
+                            val index =
+                                (pagerState.currentPage - 1 + submissions.size) % submissions.size
+                            pagerState.animateScrollToPage(index)
+                            onAction(SubmissionReviewUiAction.ViewPrevious(submissions[index].id))
+
                         }
                     },
                     onNextClicked = {
                         scope.launch {
-                            if (pagerState.currentPage < submissions.size - 1) {
-                                pagerState.animateScrollToPage(pagerState.currentPage + 1)
-                                onAction(SubmissionReviewUiAction.ViewNext(submissions[pagerState.currentPage + 1].id))
-                            }
+                            val index = (pagerState.currentPage + 1) % submissions.size
+                            pagerState.animateScrollToPage(index)
+                            onAction(SubmissionReviewUiAction.ViewNext(submissions[index].id))
+
                         }
                     })
                 HorizontalPager(
                     state = pagerState, modifier = Modifier.fillMaxSize()
                 ) { page ->
-                    //Row(Attachment Preview, Side Column)
                     Row(
                         modifier = Modifier.fillMaxWidth()
                     ) {
@@ -140,7 +149,6 @@ data class SubmissionReviewScreen(
                                 }
                             }
                         )
-                        //Side Column (Submission Details, Comments, Grade, Feedback)
                         SubmissionReviewSideColumn(currentSubmission = currentSubmission,
                             currentPreviewedAttachmentId = currentPreviewedAttachmentId,
                             maxAssignmentGrade = maxAssignmentGrade,

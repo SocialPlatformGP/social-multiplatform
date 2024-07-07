@@ -29,7 +29,7 @@ object LocalDateTimeUtil {
         return "${localDateTime.hour}:${localDateTime.minute}"
     }
 
-    fun Long.toLocalDateTime() = Instant.fromEpochMilliseconds(this).toLocalDateTime(TimeZone.UTC)
+    fun Long.toLocalDateTime() = Instant.fromEpochMilliseconds(this).toLocalDateTime(TimeZone.currentSystemDefault())
     fun Long.getDateHeader(): String {
         val localDateTime = Instant.fromEpochMilliseconds(this).toLocalDateTime(TimeZone.UTC)
         val today = LocalDateTime.now().date
@@ -60,7 +60,7 @@ object LocalDateTimeUtil {
     }
 
     fun Long.getSubmissionFormattedDate(): String {
-        val localDateTime = Instant.fromEpochMilliseconds(this).toLocalDateTime(TimeZone.UTC)
+        val localDateTime = Instant.fromEpochMilliseconds(this).toLocalDateTime(TimeZone.currentSystemDefault())
         val today = LocalDateTime.now().date
         return this.getDateHeader() + ", " + this.toHHMMTimestamp()
     }

@@ -164,11 +164,11 @@ class AssignmentRemoteDataSourceImpl(
         }
     }
 
-    override suspend fun turnInAssignments(userAssignmentId: String): Result<Boolean,AssignmentError> {
+    override suspend fun turnInAssignments(request: AssignmentRequest.TurnInAssignments): Result<Boolean,AssignmentError> {
         return try {
             val response = httpClient.post {
                 endPoint("turnInAssignment")
-                setBody(userAssignmentId)
+                setBody(request)
             }
             if (response.status == HttpStatusCode.OK) {
                 Result.Success(true)

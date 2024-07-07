@@ -13,6 +13,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -203,7 +205,7 @@ fun AssignmentItem(
     action: (AssignmentHomeUiAction) -> Unit,
     isSizeCompact: Boolean
 ) {
-    OutlinedCard(
+    Card(
         onClick = { action(AssignmentHomeUiAction.OnAssignmentClicked(assignment)) },
         modifier = modifier
             .fillMaxWidth()
@@ -213,7 +215,9 @@ fun AssignmentItem(
                 top = 4.dp,
                 bottom = 4.dp
             ),
-
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+        )
         ) {
         println("Compact?: $isSizeCompact")
 
@@ -268,4 +272,7 @@ fun AssignmentItem(
             }
         }
     }
+    HorizontalDivider(
+        Modifier.fillMaxWidth().padding( horizontal = 8.dp),
+    )
 }
