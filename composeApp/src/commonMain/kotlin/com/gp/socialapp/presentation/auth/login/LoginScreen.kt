@@ -54,13 +54,10 @@ import com.gp.socialapp.presentation.auth.login.components.MyOAuthProvider
 import com.gp.socialapp.presentation.auth.login.components.OAuthProviderItem
 import com.gp.socialapp.presentation.auth.login.components.imagevectors.OAuthProviderIcons
 import com.gp.socialapp.presentation.auth.login.components.imagevectors.oauthprovidericons.Discord
-import com.gp.socialapp.presentation.auth.login.components.imagevectors.oauthprovidericons.Facebook
 import com.gp.socialapp.presentation.auth.login.components.imagevectors.oauthprovidericons.Github
 import com.gp.socialapp.presentation.auth.login.components.imagevectors.oauthprovidericons.Google
-import com.gp.socialapp.presentation.auth.login.components.imagevectors.oauthprovidericons.Linkedin
 import com.gp.socialapp.presentation.auth.login.components.imagevectors.oauthprovidericons.Microsoft
 import com.gp.socialapp.presentation.auth.login.components.imagevectors.oauthprovidericons.Slack
-import com.gp.socialapp.presentation.auth.login.components.imagevectors.oauthprovidericons.Twitter
 import com.gp.socialapp.presentation.auth.passwordreset.PasswordResetScreen
 import com.gp.socialapp.presentation.auth.signup.SignUpScreen
 import com.gp.socialapp.presentation.auth.util.AuthError.EmailError
@@ -72,13 +69,11 @@ import com.gp.socialapp.theme.LocalThemeIsDark
 import com.gp.socialapp.util.getPlatform
 import io.github.jan.supabase.gotrue.providers.Azure
 import io.github.jan.supabase.gotrue.providers.Discord
-import io.github.jan.supabase.gotrue.providers.Facebook
 import io.github.jan.supabase.gotrue.providers.Github
 import io.github.jan.supabase.gotrue.providers.Google
-import io.github.jan.supabase.gotrue.providers.LinkedIn
 import io.github.jan.supabase.gotrue.providers.OAuthProvider
 import io.github.jan.supabase.gotrue.providers.Slack
-import io.github.jan.supabase.gotrue.providers.Twitter
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import socialmultiplatform.composeapp.generated.resources.Res
@@ -100,6 +95,8 @@ object LoginScreen : Screen {
         val state by screenModel.uiState.collectAsState()
         var isDark by LocalThemeIsDark.current
         val isSystemInDarkTheme = isSystemInDarkTheme()
+        var statesplashShowed by remember { mutableStateOf(false) }
+        val scope = rememberCoroutineScope()
         isDark = when (state.theme) {
             AppThemeOptions.LIGHT.value -> {
                 false
@@ -113,33 +110,43 @@ object LoginScreen : Screen {
                 isSystemInDarkTheme
             }
         }
+
         LifecycleEffect(
             onStarted = { screenModel.init() },
             onDisposed = { screenModel.dispose() },
         )
-
-        if (state.signedInUser != null) {
-            navigator.replaceAll(HomeContainer())
-        } else {
-            val providers = listOf(
-                MyOAuthProvider("Google", OAuthProviderIcons.Google, Google),
-                MyOAuthProvider("Microsoft", OAuthProviderIcons.Microsoft, Azure),
-                MyOAuthProvider("GitHub", OAuthProviderIcons.Github, Github),
-                MyOAuthProvider("Discord", OAuthProviderIcons.Discord, Discord),
-                MyOAuthProvider("Slack", OAuthProviderIcons.Slack, Slack),
-            )
-            LoginContent(
-                oAuthProviders = providers,
-                onSignInWithOAuth = { provider -> screenModel.signInWithOAuth(provider) },
-                state = state,
-                navigateToSignUp = { navigator.push(SignUpScreen) },
-                navigateToForgotPassword = { navigator.push(PasswordResetScreen) },
-                onEmailChange = { screenModel.updateEmail(it) },
-                onPasswordChange = { screenModel.updatePassword(it) },
-                onSignIn = { screenModel.onSignIn() },
-            )
+        if(!statesplashShowed){
+            SplashScreen()
+            scope.launch {
+                delay(3000)
+                statesplashShowed = true
+            }
+        }else {
+            if (state.signedInUser != null) {
+                navigator.replaceAll(HomeContainer())
+            } else {
+                val providers = listOf(
+                    MyOAuthProvider("Google", OAuthProviderIcons.Google, Google),
+                    MyOAuthProvider("Microsoft", OAuthProviderIcons.Microsoft, Azure),
+                    MyOAuthProvider("GitHub", OAuthProviderIcons.Github, Github),
+                    MyOAuthProvider("Discord", OAuthProviderIcons.Discord, Discord),
+                    MyOAuthProvider("Slack", OAuthProviderIcons.Slack, Slack),
+                )
+                LoginContent(
+                    oAuthProviders = providers,
+                    onSignInWithOAuth = { provider -> screenModel.signInWithOAuth(provider) },
+                    state = state,
+                    navigateToSignUp = { navigator.push(SignUpScreen) },
+                    navigateToForgotPassword = { navigator.push(PasswordResetScreen) },
+                    onEmailChange = { screenModel.updateEmail(it) },
+                    onPasswordChange = { screenModel.updatePassword(it) },
+                    onSignIn = { screenModel.onSignIn() },
+                )
+            }
         }
     }
+
+
 
     @OptIn(ExperimentalLayoutApi::class)
     @Composable

@@ -36,6 +36,8 @@ class LoginScreenModel(
         println("LoginScreenModel init called " + AppThemeOptions.SYSTEM_DEFAULT.value)
     }
 
+
+
     private fun getTheme() {
         screenModelScope.launch {
             userRepo.getTheme().let { result ->
