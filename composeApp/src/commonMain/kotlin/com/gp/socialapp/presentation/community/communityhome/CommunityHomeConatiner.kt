@@ -13,10 +13,9 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
@@ -25,7 +24,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -41,7 +39,6 @@ import cafe.adriel.voyager.navigator.tab.TabNavigator
 import com.gp.socialapp.data.auth.source.remote.model.User
 import com.gp.socialapp.data.community.source.remote.model.Community
 import com.gp.socialapp.navigation.tabs.AssignmentsTab
-import com.gp.socialapp.navigation.tabs.CommunitiesTab
 import com.gp.socialapp.navigation.tabs.CommunityMembersTab
 import com.gp.socialapp.navigation.tabs.CreatorGradesTab
 import com.gp.socialapp.navigation.tabs.MaterialTab
@@ -50,12 +47,10 @@ import com.gp.socialapp.navigation.util.BottomTabNavigationItem
 import com.gp.socialapp.presentation.auth.login.LoginScreen
 import com.gp.socialapp.presentation.community.communityhome.components.CommunitySideMenu
 import com.gp.socialapp.presentation.community.communityhome.components.MainTopBar
-import com.gp.socialapp.presentation.home.components.SideMenu
 import com.gp.socialapp.presentation.home.container.HomeContainer
 import com.gp.socialapp.presentation.post.search.SearchScreen
 import com.gp.socialapp.presentation.settings.MainSettingsScreen
 import com.gp.socialapp.util.clickableWithoutRipple
-import kotlinx.coroutines.launch
 
 
 data class CommunityHomeContainer(
@@ -77,7 +72,7 @@ data class CommunityHomeContainer(
         }
         CommunityHomeContainerContent(currentUser = state.currentUser,
             userCommunities = state.userCommunities,
-            onNavigateToHome = { navigator.replaceAll(HomeContainer(communityId=communityId)) },
+            onNavigateToHome = { navigator.replaceAll(HomeContainer()) },
             onNavigateToSearch = { navigator.push(SearchScreen) },
             onNavigateToSettings = { navigator.push(MainSettingsScreen) },
             onLogout = { screenModel.logout() })
@@ -106,14 +101,14 @@ data class CommunityHomeContainer(
         val isDesktop = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Expanded
         var showDrawer by remember { mutableStateOf(false) }
         val mainContentAlpha by animateFloatAsState(if (showDrawer) 0.6f else 1f)
-        val menuTabs = mutableListOf<Tab>().apply{
+        val menuTabs = mutableListOf<Tab>().apply {
             add(PostsTab(communityId, onNavigation))
             add(MaterialTab(communityId))
-            if(userCommunities.find { it.id == communityId }?.members?.get(currentUser.id) == true){
+            if (userCommunities.find { it.id == communityId }?.members?.get(currentUser.id) == true) {
                 add(AssignmentsTab(onNavigation, communityId))
             }
             add(CommunityMembersTab(communityId))
-            if(userCommunities.find { it.id == communityId }?.members?.get(currentUser.id) == true) {
+            if (userCommunities.find { it.id == communityId }?.members?.get(currentUser.id) == true) {
                 add(CreatorGradesTab(communityId))
             }
         }
@@ -127,8 +122,7 @@ data class CommunityHomeContainer(
                         CommunitySideMenu(
                             user = currentUser,
                             onLogout = onLogout,
-                            communityId = communityId,
-                            communities = userCommunities,
+
                             onNavigateToSettings = {
                                 onNavigateToSettings()
                             },
@@ -146,7 +140,11 @@ data class CommunityHomeContainer(
                         content = { paddingValues ->
 
                             Column(
-                                modifier = Modifier.padding(if (isBarsVisible) paddingValues else PaddingValues(0.dp)),
+                                modifier = Modifier.padding(
+                                    if (isBarsVisible) paddingValues else PaddingValues(
+                                        0.dp
+                                    )
+                                ),
 
                                 ) {
                                 CurrentTab()
@@ -171,9 +169,14 @@ data class CommunityHomeContainer(
                                 })
                             }
                         }, bottomBar = {
-                            if (isBarsVisible && !isDesktop){
+                            if (isBarsVisible && !isDesktop) {
                                 NavigationBar {
-                                    BottomTabNavigationItem(tab = PostsTab(communityId, onNavigation))
+                                    BottomTabNavigationItem(
+                                        tab = PostsTab(
+                                            communityId,
+                                            onNavigation
+                                        )
+                                    )
                                     BottomTabNavigationItem(tab = MaterialTab(communityId))
                                     if (userCommunities.find { it.id == communityId }?.members?.get(
                                             currentUser.id
@@ -204,15 +207,16 @@ data class CommunityHomeContainer(
                     CommunitySideMenu(
                         user = currentUser,
                         onLogout = onLogout,
-                        communityId = communityId,
-                        communities = userCommunities,
+
                         onNavigateToSettings = {
                             onNavigateToSettings()
                         },
                         onNavigateToHome = {
                             onNavigateToHome()
                         },
-                        windowWidthSizeClass = windowSizeClass.widthSizeClass
+                        windowWidthSizeClass = windowSizeClass.widthSizeClass,
+                        backgroundColor = MaterialTheme.colorScheme.surface
+
                     )
                 }
             }

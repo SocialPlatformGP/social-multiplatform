@@ -22,6 +22,7 @@ fun TopRow(
     isAuthor: Boolean,
     onEditPostClicked: () -> Unit,
     onDeletePostClicked: () -> Unit,
+    onReportPostClicked: () -> Unit,
     onUserClick: () -> Unit
 ) {
     Row(
@@ -50,6 +51,7 @@ fun TopRow(
         OptionButton(
             onEditPostClicked = onEditPostClicked,
             onDeletePostClicked = onDeletePostClicked,
+            onReportPostClicked = onReportPostClicked,
             isAuthor = isAuthor
         )
     }

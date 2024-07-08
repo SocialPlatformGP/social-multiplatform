@@ -1,7 +1,6 @@
 package com.gp.socialapp.data.post.source.remote.model
 
 import com.gp.socialapp.util.LocalDateTimeUtil.now
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
@@ -16,12 +15,13 @@ data class Reply(
     val content: String = "",
     val votes: Int = 0,
     val depth: Int = -1,
-    val createdAt: Long = LocalDateTime.now().toInstant(TimeZone.UTC).epochSeconds,
+    val createdAt: Long = LocalDateTime.now().toInstant(TimeZone.UTC).toEpochMilliseconds(),
     val deleted: Boolean = false,
     val upvoted: List<String> = emptyList(),
     val downvoted: List<String> = emptyList(),
     val authorName: String = "",
     val authorImageLink: String = "",
     val collapsed: Boolean = false,
-    val editStatus: Boolean = false
+    val editStatus: Boolean = false,
+    val moderationStatus: String = "SAFE"
 )

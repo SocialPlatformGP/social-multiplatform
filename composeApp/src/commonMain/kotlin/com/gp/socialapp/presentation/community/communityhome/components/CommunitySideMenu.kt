@@ -56,14 +56,14 @@ import compose.icons.tablericons.Settings
 fun CommunitySideMenu(
     modifier: Modifier = Modifier,
     user: User,
-    communityId: String,
-    communities: List<Community>,
+
     onNavigateToHome: () -> Unit,
     onNavigateToSettings: () -> Unit,
     onLogout: () -> Unit,
     windowWidthSizeClass: WindowWidthSizeClass,
     menuTabs: List<Tab> = emptyList(),
-    isDesktop: Boolean = false
+    isDesktop: Boolean = false,
+    backgroundColor: Color = Color.Transparent
 ) {
     var menuState by remember(windowWidthSizeClass) { mutableStateOf(SideMenuState.Expanded) }
     val menuWidthAnimation by animateDpAsState(
@@ -78,7 +78,7 @@ fun CommunitySideMenu(
                 .fillMaxHeight()
                 .verticalScroll(rememberScrollState())
                 .widthIn(max = menuWidthAnimation)
-                .disableClickAndRipple()
+                .disableClickAndRipple().background(backgroundColor)
         ) {
             if (user.profilePictureURL.isNotBlank())
                 AutoSizeImage(

@@ -31,12 +31,12 @@ class ReplyRemoteDataSourceImpl(
                 success(Unit)
             } else {
                 val serverError = response.body<ReplyError>()
-                error(serverError)
+                Result.Error(serverError)
 
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            error(ReplyError.SERVER_ERROR)
+            Result.Error(ReplyError.SERVER_ERROR)
         }
 
 
@@ -75,11 +75,11 @@ class ReplyRemoteDataSourceImpl(
                 success(Unit)
             } else {
                 val serverError = response.body<ReplyError>()
-                error(serverError)
+                Result.Error(serverError)
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            error(ReplyError.SERVER_ERROR)
+            Result.Error(ReplyError.SERVER_ERROR)
         }
 
 
@@ -95,11 +95,11 @@ class ReplyRemoteDataSourceImpl(
                 success(Unit)
             } else {
                 val message = response.body<ReplyError>()
-                error(message)
+                Result.Error(message)
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            error(ReplyError.SERVER_ERROR)
+            Result.Error(ReplyError.SERVER_ERROR)
         }
 
 
@@ -115,11 +115,11 @@ class ReplyRemoteDataSourceImpl(
                 success(Unit)
             } else {
                 val serverError = response.body<ReplyError>()
-                error(serverError)
+                Result.Error(serverError)
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            error(ReplyError.SERVER_ERROR)
+            Result.Error(ReplyError.SERVER_ERROR)
         }
 
 
@@ -135,11 +135,11 @@ class ReplyRemoteDataSourceImpl(
                 success(Unit)
             } else {
                 val serverError = response.body<ReplyError>()
-                error(serverError)
+                Result.Error(serverError)
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            error(ReplyError.SERVER_ERROR)
+            Result.Error(ReplyError.SERVER_ERROR)
         }
 
 
@@ -152,15 +152,16 @@ class ReplyRemoteDataSourceImpl(
                 )
             }
             val message = response.bodyAsText()
+            println("reportReply: $message")
             if (response.status == HttpStatusCode.OK) {
                 success(Unit)
             } else {
                 val serverError = response.body<ReplyError>()
-                error(serverError)
+                Result.Error(serverError)
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            error(ReplyError.SERVER_ERROR)
+            Result.Error(ReplyError.SERVER_ERROR)
         }
 
 }

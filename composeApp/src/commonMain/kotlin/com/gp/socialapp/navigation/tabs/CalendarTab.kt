@@ -16,7 +16,7 @@ import kotlin.jvm.Transient
 data class CalendarTab(
     @Transient
     private val onNavigation: (Boolean) -> Unit,
-    val communityId: String,
+    val communityId: String=""
 ): Tab {
     override val options: TabOptions
     @Composable

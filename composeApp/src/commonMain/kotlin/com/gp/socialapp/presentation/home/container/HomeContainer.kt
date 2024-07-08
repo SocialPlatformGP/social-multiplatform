@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
@@ -50,7 +51,7 @@ import com.gp.socialapp.presentation.settings.MainSettingsScreen
 import com.gp.socialapp.util.clickableWithoutRipple
 
 data class HomeContainer(
-    val startingTab: HomeTab = HomeTab.COMMUNITIES
+    val startingTab: HomeTab = HomeTab.COMMUNITIES,
 ) : Screen {
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     @Composable
@@ -167,7 +168,8 @@ data class HomeContainer(
                         onNavigateToSettings = {
                             navigator.push(MainSettingsScreen)
                         },
-                        windowWidthSizeClass = windowSizeClass.widthSizeClass
+                        windowWidthSizeClass = windowSizeClass.widthSizeClass,
+                        backgroundColor = MaterialTheme.colorScheme.surface
                     )
                 }
             }

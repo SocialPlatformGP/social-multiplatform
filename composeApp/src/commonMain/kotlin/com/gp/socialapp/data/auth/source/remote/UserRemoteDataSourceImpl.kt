@@ -14,6 +14,7 @@ import com.gp.socialapp.util.Result
 import com.gp.socialapp.util.UserError
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.gotrue.auth
+import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.storage.storage
 import io.ktor.client.HttpClient
@@ -45,9 +46,14 @@ class UserRemoteDataSourceImpl(
                     put(UserData.IS_DATA_COMPLETE.value, true)
                 }
             }
+            val userRooms = UserRooms(
+                userId = user.id,
+            )
+            supabaseClient.from("user_rooms").insert(userRooms)
             Result.Success(Unit)
         } catch (e: Exception) {
             e.printStackTrace()
+            println("Error: ${e.message}")
             Result.Error(UserError.SERVER_ERROR)
         }
     }

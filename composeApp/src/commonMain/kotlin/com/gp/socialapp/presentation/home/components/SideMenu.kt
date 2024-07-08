@@ -64,6 +64,7 @@ fun SideMenu(
     onLogOut: () -> Unit,
     onNavigateToSettings: () -> Unit,
     windowWidthSizeClass: WindowWidthSizeClass,
+    backgroundColor: Color = Color.Transparent
 ) {
     var menuState by remember(windowWidthSizeClass) { mutableStateOf(SideMenuState.Expanded) }
     val menuWidthAnimation by animateDpAsState(
@@ -77,6 +78,7 @@ fun SideMenu(
                 .verticalScroll(rememberScrollState())
                 .widthIn(max = menuWidthAnimation)
                 .disableClickAndRipple()
+                .background(backgroundColor)
         ) {
             if (userProfilePictureUrl.isNotBlank())
                 AutoSizeImage(
