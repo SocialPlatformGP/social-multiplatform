@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.CircularProgressIndicator
@@ -20,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
@@ -30,6 +32,9 @@ import com.mohamedrejeb.calf.picker.FilePickerFileType
 import com.seiko.imageloader.model.ImageAction
 import com.seiko.imageloader.rememberImageSuccessPainter
 import com.seiko.imageloader.ui.AutoSizeBox
+import compose.icons.FontAwesomeIcons
+import compose.icons.fontawesomeicons.Solid
+import compose.icons.fontawesomeicons.solid.ExclamationTriangle
 
 @Composable
 fun ResultItemContent(
@@ -68,7 +73,9 @@ fun ResultItemContent(
                     .clickable {
                         onImageClicked(imageURL)
                     }
-                    .background(Color.Transparent),
+                    .clip(
+                        RoundedCornerShape(16.dp)
+                    ).background(MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f)),
                 contentAlignment = Alignment.CenterEnd
             ) {
                 AutoSizeBox(imageURL) { action ->
@@ -79,22 +86,19 @@ fun ResultItemContent(
                                 contentDescription = null,
                                 modifier = Modifier
                                     .align(Alignment.Center).fillMaxSize(),
-                                contentScale = ContentScale.Fit
+                                contentScale = ContentScale.FillHeight
                             )
                         }
 
                         is ImageAction.Loading -> {
-                            CircularProgressIndicator(
-                                modifier = Modifier
-                                    .align(Alignment.Center)
-                            )
+                            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                         }
+
                         is ImageAction.Failure -> {
                             Icon(
-                                imageVector = Icons.Filled.Error,
+                                imageVector = FontAwesomeIcons.Solid.ExclamationTriangle,
                                 contentDescription = null,
-                                modifier = Modifier
-                                    .align(Alignment.Center),
+                                modifier = Modifier.size(36.dp).align(Alignment.Center),
                             )
                         }
                     }

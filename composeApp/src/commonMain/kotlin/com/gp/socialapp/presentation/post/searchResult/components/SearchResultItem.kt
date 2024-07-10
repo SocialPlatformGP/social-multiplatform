@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.gp.socialapp.data.post.source.remote.model.Post
+import com.gp.socialapp.presentation.post.feed.components.PostTopRow
 
 @Composable
 fun SearchResultItem(
@@ -33,11 +34,16 @@ fun SearchResultItem(
                 .fillMaxWidth()
                 .wrapContentHeight()
         ) {
-            ResultItemTopRow(
+            PostTopRow(
                 imageUrl = item.authorPfp,
                 userName = item.authorName,
                 publishedAt = item.createdAt.toString(),
-                onPostAuthorClicked = { onPostAuthorClicked(item.authorID) }
+                isAuthor = false,
+                onEditPostClicked = {},
+                onDeletePostClicked = {},
+                onReportPostClicked = {},
+                onUserClick = { onPostAuthorClicked(item.authorID)
+                }
             )
             ResultItemContent(
                 title = item.title,
@@ -47,6 +53,7 @@ fun SearchResultItem(
             ResultItemBottomRow(
                 voteCount = item.votes,
                 replyCount = item.replyCount,
+                attachmentCount = item.attachments.size
             )
         }
     }

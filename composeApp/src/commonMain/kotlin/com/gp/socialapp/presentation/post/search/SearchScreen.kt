@@ -34,6 +34,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gp.socialapp.presentation.post.search.components.RecentSearchesSection
 import com.gp.socialapp.presentation.post.searchResult.SearchResultScreen
+import sun.jvm.hotspot.oops.CellTypeState.top
 
 object SearchScreen : Screen {
     @Composable
@@ -115,11 +116,11 @@ object SearchScreen : Screen {
                     )
                 }
             }
-        ) {
+        ) { paddingValues ->
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(it)
+                    .padding(paddingValues)
                     .padding(top = 8.dp)
                     .padding(horizontal = 16.dp)
             ) {
@@ -131,15 +132,13 @@ object SearchScreen : Screen {
                     )
                 } else {
                     LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                        items(suggestionItems.size) {
+                        items(suggestionItems.size) { index ->
                             Text(
-                                text = suggestionItems[it],
+                                text = suggestionItems[index],
                                 modifier = Modifier.padding(
-                                    start = 8.dp,
-                                    top = 4.dp,
-                                    end = 8.dp,
-                                    bottom = 4.dp
-                                ).clickable { onSearchItemClick(suggestionItems[it]) }
+                                    horizontal = 8.dp,
+                                    vertical = 4.dp
+                                ).clickable { onSearchItemClick(suggestionItems[index]) }.fillMaxWidth()
                             )
                         }
                     }

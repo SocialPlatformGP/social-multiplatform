@@ -3,7 +3,6 @@ package com.gp.socialapp.presentation.post.feed.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -15,7 +14,7 @@ import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.UserCircle
 
 @Composable
-fun TopRow(
+fun PostTopRow(
     imageUrl: String,
     userName: String,
     publishedAt: String,
@@ -23,7 +22,7 @@ fun TopRow(
     onEditPostClicked: () -> Unit,
     onDeletePostClicked: () -> Unit,
     onReportPostClicked: () -> Unit,
-    onUserClick: () -> Unit
+    onUserClick: () -> Unit,
 ) {
     Row(
         modifier = Modifier.background(Color.Transparent),

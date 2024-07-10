@@ -40,7 +40,7 @@ fun FeedPostItem(
                 Column(
                     modifier = Modifier.fillMaxWidth().wrapContentHeight()
                 ) {
-                    TopRow(
+                    PostTopRow(
                         imageUrl = post.authorPfp,
                         userName = post.authorName,
                         publishedAt = post.createdAt.getPostDate(),
