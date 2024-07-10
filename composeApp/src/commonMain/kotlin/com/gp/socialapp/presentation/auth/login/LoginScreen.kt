@@ -97,6 +97,11 @@ object LoginScreen : Screen {
         val isSystemInDarkTheme = isSystemInDarkTheme()
         var statesplashShowed by remember { mutableStateOf(false) }
         val scope = rememberCoroutineScope()
+
+        LifecycleEffect(
+            onStarted = { screenModel.init() },
+            onDisposed = { screenModel.dispose() },
+        )
         isDark = when (state.theme) {
             AppThemeOptions.LIGHT.value -> {
                 false
@@ -107,14 +112,9 @@ object LoginScreen : Screen {
             }
 
             else -> {
-                isSystemInDarkTheme
+                !isSystemInDarkTheme
             }
         }
-
-        LifecycleEffect(
-            onStarted = { screenModel.init() },
-            onDisposed = { screenModel.dispose() },
-        )
         if(!statesplashShowed){
             SplashScreen()
             scope.launch {

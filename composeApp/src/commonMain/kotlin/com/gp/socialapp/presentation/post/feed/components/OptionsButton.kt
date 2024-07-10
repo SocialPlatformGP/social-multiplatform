@@ -35,9 +35,7 @@ fun OptionButton(
             onClick = { expanded = !expanded },
             modifier = Modifier
                 .padding(
-                    start = 8.dp,
-                    end = 8.dp,
-                    bottom = 2.dp
+                    horizontal = 8.dp,
                 )
         ) {
             Icon(

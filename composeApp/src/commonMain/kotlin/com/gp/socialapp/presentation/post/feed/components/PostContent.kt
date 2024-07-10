@@ -13,7 +13,6 @@ fun PostContent(
     title: String,
     body: String,
     attachments: List<PostAttachment>,
-    moderationStatus: String,
     onPostEvent: (PostEvent) -> Unit
 ) {
     BoxWithConstraints {

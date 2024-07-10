@@ -3,6 +3,7 @@ package com.gp.socialapp.presentation.post.feed.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -18,13 +19,13 @@ fun TagsFlowRow(
     if (selectedTags.isEmpty()) return
     FlowRow(
         horizontalArrangement = Arrangement.Start,
-        modifier = Modifier.padding(start = 8.dp)
     ) {
         selectedTags.toList().forEach { tag ->
             TagItem(
                 onTagClicked = onTagClicked,
                 tag = tag
             )
+            Spacer(modifier = Modifier.padding(2.dp))
         }
     }
 }

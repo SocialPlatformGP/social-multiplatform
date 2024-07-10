@@ -62,6 +62,7 @@ import com.gp.socialapp.presentation.material.utils.MimeType
 import com.gp.socialapp.presentation.post.create.CreatePostScreen
 import com.gp.socialapp.presentation.post.feed.components.FeedPostItem
 import com.gp.socialapp.presentation.post.feed.components.FilesBottomSheet
+import com.gp.socialapp.presentation.post.feed.components.isUnsafe
 import com.gp.socialapp.presentation.post.postDetails.PostDetailsScreen
 import com.gp.socialapp.presentation.post.search.SearchScreen
 import com.gp.socialapp.presentation.post.searchResult.SearchResultScreen
@@ -334,10 +335,12 @@ data class FeedScreen(val communityId: String) : Screen {
                 contentPadding = PaddingValues(vertical = 8.dp),
             ) {
                 items(posts) { post ->
-                    FeedPostItem(
-                        post = post, onPostEvent = onPostEvent, currentUserID = currentUserID
-                    )
-                    Spacer(modifier = Modifier.size(6.dp))
+                    if(!post.moderationStatus.isUnsafe()){
+                        FeedPostItem(
+                            post = post, onPostEvent = onPostEvent, currentUserID = currentUserID
+                        )
+                        Spacer(modifier = Modifier.size(6.dp))
+                    }
                 }
             }
         }

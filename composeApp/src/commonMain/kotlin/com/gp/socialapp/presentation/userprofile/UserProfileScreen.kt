@@ -45,6 +45,7 @@ import cafe.adriel.voyager.kodein.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gp.socialapp.presentation.post.feed.components.FeedPostItem
+import com.gp.socialapp.presentation.post.feed.components.isUnsafe
 import com.seiko.imageloader.rememberImagePainter
 
 data class UserProfileScreen(val userId: String) : Screen {
@@ -242,8 +243,10 @@ fun UserProfileContent(
             LazyColumn(
                 modifier = Modifier.fillMaxWidth()
             ) {
-                items(state.posts) {
-                    FeedPostItem(post = it, {}, "")
+                items(state.posts) { post ->
+                    if(!post.moderationStatus.isUnsafe()){
+                        FeedPostItem(post = post, {}, "")
+                    }
                 }
             }
         }

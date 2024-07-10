@@ -14,13 +14,6 @@ fun PostTitle(title: String) {
     if (title.isEmpty()) return
     Text(
         text = title,
-        modifier = Modifier.padding(
-            start = 8.dp,
-            end = 8.dp,
-            bottom = 2.dp
-        ),
-        fontSize = 16.sp,
-        fontWeight = FontWeight.Bold,
-        color = MaterialTheme.colorScheme.onSecondaryContainer
+        style = MaterialTheme.typography.titleMedium.copy(fontSize = 20.sp),
     )
 }

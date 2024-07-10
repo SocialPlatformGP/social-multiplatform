@@ -18,13 +18,12 @@ fun UserName(
         text = userName,
         modifier = Modifier
             .padding(
-                start = 4.dp,
+                start = 8.dp,
                 end = 8.dp,
             ).clickable { onClick() },
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
         softWrap = true,
         style = MaterialTheme.typography.titleMedium,
-        color = MaterialTheme.colorScheme.onPrimaryContainer
     )
 }
