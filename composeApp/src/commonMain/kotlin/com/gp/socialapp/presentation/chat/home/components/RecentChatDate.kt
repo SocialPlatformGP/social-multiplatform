@@ -15,7 +15,7 @@ import korlibs.time.DateTimeTz
 fun RecentChatDate(date: DateTimeTz) {
     Text(
         text = date.getRecentRoomTimestamp(),
-        style = MaterialTheme.typography.titleSmall,
+        style = MaterialTheme.typography.bodySmall,
         fontWeight = FontWeight.Normal,
         color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
         modifier = Modifier.padding(end = 8.dp)
