@@ -3,6 +3,7 @@ package com.gp.socialapp.presentation.post.feed.components
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.SuggestionChipDefaults
 import androidx.compose.material3.Text
@@ -31,8 +32,7 @@ fun TagItem(
         label = {
             Text(
                 text = tag.label,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.labelSmall,
                 color = Color.White
             )
         },
@@ -40,7 +40,6 @@ fun TagItem(
             .sizeIn(
                 maxHeight = 24.dp,
             )
-            .padding(2.dp)
 
     )
 }

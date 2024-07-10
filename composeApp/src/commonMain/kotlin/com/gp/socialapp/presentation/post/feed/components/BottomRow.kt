@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
@@ -16,6 +17,8 @@ import androidx.compose.material.icons.filled.Attachment
 import androidx.compose.material.icons.filled.KeyboardDoubleArrowDown
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.twotone.KeyboardDoubleArrowUp
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -29,6 +32,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.gp.socialapp.presentation.post.feed.components.icons.FeedIcons
+import com.gp.socialapp.presentation.post.feed.components.icons.feedicons.Attachment1
+import com.gp.socialapp.presentation.post.feed.components.icons.feedicons.Attachment2
+import com.gp.socialapp.presentation.post.feed.components.icons.feedicons.Comment
+import com.gp.socialapp.presentation.post.feed.components.icons.feedicons.Dislikefilled
+import com.gp.socialapp.presentation.post.feed.components.icons.feedicons.Dislikeoutlined
+import com.gp.socialapp.presentation.post.feed.components.icons.feedicons.Likefilled
+import com.gp.socialapp.presentation.post.feed.components.icons.feedicons.Likeoutlined
 
 @Composable
 fun BottomRow(
@@ -44,26 +55,31 @@ fun BottomRow(
     onShowFilesClicked: () -> Unit,
     onShareClicked: () -> Unit,
 ) {
+    val isUpvoted = upVotes.contains(currentUserID)
+    val isDownvoted = downVotes.contains(currentUserID)
+    val upvoteColor = MaterialTheme.colorScheme.onPrimaryContainer
+    val neutralColor = MaterialTheme.colorScheme.secondaryContainer
+    val downvoteColor = MaterialTheme.colorScheme.error
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(
-                start = 8.dp, end = 8.dp, bottom = 8.dp
-            )
+            .padding( top = 8.dp)
             .sizeIn(
                 maxHeight = 35.dp
             ),
         horizontalArrangement = Arrangement.Start
     ) {
-        OutlinedButton(
+        FilledTonalButton(
             onClick = onUpVoteClicked,
             contentPadding = PaddingValues(6.dp),
-            border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outline),
+            colors = ButtonDefaults.filledTonalButtonColors(
+                containerColor = if (isUpvoted) upvoteColor else if(isDownvoted) downvoteColor else neutralColor,
+                contentColor = if (isUpvoted || isDownvoted) Color.White else upvoteColor
+            ),
         ) {
             Icon(
-                imageVector = Icons.TwoTone.KeyboardDoubleArrowUp,
+                imageVector =if(isUpvoted) FeedIcons.Likefilled else FeedIcons.Likeoutlined,
                 contentDescription = "UpVote",
-                tint = if (upVotes.contains(currentUserID)) Color.Green else MaterialTheme.colorScheme.onPrimaryContainer,
                 modifier = Modifier
                     .clickable {
                         onUpVoteClicked()
@@ -80,17 +96,11 @@ fun BottomRow(
                     minWidth = 20.dp
                 ),
                 textAlign = TextAlign.Center,
-                color = when {
-                    upVotes.contains(currentUserID) -> Color.Green
-                    downVotes.contains(currentUserID) -> Color.Red
-                    else -> MaterialTheme.colorScheme.onPrimaryContainer
-                },
             )
             Spacer(modifier = Modifier.width(6.dp))
             Icon(
-                imageVector = Icons.Filled.KeyboardDoubleArrowDown,
+                imageVector = if(isDownvoted) FeedIcons.Dislikefilled else FeedIcons.Dislikeoutlined,
                 contentDescription = "DownVote",
-                tint = if (downVotes.contains(currentUserID)) Color.Red else MaterialTheme.colorScheme.onPrimaryContainer,
                 modifier = Modifier
                     .clickable {
                         onDownVoteClicked()
@@ -100,70 +110,65 @@ fun BottomRow(
 
         }
         Spacer(modifier = Modifier.width(16.dp))
-        OutlinedButton(
+        FilledTonalButton(
             onClick = onCommentClicked,
             contentPadding = PaddingValues(
                 horizontal = 12.dp,
-            ),
-            border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outline),
-
+            )
             ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
-                    imageVector = Icons.AutoMirrored.Outlined.Chat,
+                    imageVector = FeedIcons.Comment,
                     contentDescription = "Comment",
-                    tint = MaterialTheme.colorScheme.onPrimaryContainer
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                    modifier = Modifier.padding(horizontal = 8.dp).size(20.dp)
                 )
-                Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = commentCount.toString(),
                     style = TextStyle(
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp
                     ),
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                    modifier = Modifier.padding(end = 8.dp)
                 )
             }
         }
         if (filesCount > 0) {
             Spacer(modifier = Modifier.width(16.dp))
-            OutlinedButton(
+            FilledTonalButton(
                 onClick = onShowFilesClicked,
                 contentPadding = PaddingValues(
                     horizontal = 12.dp,
-                ),
-                border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outline),
-
+                )
                 ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Icon(
-                        imageVector = Icons.Filled.Attachment,
+                        imageVector = FeedIcons.Attachment2,
                         contentDescription = "Attachments",
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                        modifier = Modifier.padding(horizontal = 8.dp).size(24.dp)
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = filesCount.toString(),
                         style = TextStyle(
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
                             fontWeight = FontWeight.Bold,
                             fontSize = 16.sp
                         ),
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                        modifier = Modifier.padding(end = 8.dp)
                     )
                 }
             }
         }
         Spacer(modifier = Modifier.weight(1f))
-        OutlinedButton(
+        FilledTonalButton(
             onClick = onShareClicked,
-            contentPadding = PaddingValues(),
             enabled = false,
-            border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outline),
-
             ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -171,7 +176,7 @@ fun BottomRow(
                 Icon(
                     imageVector = Icons.Default.Share,
                     contentDescription = "Share Post",
-                    tint = MaterialTheme.colorScheme.onPrimaryContainer
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
                 )
             }
         }

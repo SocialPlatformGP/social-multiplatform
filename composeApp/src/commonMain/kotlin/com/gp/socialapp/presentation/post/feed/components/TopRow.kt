@@ -30,9 +30,8 @@ fun TopRow(
         verticalAlignment = Alignment.CenterVertically
     ) {
         CircularAvatar(
-            modifier = Modifier.padding(start = 8.dp, end = 8.dp),
             imageURL = imageUrl,
-            size = 36.dp,
+            size = 24.dp,
             placeHolderImageVector = FontAwesomeIcons.Solid.UserCircle,
             onClick = onUserClick
         )
