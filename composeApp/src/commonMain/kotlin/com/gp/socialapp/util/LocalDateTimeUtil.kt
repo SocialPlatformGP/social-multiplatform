@@ -113,7 +113,7 @@ object LocalDateTimeUtil {
             this.dayOfYear == today.dayOfYear && this.year == today.year -> this.format("HH:mm a")
             this.dayOfYear == (today - 1.days).dayOfYear && this.year == (today - 1.days).year-> "Yesterday"
             this.dayOfYear == (today - 7.days).dayOfYear && this.year == (today - 7.days).year -> this.dayOfWeek.name
-            else -> this.format("dd / MM / yyyy")
+            else -> this.format("dd/MM/yy")
         }
     }
 

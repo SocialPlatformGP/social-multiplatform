@@ -112,7 +112,7 @@ object LoginScreen : Screen {
             }
 
             else -> {
-                !isSystemInDarkTheme
+                isSystemInDarkTheme
             }
         }
         if(!statesplashShowed){

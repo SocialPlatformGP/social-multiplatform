@@ -14,7 +14,7 @@ fun RecentSearchesSection(
     onDeleteItem: (String) -> Unit,
 ) {
     if(items.isNotEmpty()){
-        Column{
+        Column(modifier = modifier) {
             Text(
                 text = "Recent Searches",
                 style = MaterialTheme.typography.titleMedium)

@@ -16,6 +16,7 @@ fun ResultItemBottomRow(
     modifier: Modifier = Modifier,
     voteCount: Int,
     replyCount: Int,
+    attachmentCount: Int,
 ) {
     Column(
         horizontalAlignment = Alignment.Start,
@@ -26,7 +27,7 @@ fun ResultItemBottomRow(
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
         )
         Text(
-            text = "$voteCount votes\t\t.\t\t$replyCount replies",
+            text = "$voteCount votes - $replyCount replies - $attachmentCount attachments",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.outline,
         )
