@@ -22,10 +22,10 @@ fun CommunityMembersSection(
     ) {
         Text(
             text = title,
-            style = MaterialTheme.typography.headlineLarge,
-            modifier = Modifier.padding(8.dp)
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(vertical = 8.dp)
         )
-        HorizontalDivider(Modifier.padding(horizontal = 12.dp, vertical = 4.dp))
+        HorizontalDivider(Modifier.padding(bottom = 4.dp))
         body()
     }
 
