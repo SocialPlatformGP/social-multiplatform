@@ -151,7 +151,7 @@ fun CommunityListItem(
                             style = MaterialTheme.typography.bodySmall,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
-                            color = Color.White.copy(alpha = 0.7f),
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
                             modifier = Modifier.weight(2.5f),
                         )
                     }
@@ -161,7 +161,7 @@ fun CommunityListItem(
                         modifier = Modifier.weight(1f),
                         textAlign = if(community.description.isNotBlank()) TextAlign.End else TextAlign.Start,
                         maxLines = 1,
-                        color = Color.White.copy(alpha = 0.7f),
+                        color = MaterialTheme.colorScheme.onBackground,
                         overflow = TextOverflow.Ellipsis,
                         style = MaterialTheme.typography.bodySmall
                     )

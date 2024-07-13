@@ -53,7 +53,7 @@ fun ResultItemContent(
                 style = MaterialTheme.typography.titleMedium,
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.padding(vertical = 8.dp)
+                modifier = Modifier.padding(vertical = 2.dp)
             )
             Text(
                 text = body,

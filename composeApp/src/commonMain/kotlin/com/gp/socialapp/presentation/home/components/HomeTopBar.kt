@@ -32,18 +32,19 @@ fun HomeTopBar(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(60.dp)
+//            .height(60.dp)
             .background(
                 MaterialTheme.colorScheme.onPrimaryContainer
             )
-            .padding(16.dp)
+            .padding(horizontal = 16.dp)
             .windowInsetsPadding(TopAppBarDefaults.windowInsets)
 
     ) {
-        if(!isDesktop){
-            IconButton(onClick = {
-                onDrawerIconClicked()
-            }) {
+        if (!isDesktop) {
+            IconButton(
+                onClick = {
+                    onDrawerIconClicked()
+                }) {
                 Icon(
                     imageVector = Icons.Default.Menu,
                     contentDescription = "nav drawer",

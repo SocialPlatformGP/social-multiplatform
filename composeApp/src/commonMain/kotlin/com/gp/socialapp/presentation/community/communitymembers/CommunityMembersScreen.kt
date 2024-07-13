@@ -68,7 +68,7 @@ data class CommunityMembersScreen(
         onAction: (CommunityMembersUiAction) -> Unit,
         members: List<User>
     ) {
-        Scaffold(modifier = modifier.padding(16.dp)) { paddingValues ->
+        Scaffold(modifier = modifier.padding(horizontal=16.dp)) { paddingValues ->
             Column(
                 modifier = Modifier.padding(paddingValues)
             ) {

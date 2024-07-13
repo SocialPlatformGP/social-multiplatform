@@ -1,6 +1,7 @@
 package com.gp.socialapp.presentation.post.search.components
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -17,13 +18,15 @@ fun RecentSearchesSection(
         Column(modifier = modifier) {
             Text(
                 text = "Recent Searches",
-                style = MaterialTheme.typography.titleMedium)
+                style = MaterialTheme.typography.titleLarge
+            )
             items.forEach { item ->
                 RecentSearchItem(
                     item = item,
                     onItemClick = onItemClick,
                     onDeleteItem = onDeleteItem
                 )
+                HorizontalDivider()
             }
         }
 

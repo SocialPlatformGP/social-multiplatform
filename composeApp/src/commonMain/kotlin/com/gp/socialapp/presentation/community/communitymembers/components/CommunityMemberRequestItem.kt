@@ -39,7 +39,7 @@ fun CommunityMemberRequestItem(
 ) {
     Row(
         modifier = modifier
-            .padding(start = 8.dp, end = 8.dp, top = 16.dp)
+            .padding(top = 8.dp)
             .fillMaxWidth()
             .clickable {
                 onUserClicked(request.userId)

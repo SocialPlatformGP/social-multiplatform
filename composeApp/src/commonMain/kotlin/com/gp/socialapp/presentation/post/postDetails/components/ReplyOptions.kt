@@ -5,9 +5,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Comment
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.ThumbDown
 import androidx.compose.material.icons.filled.ThumbUp
@@ -15,6 +15,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -27,6 +28,8 @@ import androidx.compose.ui.unit.dp
 import com.gp.socialapp.data.post.source.remote.model.NestedReply
 import com.gp.socialapp.data.post.source.remote.model.Reply
 import com.gp.socialapp.presentation.post.feed.ReplyEvent
+import com.gp.socialapp.presentation.post.feed.components.icons.FeedIcons
+import com.gp.socialapp.presentation.post.feed.components.icons.feedicons.Comment
 import com.gp.socialapp.util.ModerationSafety
 import org.jetbrains.compose.resources.stringResource
 import socialmultiplatform.composeapp.generated.resources.Res
@@ -58,8 +61,10 @@ fun ReplyOptions(
                 }) {
                     Icon(
                         imageVector = Icons.Filled.MoreVert,
-                        contentDescription = "More options"
-                    )
+                        contentDescription = "More options",
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
+
+                        )
                 }
                 val dropDownItems = if (nestedReply.reply?.authorID == currentUserId) {
                     listOf(ReplyDropDownItem(stringResource(Res.string.edit)) {
@@ -118,8 +123,10 @@ fun ReplyOptions(
                 replyEvent(ReplyEvent.OnAddReply(reply = nestedReply.reply ?: Reply()))
             }) {
                 Icon(
-                    imageVector = Icons.AutoMirrored.Filled.Comment,
-                    contentDescription = "Add a comment"
+                    imageVector = FeedIcons.Comment,
+                    contentDescription = "Comment",
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                    modifier = Modifier.padding(horizontal = 8.dp).size(20.dp)
                 )
             }
             IconButton(onClick = {
@@ -130,8 +137,10 @@ fun ReplyOptions(
                 )
             }) {
                 Icon(
-                    imageVector = Icons.Filled.ThumbUp, contentDescription = "Like"
-                )
+                    imageVector = Icons.Filled.ThumbUp, contentDescription = "Like",
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
+
+                    )
             }
             Text(text = (nestedReply.reply?.votes ?: 0).toString())
             IconButton(onClick = {
@@ -142,8 +151,10 @@ fun ReplyOptions(
                 )
             }) {
                 Icon(
-                    imageVector = Icons.Filled.ThumbDown, contentDescription = "Share"
-                )
+                    imageVector = Icons.Filled.ThumbDown, contentDescription = "Share",
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
+
+                    )
             }
         }
-    }
+}

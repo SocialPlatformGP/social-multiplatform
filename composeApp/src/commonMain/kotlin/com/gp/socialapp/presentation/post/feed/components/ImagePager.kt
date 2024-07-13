@@ -102,7 +102,7 @@ fun ImagePager(
                                 contentDescription = null,
                                 modifier = Modifier
                                     .align(Alignment.Center).fillMaxSize(),
-                                contentScale = ContentScale.FillHeight                            )
+                                contentScale = ContentScale.FillWidth                            )
                         }
 
                         is ImageAction.Loading -> {

@@ -7,9 +7,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -50,6 +52,7 @@ data class SearchResultScreen(
         )
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun SearchResultContent(
         modifier: Modifier = Modifier,
@@ -61,26 +64,34 @@ data class SearchResultScreen(
         Scaffold(
             modifier = modifier.fillMaxSize(),
             topBar = {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    IconButton(
-                        onClick = {
-                            onBackPressed()
+                TopAppBar(
+                    title = {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+
+                            SearchResultHeader(
+                                searchTerm = searchTerm,
+                                searchTag = searchTag,
+                                isTag = isTag
+                            )
                         }
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
-                        )
+                    },
+                    navigationIcon = {
+                        IconButton(
+                            onClick = {
+                                onBackPressed()
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Back"
+                            )
+                        }
                     }
-                    SearchResultHeader(
-                        searchTerm = searchTerm,
-                        searchTag = searchTag,
-                        isTag = isTag
-                    )
-                }
+                )
+
             }
         ) {
             Column(

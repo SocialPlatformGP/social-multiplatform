@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.gp.socialapp.data.post.source.remote.model.Post
 import com.gp.socialapp.presentation.post.feed.components.PostTopRow
+import com.gp.socialapp.util.LocalDateTimeUtil.getPostDate
 
 @Composable
 fun SearchResultItem(
@@ -24,7 +25,7 @@ fun SearchResultItem(
     Card(
         onClick = { onPostClicked(item) },
         shape = RoundedCornerShape(4.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onSecondary),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.03f)),
         modifier = modifier
             .fillMaxWidth()
             .padding(8.dp)
@@ -37,7 +38,7 @@ fun SearchResultItem(
             PostTopRow(
                 imageUrl = item.authorPfp,
                 userName = item.authorName,
-                publishedAt = item.createdAt.toString(),
+                publishedAt = item.createdAt.getPostDate(),
                 isAuthor = false,
                 onEditPostClicked = {},
                 onDeletePostClicked = {},

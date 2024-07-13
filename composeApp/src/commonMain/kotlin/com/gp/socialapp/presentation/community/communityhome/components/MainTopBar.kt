@@ -32,11 +32,10 @@ fun MainTopBar(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(60.dp)
             .background(
                 MaterialTheme.colorScheme.onPrimaryContainer
             )
-            .padding(16.dp)
+            .padding(horizontal=16.dp)
             .windowInsetsPadding(TopAppBarDefaults.windowInsets)
 
     ) {
