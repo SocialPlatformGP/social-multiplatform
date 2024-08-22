@@ -53,32 +53,7 @@
 | bouquet | 1.1.2 | A library for managing state in Jetpack Compose. |
 | compose-pdf | 1.1.1 | A library for creating PDFs with Jetpack Compose. |
 
-## 📸 Screenshots
 
-<details>
-<summary>Click to expand</summary>
-
-### Chat Screen
-
-![Chat Screen](https://firebasestorage.googleapis.com/v0/b/social-platform-3e56e.appspot.com/o/Picture2.png?alt=media&token=adb251eb-816d-4c12-8165-994ac57164ce)
-
-### Academic Social Posts Screen
-
-![Academic Social Posts Screen](https://firebasestorage.googleapis.com/v0/b/social-platform-3e56e.appspot.com/o/Picture1.png?alt=media&token=523f4e8e-0719-4884-b1bf-07cda4bbbe93)
-
-### Study Material Repository Screen
-
-![Study Material Repository Screen](https://firebasestorage.googleapis.com/v0/b/social-platform-3e56e.appspot.com/o/Picture3.png?alt=media&token=4d82f399-edc4-4716-90aa-596fb64de03b)
-
-### Announcements Channel Screen
- Under construction
-
-### Task and Deadline Management Screen
- Under construction
-### Grade Tracking Screen
- Under construction
-
-</details>
 
 ## 📝 Contributing
 
