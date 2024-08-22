@@ -1,6 +1,6 @@
 # 🎓A Social Platform for Student Communication with AI-Powered Content Moderation
 
-**Welcome to the repository of our cross-platform application (Android, Desktop, and Web) for college students!** This comprehensive platform is designed to facilitate focused learning, efficient communication, and task management. Our goal is to save students time, minimize distractions, and enhance their overall academic experience.
+**Welcome to the repository of our cross-platform application (Android, Desktop) for college students!** This comprehensive platform is designed to facilitate focused learning, efficient communication, and task management. Our goal is to save students time, minimize distractions, and enhance their overall academic experience.
 
 ## 🌟 Core Features
 
